@@ -1,0 +1,66 @@
+
+preliminary notes
+=================
+
+- i used crosstool-ng. this was a life saver. otherwise, figuring out
+  the right combinations of gcc + glibc + kernel headers, with the
+  necessary patching, is a major headache.
+
+- in some (rare) cases, libcurl fails in getaddrinfo(). the one place
+  i've seen this in an out-of-the-box distribution is in 32-bit
+  apps. in a 64-bit distribution. some versions of glibc appear to
+  have a getaddrinfo() bug, and i think that's what's appearing. i
+  apply a patch to curl to simply turn off getaddrinfo().
+
+
+======================
+i686-unknown-linux-gnu
+======================
+
+ln -s \
+  /usr/local/i686-unknown-linux-gnu/i686-unknown-linux-gnu/sys-root/usr \
+  /usr/local/i686-unknown-linux-gnu/i686-unknown-linux-gnu/usr
+
+
+libgpg-error
+------------
+
+~/tmp/wfdb-local/libgpg-error-1.7/configure --host=$TARGET --prefix=$PREFIX CFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4" CPPFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4/$TARGET"
+
+
+libidn
+------
+
+~/tmp/wfdb-local/libidn-1.12/configure --host=$TARGET --prefix=$PREFIX CFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4" CPPFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4/$TARGET"
+
+
+libgcrypt
+---------
+
+~/tmp/wfdb-local/libgcrypt-1.4.4/configure --host=$TARGET --prefix=$PREFIX --with-gpg-error-prefix=$PREFIX CFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4" CPPFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4/$TARGET"
+
+
+gnutls
+------
+
+~/tmp/wfdb-local/gnutls-2.6.4/configure --host=$TARGET --prefix=$PREFIX --with-libgcrypt-prefix=$PREFIX --without-zlib --disable-openssl-compatibility CFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4" CPPFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4/$TARGET"
+
+
+curl
+----
+
+cp -R ~/tmp/wfdb-local/curl-7.19.3 ~/tmp/wfdb-local/curl-7.19.3-$TARGET
+cd ~/tmp/wfdb-local/curl-$TARGET
+patch -p1 < ../curl-7.19.3-getaddrinfo_off.patch
+
+~/tmp/wfdb-local/curl-7.19.3-$TARGET/configure --host=$TARGET --prefix=$PREFIX --with-gnutls=$PREFIX --with-libidn=$PREFIX --without-ssl --without-zlib --without-libssh2 --disable-ldap CFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4" CPPFLAGS="--sysroot=/usr/local/$TARGET/$TARGET -B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4 -isystem /usr/local/$TARGET/$TARGET/include/c++/4.2.4/$TARGET"
+
+
+wfdb
+----
+
+cd wfdb-10.4.21
+patch -p2 < ../$TARGET-wfdb-10.4.21.patch
+export PATH=$PREFIX/bin:$PATH
+./configure --prefix=$PREFIX --with-libcurl
+

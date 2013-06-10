@@ -1,0 +1,138 @@
+
+preliminary notes
+=================
+
+- i was lucky to find very good instructions at
+  http://devs.openttd.org/~truebrain/compile-farm/apple-darwin9.txt
+  and i followed them almost exactly
+
+- made another patch (odcctools_ld64_flags.patch) which makes
+  -current_version and -compatibility_version valid flags for ld64 (it
+  appears that the ltmain.sh shipped with most software packages
+  expect to use these)
+
+- i'm using swig version 1.3.36. it's important that the .c file used
+  match the .class compiled by the generated .java files.
+
+- i installed JavaForMacOSX10.4Release6.dmg, then JavaForMacOSX10.5Update1.dmg
+
+- for mac, r280 of odcctools must be used
+
+- libuuid is part of e2fsprogs
+
+
+
+env. vars.
+----------
+
+export TARGET=X-apple-darwin9, for X in i686, x86_64, powerpc, ppc64
+export PREFIX=/home/wfdbuser/tmp/wfdb-local/$TARGET/usr
+export PATH=$PATH:/usr/local/$TARGET/bin:$PREFIX/bin
+
+
+build dirs.
+-----------
+
+mkdir libgpg-error-1.7-build
+mkdir libidn-1.12-build
+mkdir libgcrypt-1.4.4-build
+mkdir gnutls-2.6.4-build
+mkdir curl-7.19.3-build
+
+
+libgpg-error
+------------
+
+~/tmp/wfdb-local/libgpg-error-1.7/configure --host=$TARGET --prefix=$PREFIX CFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1" CPPFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1/$TARGET"
+
+
+libidn
+------
+
+~/tmp/wfdb-local/libidn-1.12/configure --host=$TARGET --prefix=$PREFIX CFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1" CPPFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1/$TARGET"
+
+
+libgcrypt
+---------
+
+~/tmp/wfdb-local/libgcrypt-1.4.4/configure --host=$TARGET --prefix=$PREFIX --with-gpg-error-prefix=$PREFIX CFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1" CPPFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1/$TARGET"
+
+
+gnutls
+------
+
+~/tmp/wfdb-local/gnutls-2.6.4/configure --host=$TARGET --prefix=$PREFIX --with-libgcrypt-prefix=$PREFIX --without-zlib --disable-openssl-compatibility CFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1" CPPFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1/$TARGET"
+
+
+curl
+----
+
+~/tmp/wfdb-local/curl-7.19.3/configure --host=$TARGET --prefix=$PREFIX --with-gnutls=$PREFIX --with-libidn=$PREFIX --without-ssl --without-zlib --without-libssh2 --disable-ldap CFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1" CPPFLAGS="-B/usr/local/$TARGET/lib -B/usr/local/$TARGET/usr -B/usr/local/$TARGET/lib/gcc/$TARGET/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1 -isystem /usr/local/$TARGET/include/c++/4.0.1/$TARGET" LDFLAGS="-Wl,-macosx_version_min -Wl,10.3"
+
+
+wfdb
+----
+
+cd wfdb-10.4.21
+patch -p2 < ../$TARGET-wfdb-10.4.21.patch
+export PATH=$PREFIX/bin:$PATH
+./configure --prefix=$PREFIX --with-libcurl
+
+- in app/Makefile, LDFLAGS needs to be updated: put "-l" links for all
+  the libraries on which wfdb depends; i.e.,
+  "-lcurl -lgnutls -lgcrypt -lidn -lgpgerror"
+  (OR: ln -s /home /usr/local/$TARGET/home
+   (see below))
+
+  this is the manifestation of a couple of annoying facts when
+  cross-compiling to mac os x. first, when a shared library is built,
+  libtool usually passes "-install_name $rpath/$soname" to gcc, which
+  usually embeds the absolute path ($rpath) into the library's id
+  name (check with otool -D). if a shared library depends on other
+  shared libraries, it expects those dependencies to be at those
+  absolute paths -- ALMOST: when you then compile an app., and pass
+  "-l" flags for its direct dependencies, but not its indirect
+  dependencies, it will prepend the syslibroot path to the
+  aforementioned "$rpath/$soname", and that path is defined by where
+  the cross compiler was installed. for me, this is
+  e.g. /usr/local/powerpc-apple-darwin9. apple's ld has a flag
+  "-syslibroot" to override that path, but since it apparently does
+  not distinguish truly system libraries from user libraries, it then
+  won't be able to find e.g. libSystem.B.dylib (which is in fact at
+  /usr/local/powerpc-apple-darwin9/usr/lib/libSystem.B.dylib, not at
+  /usr/lib/libSystem.B.dylib).
+
+  a concrete example (-isystem flags omitted for conciseness):
+
+    gcc bxb.c -o bxb \
+    -L/home/wfdbuser/tmp/wfdb-local/powerpc-apple-darwin9/usr/lib \
+    -lwfdb -lm
+
+  this will fail with errors that some libraries, such as
+  /usr/local/powerpc-apple-darwin9/home/wfdbuser/tmp/wfdb-local/powerpc-apple-darwin9/usr/lib/libcurl.4.dylib,
+  cannot be found. it should not be found: note the erroneous prefix
+  "/usr/local/powerpc-apple-darwin9" -- this is the syslibroot.
+
+  one way i see to fix this is to include "-l" references to all the
+  needed shared libraries.
+
+  a better way is to do:
+
+    ln -s /home /usr/local/$TARGET/home
+
+  this is in fact what i did, and it solves the problem.
+
+
+wfdbjava
+--------
+
+cp -pr conf build
+cp -p ../common/* build
+cp -p ../AUTHORS ../ChangeLog ../COPYING ../INSTALL ../NEWS ../README build
+FIXME: finish me!
+
+
+
+
+
+
