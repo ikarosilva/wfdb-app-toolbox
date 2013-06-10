@@ -14,7 +14,7 @@
 #fi
 
 #Script not functional yet!
-arg1="/home/ikaro/workspace/PhysioNet2013Challenge/mcode/nativelibs/linux-amd64"
+arg1="/home/ikaro/workspace/wfdb-app-toolbox/mcode/nativelibs/linux-amd64"
 
 #Where <software> is one of the following options:
 #

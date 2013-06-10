@@ -34,7 +34,6 @@ public class TestWrSamp extends Thread {
 		commandInput.add("./wrsamp");
 		commandInput.add("-c");
 		commandInput.add("-z");
-		commandInput.add("-o");
 		commandInput.add("ikaro");
 		commandInput.add("-F");
 		commandInput.add("1000");
@@ -46,10 +45,10 @@ public class TestWrSamp extends Thread {
 		pb = new ProcessBuilder(commandInput);
 		pb.redirectErrorStream(true);
 		pb.directory(new File("/afs/ecg.mit.edu/user/ikaro/home/common_linux/workspace/" +
-				"PhysioNet2013Challenge/mcode/nativelibs/linux-amd64/"));
+				"wfdb-app-toolbox/mcode/nativelibs/linux-amd64/"));
 		env = pb.environment();
 		env.put("LD_LIBRARY_PATH","/afs/ecg.mit.edu/user/ikaro/home/common_linux/workspace/" +
-				"PhysioNet2013Challenge/mcode/nativelibs/linux-amd64/");
+				"wfdb-app-toolbox/mcode/nativelibs/linux-amd64/");
 		this.data=data;
 	}
 
