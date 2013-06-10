@@ -1,11 +1,9 @@
+function wfdbdemo()
 % WFDB App Toolbox Demo
 %
 % Written by Ikaro Silva, 2013
 %
 %
-
-clear all;close all;clc
-
 
 %Read sample ECG signal from MIT-BIH Arrhythmia Database
 N=10000;
