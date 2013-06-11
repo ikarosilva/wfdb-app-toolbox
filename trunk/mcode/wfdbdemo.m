@@ -31,7 +31,6 @@ for m=1:M
    stack(m,1:RR(m)+1)=ecg(tms(m)-delay:tms(m)+RR(m)-delay);
    qrs(m,:)=[delay+1 ecg(tms(m))];
 end
-
 figure
 [X,Y] = meshgrid(1:max(RR)+1,1:M);
 surf(Y,X,stack);hold on;grid on
