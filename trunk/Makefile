@@ -35,7 +35,7 @@ clean:
 	
 	
 package: clean jartest
-	zip -vr $(APP_NAME) mcode
+	zip -vr $(APP_NAME) mcode -x@zipexclude.lst  
 	
 %.java:
 	java $(JARFLAGS) jar6; \
