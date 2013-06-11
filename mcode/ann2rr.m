@@ -36,7 +36,7 @@ function varargout=ann2rr(varargin)
 %       annotion file (default 1 = begining of the record).
 %
 % consecutiveOnly 
-%       A 1x1 boolean. If true, prin intervals between consecutive valid
+%       A 1x1 boolean. If true, prints intervals between consecutive valid
 %       annotaions only (default =true).
 %
 %
