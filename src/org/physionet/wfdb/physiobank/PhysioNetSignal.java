@@ -24,6 +24,8 @@ public class PhysioNetSignal {
 	private String checkSum=null;
 	private double[][] data=null; //data in physical units
 
+	//TODO: Consider overriding equals() and hashcode!
+	
 	public PhysioNetSignal(Integer mrecordIndex, String mrecName){
 		setRecordIndex(mrecordIndex);
 		recordName=mrecName;
