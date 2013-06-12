@@ -76,7 +76,7 @@ public class Wfdbexec {
 	private static String packageDir="";
 	private int DoubleArrayListCapacity=0;
 	private static Logger logger =
-			Logger.getLogger(PhysioNetRecord.class.getName());
+			Logger.getLogger(Wfdbexec.class.getName());
 
 	public Wfdbexec(String commandName){
 		logger.finest("\n\t***Setting exec commandName to: " + commandName);
