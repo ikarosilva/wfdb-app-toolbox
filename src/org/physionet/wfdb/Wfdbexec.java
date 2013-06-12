@@ -85,7 +85,6 @@ public class Wfdbexec {
 	}
 
 	public void setArguments(String[] args){
-		logger.finest("\n\t***Setting exec arguments to: " + args);
 		arguments=args;
 	}
 
@@ -94,13 +93,18 @@ public class Wfdbexec {
 	}
 
 	public void setExecutingDir(File dir){
+		logger.finer("\n\t***Setting EXECUTING_DIR: " 
+				+ dir);
 		EXECUTING_DIR=dir;
 	}
 	private void gen_exec_arguments() {
 		commandInput = new ArrayList<String>();
 		commandInput.add(WFDB_NATIVE_BIN + commandName);
-		for(String i: arguments)
-			commandInput.add(i);
+		logger.finest("\n\t***commandInput.add = "+WFDB_NATIVE_BIN + commandName);
+		if(arguments != null){
+			for(String i: arguments)
+				commandInput.add(i);
+		}
 		//TODO: For the RDSAMP case:
 		//ensure array capacity when user submits N0 and N
 		//or (default) by querying the signal size
@@ -293,6 +297,8 @@ public class Wfdbexec {
 	}
 
 	public synchronized void setWFDBPATH(String str){
+		logger.finer("\n\t***Setting WFDB_PATH: " 
+				+ str);
 		WFDB_PATH=str;
 	}
 
@@ -307,7 +313,9 @@ public class Wfdbexec {
 		}
 		env.put("WFDBNOSORT","1");
 		if(WFDB_PATH != null){
-			env.put("WFDB",WFDB_PATH);
+			env.put("WFDB_PATH",WFDB_PATH);
+			logger.finer("\n\t***launcher configure with WFDB_PATH: " 
+					+ WFDB_PATH);
 		}
 		launcher.environment().put("WFDBNOSORT","1");
 		logger.finest("\n\t***Setting executing process with command and arguments: " + commandInput);
