@@ -33,6 +33,7 @@ function varargout=score2013(varargin)
 % Last Modified: -
 % Version 1.0
 %
+% Last modified June 11, 2013
 %
 % See also WRANN, TACH, MXM
 
