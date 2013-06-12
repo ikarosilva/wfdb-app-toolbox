@@ -47,7 +47,7 @@ public class Score2013 {
 
 	private static final int logLevel=0;
 
-	private static double score2(String recName,String refAnn,String testAnn){
+	private static double score1(String recName,String refAnn,String testAnn){
 		//Generate score1
 		Wfdbexec tach=new Wfdbexec("tach");
 		String[] refArg={"-r",recName,"-a",refAnn,"-n","12"};
@@ -80,11 +80,11 @@ public class Score2013 {
 		Wfdbexec ann2rr=new Wfdbexec("ann2rr");
 		Wfdbexec patch=new Wfdbexec("patchann");
 		String[] ann2rrArg={"-r",recName,"-a",annName,"-c","-V"};
-		patch.setLogLevel(0);
-		ann2rr.setLogLevel(0);
+		patch.setLogLevel(logLevel);
+		ann2rr.setLogLevel(logLevel);
 		String rrName=null;
-		String header="[LWEditLog-1.0] Record " + recName + ", annotator "
-		             +  annName +" (1000 samples/second)\n";
+		String header="[LWEditLog-1.0] Record " + recName + ", annotator rr_"
+		             +  annName +" (1000 samples/second)";
 		double[][] rr=null;
 		try {
 			rr=ann2rr.execToDoubleArray(ann2rrArg);
@@ -99,16 +99,21 @@ public class Score2013 {
 		//with the output, but in this case a file gets generated
 		@SuppressWarnings("unused") 
 		ArrayList<String> res=null;
-		String[] rrData=new String[rr.length+1];
+		String[] rrData=new String[rr.length+2];
 		rrData[0]=header;
+		rrData[1]="";//Second header line should be empty according to patchann.c
+		//System.out.println(rrData[0]);
+		//System.out.println(rrData[1]);
 		for(int n=0;n<rr.length;n++){
-			rrData[n+1]=Integer.toString((int) rr[n][0]) 
+			rrData[n+2]=Integer.toString((int) rr[n][0]) 
 					+ ",=,"+Integer.toString((int) rr[n][1]);
+			//System.out.println(rrData[n+2]);
 		}
+		
 		try {
 			patch.setArguments(null);//patch takes no  arguments;
 			res = patch.execWithStandardInput(rrData);
-			rrName=annName +"_";
+			rrName="rr_" + annName;
 		} catch (Exception e) {
 			System.err.println("Could not generate patch for entry: " + annName);
 			e.printStackTrace();
@@ -117,11 +122,12 @@ public class Score2013 {
 		return rrName;
 	}
 
-	private static String score1(String recName,String rrAnn,String rrTest){
+	private static String score2(String recName,String rrAnn,String rrTest){
 		Wfdbexec mxm=new Wfdbexec("mxm");
-		String[] arg={"-r",recName,"-a",rrAnn,rrTest,"-f","0"};
+		String[] arg={"-r",recName,"-a",rrAnn,rrTest,
+				"-f","0"};
 		mxm.setArguments(arg);
-		mxm.setLogLevel(5);
+		mxm.setLogLevel(logLevel);
 		ArrayList<String> ans=null;
 		try {
 			ans = mxm.execToStringList();
@@ -129,16 +135,20 @@ public class Score2013 {
 			System.err.println("Could not generate RR series for entry: " + rrTest);
 			e.printStackTrace();
 		}
-
-		for(String str: ans)
-			System.out.println("Answer= : " + str);
-
-		return ans.get(ans.size()-1);
-
+		String score=null;
+		int cutPoint;
+		for(String tmp: ans){
+			if(tmp.contains("Normalized RMS error:")){
+				tmp=tmp.replaceAll("Normalized RMS error:","");
+				cutPoint=tmp.indexOf("%");
+				score=tmp.substring(0,cutPoint-1);
+				break;
+			}
+		}
+		return score;
 	}
 
-	public static void main(String[] args) {
-
+	public static double[] getScore(String[] args) {
 
 		// Parse input arguments
 		if(args.length != 3){
@@ -146,29 +156,38 @@ public class Score2013 {
 			System.out.println("\trecName = String name of WFDB record");
 			System.out.println("\trefAnn = String name of WFDB reference annotation file");
 			System.out.println("\ttestAnn = String name of your WFDB test annotation file");
-			return;
+			return null;
 		}
 		String recName=args[0];
 		String refAnn=args[1];
 		String testAnn=args[2];	
-		double score1 = 0, score2=0;
+		double[] score = new double[2];
 
+		//Generate HR score
+		score[0]=score1(recName,refAnn,testAnn);
+		
 		//Generate RR series
 		String rrRefFile=generateRR(recName,refAnn);
+		
 		String rrTestFile=generateRR(recName,testAnn);
 		if(rrRefFile != null && rrTestFile != null){
-			System.out.println("Generated RR files: " +rrRefFile 
-					+ " and " + rrTestFile);
 			//Calculate the error
-			score1=Double.valueOf(score1(recName,refAnn,testAnn));
-		}
-		
-		//score2=score2(recName,refAnn,testAnn);
-		System.out.println("Score (event 1/4): " + score1);
-		//System.out.println("Score (event 2/5): " + score2);
+			score[1]=Double.valueOf(score2(recName,rrRefFile,rrTestFile));
+		}	
+		return score;
 
 	}
 
+	public static void main(String[] args) {
+
+		double[] score = new double[2];
+		score=getScore(args);
+		System.out.println("Score (event 1/4): " + score[0]);
+		System.out.println("Score (event 2/5): " + score[1]);
+	}
+
+	
+	
 
 
 
