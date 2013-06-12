@@ -44,8 +44,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 public class PhysioNetDB {
 
@@ -261,10 +259,10 @@ public class PhysioNetDB {
 	}
 
 
-	public static Comparator DBNameComparator = new Comparator() {
-		public int compare(Object db, Object anotherDB) {
-			String Name1 = ((PhysioNetDB) db).getname().toUpperCase();
-			String Name2 = ((PhysioNetDB) anotherDB).getname().toUpperCase();
+	public static Comparator<PhysioNetDB> DBNameComparator = new Comparator<PhysioNetDB>() {
+		public int compare(PhysioNetDB db, PhysioNetDB anotherDB) {
+			String Name1 = db.getname().toUpperCase();
+			String Name2 = anotherDB.getname().toUpperCase();
 			if (!(Name1.equals(Name2)))
 				return Name1.compareTo(Name2);
 			else

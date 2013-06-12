@@ -202,7 +202,6 @@ public class PhysioNetRecord {
 		return signalList;
 	}
 
-	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 
 

@@ -1,6 +1,6 @@
 package org.physionet.wfdb.physiobank;
 
-import java.util.ArrayList;
+
 
 public class PhysioNetSignal {
 
