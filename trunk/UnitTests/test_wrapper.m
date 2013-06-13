@@ -11,6 +11,7 @@ outputs={'tests','pass','performance'};
 pass=0;
 clean_up={};
 verbose=0;
+cur_dir=pwd;
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -18,7 +19,6 @@ for n=1:nargin
 end
 tests=length(test_string);
 performance=zeros(tests,1)+NaN;
-
 for n=1:tests
     try
         tic
@@ -35,7 +35,7 @@ for n=1:tests
         end
     end
 end
-
+cd(cur_dir)
 for n=1:nargout
         eval(['varargout{n}=' outputs{n} ';'])
 end
