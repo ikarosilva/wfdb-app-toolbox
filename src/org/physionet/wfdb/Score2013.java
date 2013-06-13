@@ -41,11 +41,14 @@
  */
 package org.physionet.wfdb;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Score2013 {
 
 	private static final int logLevel=0;
+	private static final String fSep=System.getProperty("file.separator");
 
 	private static double score1(String recName,String refAnn,String testAnn){
 		//Generate score1
@@ -162,12 +165,24 @@ public class Score2013 {
 		String refAnn=args[1];
 		String testAnn=args[2];	
 		double[] score = new double[2];
-
+		String curDir="";
+		try {
+			curDir = new java.io.File( "." ).getCanonicalPath();
+		} catch (IOException e) {
+			System.err.println("Could not get user's current directory...");
+		}
 		//Generate HR score
 		score[0]=score1(recName,refAnn,testAnn);
 		
 		//Generate RR series
-		String rrRefFile=generateRR(recName,refAnn);
+		//Generate reference RR if it does not exist already
+		String rrRefFile="rr_"+refAnn;
+		System.out.println("Checking for file: " +
+				curDir+fSep+recName+"."+ rrRefFile);
+		boolean refFile=new File(curDir+fSep+recName+"."+ rrRefFile).isFile();
+		System.out.println("exist= " + refFile);
+		if(!refFile)
+			rrRefFile=generateRR(recName,refAnn);
 		
 		String rrTestFile=generateRR(recName,testAnn);
 		if(rrRefFile != null && rrTestFile != null){
