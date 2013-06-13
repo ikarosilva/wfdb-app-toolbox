@@ -24,8 +24,8 @@ JARFLAGS := -jar		\
 APP_NAME="wfdb-app-toolbox-0-0-1.zip"
 
 #Always check that this matches with Ant's script (jarbuild.xml)
-JAR6_NAME="wfdb-app-JVM6-0-0-1.jar" 
-JAR7_NAME="wfdb-app-JVM7-0-0-1.jar"
+JAR6_NAME="wfdb-app-JVM6-0-0-2.jar" 
+JAR7_NAME="wfdb-app-JVM7-0-0-2.jar"
 	
 #TODO: There are two directories for linux. we need to remove one!	
 clean: 
