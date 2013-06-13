@@ -1,0 +1,11 @@
+For a detailed list of changes see the repository Log at:
+   http://code.google.com/p/wfdb-app-toolbox/source/list
+   
+0.0.2 (13 June 2013):
+	Added score2013 to score PhysioNet2013 challenge entries.
+	Fixed MATLAB/WDDB indexing issues with RDANN and WRANN.
+	Allowed scalar parameters into WRANN.
+	Added external logging capabilities to the Java wrappers.
+	
+0.0.1 (11 June 2013):
+	Initial beta release. 

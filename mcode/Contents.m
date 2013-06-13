@@ -21,6 +21,7 @@
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals
 %   rdann           - Read annotation files for WFDB records
 %   rdsamp          - Read signal files of WFDB records
+%   score2013       - Scores entries to the PhysioNet 2013 Fetal ECG challenge
 %   sqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   tach            - Calculates instantaneous heart rate of a WFDB ECG record signal
 %   wfdb            - Prints this help information of the Toolbox
