@@ -54,15 +54,12 @@ function varargout=score2013(varargin)
 %         function is being evaluated. You must also have write permission
 %         to this directory because the scoring process generates temporary
 %         files for the RR interval scoring step. These temporary files
-%         are denoted by recName.rr_refAnn and recName.rr_testAnn. If
-%         you answer is not in binary annotation format, you can use WRANN
-%         to convert it to this format.
-%
-%      3) The scoring will go quicker once the RR files for the reference
-%         annotation (recName.rr_refAnn) from step (2) above have been
-%         generated for the first time. If the original reference annotations
-%         (recName.refAnn) changes for some reason, you should delete these
-%         temporary files and let the function re-generate them.
+%         are denoted by recName.rr_refAnn and recName.rr_testAnn. These 
+%         temporary files will be deleted when the function exists. If they 
+%         remain for some reason, the next time the function gets called an extra
+%         set of temporary files (appened by a "_") will be generated. So you
+%         should remove all these temporary files if they do not get removed
+%         for some reason. 
 %
 %
 % %Example :
@@ -100,7 +97,8 @@ for n=1:nargin
     end
 end
 try
-    score=javaWfdbExec.getScore({recName,refAnn,testAnn});
+    curDir=pwd;
+    score=javaWfdbExec.getScore({recName,curDir,refAnn,testAnn});
 catch
     if(~isempty(strfind(lasterr,'java.lang.AssertionError')))
         warning(['Could not process your input file (see NOTE item #1 on help) !! Please make sure your ' recName '.' refAnn ...
