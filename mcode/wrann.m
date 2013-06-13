@@ -1,6 +1,6 @@
 function varargout=wrann(varargin)
 %
-% wrann(recordName,annotator,ann,Anntype,subtype,chan,num)
+% wrann(recordName,annotator,ann,AnnType,subType,chan,num)
 %
 %    Wrapper to WFDB WRANN:
 %         http://www.physionet.org/physiotools/wag/wrann-1.htm
@@ -29,17 +29,18 @@ function varargout=wrann(varargin)
 %       sample numbers (indices) with respect to the begining of the
 %       record.
 %
-% Anntype
-%       Nx1 vector of the chars describing annotaion type.
+% AnnType
+%       Nx1 vector of the chars or scalar describing annotaion type. Default is 'N'.
 %
-% subtype
-%       Nx1 vector of the chars describing annotaion subtype.
+% subType
+%       Nx1 vector of the chars or scalar describing annotaion subtype. Default is
+%       '0'.
 %
 % chan
-%       Nx1 vector of the ints describing annotaion subtype.
+%       Nx1 vector of the ints or scalar describing annotaion subtype. Default is 0.
 %
 % num
-%       Nx1 vector of the ints describing annotaion NUM.
+%       Nx1 vector of the ints or scalar describing annotaion NUM. Default is 0.
 %
 %
 %%Example- Creates a *.test file in your current directory
@@ -74,7 +75,11 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','annotator','ann','Anntype','subtype','chan','num'};
+inputs={'recordName','annotator','ann','Anntype','subType','chan','num'};
+AnnType='N';
+subType='0';
+chan=0;
+num=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -96,8 +101,20 @@ del=repmat(' ',size(ann));
 annTimeStamp=cell2mat(wfdbtime(recordName,ann));
 L=length(annTimeStamp);
 data=[];
+if(length(AnnType)==1);
+   annType=repmat(AnnType,[1 L]); 
+end
+if(length(subType)==1);
+   subType=repmat(subType,[1 L]); 
+end
+if(length(chan)==1);
+   chan=repmat(chan,[1 L]); 
+end
+if(length(num)==1);
+   num=repmat(num,[1 L]); 
+end
 for i=1:L
-    data(end+1,:)=sprintf('%s  %7ld %6s%5d%5d%5d',annTimeStamp(i,:),ann(i),Anntype(i),subtype(i),...
+    data(end+1,:)=sprintf('%s  %7ld %6s%5d%5d%5d',annTimeStamp(i,:),ann(i),annType(i),subType(i),...
         chan(i),num(i));
 end
 
