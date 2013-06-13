@@ -5,6 +5,12 @@ function varargout=rdann(varargin)
 %    Wrapper to WFDB RDANN:
 %         http://www.physionet.org/physiotools/wag/rdann-1.htm
 %
+% NOTE: The WFDB Toolbox uses 0 based index, and MATLAB uses 1 based index.
+%       Due to this difference annotation values ('ann') are shifted inside
+%       this function in order to be compatible with the WFDB native
+%       library. The MATLAB user should leave the indexing conversion to
+%       the WFDB Toolbox.
+%
 % Reads a WFDB annotation and returns:
 %
 %
@@ -49,7 +55,7 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: -
+% Last Modified: 6/13/2013
 % Version 1.0
 %
 % %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
@@ -77,7 +83,7 @@ end
 %Set default pararamter values
 % [ann,type,subtype,chan,num]=rdann(recordName,annotator,C,N,N0)
 inputs={'recordName','annotator','C','N','N0'};
-outputs={'round(data(:,1))','char(data(:,2))',...
+outputs={'ann','char(data(:,2))',...
     'floor(data(:,3))','floor(data(:,4))','floor(data(:,5))'};
 N=[];
 N0=[];
@@ -110,6 +116,7 @@ if(~isempty(C))
 end
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+ann=round(data(:,1))+1; %Convert to MATLAB indexing
 for n=1:nargout
         eval(['varargout{n}=' outputs{n} ';'])
 end

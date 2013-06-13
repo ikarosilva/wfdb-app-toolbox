@@ -69,10 +69,10 @@ function varargout=score2013(varargin)
 % [score1,score2]=score2013('a01','fqrs','test')
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: -
+% Last Modified: 6/13/2013
 % Version 1.0
+% Since 0.0.2
 %
-% Last modified June 11, 2013
 %
 % See also WRANN, TACH, MXM, ANN2RR,
 
@@ -101,7 +101,8 @@ try
     curDir=pwd;
     score=javaWfdbExec.getScore({recName,curDir,refAnn,testAnn});
 catch
-    if(~isempty(strfind(lasterr,'java.lang.AssertionError')))
+    if(~isempty(strfind(lasterr,'java.lang.AssertionError')) && ...
+        isempty(strfind(lasterr,'Annotation size do not match!')) )
         warning(['Could not process your input file (see NOTE item #1 on help) !! Please make sure your ' recName '.' refAnn ...
             ' and ' recName '.' testAnn ' are a binary WFDB file.' ...
             ' Your can convert from text to WFDB binary by using WRANN.'])
