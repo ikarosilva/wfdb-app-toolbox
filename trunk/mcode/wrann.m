@@ -13,6 +13,13 @@ function varargout=wrann(varargin)
 % verify that the write was completed sucessfully (see example below).
 %
 %
+%
+% NOTE: The WFDB Toolbox uses 0 based index, and MATLAB uses 1 based index.
+%       Due to this difference annotation values ('ann') are shifted inside
+%       this function in order to be compatible with the WFDB native
+%       library. The MATLAB user should leave the indexing conversion to
+%       the WFDB Toolbox.
+%
 % Required Parameters:
 %
 % recorName
@@ -55,7 +62,7 @@ function varargout=wrann(varargin)
 %err=sum(ann ~= ann2)
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: -
+% Last Modified: 6/13/2013
 % Version 1.0
 %
 %
@@ -88,7 +95,8 @@ end
 
 wfdb_argument={'-r',recordName,'-a',annotator};
 
-%Convert all the annoation to strings, in order to set as standard input
+%Convert all the annoation to 0 based index and then to strings, in order to set as standard input
+ann=ann-1;
 del=repmat(' ',size(ann));
 
 %WRANN expects the first column to be timestamps. So convert use the first
