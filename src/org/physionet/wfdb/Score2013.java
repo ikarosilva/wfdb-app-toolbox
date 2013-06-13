@@ -87,7 +87,7 @@ public class Score2013 {
 		ann2rr.setLogLevel(logLevel);
 		String rrName=null;
 		String header="[LWEditLog-1.0] Record " + recName + ", annotator rr_"
-		             +  annName +" (1000 samples/second)";
+				+  annName +" (1000 samples/second)";
 		double[][] rr=null;
 		try {
 			rr=ann2rr.execToDoubleArray(ann2rrArg);
@@ -112,7 +112,7 @@ public class Score2013 {
 					+ ",=,"+Integer.toString((int) rr[n][1]);
 			//System.out.println(rrData[n+2]);
 		}
-		
+
 		try {
 			patch.setArguments(null);//patch takes no  arguments;
 			res = patch.execWithStandardInput(rrData);
@@ -124,7 +124,7 @@ public class Score2013 {
 		//Return the pathname if sucessfull
 		return rrName;
 	}
-
+	
 	private static String score2(String recName,String rrAnn,String rrTest){
 		Wfdbexec mxm=new Wfdbexec("mxm");
 		String[] arg={"-r",recName,"-a",rrAnn,rrTest,
@@ -154,40 +154,66 @@ public class Score2013 {
 	public static double[] getScore(String[] args) {
 
 		// Parse input arguments
-		if(args.length != 3){
-			System.out.println("Usage: org.physionet.wfdb.Score2013 recName refAnn testAnn");
+		if(args.length != 4){
+			System.out.println("Usage: org.physionet.wfdb.Score2013 recName dataDir refAnn testAnn");
 			System.out.println("\trecName = String name of WFDB record");
+			System.out.println("\tdataDir = Full path of the current direcotry, where the data and annotions should be");
 			System.out.println("\trefAnn = String name of WFDB reference annotation file");
 			System.out.println("\ttestAnn = String name of your WFDB test annotation file");
 			return null;
 		}
 		String recName=args[0];
-		String refAnn=args[1];
-		String testAnn=args[2];	
+		String dataDir=args[1];
+		String refAnn=args[2];
+		String testAnn=args[3];	
+
 		double[] score = new double[2];
-		String curDir="";
-		try {
-			curDir = new java.io.File( "." ).getCanonicalPath();
-		} catch (IOException e) {
-			System.err.println("Could not get user's current directory...");
-		}
+
 		//Generate HR score
 		score[0]=score1(recName,refAnn,testAnn);
-		
+
 		//Generate RR series
-		//Generate reference RR if it does not exist already
-		String rrRefFile="rr_"+refAnn;
-		System.out.println("Checking for file: " +
-				curDir+fSep+recName+"."+ rrRefFile);
-		boolean refFile=new File(curDir+fSep+recName+"."+ rrRefFile).isFile();
-		System.out.println("exist= " + refFile);
-		if(!refFile)
-			rrRefFile=generateRR(recName,refAnn);
 		
-		String rrTestFile=generateRR(recName,testAnn);
+		//Delet any old cache file and generate new RR files
+		String rrRefFile="rr_"+refAnn;
+		File refFile=new File(dataDir+fSep+recName+"."+ rrRefFile);
+		//Delete temporary file it exists already
+		if(refFile.isFile()){
+			if(! refFile.delete()){
+    		    System.err.println("Could not remove existing cache file:" 
+			+ refFile);
+    		}
+		}
+		rrRefFile=generateRR(recName,refAnn);
+		
+		String rrTestFile="rr_"+testAnn;
+		File testFile=new File(dataDir+fSep+recName+"."+ rrTestFile);
+		if(testFile.isFile()){
+			if(! testFile.delete()){
+    		 System.err.println("Could not remove existing cache file:"
+			+ testFile);
+    		 System.err.println("Cannot score entry without generating a "+
+			" clean cache file. Please remove old file:" + testFile);
+    		 return null;
+    		}
+		}
+		rrTestFile=generateRR(recName,testAnn);
+
+		
 		if(rrRefFile != null && rrTestFile != null){
 			//Calculate the error
 			score[1]=Double.valueOf(score2(recName,rrRefFile,rrTestFile));
+			//Perform clean up of cached files
+			if(! testFile.delete()){
+	    		 System.err.println("Could not remove cache file:"
+	    				 + testFile);
+	    		 System.err.println("Pleaes remove them manually.");
+	    		}
+			if(! refFile.delete()){
+    		    System.err.println("Could not remove cache file:" 
+    		    		+ refFile);
+    		    System.err.println("Pleaes remove them manually.");
+    		}
 		}	
 		return score;
 
@@ -201,8 +227,8 @@ public class Score2013 {
 		System.out.println("Score (event 2/5): " + score[1]);
 	}
 
-	
-	
+
+
 
 
 
