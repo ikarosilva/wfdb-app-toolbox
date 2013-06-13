@@ -36,7 +36,7 @@ function varargout=tach(varargin)
 %
 %    A 1x1 integer specifying the number of output samples (ie estimated
 %    heart rate intervals) such that the output 'hr' is a vector of 
-%    size outputSize x 1.
+%    size (outputSize-1) x 1.
 %
 %
 % Written by Ikaro Silva, 2013
