@@ -64,8 +64,9 @@ function varargout=score2013(varargin)
 %
 % %Example :
 % %Gets score for recrod 'a01.dat', with reference annotation 'a01.fqrs'
-% %and user submitted answer 'a01.wfdbsample_entry1'
-% [score1,score2]=score2013('a01','fqrs','wfdbsample_entry1')
+% %and user submitted answer 'a01.test' as in the format describe in
+% %NOTE (1) above:
+% [score1,score2]=score2013('a01','fqrs','test')
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: -
