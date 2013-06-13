@@ -50,16 +50,15 @@ function varargout=score2013(varargin)
 %               iv. Score your results based on the file from step ii :
 %                       score2013('a01','fqrs','entry1'
 %
-%      2) All the files must be located in the directory at which this
-%         function is being evaluated. You must also have write permission
+%      2) ***PLEASE make sure you run this on a directory that has been
+%         backed up!!All the files must be located in the current directory
+%         from where this function called. You must also have write permission
 %         to this directory because the scoring process generates temporary
 %         files for the RR interval scoring step. These temporary files
 %         are denoted by recName.rr_refAnn and recName.rr_testAnn. These 
 %         temporary files will be deleted when the function exists. If they 
-%         remain for some reason, the next time the function gets called an extra
-%         set of temporary files (appened by a "_") will be generated. So you
-%         should remove all these temporary files if they do not get removed
-%         for some reason. 
+%         remain for some reason, please remove all these temporary files 
+%         otherwise the scores you receive may not be valid. 
 %
 %
 % %Example :
