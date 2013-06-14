@@ -18,6 +18,7 @@
 % -----------------------
 %   ann2rr          - Extract a list of intervals from an annotation file	
 %   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
+%   mxm             TODO: - ANSI/AAMI-standard measurement-by-measurement annotation comparator.
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals
 %   rdann           - Read annotation files for WFDB records
 %   rdsamp          - Read signal files of WFDB records
@@ -35,15 +36,32 @@
 %   wrsamp          - Writes signal data into WFDB-compatible records
 %
 %
+% 
+%   To credit this toolbox, please cite the following paper at your work:
+%    
+%   Goldberger AL, Amaral LAN, Glass L, Hausdorff JM, Ivanov PCh, Mark RG, Mietus JE, Moody GB, Peng CK, Stanley HE. 
+%   "PhysioBank, PhysioToolkit, and PhysioNet: Components of a New Research Resource for Complex 
+%   Physiologic Signals."
+%   Circulation 101(23):e215-e220 
+%   [http://circ.ahajournals.org/cgi/content/full/101/23/e215]; 
+%   2000 (June 13). 
+%   PMID: 10851218; doi: 10.1161/01.CIR.101.23.e215 
 %
-%   Contact: wfdb-matlab-support@physionet.org
+%
+%   In addition, some of these functions use binary executables compiled
+%   from open-source third-party code contributed to PhysioNet. When using
+%   these functions on your work, please look at the help for that function
+%   in order find out how to credit the original paper and authors.
+%
+%   For questions and feedback please contact us at: wfdb-matlab-support@physionet.org
 %
 %   Contributors:
 %
-%   Ikaro Silva (ikaro@mit.edu)
+%   Ikaro Silva 
+%   George Moody 
 %   Daniel J. Scott
 %   Michael Craig
-%   George Moody
+%   
 
 
 %Created by Ikaro Silva 2012

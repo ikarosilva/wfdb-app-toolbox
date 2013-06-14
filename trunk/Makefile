@@ -21,7 +21,7 @@ JARFLAGS := -jar		\
 		  $(EQUINOXPATH)		\
 		  -application $(ANTPATH)	\
 		  -buildfile $(BUILDFILE)
-APP_NAME="wfdb-app-toolbox-0-0-1.zip"
+APP_NAME="wfdb-app-toolbox-0-0-2.zip"
 
 #Always check that this matches with Ant's script (jarbuild.xml)
 JAR6_NAME="wfdb-app-JVM6-0-0-2.jar" 
