@@ -16,7 +16,8 @@
 %
 %  Table of Contents (T0C)
 % -----------------------
-%   ann2rr          - Extract a list of intervals from an annotation file	
+%   ann2rr          - Extract a list of intervals from an annotation file
+%   bxb             - ANSI/AAMI-standard beat-by-beat annotation comparator.	
 %   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
 %   mxm             TODO: - ANSI/AAMI-standard measurement-by-measurement annotation comparator.
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals
@@ -34,6 +35,7 @@
 %   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   wrann           - Writes annotations for WFDB records into annotation files
 %   wrsamp          - Writes signal data into WFDB-compatible records
+%   wfdbupdate      - Checks if this versio of the WFDB Toolbox is up-to-date
 %
 %
 % 

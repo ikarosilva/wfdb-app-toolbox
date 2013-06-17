@@ -50,9 +50,9 @@ function varargout=mxm(varargin)
 % Written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
-% Since 0.0.2 
+% Since 0.0.3 
 %
-% See also WRANN, RDANN
+% See also WRANN, RDANN, BXB
 
 
 persistent javaWfdbExec
@@ -85,7 +85,7 @@ for n=1:nargin
     end
 end
 
-wfdb_argument={'-r',recName,'-a',[refAnn ' ' testAnn],'-l',reportFile};
+wfdb_argument={'-r',recName,'-a',refAnn,testAnn,'-l',reportFile};
 
 if(~isempty(beginTime))
      wfdb_argument{end+1}='-f';
@@ -98,10 +98,6 @@ end
 if(~isempty(appendReport))
      wfdb_argument{end+1}='-s';
     wfdb_argument{end+1}=reportFile;
-end
-if(~isempty(stopTime))
-     wfdb_argument{end+1}='-t';
-    wfdb_argument{end+1}=stopTime;
 end
 if(~isempty(stopTime))
      wfdb_argument{end+1}='-t';
