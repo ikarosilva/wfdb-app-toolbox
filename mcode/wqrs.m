@@ -1,4 +1,4 @@
-function varargout=sqrs(varargin)
+function varargout=wqrs(varargin)
 %
 % wqrs(recordName,N,N0,signal,threshold,findJ,powerLineFrequency,resample)
 %

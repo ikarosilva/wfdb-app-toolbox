@@ -31,8 +31,6 @@ http://www.physionet.org/physiotools/software-index.shtml#psp
     rxr: ANSI/AAMI-standard run-by-run annotation comparator
     skewedit: edit skew fields of header file(s)
     snip: copy an excerpt of a WFDB record
-    sortann: rearrange annotations in canonical order
-    sumann: summarize the contents of a WFDB annotation file
     sumstats: derive aggregate statistics from bxb, rxr, etc., line-format output
     wabp: arterial blood pressure (ABP) pulse detector
     wav2mit, mit2wav: convert between .wav and WFDB-compatible formats
