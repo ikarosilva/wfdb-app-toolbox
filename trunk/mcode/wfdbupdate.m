@@ -12,14 +12,14 @@ function varargout=wfdbupdate(varargin)
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: -
-% Since 0.0.2
+% Since 0.0.3
 %
 %
 % See also WFDB, WFDBLICENSE
 %
 
 [~,config]=wfdbloadlib;
-this=urlread(['file://' config.MATLAB_PATH 'test']);
+this=urlread(['file://' config.MATLAB_PATH 'NEWS']);
 updates=urlread('http://physionet.org/physiotools/matlab/wfdb-app-matlab/NEWS');
 
 if(strcmp(this,updates))
