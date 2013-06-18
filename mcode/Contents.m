@@ -29,6 +29,7 @@
 %	sumann			- Summarize the contents of a WFDB annotation file   
 %	tach            - Calculates instantaneous heart rate of a WFDB ECG record signal
 %   wfdb            - Prints this help information of the Toolbox
+%   wabp			- Arterial blood pressure (ABP) pulse detector
 %   wfdbdemo        - Demonstration of the WFDB App Toolbox
 %   wfdbdesc        - Return signal information for about a WFDB record
 %   wfdblicense     - License information about this Toolbox
