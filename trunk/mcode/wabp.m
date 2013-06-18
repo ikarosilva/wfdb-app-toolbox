@@ -45,7 +45,7 @@ function varargout=wabp(varargin)
 % resample
 %       A 1x1 boolean. If true resamples the signal to 125 Hz (default=0).
 %
-% singal
+% signal
 %       A 1x1 integer. Specify the signal index of the WFDB record to be
 %       used for ABP pulse detection.
 %
@@ -57,8 +57,21 @@ function varargout=wabp(varargin)
 % Last Modified: -
 % Version 1.0
 %
-% %Example - Requires write permission to current directory
-%wqrs('challenge/2013/set-a/a01');
+% Since 0.0.3
+%
+% See also RDANN, RDSAMP, WFDBDESC, WFDBTIME
+%
+%
+% %Example - Note this will create the file: ./slpdb/slp60.wabp in you
+% %directory
+% N=2000;
+% [tm,x]=rdsamp('slpdb/slp60',2,N);
+% [endTime,dateStamp]=wfdbtime('slpdb/slp60',N);
+% wabp('slpdb/slp60',[],endTime{1},[],2);
+% [ann]=rdann('slpdb/slp60','wabp')
+% plot(tm,x);hold on;grid on
+% plot(tm(ann),x(ann),'or')
+%
 
 
 persistent javaWfdbExec
@@ -70,55 +83,39 @@ end
 
 if(isempty(javaWfdbExec))
     %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('wqrs');
+    javaWfdbExec=org.physionet.wfdb.Wfdbexec('wabp');
 end
 
 %Set default pararamter values
-inputs={'recordName','annotator','N','N0','signal','threshold', ...
-    'findJ','powerLineFrequency','resample'};
-N=[];
-N0=1;
-signal=[]; %use application default
-threshold=[];%use application default
-findJ=[];
-powerLineFrequency=[];
-resample=[];
+inputs={'recName','beginTime','stopTime','resample','signal'};
+beginTime=[];
+stopTime=1;
+resample=0;
+signal=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
     end
 end
 
-N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
-wfdb_argument={'-r',recordName,'-f',['s' N0]};
+wfdb_argument={'-r',recName};
 
-if(~isempty(N))
+if(~isempty(beginTime))
+    wfdb_argument{end+1}='-f';
+    %-1 is necessary because WFDB is 0 based indexed.
+    wfdb_argument{end+1}=beginTime;
+end
+if(~isempty(stopTime))
     wfdb_argument{end+1}='-t';
     %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument{end+1}=['s' num2str(N-1)];
+    wfdb_argument{end+1}=[stopTime];
+end
+if(resample)
+    wfdb_argument{end+1}='-R';
 end
 if(~isempty(signal))
     wfdb_argument{end+1}='-s';
-    %-1 is necessary because WFDB is 0 based indexed.
     wfdb_argument{end+1}=num2str(signal-1);
-end
-if(~isempty(threshold))
-    wfdb_argument{end+1}='-m';
-    %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument{end+1}=num2str(threshold-1);
-end
-if(~isempty(findJ) && findJ)
-    wfdb_argument{end+1}='-j';
-end
-
-if(~isempty(powerLineFrequency))
-    wfdb_argument{end+1}='-p';
-    %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument{end+1}=num2str(powerLineFrequency);
-end
-
-if(~isempty(resample) && resample)
-    wfdb_argument{end+1}='-R';
 end
 
 javaWfdbExec.execToStringList(wfdb_argument);

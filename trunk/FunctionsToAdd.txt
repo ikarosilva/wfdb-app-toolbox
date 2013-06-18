@@ -32,7 +32,6 @@ http://www.physionet.org/physiotools/software-index.shtml#psp
     skewedit: edit skew fields of header file(s)
     snip: copy an excerpt of a WFDB record
     sumstats: derive aggregate statistics from bxb, rxr, etc., line-format output
-    wabp: arterial blood pressure (ABP) pulse detector
     wav2mit, mit2wav: convert between .wav and WFDB-compatible formats
     wfdb2mat: convert WFDB-compatible signal file to Matlab .mat file
     wfdbcat: copy WFDB files to standard output

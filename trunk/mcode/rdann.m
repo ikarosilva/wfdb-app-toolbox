@@ -116,7 +116,20 @@ if(~isempty(C))
 end
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
-ann=round(data(:,1))+1; %Convert to MATLAB indexing
+
+%TODO: Improve the parsing of data. To avoid doing this at the ML wrapper
+%level
+if(length(data(1,:))==6) 
+    %In this case there is a data stamp right after the timestamp that did
+    %not get properly parsed such as:
+    % [00:11:30.628 09/11/1989]      157     N    0    1    0
+    % So ignore the second column
+    ann=round(data(:,2))+1; %Convert to MATLAB indexing
+else
+    %In this case there is only timestamp that was properly parsed by the Java such as:
+    % 0:00.355      355     N    0    0    0
+    ann=round(data(:,1))+1; %Convert to MATLAB indexing
+end
 for n=1:nargout
         eval(['varargout{n}=' outputs{n} ';'])
 end
