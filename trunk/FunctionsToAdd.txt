@@ -6,37 +6,21 @@ http://www.physionet.org/physiotools/wag/wag.htm
 http://www.physionet.org/physiotools/software-index.shtml#psp
 
     
-    calsig: calibrate signals of a WFDB record
-    dfa: detrended fluctuation analysis
-    ecgeval: generate and run ECG analyzer evaluation script
-    ecgpuwave: QRS detector and waveform limit locator
-    edf2mit, mit2edf: convert between EDF and WFDB-compatible formats
-    edr: derive a respiration signal from an ECG
-    epicmp: ANSI/AAMI-standard episode-by-episode annotation comparator
-    gqfuse: combine QRS annotation files
-    gqrs, gqpost: QRS detector and post-processor
-    hrstats: collect and summarize heart rate statistics from an annotation file
-    ihr: calculate instantaneous heart rate
-    lomb: estimate power spectrum using the Lomb periodogram method
-    lwcat: postprocess output of plt to make PostScript, EPS, PDF or PNG
+    
+    
+    
+    
+  
     memse: estimate power spectrum using maximum entropy (all poles) method
-    mfilt: general-purpose median filter for WFDB records
-    mrgann: merge annotation files
-    nguess: guess the times of missing normal beats in an annotation file
     nst: noise stress test for ECG analysis programs
-    pnnlist, pNNx: derive pNNx statistics from an annotation interval list or an annotation file
-    pnwlogin: provide direct access to PhysioNetWorks for WFDB applications
-    pschart: produce annotated `chart recordings' on a PostScript device
-    rdedfann: extract annotations from an EDF+ file
     rxr: ANSI/AAMI-standard run-by-run annotation comparator
-    skewedit: edit skew fields of header file(s)
-    snip: copy an excerpt of a WFDB record
-    sumstats: derive aggregate statistics from bxb, rxr, etc., line-format output
-    wav2mit, mit2wav: convert between .wav and WFDB-compatible formats
-    wfdb2mat: convert WFDB-compatible signal file to Matlab .mat file
-    wfdbcat: copy WFDB files to standard output
-    wfdbcollate: collate WFDB records into a multi-segment record
-    wfdbmap: make a synoptic map of a WFDB record
     xform: sampling frequency, amplitude, and format conversion for WFDB records
+    
+    //Need Examples
+    epicmp: ANSI/AAMI-standard episode-by-episode annotation comparator
+    
+    
+    //Outside the library
     mse: Multiscale Entropy
-     
+    dfa: detrended fluctuation analysis
+    edr: derive a respiration signal from an ECG 
