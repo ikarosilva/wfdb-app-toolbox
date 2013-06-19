@@ -43,9 +43,14 @@ function varargout=sqrs(varargin)
 %       Use higher values to reduce false detections, or lower values to 
 %       reduce the number of missed beats. 
 %
-% Written by Ikaro Silva, 2013
+%
+% Source code by George B. Moody. The source code is a fairly literal translation with minor 
+% corrections of the Pascal original by WAH Engelse and Cees Zeelenberg. 
+%
+% MATLAB wrapper written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
+%
 %
 % %Example
 %sqrs('challenge/2013/set-a/a01',[],1000);

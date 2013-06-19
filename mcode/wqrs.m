@@ -60,7 +60,10 @@ function varargout=wqrs(varargin)
 %       is 60 Hz, or at 150 Hz otherwise (default= false : do not resample).
 %
 %
-% Written by Ikaro Silva, 2013
+%
+% Source code written by Wei Zong and George B. Moody. 
+%
+% MATLAB wrapper written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
 %
