@@ -66,6 +66,7 @@ isloaded=per_isloaded;
 outputs={'isloaded','config'};
 for n=1:nargout
         if(n>1)
+            config.MATLAB_VERSION=version;
             javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config');
             javaWfdbExec.setLogLevel(debugLevel);
             config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
