@@ -1,6 +1,11 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
    
+0.9.0 (24 June 2013):
+	Added: WFDBUPDATE, BXB, MXM, SUMANN, SORTANN, WABP, LOMB, and 
+	RDMIMIC2WAVE. Fixed bug and performance issues with RDANN and
+	RDSAMP.
+	
 0.0.2 (13 June 2013):
 	Added score2013 to score PhysioNet2013 challenge entries.
 	Fixed MATLAB/WDDB indexing issues with RDANN and WRANN.
