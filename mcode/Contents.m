@@ -35,7 +35,6 @@
 %   wabp			- Arterial blood pressure (ABP) pulse detector
 %   wfdbdemo        - Demonstration of the WFDB App Toolbox
 %   wfdbdesc        - Return signal information for about a WFDB record
-%   wfdblicense     - License information about this Toolbox
 %   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information
 %   wfdbtest        - Script to test installation of the Toolbox.
 %   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
