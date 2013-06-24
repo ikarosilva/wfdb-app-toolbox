@@ -32,7 +32,7 @@ function varargout=sumann(varargin)
 % Written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
-% Since 0.0.3
+% Since 0.9.0
 %
 % %Example (this will generate a /mitdb/100.qrs file at your directory):
 %

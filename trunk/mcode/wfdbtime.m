@@ -36,7 +36,7 @@ function varargout=wfdbtime(varargin)
 % Written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
-%
+% Since 0.0.1
 %
 % See also rdann, wfdbdesc
 %

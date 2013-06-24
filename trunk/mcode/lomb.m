@@ -55,7 +55,7 @@ function varargout=lomb(varargin)
 % MATLAB wrapper written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
-% Since 0.0.3 
+% Since 0.9.0 
 %
 %
 % %Example: Heart Rate Spectral Analysis:

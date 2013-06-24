@@ -57,7 +57,7 @@ function varargout=wabp(varargin)
 % Last Modified: -
 % Version 1.0
 %
-% Since 0.0.3
+% Since 0.9.0
 %
 % See also RDANN, RDSAMP, WFDBDESC, WFDBTIME
 %

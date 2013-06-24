@@ -49,7 +49,7 @@ function varargout=wfdbdesc(varargin)
 % Last Modified: -
 % Version 1.0
 %
-%
+% Since 0.0.1
 % See also rdsamp
 
 if(~wfdbloadlib)

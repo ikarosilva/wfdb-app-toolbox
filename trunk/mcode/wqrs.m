@@ -66,6 +66,7 @@ function varargout=wqrs(varargin)
 % MATLAB wrapper written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
+% Since 0.0.1
 %
 % %Example - Requires write permission to current directory
 %wqrs('challenge/2013/set-a/a01');
