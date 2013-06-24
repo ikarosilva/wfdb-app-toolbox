@@ -44,7 +44,7 @@ function mrgann(varargin)
 % Last Modified: 6/13/2013
 % Version 1.0
 %
-% Since 0.0.3
+% Since 0.9.0
 % 
 % See also BXB, RDANN, WRANN
 %

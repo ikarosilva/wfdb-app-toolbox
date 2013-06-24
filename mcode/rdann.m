@@ -57,6 +57,7 @@ function varargout=rdann(varargin)
 % Written by Ikaro Silva, 2013
 % Last Modified: 6/13/2013
 % Version 1.0
+% Since 0.0.1
 %
 % %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
 %[tm, signal]=rdsamp('challenge/2013/set-a/a01');

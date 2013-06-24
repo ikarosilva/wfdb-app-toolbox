@@ -50,7 +50,7 @@ function varargout=mxm(varargin)
 % Written by Ikaro Silva, 2013
 % Last Modified: -
 % Version 1.0
-% Since 0.0.3 
+% Since 0.9.0 
 %
 % See also WRANN, RDANN, BXB
 

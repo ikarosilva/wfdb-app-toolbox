@@ -53,6 +53,8 @@ function varargout=rdsamp(varargin)
 % Last Modified: June 24, 2013
 % Version 1.0
 %
+% Since 0.0.1
+%
 % %Example 1- Read a signal from PhysioNet's Remote server:
 %[tm, signal]=rdsamp('challenge/2013/set-a/a01',1,1000);
 %plot(tm,signal(:,1))

@@ -12,7 +12,7 @@ function varargout=wfdbupdate(varargin)
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: -
-% Since 0.0.3
+% Since 0.9.0
 %
 %
 % See also WFDB, WFDBLICENSE

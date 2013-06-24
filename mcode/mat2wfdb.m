@@ -54,7 +54,7 @@ function [varargout]=mat2wfdb(varargin)
 %Modified by Louis Mayaud 2011
 % Version 1.0
 %
-%
+% Since 0.0.1
 % See also wrsamp, wfdbdesc
 %
 %%%%%%%%%%  Example 1 %%%%%%%%%%%%

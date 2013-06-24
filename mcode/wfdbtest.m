@@ -4,7 +4,7 @@ function wfdbtest(varargin)
 % Written by Ikaro Silva, 2013
 %
 % Version 1.0
-% Since 1.0
+% Since 0.0.1
 %
 % See also wfdb, rdsamp
 inputs={'verbose'};

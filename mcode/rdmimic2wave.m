@@ -94,7 +94,7 @@ function varargout=rdmimic2wave(varargin)
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: -
-% Since 0.0.1
+% Since 0.9.0
 %
 %
 %
