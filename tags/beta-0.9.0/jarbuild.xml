@@ -1,0 +1,44 @@
+<project name="wfdb" basedir="." default="jar6">
+	
+	<property name="src.dir"     value="src"/>
+	<property name="build.dir"     value="bin"/>
+  	<property name="classes.dir" value="${build.dir}/classes"/>
+  	<property name="jar.dir"     value="mcode"/>
+  	<property name="jar6name"     value="wfdb-app-JVM6-0-9-0.jar"/>
+	<property name="jar7name"     value="wfdb-app-JVM7-0-9-0.jar"/>
+
+ 	 <target name="compile6">
+ 	 	<delete dir="${build.dir}"/>
+ 	 	<mkdir dir="${build.dir}"/>
+    	<mkdir dir="${classes.dir}"/>
+    	<javac srcdir="${src.dir}" destdir="${classes.dir}"	
+    		includeantruntime="yes"	target="1.6" 
+    		source="1.6" />
+  	</target>
+	<target name="compile7">
+		<delete dir="${build.dir}"/>
+		<mkdir dir="${build.dir}"/>
+	    <mkdir dir="${classes.dir}"/>
+	    <javac srcdir="${src.dir}" destdir="${classes.dir}"	
+	    	includeantruntime="yes"	target="1.7" 
+	    	source="1.7" />
+	</target>
+	
+ 	<target name="jar6" depends="compile6">
+ 		<delete file="${jar.dir}/${jar6name}"/>
+    	<jar destfile="${jar.dir}/${jar6name}" basedir="${classes.dir}">
+      	<manifest>
+        	<attribute name="Main-Class" value="org.physionet.wfdb.Wfdbexec"/>
+      	</manifest>
+    	</jar>
+ 	</target>
+	<target name="jar7" depends="compile7">
+	 		<delete file="${jar.dir}/${jar7name}"/>
+	    	<jar destfile="${jar.dir}/${jar7name}" basedir="${classes.dir}">
+	      	<manifest>
+	        	<attribute name="Main-Class" value="org.physionet.wfdb.Wfdbexec"/>
+	      	</manifest>
+	    	</jar>
+	</target>
+	
+</project>

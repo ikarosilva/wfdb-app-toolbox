@@ -1,0 +1,14 @@
+*.settings
+*.project
+*\*.svn\*
+*.class
+*.jdb
+*.id
+*.lck
+mcode/mxm.m
+mcode/challenge/*
+mcode/slpdb/*
+mcode/*~
+mcode/.__afs*
+mcode/nativelibs/linux-i386/build_wfdbjava.sh
+mcode/nativelibs/Makefile
