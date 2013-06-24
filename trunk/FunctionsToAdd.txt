@@ -7,18 +7,14 @@ http://www.physionet.org/physiotools/software-index.shtml#psp
 
     
     
+   nst: noise stress test for ECG analysis programs
+   xform: sampling frequency, amplitude, and format conversion for WFDB records
     
     
-    
-  
-    memse: estimate power spectrum using maximum entropy (all poles) method
-    nst: noise stress test for ECG analysis programs
-    rxr: ANSI/AAMI-standard run-by-run annotation comparator
-    xform: sampling frequency, amplitude, and format conversion for WFDB records
     
     //Need Examples
+    rxr: ANSI/AAMI-standard run-by-run annotation comparator
     epicmp: ANSI/AAMI-standard episode-by-episode annotation comparator
-    
     
     //Outside the library
     mse: Multiscale Entropy
