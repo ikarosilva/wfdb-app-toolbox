@@ -7,16 +7,16 @@ function varargout=rdmimic2wave(varargin)
 % Output Parameters:
 %
 % tm
-%       Nx1 vector of doubles represeting time in minutes if a match is
-%       found. Otherwise tm is empty (tm=[];), The time of
-%       the first index is an offset from beginMinute. So that:
+%       Nx1 vector of doubles representing time in minutes if a match is
+%       found, otherwise tm is empty. The time of the first index is an offset 
+%       from beginMinute. So that the total duration in minutes is:
 %
 %       tm(end) - tm(1) = endMinute - beginMinute
 %
 %       And the time of the clinical event (clinicalTimeStamp) in the waveform signal is given by
 %       (to the closest minute):
 %
-%       timeStamp = tm(1) + Minute
+%       timeStamp = tm(1) + beginMinute
 %
 %
 % signal
@@ -27,7 +27,7 @@ function varargout=rdmimic2wave(varargin)
 % Optional Ouput:
 %
 % Fs
-%       A 1x1 double the sampling frequency (in Hz).
+%       A 1x1 double representing the sampling frequency (in Hz).
 %
 %recList
 %       A Lx1 double specifying a list of valid subjectIDs  or matched record. You can use this
@@ -37,10 +37,7 @@ function varargout=rdmimic2wave(varargin)
 %
 %
 %sigInfo
-%       A Lx1 double specifying a list of valid subjectIDs  or matched record. You can use this
-%       field to find which IDs are in the matched waveform list (see below). If the
-%       subjectID is defined in the function signature, recList will be
-%       equal to the first found matched record if it exists.
+%       A Mx1 structure containing meta information about the waverforms in the 'signal' output. 
 %
 %
 % Input Parameters:
