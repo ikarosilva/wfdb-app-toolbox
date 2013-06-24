@@ -1,6 +1,6 @@
 function varargout=rdmimic2wave(varargin)
 %
-% [tm,signal,Fs,idList]=rdmimic2wave(subjectID,clinicalTimeStamp,dataType,beginMinute,endMinute)
+% [tm,signal,Fs,recList,sigInfo]=rdmimic2wave(subjectID,clinicalTimeStamp,dataType,beginMinute,endMinute)
 %
 %
 %
@@ -29,12 +29,18 @@ function varargout=rdmimic2wave(varargin)
 % Fs
 %       A 1x1 double the sampling frequency (in Hz).
 %
-%idList
-%       A Lx1 double specifying a list of valid subjectIDs. Use this to
-%       find which IDs are in the matched waveform list (see below). If the
-%       subjectID is defined in the function signature, idList will be
-%       equal to the subjectID (in other words, idList is only useful when
-%       subjectID is not specified).
+%recList
+%       A Lx1 double specifying a list of valid subjectIDs  or matched record. You can use this
+%       field to find which IDs are in the matched waveform list (see below). If the
+%       subjectID is defined in the function signature, recList will be
+%       equal to the first found matched record if it exists.
+%
+%
+%sigInfo
+%       A Lx1 double specifying a list of valid subjectIDs  or matched record. You can use this
+%       field to find which IDs are in the matched waveform list (see below). If the
+%       subjectID is defined in the function signature, recList will be
+%       equal to the first found matched record if it exists.
 %
 %
 % Input Parameters:
@@ -43,10 +49,10 @@ function varargout=rdmimic2wave(varargin)
 %       A 1x1 Double specifying a valid MIMIC II subject ID. For a list
 %       of valid subjectID with matched waveform use this to query:
 %
-%       [~,~,~,idList]=rdmimic2wave([],[],dataType);
+%       [~,~,~,recList]=rdmimic2wave([],[],dataType);
 %
-%       Once you have a valid subjectID and pass it to RDMIMI2WAVE, idList
-%       will always return the same subjectID value.
+%       Once you have a valid subjectID and pass it to RDMIMI2WAVE, recList
+%       will return the string name of the first matched record if any (empty otherwise).
 %
 %
 % clinicalTimeStamp
@@ -81,8 +87,10 @@ function varargout=rdmimic2wave(varargin)
 %
 %
 % % Example:
-%[tm,signal]=rdmimic2wave(32805,'2823-03-12-14-53',[],0,2);
-%
+%[tm,signal,Fs,recList,sigInfo]=rdmimic2wave(32805,'2986-12-15-10-00',[],0,2);
+%plot(tm,signal(:,2))
+%title(['Found data in record: ' recList]) 
+%legend(sigInfo(2).Description)
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: -
@@ -93,13 +101,16 @@ function varargout=rdmimic2wave(varargin)
 % See also rdsamp, wfdbdesc
 
 inputs={'subjectID','clinicalTimeStamp','dataType','beginWindow','endWindow'};
-outputs={'tm','signal','Fs','matched_id'};
+outputs={'tm','signal','Fs','recList','sigInfo'};
 beginWindow=60; %beginWindow in minutes!
 endWindow=60; %endWindow in minutes!
 dataType='numerics';
+dBName='mimic2wdb/matched/';
 tm=[];
 signal=[];
 Fs=[];
+sigInfo=[];
+recList=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -115,7 +126,6 @@ clinicalDateNum=datenum(clinicalTimeStamp,dateFormat);
 %Window to include before and after the measurement (in days)
 beginTime=clinicalDateNum - (beginWindow/(60*24));
 endTime=clinicalDateNum + (endWindow/(60*24));
-clinicalDurationDays=endTime-beginTime;
 
 if(~strcmp(cachedDataType,dataType))
     switch (dataType)
@@ -137,6 +147,12 @@ if(~strcmp(cachedDataType,dataType))
         matched_id{n}=str2num(matched_id{n});
     end
     matched_id=unique(cell2mat(matched_id));
+    
+    if(isempty(subjectID))
+        %In this case the user is just querying for a list of matched
+        %records
+       recList=matched_id; 
+    end
 end
 
 %If id exists loop through the files to see if any file is within the
@@ -170,20 +186,20 @@ if(~isempty(matched_pid))
         if(thisDateNum <= beginTime)
             
             %Get record length and check its duration
-            siginfo=wfdbdesc('challenge/2013/set-a/a01');
-            Fs=str2double(regexprep(siginfo(1).SamplingFrequency,' Hz',''));
-            waveDurationDays=(siginfo(1).LengthSamples/(60*60*24))*Fs;
+            recList=[dBName recName{:}];
+            sigInfo=wfdbdesc(recList);
+            Fs=str2double(regexprep(sigInfo(1).SamplingFrequency,' Hz',''));
+            waveLengthSamples=sigInfo(1).LengthSamples;
             
-            if(clinicalDurationDays <= waveDurationDays)
+            %Get the starting/ending offsets in samples wrt the beginning of
+            %the waveform
+            start_offset=round(Fs*(beginTime-thisDateNum)*24*60*60) + 1;
+            end_offset=round(Fs*(endTime-thisDateNum)*24*60*60) + 1;
+    
+            if(end_offset <= waveLengthSamples)
                 %Found a match. Get the waveform and exit the the search
-                
-                %Get the starting/ending offsets in samples wrt the beginning of
-                %the waveform
-                start_offset=Fs*(beginTime-thisDateNum)*24*60*60 + 1;
-                end_offset=Fs*(endTime-thisDateNum)*24*60*60 + 1;
-                
                 %Get signal and exit
-                [tm,signal]=rdsamp(recName,[],end_offset,start_offset);
+                [tm,signal]=rdsamp(recList,[],end_offset,start_offset);
                 break;
             end
         end %of thisDateNum< beginTime

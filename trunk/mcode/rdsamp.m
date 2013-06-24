@@ -50,7 +50,7 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: June 6, 2013
+% Last Modified: June 24, 2013
 % Version 1.0
 %
 % %Example 1- Read a signal from PhysioNet's Remote server:
@@ -88,11 +88,11 @@ for n=1:nargin
     end
 end
 
-N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
 if(~rawUnits)
-    wfdb_argument={'-r',recordName,'-ps','-f',['s' N0]};
+    %-1 is necessary because WFDB is 0 based indexed.
+    wfdb_argument={'-r',recordName,'-ps','-f',['s' num2str(N0-1)]};
 else
-    wfdb_argument={'-r',recordName,'-f',['s' N0]};
+    wfdb_argument={'-r',recordName,'-f',['s' num2str(N0-1)]};
 end
 
 %If N is empty, it is the entire dataset. We should ensure capacity
