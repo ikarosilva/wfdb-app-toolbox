@@ -21,11 +21,15 @@ JARFLAGS := -jar		\
 		  $(EQUINOXPATH)		\
 		  -application $(ANTPATH)	\
 		  -buildfile $(BUILDFILE)
-APP_NAME="wfdb-app-toolbox-0-0-2.zip"
 
-#Always check that this matches with Ant's script (jarbuild.xml)
-JAR6_NAME="wfdb-app-JVM6-0-0-2.jar" 
-JAR7_NAME="wfdb-app-JVM7-0-0-2.jar"
+#Always check that this matches with Ant's script (jarbuild.xml),
+#with the loading function wfdbloadlib.m , and with Contents.m
+#There is really no reason by the *.jar and *.zip should need to have the same
+#version numbers, as they are really modular...But for now we keep them at the same
+#versioning level in order to avoid (or increase?) confusion.
+APP_NAME="wfdb-app-toolbox-0-9-0.zip"
+JAR6_NAME="wfdb-app-JVM6-0-9-0.jar" 
+JAR7_NAME="wfdb-app-JVM7-0-9-0.jar"
 	
 #TODO: There are two directories for linux. we need to remove one!	
 clean: 

@@ -5,9 +5,10 @@
 *.jdb
 *.id
 *.lck
-mcode/wfdb-app-JVM7-0-0-1.jar
 mcode/mxm.m
 mcode/challenge/*
+mcode/slpdb/*
+mcode/*~
 mcode/.__afs*
 mcode/nativelibs/linux-i386/build_wfdbjava.sh
 mcode/nativelibs/Makefile
