@@ -1,6 +1,6 @@
 function varargout=rdann(varargin)
 %
-% [ann,type,subtype,chan,num]=rdann(recordName,annotator,C,N,N0)
+% [ann,type,subtype,chan,num,comments]=rdann(recordName,annotator,C,N,N0,type)
 %
 %    Wrapper to WFDB RDANN:
 %         http://www.physionet.org/physiotools/wag/rdann-1.htm
@@ -14,30 +14,34 @@ function varargout=rdann(varargin)
 % Reads a WFDB annotation and returns:
 %
 %
-% ann     
+% ann
 %       Nx1 vector of the ints. The time of the annotation in samples
-%       with respect to the fist sample in the signals in recordName. 
+%       with respect to the fist sample in the signals in recordName.
 %       To convert this vector to a string of time stamps see WFDBTIME.
 %
-% type  
-%       Nx1 vector of the chars describing annotation type. 
+% type
+%       Nx1 vector of the chars describing annotation type.
 %
-% subtype 
-%       Nx1 vector of the chars describing annotation subtype. 
+% subtype
+%       Nx1 vector of the chars describing annotation subtype.
 %
-% chan  
-%       Nx1 vector of the ints describing annotation subtype. 
+% chan
+%       Nx1 vector of the ints describing annotation subtype.
 %
-% num   
-%       Nx1 vector of the ints describing annotation NUM. 
+% num
+%       Nx1 vector of the ints describing annotation NUM.
+%
+% comments
+%       Nx1 vector of the cells describing annotation comments.
+%
 %
 % Required Parameters:
 %
-% recorName  
+% recorName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
-% annotator  
+% annotator
 %       String specifying the name of the annotation file in the WFDB path or
 %       in the current directory.
 %
@@ -45,28 +49,31 @@ function varargout=rdann(varargin)
 %
 % C
 %       A 1x1 integer. Read only the annotations for signal C.
-% N 
-%       A 1x1 integer specifying the sample number at which to stop reading the 
+% N
+%       A 1x1 integer specifying the sample number at which to stop reading the
 %       record file (default read all = N).
-% N0 
-%       A 1x1 integer specifying the sample number at which to start reading the 
+% N0
+%       A 1x1 integer specifying the sample number at which to start reading the
 %       annotion file (default 1 = begining of the record).
 %
+% type
+%       A 1x1 String specifying the type of annoation to output (default is
+%       empty, which get all annotations).
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: 6/13/2013
+% Last Modified: 6/27/2013
 % Version 1.0
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
 %[tm, signal]=rdsamp('challenge/2013/set-a/a01');
-%[ann]=rdann('challenge/2013/set-a/a01','fqrs'); 
+%[ann]=rdann('challenge/2013/set-a/a01','fqrs');
 %plot(tm,signal(:,1));hold on;grid on
 %plot(tm(ann),signal(ann,1),'ro','MarkerSize',4)
 %
 %
-% 
+%
 % See also wfdbtime, wrann
 
 persistent javaWfdbExec
@@ -82,13 +89,13 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-% [ann,type,subtype,chan,num]=rdann(recordName,annotator,C,N,N0)
-inputs={'recordName','annotator','C','N','N0'};
-outputs={'ann','char(data(:,2))',...
-    'floor(data(:,3))','floor(data(:,4))','floor(data(:,5))'};
+% [ann,type,subtype,chan,num,comments]=rdann(recordName,annotator,C,N,N0)
+inputs={'recordName','annotator','C','N','N0','type'};
+outputs={'ann','type','subtype','chan','num','comments'};
 N=[];
 N0=[];
 C=[];
+type=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -109,30 +116,69 @@ if(~isempty(N))
     %-1 is necessary because WFDB is 0 based indexed.
     wfdb_argument{end+1}=['s' num2str(N-1)];
 end
-    
+
+if(~isempty(type))
+    wfdb_argument{end+1}='-p';
+    %-1 is necessary because WFDB is 0 based indexed.
+    wfdb_argument{end+1}=type;
+end
+
 if(~isempty(C))
     wfdb_argument{end+1}='-c ';
     %-1 is necessary because WFDB is 0 based indexed.
     wfdb_argument{end+1}=[num2str(C-1)];
 end
 
-data=javaWfdbExec.execToDoubleArray(wfdb_argument);
 
 %TODO: Improve the parsing of data. To avoid doing this at the ML wrapper
-%level
-if(length(data(1,:))==6) 
-    %In this case there is a data stamp right after the timestamp that did
-    %not get properly parsed such as:
+%level! The parsing assumes each line starts with a "[" and that not "["
+%occurs at the comment.
+%outputs={ann,type,subtype,chan,num,comments};
+data=javaWfdbExec.execToStringList(wfdb_argument);
+data=data.toArray();
+N=length(data);
+ann=zeros(N,1);
+type=zeros(N,1);
+subtype=zeros(N,1);
+chan=zeros(N,1);
+num=zeros(N,1);
+comments=cell(N,1);
+str=char(data(1));
+if(strcmp(str(1),'['))
+    %In this case there is a data stamp right after the timestamp such as:
     % [00:11:30.628 09/11/1989]      157     N    0    1    0
-    % So ignore the second column
-    ann=round(data(:,2))+1; %Convert to MATLAB indexing
+    for n=1:N
+        str=char(data(n));
+        C=textscan(str,'%s %s %u %s %u %u %u %[^\n\r]');
+        ann(n)=C{3};
+        type(n)=char(C{4});
+        subtype(n)=char(C{5});
+        chan(n)=C{6};
+        num(n)=C{7};
+        comments(n)=C(8);
+    end
 else
-    %In this case there is only timestamp that was properly parsed by the Java such as:
+    %In this case there is only timestamp such as:
     % 0:00.355      355     N    0    0    0
-    ann=round(data(:,1))+1; %Convert to MATLAB indexing
+    for n=1:N
+        str=char(data(n));
+        C=textscan(str,'%s %u %s %u %u %u %[^\n\r]');
+        ann(n)=C{2};
+        type(n)=char(C{3});
+        subtype(n)=char(C{4});
+        chan(n)=C{5};
+        num(n)=C{6};
+        comments(n)=C(7);
+    end
 end
+
+ann=ann+1; %Convert to MATLAB indexing
+type=char(type);
+subtype=char(subtype);
+
+
 for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';'])
 end
 
 
