@@ -137,15 +137,16 @@ public class Dfa implements Callable<Double>{
 			}
 
 			//Perform recursive least square estimation
-			System.err.println("b= "+ b +" e= " + err + " m= " + m
-					+" k= " + k + " data= " + data[n]);
 			
 			err=data[n] - b -m*Ts;
 			K1=(4*k-2)/(k*k+k);
-			K2=6/(Ts*(k*k+k));
-			b=b + m*k + K1*err;
+			K2=6/( Ts*(k*k+k) );
+			b=b + m*Ts + K1*err;
 			m=m + K2*err;
 			k=k+1;
+			
+			System.err.println("b= "+ b +" e= " + err + " m= " + m
+					+" K1= " + K1 +" K2= " + K2 + " data= " + data[n]);
 			
 			sumX+=data[n];
 			sumTX +=n*data[n];
