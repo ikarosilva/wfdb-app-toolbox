@@ -25,7 +25,7 @@
 %   mxm             TODO: - ANSI/AAMI-standard measurement-by-measurement annotation comparator.
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals
 %   rdann           - Read annotation files for WFDB records
-%   rdmimic2wave    - Searches MIMIC2 matched waveform records within a clinical time range
+%   rdmimic2wave    - Searches MIMIC II matched waveform records within a clinical time range
 %   rdsamp          - Read signal files of WFDB records
 %   score2013       - Scores entries to the PhysioNet 2013 Fetal ECG challenge
 %   sortann         - Rearrange annotations in canonical order
@@ -41,7 +41,7 @@
 %   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   wrann           - Writes annotations for WFDB records into annotation files
 %   wrsamp          - Writes signal data into WFDB-compatible records
-%   wfdbupdate      - Checks if this versio of the WFDB Toolbox is up-to-date
+%   wfdbupdate      - Checks if this version of the WFDB Toolbox is up-to-date
 %
 %
 % 
