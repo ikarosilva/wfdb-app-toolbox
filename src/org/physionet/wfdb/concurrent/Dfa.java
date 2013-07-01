@@ -48,7 +48,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -187,9 +186,6 @@ public class Dfa implements Callable<Double>{
 		ArrayList<Double> numbers = new ArrayList<Double>();
 		numbers.ensureCapacity(100000);
 		double tmp;
-		//while (in.hasNextDouble())
-		//numbers.add(in.nextDouble());
-
 		String line=null;
 		try {
 			while ( ( line = br.readLine() )!= null ){
@@ -197,14 +193,10 @@ public class Dfa implements Callable<Double>{
 			}
 		} catch (IOException e2) {
 			e2.printStackTrace();
-		}
-		
+		}		
 		Dfa dfa=null;
 		try {
-			System.err.println("Initializing constructor with: " + THREADS + " threads, N= "+ numbers.size());
 			dfa = new Dfa(numbers);
-			long start=System.currentTimeMillis();
-			System.err.println("Using: " + THREADS + " threads");
 			for(int i=0;i<THREADS;i++){
 				Future<Double> future= executor.submit(dfa);
 				futures.add(future);
@@ -212,9 +204,6 @@ public class Dfa implements Callable<Double>{
 			for( Future<Double> future: futures){
 				tmp =future.get();
 			}
-			long end=System.currentTimeMillis();
-			System.err.println(" !!Finished -> Time= " + (end-start)/1000.0);
-
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		} catch (ExecutionException e) {
