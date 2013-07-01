@@ -41,8 +41,12 @@
  */
 
 package org.physionet.wfdb.concurrent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -80,7 +84,7 @@ public class Dfa implements Callable<Double>{
 		double boxRatio=Math.pow(2.0, 1.0/8.0);
 		int minBox=4;
 		int maxBox= N/4;
-		int scaleSize=(int) (Math.log10(maxBox/minBox)/Math.log10(boxRatio) +1.5) -6;
+		int scaleSize=(int) (Math.log10(maxBox/minBox)/Math.log10(boxRatio) +1.5) -5;
 				System.err.println("Scales from: 4 to " + maxBox + " ( " + scaleSize 
 				+ " scales)") ;
 		scales = new int[scaleSize];
@@ -130,7 +134,7 @@ public class Dfa implements Callable<Double>{
 				//Get detrended residue power, and keep running average over entire waveform
 				if(n != 0){
 					for(int i=0;i<k;i++){
-						err=(data[(int) (n-k+i+1)] - b -m*i);
+						err= b + m*i - data[(int) (n-k+i+1)];
 						mse+=err*err;
 					}
 					//System.err.println("");
@@ -165,21 +169,35 @@ public class Dfa implements Callable<Double>{
 				new ArrayList<Future<Double>>(THREADS);
 		ExecutorService executor= 
 				Executors.newFixedThreadPool(THREADS);
-		Scanner in = null;
+		//Scanner in = null;
+		BufferedReader br = null;
+		
 		if (args!=null && args.length>0 && args[0].equals("-d")){
 			try {
-				in = new Scanner(new File(args[1]));
+				//in = new Scanner(new File(args[1]));
+				br = new BufferedReader(new FileReader(new File(args[1])));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 		} else {
-			in = new Scanner(System.in);
+			//in = new Scanner(System.in);
+			br = new BufferedReader(new InputStreamReader(System.in));
 		}
 
 		ArrayList<Double> numbers = new ArrayList<Double>();
+		numbers.ensureCapacity(100000);
 		double tmp;
-		while (in.hasNextDouble())
-		    numbers.add(in.nextDouble());
+		//while (in.hasNextDouble())
+		//numbers.add(in.nextDouble());
+
+		String line=null;
+		try {
+			while ( ( line = br.readLine() )!= null ){
+				numbers.add(Double.valueOf(line));
+			}
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 		
 		Dfa dfa=null;
 		try {
