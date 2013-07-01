@@ -25,7 +25,11 @@
  *
  *
  *
- * Original Author:  Ikaro Silva, 
+ * Author:  Ikaro Silva,
+ * 
+ *  
+ *  Algorith contains elements based on DFA C version:
+ *  				http://www.physionet.org/physiotools/dfa/dfa.c
  * 
  * Last Modified:	 June 28, 2013
  * 
@@ -50,7 +54,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class Dfa implements Callable<Double>{
-	private static final int THREADS=1;//Runtime.getRuntime().availableProcessors();
+	private static final int THREADS=Runtime.getRuntime().availableProcessors();
 	private final double[] data; //Once initialized should be read only
 	private final int N;		//Size of data
 	private final int[] scales; //Once initialized should be read only
@@ -68,20 +72,30 @@ public class Dfa implements Callable<Double>{
 			mx+=i;
 		mx=mx/((double) N);
 		for(int i=0;i<N;i++){
-			//integrator+=x.get(i)-mx;
-			data[i]=x.get(i);//integrator;
+			integrator+=x.get(i)-mx;
+			data[i]=integrator;
 		}
 
-		//Set task queue according to scales to be calculated
-		int scaleSize=1;//(int) (Math.round(N/4.0)-4);
-		System.err.println("Scales from: 4 to " + Math.round(N/4.0));
+		//Set task queue according to scales to be calculated as in the C code
+		double boxRatio=Math.pow(2.0, 1.0/8.0);
+		int minBox=4;
+		int maxBox= N/4;
+		int scaleSize=(int) (Math.log10(maxBox/minBox)/Math.log10(boxRatio) +1.5) -6;
+				System.err.println("Scales from: 4 to " + maxBox + " ( " + scaleSize 
+				+ " scales)") ;
 		scales = new int[scaleSize];
 		results=new double[scales.length];
 		tasks=new ArrayBlockingQueue<Integer>(scales.length);
-		scales[0]=N;
-		for(int i=0;i<scales.length;i++){
-			//scales[i]=4+i;
-			tasks.put(i);
+		int thisScale, oldScale=0;
+		int index=0;
+		for(int i=0;i<scales.length+5;i++){
+			thisScale=(int) (minBox*Math.pow(boxRatio,i) + 0.5);
+			if(thisScale != oldScale){
+				scales[index]=thisScale;
+				tasks.put(index);
+				oldScale=thisScale;
+				index++;
+			}		
 		}
 
 	}
@@ -91,7 +105,6 @@ public class Dfa implements Callable<Double>{
 		Integer scaleInd=0;
 		long id=Thread.currentThread().getId();
 		while ((scaleInd = tasks.poll()) != null ){ 
-			//System.out.println(id + ": runing scale:" + scales[scaleInd]);
 			results[scaleInd]=compute(scales[scaleInd]);
 			//System.out.println(id + ": " + scales[scaleInd] + " dfa= " + results[scaleInd]);
 		}
@@ -107,13 +120,9 @@ public class Dfa implements Callable<Double>{
 
 		//Local linear trend is based on recursive least square estimation technique from
 		//"Fundamentals of Kalman Filtering: A Practical Approach", Zarchan ad Musoff, pg 125
-		double K1=0, K2=0, err=0, m = 0.0, b=0.0, k=1.0;
+		double K1=0, K2=0, e=0, m = 0.0, b=0.0, k=1.0;
 		double Ts=1; //step size in x-axis (is evenly sampled, use 1)
-		double detrendVar=0, tmp=0;
-		double sumX=0;
-		double sumTX=0;
-		double C=0;
-		double D=0;
+		double mse=0, err=0;
 		int Ncorrect=(int) (scale*(N/((double) scale)));//Correct for cases where we were not able to calculate last box
 		for(int n=0;n<Ncorrect;n++){
 			
@@ -121,48 +130,30 @@ public class Dfa implements Callable<Double>{
 				//Get detrended residue power, and keep running average over entire waveform
 				if(n != 0){
 					for(int i=0;i<k;i++){
-						tmp=(data[(int) (n-k+i+1)] - b -m*i);
-						detrendVar+=tmp*tmp;
-						System.err.print(data[n] + " ");
+						err=(data[(int) (n-k+i+1)] - b -m*i);
+						mse+=err*err;
 					}
-					System.err.println("");
+					//System.err.println("");
 				}
 				//Reset state of least square estimator
 				K1=0.0;
 				K2=0.0;
-				err=0.0;
+				e=0.0;
 				m=0.0;
 				k=1.0;
 				b=0.0;
 			}
 
-			//Perform recursive least square estimation
-			
-			err=data[n] - b -m*Ts;
+			//Perform recursive least square estimation			
+			e=data[n] - b -m*Ts;
 			K1=(4*k-2)/(k*k+k);
 			K2=6/( Ts*(k*k+k) );
-			b=b + m*Ts + K1*err;
-			m=m + K2*err;
+			b=b + m*Ts + K1*e;
+			m=m + K2*e;
 			k=k+1;
-			
-			System.err.println("b= "+ b +" e= " + err + " m= " + m
-					+" K1= " + K1 +" K2= " + K2 + " data= " + data[n]);
-			
-			sumX+=data[n];
-			sumTX +=n*data[n];
-			C +=n;
-			D += (n*n);
-		}
 
-		
-		double den= (Ncorrect*D- C*C);
-		D=D/den;
-		double A=Ncorrect/den;
-		C=C/den;
-		double optb= D*sumX - C*sumTX; 
-		double optm= -C*sumX + A*sumTX;
-		System.err.println("optb= "+ optb +" optm = "+ optm );
-		return 0.5*Math.log10( detrendVar/((double) Ncorrect) );
+		}
+		return 0.5*Math.log10( mse/((double) Ncorrect) );
 
 	}
 
@@ -187,13 +178,8 @@ public class Dfa implements Callable<Double>{
 
 		ArrayList<Double> numbers = new ArrayList<Double>();
 		double tmp;
-		//while (in.hasNextDouble())
-		//    numbers.add(in.nextDouble());
-			
-		numbers.add(1.2);
-		numbers.add(0.2);
-		numbers.add(2.9);
-		numbers.add(2.1);
+		while (in.hasNextDouble())
+		    numbers.add(in.nextDouble());
 		
 		Dfa dfa=null;
 		try {
@@ -219,7 +205,7 @@ public class Dfa implements Callable<Double>{
 		executor.shutdown();
 		
 		for(int i=0;i<dfa.results.length;i++)
-			System.out.println(Math.log10(i+4) + " " + dfa.results[i]); 
+			System.out.println(Math.log10(dfa.scales[i]) + " " + dfa.results[i]); 
 		
 	}
 
