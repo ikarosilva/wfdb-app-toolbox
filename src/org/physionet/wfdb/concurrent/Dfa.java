@@ -1,6 +1,6 @@
 /*
  * ===========================================================
- * PhysioNet Challenge Score 2013
+ * DFA 2013
  *              
  * ===========================================================
  *
@@ -31,7 +31,7 @@
  *  Algorith contains elements based on DFA C version:
  *  				http://www.physionet.org/physiotools/dfa/dfa.c
  * 
- * Last Modified:	 June 28, 2013
+ * Last Modified:	 July 1, 2013
  * 
  * Changes
  * -------
@@ -75,8 +75,8 @@ public class Dfa implements Callable<Double>{
 			mx+=i;
 		mx=mx/((double) N);
 		for(int i=0;i<N;i++){
-			integrator+=x.get(i)-mx;
-			data[i]=integrator;
+			//integrator+=x.get(i)-mx;
+			data[i]=x.get(i);//integrator;
 		}
 
 		//Set task queue according to scales to be calculated as in the C code
@@ -134,6 +134,7 @@ public class Dfa implements Callable<Double>{
 				if(n != 0){
 					for(int i=0;i<k;i++){
 						err= b + m*i - data[(int) (n-k+i+1)];
+						//System.out.println("err= " + err);
 						mse+=err*err;
 					}
 					//System.err.println("");
@@ -146,16 +147,20 @@ public class Dfa implements Callable<Double>{
 				k=1.0;
 				b=0.0;
 			}
+			//TODO: use ls estimator of Scharf pg. 385 to see if performance is 
+			//improved
 
 			//Perform recursive least square estimation			
-			e=data[n] - b -m*Ts;
+			e=data[n] - b -m*(k-1);
 			K1=(4*k-2)/(k*k+k);
 			K2=6/( Ts*(k*k+k) );
 			b=b + m*Ts + K1*e;
 			m=m + K2*e;
 			k=k+1;
-
+			System.err.println(data[n]);
 		}
+		//System.err.println("mse=" + mse);
+		System.err.println("a=" + m + " b= " + b);
 		return 0.5*Math.log10( mse/((double) Ncorrect) );
 
 	}
@@ -187,9 +192,13 @@ public class Dfa implements Callable<Double>{
 		numbers.ensureCapacity(100000);
 		double tmp;
 		String line=null;
+		double index=0, y;
 		try {
 			while ( ( line = br.readLine() )!= null ){
-				numbers.add(Double.valueOf(line));
+				//numbers.add(Double.valueOf(line));
+				index=index+1;
+				y=index*1 + 0.0; 
+				numbers.add(y);
 			}
 		} catch (IOException e2) {
 			e2.printStackTrace();

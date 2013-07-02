@@ -227,7 +227,7 @@ public class PhysioNetDB {
 		return desc;
 	}
 
-	private void setDBRecordList(){
+	public void setDBRecordList(){
 		String inputLine;
 		BufferedReader in = null;
 		String[] tmpStr;
