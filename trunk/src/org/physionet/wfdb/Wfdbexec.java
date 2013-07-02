@@ -178,6 +178,16 @@ public class Wfdbexec {
 
 	}
 
+	public synchronized ArrayList<String> execWithStandardInput(double[] inputData) throws IOException {
+
+		String[] stringArr=new String[inputData.length];
+		for(int i=0;i<inputData.length;i++)
+			stringArr[i]=Double.toString(inputData[i]);
+		
+		return execWithStandardInput(stringArr);
+
+	}
+	
 
 	public synchronized ArrayList<String> execToStringList(String[] args) {
 		setArguments(args);   
