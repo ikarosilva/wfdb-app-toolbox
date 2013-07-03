@@ -28,7 +28,7 @@
  * Author:  Ikaro Silva,
  * 
  *  
- * Last Modified:	 July 1, 2013
+ * Last Modified:	 July 3, 2013
  * 
  * Changes
  * -------
@@ -53,7 +53,7 @@ import org.physionet.wfdb.physiobank.PhysioNetDB;
 import org.physionet.wfdb.physiobank.PhysioNetRecord;
 
 public class  MapRecord implements Callable<Double>{
-	private static final int THREADS=1;//Runtime.getRuntime().availableProcessors();
+	private static final int MAX_THREADS=Runtime.getRuntime().availableProcessors();
 	private final int N;		//Total number of records
 	private final BlockingQueue<String> tasks;
 	private final HashMap<String,Integer> index;
@@ -74,8 +74,8 @@ public class  MapRecord implements Callable<Double>{
 		tasks=new ArrayBlockingQueue<String>(N);
 		index=new HashMap<String,Integer>();
 		Integer ind=0;
-		this.commandName=commandName;
-		this.commandDir=commandDir;
+		MapRecord.commandName=commandName;
+		MapRecord.commandDir=commandDir;
 		for(PhysioNetRecord rec : recordList){
 			tasks.put(rec.getRecordName());
 			index.put(rec.getRecordName(),ind);
@@ -124,22 +124,34 @@ public class  MapRecord implements Callable<Double>{
 
 	public static void main(String[] args){
 
-		ArrayList<Future<Double>> futures=
-				new ArrayList<Future<Double>>(THREADS);
-		ExecutorService executor= 
-				Executors.newFixedThreadPool(THREADS);
-
+		
+		if(args.length<3){
+			System.out.println("Usage: MapRecord databaseName commandName commandDir nThreads");
+			System.out.println("Example 1: MapRecord aami-ec13 dfa /home/ikaro/workspace/wfdb-app-toolbox/mcode/example/");
+			System.out.println("Example 2: MapRecord aami-ec13 dfa /home/ikaro/workspace/wfdb-app-toolbox/mcode/example/ 3");
+		}
 		MapRecord map=null;
-		String database="aami-ec13";
-		String commandName="dfa";
-		String commandDir="/home/ikaro/workspace/wfdb-app-toolbox/mcode/example/";
+		String database=args[0];
+		String commandName=args[1];
+		String commandDir=args[2];
+		int threads= MAX_THREADS;
+		
+		if(args.length>3)
+			threads=Integer.valueOf(args[3]);
+		threads=(threads > MAX_THREADS) ? MAX_THREADS:threads;
+		
+		ArrayList<Future<Double>> futures=
+				new ArrayList<Future<Double>>(threads);
+		ExecutorService executor= 
+				Executors.newFixedThreadPool(threads);
 
+		
 		double[][] results = null;
 		double fail=0;
 		try {
 			map = new MapRecord(database,commandName,commandDir);
 
-			for(int i=0;i<THREADS;i++){
+			for(int i=0;i<threads;i++){
 				Future<Double> future= executor.submit(map);
 				futures.add(future);
 			}
