@@ -59,8 +59,9 @@ public class  MapRecord implements Callable<Double>{
 	private final HashMap<String,Integer> index;
 	private double[][] results;
 	private static String commandName;
+	private static String commandDir;
 
-	MapRecord(String dataBase,String commandName) throws InterruptedException{
+	MapRecord(String dataBase,String commandName,String commandDir) throws InterruptedException{
 
 		//Initialize record list
 		PhysioNetDB db = new PhysioNetDB(dataBase);
@@ -74,6 +75,7 @@ public class  MapRecord implements Callable<Double>{
 		index=new HashMap<String,Integer>();
 		Integer ind=0;
 		this.commandName=commandName;
+		this.commandDir=commandDir;
 		for(PhysioNetRecord rec : recordList){
 			tasks.put(rec.getRecordName());
 			index.put(rec.getRecordName(),ind);
@@ -92,28 +94,31 @@ public class  MapRecord implements Callable<Double>{
 		long id=Thread.currentThread().getId();
 		while ((taskInd = tasks.poll()) != null ){ 
 			System.out.println("Thread [" + id + "]: Processing: " + taskInd);
-			results[index.get(taskInd)]=compute(taskInd);
+			results[index.get(taskInd)]=compute(taskInd).clone();
 		}
 		return fail;
 	}
 
 
 	public double[] compute(String record){
-		
+
 		Wfdbexec rdsamp=new Wfdbexec("rdsamp");
-		Wfdbexec exec=new Wfdbexec(commandName);
+		Wfdbexec exec=new Wfdbexec(commandName,commandDir);
 		String[] arguments={"-r",record};
 		//Execute command
 		double[][] inputData=null;
-		double[] y;
+		ArrayList<String> y;
+		double[] out = null;
 		try {
 			inputData=rdsamp.execToDoubleArray(arguments);
-			exec.execWithStandardInput(inputData);
+			y=exec.execWithStandardInput(inputData);
+			out=new double[y.size()];
+			for(int n=0;n<y.size();n++)
+				out[n]=Double.valueOf(y.get(n));
 		} catch (Exception e) {
-			System.err.println("Could not execute command:" + e);
+			e.printStackTrace();
 		}
-		return y;
-
+		return out;
 	}
 
 
@@ -127,11 +132,12 @@ public class  MapRecord implements Callable<Double>{
 		MapRecord map=null;
 		String database="aami-ec13";
 		String commandName="dfa";
-		
+		String commandDir="/home/ikaro/workspace/wfdb-app-toolbox/mcode/example/";
+
 		double[][] results = null;
 		double fail=0;
 		try {
-			map = new MapRecord(database,commandName);
+			map = new MapRecord(database,commandName,commandDir);
 
 			for(int i=0;i<THREADS;i++){
 				Future<Double> future= executor.submit(map);
@@ -149,9 +155,13 @@ public class  MapRecord implements Callable<Double>{
 			e.printStackTrace();
 		} 
 		executor.shutdown();
-		System.out.println("Done!!");
-		System.out.println(results[0]); 
-
+		System.out.println("!!Done: Processed records: " + results.length);
+		for(int i=0;i<results.length;i++){
+			System.out.println("results[" + i + "] (" + results[i].length+  ") : ");
+			for(int k=0;k<results[i].length;k++)
+				System.out.print(results[i][k] + " ");
+			System.out.println("");
+		}
 	}
 
 }

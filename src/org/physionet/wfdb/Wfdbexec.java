@@ -77,13 +77,22 @@ public class Wfdbexec {
 	private int DoubleArrayListCapacity=0;
 	private static Logger logger =
 			Logger.getLogger(Wfdbexec.class.getName());
+	private String commandDir;
 
 	public Wfdbexec(String commandName){
 		logger.finest("\n\t***Setting exec commandName to: " + commandName);
 		this.commandName=commandName;
 		set_environment();
+		this.commandDir=WFDB_NATIVE_BIN;
 	}
 
+	public Wfdbexec(String commandName, String commandDir){
+		logger.finest("\n\t***Setting exec commandName to: " + commandDir + commandName);
+		this.commandName=commandName;
+		this.commandDir=commandDir;
+		set_environment();
+	}
+	
 	public void setArguments(String[] args){
 		arguments=args;
 	}
@@ -97,9 +106,10 @@ public class Wfdbexec {
 				+ dir);
 		EXECUTING_DIR=dir;
 	}
+	
 	private void gen_exec_arguments() {
 		commandInput = new ArrayList<String>();
-		commandInput.add(WFDB_NATIVE_BIN + commandName);
+		commandInput.add(commandDir + commandName);
 		logger.finest("\n\t***commandInput.add = "+WFDB_NATIVE_BIN + commandName);
 		if(arguments != null){
 			for(String i: arguments)
@@ -178,11 +188,11 @@ public class Wfdbexec {
 
 	}
 
-	public synchronized ArrayList<String> execWithStandardInput(double[] inputData) throws IOException {
+	public synchronized ArrayList<String> execWithStandardInput(double[][] inputData) throws IOException {
 
 		String[] stringArr=new String[inputData.length];
 		for(int i=0;i<inputData.length;i++)
-			stringArr[i]=Double.toString(inputData[i]);
+			stringArr[i]=Double.toString(inputData[i][0]);
 		
 		return execWithStandardInput(stringArr);
 
