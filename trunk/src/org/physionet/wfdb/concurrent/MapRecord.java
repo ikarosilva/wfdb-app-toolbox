@@ -60,9 +60,43 @@ public class  MapRecord implements Callable<Double>{
 	private double[][] results;
 	private static String commandName;
 	private static String commandDir;
+	private final String startSample;
+	private final String endSample;
+	private static final String UNSPECIFIED_SAMPLE="0"; //In this should read entire wfdb record (for both start and end samples)
 
-	MapRecord(String dataBase,String commandName,String commandDir) throws InterruptedException{
+	
+	public MapRecord(ArrayList<String> recordList,String commandName,String commandDir) throws InterruptedException{
+		this(recordList,commandName,commandDir,UNSPECIFIED_SAMPLE,UNSPECIFIED_SAMPLE);
+	}
+	
+	public MapRecord(ArrayList<String> recordList,String commandName,String commandDir,
+			String startSample,String endSample) throws InterruptedException{
 
+		//Set task queue 
+		N= recordList.size();
+		results=new double[N][];
+		tasks=new ArrayBlockingQueue<String>(N);
+		index=new HashMap<String,Integer>();
+		Integer ind=0;
+		MapRecord.commandName=commandName;
+		MapRecord.commandDir=commandDir;
+		this.startSample=startSample;
+		this.endSample=endSample;
+		for(String rec : recordList){
+			tasks.put(rec);
+			index.put(rec,ind);
+			ind++;
+		}
+	}
+	
+	public MapRecord(String dataBase,String commandName,String commandDir) 
+			throws InterruptedException{
+		this(dataBase,commandName,commandDir,UNSPECIFIED_SAMPLE,UNSPECIFIED_SAMPLE); //Start from beginning of the record and leave end unspecified
+	}
+		
+	
+	public MapRecord(String dataBase,String commandName,String commandDir,
+			String startSample,String endSample) throws InterruptedException{
 		//Initialize record list
 		PhysioNetDB db = new PhysioNetDB(dataBase);
 		db.setDBRecordList();
@@ -76,12 +110,13 @@ public class  MapRecord implements Callable<Double>{
 		Integer ind=0;
 		MapRecord.commandName=commandName;
 		MapRecord.commandDir=commandDir;
+		this.startSample=startSample;
+		this.endSample=endSample;
 		for(PhysioNetRecord rec : recordList){
 			tasks.put(rec.getRecordName());
 			index.put(rec.getRecordName(),ind);
 			ind++;
 		}
-
 	}
 
 	public double[][] getResults(){
@@ -104,7 +139,9 @@ public class  MapRecord implements Callable<Double>{
 
 		Wfdbexec rdsamp=new Wfdbexec("rdsamp");
 		Wfdbexec exec=new Wfdbexec(commandName,commandDir);
-		String[] arguments={"-r",record};
+		
+		String[] arguments={"-r",record,"-f",startSample,"-t",endSample,"-P"};
+		
 		//Execute command
 		double[][] inputData=null;
 		ArrayList<String> y;
