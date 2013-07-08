@@ -1,6 +1,10 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
    
+0.9.1 (tba):
+	Added: MAPRECORD. Fixed parsing issues with RDANN and added option
+	to load specific annotation types only.
+
 0.9.0 (24 June 2013):
 	Added: WFDBUPDATE, BXB, MXM, SUMANN, SORTANN, WABP, LOMB, and 
 	RDMIMIC2WAVE. Fixed bug and performance issues with RDANN and

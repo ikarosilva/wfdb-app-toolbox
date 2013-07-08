@@ -60,17 +60,17 @@ public class  MapRecord implements Callable<Double>{
 	private double[][] results;
 	private static String commandName;
 	private static String commandDir;
-	private final String startSample;
-	private final String endSample;
+	private final String startTime;
+	private final String endTime;
 	private static final String UNSPECIFIED_SAMPLE="0"; //In this should read entire wfdb record (for both start and end samples)
 
-	
+
 	public MapRecord(ArrayList<String> recordList,String commandName,String commandDir) throws InterruptedException{
 		this(recordList,commandName,commandDir,UNSPECIFIED_SAMPLE,UNSPECIFIED_SAMPLE);
 	}
-	
+
 	public MapRecord(ArrayList<String> recordList,String commandName,String commandDir,
-			String startSample,String endSample) throws InterruptedException{
+			String startTime,String endTime) throws InterruptedException{
 
 		//Set task queue 
 		N= recordList.size();
@@ -80,23 +80,23 @@ public class  MapRecord implements Callable<Double>{
 		Integer ind=0;
 		MapRecord.commandName=commandName;
 		MapRecord.commandDir=commandDir;
-		this.startSample=startSample;
-		this.endSample=endSample;
+		this.startTime=startTime;
+		this.endTime=endTime;
 		for(String rec : recordList){
 			tasks.put(rec);
 			index.put(rec,ind);
 			ind++;
 		}
 	}
-	
+
 	public MapRecord(String dataBase,String commandName,String commandDir) 
 			throws InterruptedException{
 		this(dataBase,commandName,commandDir,UNSPECIFIED_SAMPLE,UNSPECIFIED_SAMPLE); //Start from beginning of the record and leave end unspecified
 	}
-		
-	
+
+
 	public MapRecord(String dataBase,String commandName,String commandDir,
-			String startSample,String endSample) throws InterruptedException{
+			String startTime,String endTime) throws InterruptedException{
 		//Initialize record list
 		PhysioNetDB db = new PhysioNetDB(dataBase);
 		db.setDBRecordList();
@@ -110,8 +110,8 @@ public class  MapRecord implements Callable<Double>{
 		Integer ind=0;
 		MapRecord.commandName=commandName;
 		MapRecord.commandDir=commandDir;
-		this.startSample=startSample;
-		this.endSample=endSample;
+		this.startTime=startTime;
+		this.endTime=endTime;
 		for(PhysioNetRecord rec : recordList){
 			tasks.put(rec.getRecordName());
 			index.put(rec.getRecordName(),ind);
@@ -123,12 +123,16 @@ public class  MapRecord implements Callable<Double>{
 		return results;
 	}
 
+	public HashMap<String,Integer> getIndexMap(){
+		return index;
+	}
+
 	public Double call(){
 		double fail=0;
 		String taskInd;
 		long id=Thread.currentThread().getId();
 		while ((taskInd = tasks.poll()) != null ){ 
-			System.out.println("Thread [" + id + "]: Processing: " + taskInd);
+			//System.out.println("Thread [" + id + "]: Processing: " + taskInd);
 			results[index.get(taskInd)]=compute(taskInd).clone();
 		}
 		return fail;
@@ -139,9 +143,9 @@ public class  MapRecord implements Callable<Double>{
 
 		Wfdbexec rdsamp=new Wfdbexec("rdsamp");
 		Wfdbexec exec=new Wfdbexec(commandName,commandDir);
-		
-		String[] arguments={"-r",record,"-f",startSample,"-t",endSample,"-P"};
-		
+
+		String[] arguments={"-r",record,"-f",startTime,"-t",endTime,"-P"};
+
 		//Execute command
 		double[][] inputData=null;
 		ArrayList<String> y;
@@ -161,9 +165,21 @@ public class  MapRecord implements Callable<Double>{
 
 	public static void main(String[] args){
 
-		
+		double[][] results=start(args);
+		String[] recList=getRecordList(args);
+		for(int i=0;i<results.length;i++){
+			System.out.println(recList[i]+  " :\t");
+			for(int k=0;k<results[i].length;k++)
+				System.out.print(results[i][k] + " ");
+			System.out.println("");
+		}
+	}
+
+	public static String[] getRecordList(String[] args){
+
+
 		if(args.length<3){
-			System.out.println("Usage: MapRecord databaseName commandName commandDir nThreads");
+			System.out.println("Usage: MapRecord databaseName commandName commandDir nThreads stopTime startTime");
 			System.out.println("Example 1: MapRecord aami-ec13 dfa /home/ikaro/workspace/wfdb-app-toolbox/mcode/example/");
 			System.out.println("Example 2: MapRecord aami-ec13 dfa /home/ikaro/workspace/wfdb-app-toolbox/mcode/example/ 3");
 		}
@@ -171,22 +187,57 @@ public class  MapRecord implements Callable<Double>{
 		String database=args[0];
 		String commandName=args[1];
 		String commandDir=args[2];
+
+		try {
+			map = new MapRecord(database,commandName,commandDir);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		HashMap<String, Integer> indexMap = map.getIndexMap();
+		String[] recList=new String[indexMap.size()];
+		indexMap.keySet().toArray(recList);
+
+		//System.out.println("!!Done: Processed records: " + results.length);
+		return recList;
+	}
+
+	public static double[][] start(String[] args){
+
+
+		if(args.length<3){
+			System.out.println("Usage: MapRecord databaseName commandName commandDir nThreads stopTime startTime");
+			System.out.println("Example 1: MapRecord aami-ec13 dfa /home/ikaro/workspace/wfdb-app-toolbox/mcode/example/");
+			System.out.println("Example 2: MapRecord aami-ec13 dfa /home/ikaro/workspace/wfdb-app-toolbox/mcode/example/ 3");
+		}
+		MapRecord map=null;
+		String database=args[0];
+		String commandName=args[1];
+		String commandDir=args[2];
+
 		int threads= MAX_THREADS;
-		
 		if(args.length>3)
 			threads=Integer.valueOf(args[3]);
 		threads=(threads > MAX_THREADS) ? MAX_THREADS:threads;
-		
+		threads=(threads < 1) ? MAX_THREADS:threads;
+
+		String endTime=UNSPECIFIED_SAMPLE;
+		if(args.length>4)
+			threads=Integer.valueOf(args[4]);
+
+		String startTime=UNSPECIFIED_SAMPLE;
+		if(args.length>5)
+			threads=Integer.valueOf(args[5]);
+
 		ArrayList<Future<Double>> futures=
 				new ArrayList<Future<Double>>(threads);
 		ExecutorService executor= 
 				Executors.newFixedThreadPool(threads);
 
-		
+
 		double[][] results = null;
 		double fail=0;
 		try {
-			map = new MapRecord(database,commandName,commandDir);
+			map = new MapRecord(database,commandName,commandDir,startTime,endTime);
 
 			for(int i=0;i<threads;i++){
 				Future<Double> future= executor.submit(map);
@@ -204,13 +255,8 @@ public class  MapRecord implements Callable<Double>{
 			e.printStackTrace();
 		} 
 		executor.shutdown();
-		System.out.println("!!Done: Processed records: " + results.length);
-		for(int i=0;i<results.length;i++){
-			System.out.println("results[" + i + "] (" + results[i].length+  ") : ");
-			for(int k=0;k<results[i].length;k++)
-				System.out.print(results[i][k] + " ");
-			System.out.println("");
-		}
+		//System.out.println("!!Done: Processed records: " + results.length);
+		return results;
 	}
 
 }
