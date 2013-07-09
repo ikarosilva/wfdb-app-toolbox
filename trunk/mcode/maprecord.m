@@ -39,7 +39,7 @@ function varargout=maprecord(varargin)
 % Nthreads
 %       A 1x1 integer specifying the number of threads to use for 
 %       processing (between 1 and the number of processors in your system).
-%       Default is the number of processor on your system. 
+%        Default is the number of processor on your system. 
 %
 %
 % Ouput parameters:
@@ -63,10 +63,10 @@ function varargout=maprecord(varargin)
 % See also RDSAMP, PHYSIONETDB, WFDBTIME, WFDBDESC
 %
 %%Example 1- Single thread execution of DFA on the 'aami-ec13' database
-%tic;[mapvalues]=maprecord('aami-ec13','/usr/lib/dfa',[],[],1);toc
+%tic;[mapvalues,recList]=maprecord('aami-ec13','/usr/lib/dfa',[],[],1);toc
 %
 % %Example 2- Maximum Multi-thread execution
-%tic;[mapvalues]=maprecord('aami-ec13','/usr/lib/dfa');toc
+%tic;[mapvalues,recList]=maprecord('aami-ec13','/usr/lib/dfa');toc
 
 if(~wfdbloadlib)
     %Add classes to dynamic path
@@ -88,22 +88,13 @@ end
 
 %If N is empty, it is the entire dataset. We should ensure capacity
 %so that the fetching will be more efficient.
-if(isempty(N))
-    [siginfo,~]=wfdbdesc(recordName);
-    if(~isempty(siginfo))
-        N=siginfo(1).LengthSamples;
-    else
-        warning('Could not get signal information. Attempting to read signal without buffering.')
-    end
-end
-
 mapvalues=javaMethod('start','org.physionet.wfdb.concurrent.MapRecord',...
-    {names,executeCommand,'',num2str(Nthreads),stopTime,startTime});
+    {names,executeCommand,num2str(Nthreads),stopTime,startTime});
 
 if(nargout>1)
     %Get record list 
     recList=javaMethod('getRecordList','org.physionet.wfdb.concurrent.MapRecord',...
-    {names,executeCommand,'',num2str(Nthreads),stopTime,startTime});
+    {names,executeCommand,num2str(Nthreads),stopTime,startTime});
 end
 
 for n=1:nargout
