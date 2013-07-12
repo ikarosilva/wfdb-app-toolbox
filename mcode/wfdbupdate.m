@@ -19,7 +19,7 @@ function varargout=wfdbupdate(varargin)
 %
 
 [~,config]=wfdbloadlib;
-this=urlread(['file://' config.MATLAB_PATH 'NEWS']);
+this=urlread(['file:' config.MATLAB_PATH 'NEWS']);
 updates=urlread('http://physionet.org/physiotools/matlab/wfdb-app-matlab/NEWS');
 
 if(strcmp(this,updates))
