@@ -51,7 +51,7 @@ function varargout=maprecord(varargin)
 %       (which gives Mx1 doubles for each record processed). 
 %
 % recList (Optional)
-%       A Nx1 cell array of strings correspodin to the record names
+%       A Nx1 char array of strings correspoding to the record names
 %       processed by MAPRECORD.
 %        
 % Written by Ikaro Silva, 2013
@@ -95,6 +95,7 @@ if(nargout>1)
     %Get record list 
     recList=javaMethod('getRecordList','org.physionet.wfdb.concurrent.MapRecord',...
     {names,executeCommand,num2str(Nthreads),stopTime,startTime});
+    recList=char(recList);
 end
 
 for n=1:nargout
