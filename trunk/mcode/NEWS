@@ -1,7 +1,7 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
    
-0.9.1 (tba):
+0.9.1 (12 July 2013):
 	Added: MAPRECORD. Fixed parsing issues with RDANN and added option
 	to load specific annotation types only.
 
