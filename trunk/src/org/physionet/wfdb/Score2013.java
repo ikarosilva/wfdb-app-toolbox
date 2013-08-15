@@ -177,7 +177,6 @@ public class Score2013 {
 		ArrayList<String> refAnnSamples= new ArrayList<String>();
 		refAnnSamples=rdann.execToStringList(annArg);
 		
-		System.out.println("Printint annotations");
 		String[] T0=refAnnSamples.get(0).split("\\s+");;
 		String[] TF=refAnnSamples.get(refAnnSamples.size()-1).split("\\s+");;;
 		
