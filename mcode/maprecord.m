@@ -62,11 +62,15 @@ function varargout=maprecord(varargin)
 %
 % See also RDSAMP, PHYSIONETDB, WFDBTIME, WFDBDESC
 %
+% %The examples below assume you have an executable called 'max'
+% %in a Linux machinhe under '/usr/lib/max' that calculates the maximum
+% %value for each column in matrix and returns the ouput of each column
+% %on a separate line
 %%Example 1- Single thread execution of DFA on the 'aami-ec13' database
-%tic;[mapvalues,recList]=maprecord('aami-ec13','/usr/lib/dfa',[],[],1);toc
+%tic;[mapvalues,recList]=maprecord('aami-ec13','/usr/lib/max',[],[],1);toc
 %
 % %Example 2- Maximum Multi-thread execution
-%tic;[mapvalues,recList]=maprecord('aami-ec13','/usr/lib/dfa');toc
+%tic;[mapvalues,recList]=maprecord('aami-ec13','/usr/lib/max');toc
 
 if(~wfdbloadlib)
     %Add classes to dynamic path
