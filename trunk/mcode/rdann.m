@@ -62,7 +62,7 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: 6/27/2013
+% Last Modified: 8/9/2013
 % Version 1.0
 % Since 0.0.1
 %
@@ -144,7 +144,7 @@ chan=zeros(N,1);
 num=zeros(N,1);
 comments=cell(N,1);
 str=char(data(1));
-if(strcmp(str(1),'['))
+if(~isempty(str) && strcmp(str(1),'['))
     %In this case there is a data stamp right after the timestamp such as:
     % [00:11:30.628 09/11/1989]      157     N    0    1    0
     for n=1:N

@@ -21,6 +21,7 @@
 %   bxb             - ANSI/AAMI-standard beat-by-beat annotation comparator.
 %   lomb			- Estimate power spectrum using the Lomb periodogram method	
 %   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
+%   maprecord       - Perform multithread batch processing of WFDB records 
 %   mrgann          - Merge annotation files
 %   mxm             TODO: - ANSI/AAMI-standard measurement-by-measurement annotation comparator.
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals

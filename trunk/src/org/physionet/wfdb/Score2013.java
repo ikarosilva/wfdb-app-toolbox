@@ -27,7 +27,7 @@
  *
  * Original Author:  Ikaro Silva, 
  * 
- * Last Modified:	 June 6, 2013
+ * Last Modified:	 August 15, 2013
  * 
  * Changes
  * -------
@@ -50,11 +50,12 @@ public class Score2013 {
 	private static final int logLevel=0;
 	private static final String fSep=System.getProperty("file.separator");
 
-	private static double score1(String recName,String refAnn,String testAnn){
+	private static double score1(String recName,String refAnn,String testAnn,
+								String T0, String TF){
 		//Generate score1
 		Wfdbexec tach=new Wfdbexec("tach");
-		String[] refArg={"-r",recName,"-a",refAnn,"-n","12"};
-		String[] testArg={"-r",recName,"-a",testAnn,"-n","12"};
+		String[] refArg={"-r",recName,"-a",refAnn,"-f",T0,"-t",TF,"-n","12"};
+		String[] testArg={"-r",recName,"-a",testAnn,"-f",T0,"-t",TF,"-n","12"};
 		double[][] hrFQRS=null;
 		double[][] hrTEST=null;
 		double score2=0;
@@ -126,10 +127,11 @@ public class Score2013 {
 		return rrName;
 	}
 	
-	private static String score2(String recName,String rrAnn,String rrTest){
+	private static String score2(String recName,String rrAnn,String rrTest,
+								String T0, String TF){
 		Wfdbexec mxm=new Wfdbexec("mxm");
 		String[] arg={"-r",recName,"-a",rrAnn,rrTest,
-				"-f","0"};
+				"-f",T0,"-t",TF};
 		mxm.setArguments(arg);
 		mxm.setLogLevel(logLevel);
 		ArrayList<String> ans=null;
@@ -168,10 +170,21 @@ public class Score2013 {
 		String refAnn=args[2];
 		String testAnn=args[3];	
 
+		//Get first and last reference annotations
+		//Output should be in a format similar to: "0:01.384"
+		Wfdbexec rdann=new Wfdbexec("rdann");
+		String[] annArg={"-r",recName,"-a",refAnn};
+		ArrayList<String> refAnnSamples= new ArrayList<String>();
+		refAnnSamples=rdann.execToStringList(annArg);
+		
+		System.out.println("Printint annotations");
+		String[] T0=refAnnSamples.get(0).split("\\s+");;
+		String[] TF=refAnnSamples.get(refAnnSamples.size()-1).split("\\s+");;;
+		
 		double[] score = new double[2];
 
 		//Generate HR score
-		score[0]=score1(recName,refAnn,testAnn);
+		score[0]=score1(recName,refAnn,testAnn,T0[1],TF[1]);
 
 		//Generate RR series
 		
@@ -203,7 +216,7 @@ public class Score2013 {
 		
 		if(rrRefFile != null && rrTestFile != null){
 			//Calculate the error
-			score[1]=Double.valueOf(score2(recName,rrRefFile,rrTestFile));
+			score[1]=Double.valueOf(score2(recName,rrRefFile,rrTestFile,T0[1],TF[1]));
 			//Perform clean up of cached files
 			if(! testFile.delete()){
 	    		 System.err.println("Could not remove cache file:"
@@ -227,11 +240,6 @@ public class Score2013 {
 		System.out.println("Score (event 1/4): " + score[0]);
 		System.out.println("Score (event 2/5): " + score[1]);
 	}
-
-
-
-
-
 
 
 }
