@@ -62,9 +62,6 @@ public class Score2013 {
 		try {
 			hrFQRS=tach.execToDoubleArray(refArg);
 			hrTEST=tach.execToDoubleArray(testArg);
-			if((hrTEST != null) && hrTEST.length != hrFQRS.length)
-				throw new AssertionError("Could not generate HR " +
-			                             "series of same size using TACH!!");    
 		} catch (Exception e) {
 			System.err.println("Could not score event 2 on entry: " + testAnn);
 			e.printStackTrace();
