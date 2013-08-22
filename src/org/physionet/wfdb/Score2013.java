@@ -69,10 +69,10 @@ public class Score2013 {
 
 		//Calculate MSE for the score, TACH returns two vectors,
 		//We want to calculate the MSE over the second column (HR estimates)
-		//and we purposely omit the first sample from the calculation
-		for(int n=1;n< hrTEST.length;n++){
-			score2=( (n-1)*score2 + 
-					(hrTEST[n][0] - hrFQRS[n][0])*(hrTEST[n][0] - hrFQRS[n][0]) )/n;
+		//and we purposely omit the first 2 samples from the calculation
+		for(int n=2;n< hrTEST.length;n++){
+			score2=( (n-2)*score2 + 
+					(hrTEST[n][0] - hrFQRS[n][0])*(hrTEST[n][0] - hrFQRS[n][0]) )/(n-1);
 		}
 		return score2;
 	}
