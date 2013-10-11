@@ -40,14 +40,14 @@ do
 done
 
 if [ x$PLOT = x ]; then
-  if [ -x //Users/ikaro/wfdb_tmp/wfdb-10.5.18/usr/bin/plt ]; then
-    PLOT=//Users/ikaro/wfdb_tmp/wfdb-10.5.18/usr/bin/plt
+  if [ -x /Users/ikaro/workspace/wfdb-app-toolbox/mcode/nativelibs/macosx-x86_64//bin/plt ]; then
+    PLOT=/Users/ikaro/workspace/wfdb-app-toolbox/mcode/nativelibs/macosx-x86_64//bin/plt
   elif [ -x /usr/local/bin/plt ]; then
     PLOT=/usr/local/bin/plt
   elif [ -x /usr/bin/plt ]; then
     PLOT=/usr/bin/plt
-  elif [ -x //Users/ikaro/wfdb_tmp/wfdb-10.5.18/usr/bin/plot2d ]; then
-    PLOT=//Users/ikaro/wfdb_tmp/wfdb-10.5.18/usr/bin/plot2d
+  elif [ -x /Users/ikaro/workspace/wfdb-app-toolbox/mcode/nativelibs/macosx-x86_64//bin/plot2d ]; then
+    PLOT=/Users/ikaro/workspace/wfdb-app-toolbox/mcode/nativelibs/macosx-x86_64//bin/plot2d
   elif [ -x /usr/local/bin/plot2d ]; then
     PLOT=/usr/local/bin/plot2d
   elif [ -x /usr/bin/plot2d ]; then
