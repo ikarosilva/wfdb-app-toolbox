@@ -61,9 +61,15 @@ function varargout=wrann(varargin)
 %[ann2,type2,subtype2,chan2,num2]=rdann('challenge/2013/set-a/a01','test',[],[],1);
 %err=sum(ann ~= ann2)
 %
+%
+%
+% %Example 2
+%[ann,type,subtype,chan,num]=rdann('mitdb/100','atr');
+%wrann('mitdb/100','test',wann,type,subtype,chan,num);
+%
 % Written by Ikaro Silva, 2013
-% Last Modified: 6/13/2013
-% Version 1.0
+% Last Modified: 10/11/2013
+% Version 1.1.1
 % Since 0.0.1
 %
 % See also rdann, rdsamp, wfdbdesc
@@ -106,26 +112,30 @@ del=repmat(' ',size(ann));
 %printf("%6s%5d%5d%5d", annstr(annot.anntyp), annot.subtyp,annot.chan, annot.num);
 %printf("\t%s", annot.aux + 1)
 
-annTimeStamp=cell2mat(wfdbtime(recordName,ann));
+[annTimeStamp]=wfdbtime(recordName,ann);
 L=length(annTimeStamp);
-data=[];
+data=cell(L,1);
 if(length(AnnType)==1);
-   annType=repmat(AnnType,[1 L]); 
+    annType=repmat(AnnType,[1 L]);
 end
 if(length(subType)==1);
-   subType=repmat(subType,[1 L]); 
+    subType=repmat(subType,[1 L]);
 end
 if(length(chan)==1);
-   chan=repmat(chan,[1 L]); 
+    chan=repmat(chan,[1 L]);
 end
 if(length(num)==1);
-   num=repmat(num,[1 L]); 
-end
-for i=1:L
-    data(end+1,:)=sprintf('%s  %7ld %6s%5d%5d%5d',annTimeStamp(i,:),ann(i),annType(i),subType(i),...
-        chan(i),num(i));
+    num=repmat(num,[1 L]);
 end
 
+for i=1:L
+    %data{end+1}={char(sprintf('%s  %7ld %6s%5d%5d%5d',annTimeStamp{i},ann(i),annType(i),subType(i),...
+    %    chan(i),num(i)))};
+    data{i}=[annTimeStamp{i} ' ' num2str(ann(i)) ' ' annType(i) ' ' ...
+        subType(i) ' ' num2str(chan(i)) ' ' num2str(num(i))];
+end
+
+
 javaWfdbExec.setArguments(wfdb_argument);
-javaWfdbExec.execWithStandardInput(cellstr(char(data)));
+javaWfdbExec.execWithStandardInput(data);
 
