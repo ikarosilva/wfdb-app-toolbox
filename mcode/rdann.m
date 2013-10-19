@@ -63,7 +63,7 @@ function varargout=rdann(varargin)
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: 8/9/2013
-% Version 1.0
+% Version 1.0.1
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
@@ -144,18 +144,29 @@ chan=zeros(N,1);
 num=zeros(N,1);
 comments=cell(N,1);
 str=char(data(1));
+if(~isempty(strfind(str,'init: can''t open header for record')))
+    error(str)
+end
 if(~isempty(str) && strcmp(str(1),'['))
-    %In this case there is a data stamp right after the timestamp such as:
+    %In this case it is possible that there is a data stamp
+    % right after the timestamp such as:
     % [00:11:30.628 09/11/1989]      157     N    0    1    0
+    % but not always, the following case is also possible:
+    % [00:11:30.628]      157     N    0    1    0
+    % 
+    % So we remove the everything between [ * ]  prior to parsing
+    
     for n=1:N
         str=char(data(n));
-        C=textscan(str,'%s %s %u %s %u %u %u %[^\n\r]');
-        ann(n)=C{3};
-        type(n)=char(C{4});
-        subtype(n)=char(C{5});
-        chan(n)=C{6};
-        num(n)=C{7};
-        comments(n)=C(8);
+        del_str=findstr(str,']');
+        str(1:del_str)=[];
+        C=textscan(str,'%u %s %u %u %u %[^\n\r]');
+        ann(n)=C{1};
+        type(n)=char(C{2});
+        subtype(n)=char(C{3});
+        chan(n)=C{4};
+        num(n)=C{5};
+        comments(n)=C(6);
     end
 else
     %In this case there is only timestamp such as:
