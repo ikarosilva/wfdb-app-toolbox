@@ -65,7 +65,7 @@ function varargout=wrann(varargin)
 %
 % %Example 2
 %[ann,type,subtype,chan,num]=rdann('mitdb/100','atr');
-%wrann('mitdb/100','test',wann,type,subtype,chan,num);
+%wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: 10/11/2013

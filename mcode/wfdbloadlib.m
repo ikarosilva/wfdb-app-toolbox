@@ -19,7 +19,6 @@ function [varargout]=wfdbloadlib(varargin)
 % Since 0.0.1
 %
 
-WFDB_APP_ML_VERSION='Beta';
 inputs={'debugLevel'};
 debugLevel=0;
 for n=1:nargin
@@ -79,8 +78,9 @@ for n=1:nargout
                 eval(['config.' varname '=''' tmpstr{2} ''';'])
             end
             config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m',''); 
-            config.WFDB_APP_ML_VERSION=WFDB_APP_ML_VERSION;
-            config.MAILTO='wfdb-matlab-support@physionet.org';
+            config.SUPPORT_EMAIL='wfdb-matlab-support@physionet.org';
+            config.WFDB_JAVA_VERSION=regexp(config.WFDBJavaPackageDir,filesep,'split');
+            config.WFDB_JAVA_VERSION=config.WFDB_JAVA_VERSION{end};
         end
         eval(['varargout{n}=' outputs{n} ';'])
 end
