@@ -9,7 +9,12 @@ for n=1:nargin
 end
 
 %Test the examples 
-test_string={'[tm, signal]=rdsamp(''challenge/2013/set-a/a01'',1,1000);' ...
-              'plot(tm,signal(:,1));close all'};
+test1_str=['[tm,signal,Fs]=rdsamp(''mghdb/mgh001'', [1 3 5],1000);'];
+test2_str=['[tm, signal]=rdsamp(''challenge/2013/set-a/a01'',1,1000);'...
+    'plot(tm,signal(:,1));close all'];
+test_string={test1_str,test2_str}; 
 
-[tests,pass,perf]=test_wrapper(test_string,[],verbose);
+clean_up={['delete([pwd filesep ''mghdb'' filesep ''mgh001'' filesep ''*'']);' ...
+          'rmdir([pwd filesep ''mghdb''],''s'');'] ...
+          ['%do nothing for second test']};
+[tests,pass,perf]=test_wrapper(test_string,clean_up,verbose);

@@ -50,8 +50,8 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: June 24, 2013
-% Version 1.0
+% Last Modified: October 23, 2013
+% Version 1.0.1
 %
 % Since 0.0.1
 %
@@ -59,6 +59,8 @@ function varargout=rdsamp(varargin)
 %[tm, signal]=rdsamp('challenge/2013/set-a/a01',1,1000);
 %plot(tm,signal(:,1))
 %
+%%Example 2- 
+%[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000);
 %
 % See also WFDBDESC, PHYSIONETDB
 
@@ -124,7 +126,9 @@ end
 if(~isempty(signalList))
     wfdb_argument{end+1}='-s ';
     %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument{end+1}=[num2str(signalList-1)];
+    for sInd=1:length(signalList)
+    wfdb_argument{end+1}=[num2str(signalList(sInd)-1)];
+    end
 end
 if(nargout>2)
     if(isempty(siginfo))

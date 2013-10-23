@@ -25,7 +25,12 @@ for n=1:tests
         eval(test_string{n});
         performance(n)=toc;
         if(~isempty(clean_up) && ~isempty(clean_up{n}))
-            eval(clean_up{n});
+            try
+              eval(clean_up{n});
+            catch
+              display('Clean up failed: ')
+              warning(lasterr)
+            end
         end
         pass=pass+1;
     catch
