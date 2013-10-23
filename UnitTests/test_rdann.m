@@ -8,11 +8,18 @@ for n=1:nargin
     end
 end
   %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
- tmp_str=['[tm, signal]=rdsamp(''challenge/2013/set-a/a01'');' ...
+ test1_str=['[tm, signal]=rdsamp(''challenge/2013/set-a/a01'');' ...
           '[ann]=rdann(''challenge/2013/set-a/a01'',''fqrs'');' ...
          ];   
 
-%Test the examples 
-test_string={tmp_str};
+test2_str=['ann=rdann(''mitdb/100'',''atr'',[],500);'];
 
-[tests,pass,perf]=test_wrapper(test_string,[],verbose);
+%Test the examples 
+test_string={test1_str,test2_str};
+
+clean_up={['%do nothing for second test'],...
+          ['delete([pwd filesep ''mitdb'' filesep ''100'' filesep ''*'']);' ...
+          'rmdir([pwd filesep ''mitdb''],''s'');'] ...
+          };
+
+[tests,pass,perf]=test_wrapper(test_string,clean_up,verbose);

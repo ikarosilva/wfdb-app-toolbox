@@ -62,17 +62,18 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: 8/9/2013
-% Version 1.0.1
+% Last Modified: October 23, 013
+% Version 1.0.3
 % Since 0.0.1
 %
-% %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
+% %Example 1- Read a signal and annotation from PhysioNet's Remote server:
 %[tm, signal]=rdsamp('challenge/2013/set-a/a01');
 %[ann]=rdann('challenge/2013/set-a/a01','fqrs');
 %plot(tm,signal(:,1));hold on;grid on
 %plot(tm(ann),signal(ann,1),'ro','MarkerSize',4)
 %
-%
+%%Example 2- Read annotation from the first 500 samples only
+% ann=rdann('mitdb/100','atr',[],500);
 %
 % See also wfdbtime, wrann
 
@@ -107,14 +108,18 @@ wfdb_argument={'-r',recordName,'-a',annotator};
 if(~isempty(N0) && N0>1)
     wfdb_argument{end+1}='-f';
     %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument{end+1}=['s' num2str(N0-1)];
+    %RDANN expects timestamp, so convert from sample to timestamp
+    start_time=wfdbtime(recordName,N0-1);
+    wfdb_argument{end+1}=[start_time{1}];
 end
 
 
 if(~isempty(N))
     wfdb_argument{end+1}='-t';
-    %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument{end+1}=['s' num2str(N-1)];
+    %-1 is necessary because WFDB is 0 based indexed.    
+    %RDANN expects timestamp, so convert from sample to timestamp
+    end_time=wfdbtime(recordName,N-1);
+    wfdb_argument{end+1}=[end_time{1}];
 end
 
 if(~isempty(type))
