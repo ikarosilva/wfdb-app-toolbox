@@ -57,8 +57,8 @@ function varargout=rdann(varargin)
 %       annotion file (default 1 = begining of the record).
 %
 % type
-%       A 1x1 String specifying the type of annoation to output (default is
-%       empty, which get all annotations).
+%       A 1x1 String specifying the type of annotation to output (default is
+%       empty, which gets all annotations).
 %
 %
 % Written by Ikaro Silva, 2013
