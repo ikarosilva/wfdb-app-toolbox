@@ -1,7 +1,7 @@
 %  WaveForm DataBase (WFDB) Toolbox 
 %  Version Beta 0.9.3 
 % 
-%  Last Updated August 22, 2013
+%  Last Updated October 30, 2013
 %
 %
 %This is a set of MATLAB functions and wrappers for reading, writing, and processing
@@ -39,6 +39,7 @@
 %   wfdbdesc        - Return signal information for about a WFDB record
 %   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information
 %   wfdbtest        - Script to test installation of the Toolbox.
+%   wfdbtool        - Interface to PhysioNet's LightWave GUI.
 %   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   wrann           - Writes annotations for WFDB records into annotation files
 %   wrsamp          - Writes signal data into WFDB-compatible records
