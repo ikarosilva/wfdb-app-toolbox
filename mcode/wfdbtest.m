@@ -1,14 +1,16 @@
-function wfdbtest
-%This script will test the installation of the WFDB Application Toolbox
+function varargout=wfdbtest
+%This script will test the installation of the WFDB Application Toolbox on
+%client machine.
 %
 % Written by Ikaro Silva, 2013
 %
 % Version 1.0
 % Since 0.0.1
-% Last Modified: October 28, 2013
+% Last Modified: October 30, 2013
 %
 % See also wfdb, rdsamp
-
+outputs={'good'};
+good=1;
 fprintf('***Starting test of the WFDB Application Toolbox\n')
 fprintf('\tIf you have any problems with this test, please contact: \n')
 fprintf('\t\twfdb-matlab-support@physionet.org \n\n\n')
@@ -27,6 +29,7 @@ try
     config
 catch
     fprintf('**\t\tError: Could not load WFDB Java classes.');
+    good=0;
 end
 
 %Test 2- Test2 simple queries to PhysioNet servers
@@ -39,6 +42,7 @@ try
         ' databases available for download (type ''help physionetdb'' for more info).\n'])
 catch
     fprintf(['**\t\tError: ' lasterr '\n']);
+    good=0;
 end
 
 %Test 3- Test ability to read local data and annotations
@@ -53,11 +57,12 @@ try
     [ann]=rdann(fname,'fqrs',[],sampleLength);
     plot(tm,signal(:,1),'r-','LineWidth',1);grid on; hold on
     plot(tm(ann),signal(ann,1),'bo','MarkerSize',2,'MarkerFaceColor','b',...
-    'LineWidth',5)
+        'LineWidth',5)
     close all
 catch
     cd(cur_dir)
     fprintf(['**\t\tError: ' lasterr '\n']);
+    good=0;
 end
 
 %Test 4- Test ability to read local data and annotations
@@ -68,6 +73,13 @@ try
     close all
 catch
     fprintf(['**\t\tError: ' lasterr '\n']);
+    good=0;
 end
 
 fprintf('***Finished testing WFDB App Toolbox!\n')
+
+if(nargout>0)
+    for n=1:nargout
+        eval(['varargout{n}=' outputs{n} ';'])
+    end
+end

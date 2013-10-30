@@ -9,7 +9,7 @@ for n=1:nargin
 end
   %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
  tmp_str=['[isloaded,config]=wfdbloadlib;data_dir=[config.MATLAB_PATH filesep ''example'' filesep];' ...
-          'cd(data_dir);[s1,s1]=score2013(''a01'',''fqrs'',''entry1'');'];   
+          'cd(data_dir);[s1,s1]=score2013(''a01'',''fqrs'',''entry1'');if(!s1) error(''unexpected output''); end'];   
 
 %Test the examples 
 test_string={tmp_str};

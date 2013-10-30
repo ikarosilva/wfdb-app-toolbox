@@ -10,5 +10,5 @@ end
 %Sounds redundant, I know, but wfdbtest is used for remote installation
 %debugging, it has a  nice suite of test not in the function examples.
 %Should be one the first tests run (or for a light check of the toolbox).
-test_string={'wfdbtest(0);close all'};
+test_string={'good=wfdbtest;close all;if(!good) error(''wfdbtest failed'');end'};
 [tests,pass,perf]=test_wrapper(test_string,[],verbose);
