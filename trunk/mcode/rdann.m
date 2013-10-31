@@ -75,6 +75,11 @@ function varargout=rdann(varargin)
 %%Example 2- Read annotation from the first 500 samples only
 % ann=rdann('mitdb/100','atr',[],500);
 %
+%
+%%Example 3- Read only a certain type of annotation
+% annV=rdann('mitdb/100', 'atr', [],[],[],'V');
+%
+%
 % See also wfdbtime, wrann
 
 persistent javaWfdbExec
