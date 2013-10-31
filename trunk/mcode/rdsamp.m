@@ -1,6 +1,6 @@
 function varargout=rdsamp(varargin)
 %
-% [tm,signal,Fs]=rdsamp(recordName,signaList,N,N0,rawUnits)
+% [tm,signal,Fs]=rdsamp(recordName,signaList,N,N0,rawUnits,highResolution)
 %
 %    Wrapper to WFDB RDSAMP:
 %         http://www.physionet.org/physiotools/wag/rdsamp-1.htm
@@ -48,10 +48,14 @@ function varargout=rdsamp(varargin)
 %       A 1x1 boolean (default: false=0). If true, returns tm in samples (Nx1
 %       integets) and returns signal in the original DA units (NxM integers).
 %
+% highResolution
+%      A 1x1 boolean (default =0). If true, reads the record in high
+%      resolution mode.
+%
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: October 23, 2013
-% Version 1.0.1
+% Last Modified: October 31, 2013
+% Version 1.0.2
 %
 % Since 0.0.1
 %
@@ -77,7 +81,7 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','signalList','N','N0','rawUnits'};
+inputs={'recordName','signalList','N','N0','rawUnits','highResolution'};
 outputs={'data(:,1)','data(:,2:end)','Fs'};
 signalList=[];
 N=[];
@@ -86,6 +90,7 @@ ListCapacity=[]; %Use to pre-allocate space for reading
 siginfo=[];
 rawUnits=0;
 Fs=[];
+highResolution=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -130,6 +135,11 @@ if(~isempty(signalList))
     wfdb_argument{end+1}=[num2str(signalList(sInd)-1)];
     end
 end
+
+if(highResolution)
+    wfdb_argument{end+1}=['-H'];
+end
+
 if(nargout>2)
     if(isempty(siginfo))
         [siginfo,~]=wfdbdesc(recordName);
