@@ -56,14 +56,11 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.physionet.wfdb.physiobank.PhysioNetRecord;
-
-
 public class Wfdbexec {
 
 	private String commandName;
 	protected static String WFDB_JAVA_HOME;
-	protected static String WFDB_PATH;
+	//protected static String WFDB_PATH;
 	private static String WFDB_NATIVE_BIN;
 	private static String osArch;
 	private static String osName;
@@ -83,7 +80,7 @@ public class Wfdbexec {
 		logger.finest("\n\t***Setting exec commandName to: " + commandName);
 		this.commandName=commandName;
 		set_environment();
-		this.commandDir=WFDB_NATIVE_BIN;
+		this.commandDir=WFDB_NATIVE_BIN+ "bin" + fileSeparator;
 	}
 
 	public Wfdbexec(String commandName, String commandDir){
@@ -110,7 +107,7 @@ public class Wfdbexec {
 	private void gen_exec_arguments() {
 		commandInput = new ArrayList<String>();
 		commandInput.add(commandDir + commandName);
-		logger.finest("\n\t***commandInput.add = "+WFDB_NATIVE_BIN + commandName);
+		logger.finest("\n\t***commandInput.add = " + commandDir + commandName);
 		if(arguments != null){
 			for(String i: arguments)
 				commandInput.add(i);
@@ -122,7 +119,7 @@ public class Wfdbexec {
 
 	}
 
-	public synchronized ArrayList<String> execToStringList() {
+	public synchronized ArrayList<String> execToStringList() throws Exception {
 		gen_exec_arguments();
 		ArrayList<String> results= new ArrayList<String>();
 		ProcessBuilder launcher = setLauncher();
@@ -134,7 +131,7 @@ public class Wfdbexec {
 			logger.finer("\n\t***Creating read buffer and waiting for exec process...");
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
-			//p.waitFor();
+
 			logger.finer("\n\t***Reading output.");
 			while ((line = output.readLine()) != null){
 				logger.finest("\n\t***Reading output: \n" + line);
@@ -150,7 +147,7 @@ public class Wfdbexec {
 	}
 
 
-	public synchronized ArrayList<String> execWithStandardInput(String[] inputData) throws IOException {
+	public synchronized ArrayList<String> execWithStandardInput(String[] inputData) throws Exception {
 
 		gen_exec_arguments();
 		ProcessBuilder launcher = setLauncher();
@@ -188,7 +185,7 @@ public class Wfdbexec {
 
 	}
 
-	public synchronized ArrayList<String> execWithStandardInput(double[][] inputData) throws IOException {
+	public synchronized ArrayList<String> execWithStandardInput(double[][] inputData) throws Exception {
 
 		String[] stringArr=new String[inputData.length];
 		for(int i=0;i<inputData.length;i++)
@@ -199,7 +196,7 @@ public class Wfdbexec {
 	}
 	
 
-	public synchronized ArrayList<String> execToStringList(String[] args) {
+	public synchronized ArrayList<String> execToStringList(String[] args) throws Exception {
 		setArguments(args);   
 		return execToStringList();
 	}
@@ -316,27 +313,29 @@ public class Wfdbexec {
 		return data;
 	}
 
-	public synchronized void setWFDBPATH(String str){
-		logger.finer("\n\t***Setting WFDB_PATH: " 
-				+ str);
-		WFDB_PATH=str;
-	}
-
-	private synchronized ProcessBuilder setLauncher(){
+	private synchronized ProcessBuilder setLauncher() throws Exception{
 		ProcessBuilder launcher = new ProcessBuilder();
 		launcher.redirectErrorStream(true);
 		env = launcher.environment();
-		if(osName.contains("macosx")){
-			env.put("DYLD_LIBRARY_PATH",WFDB_NATIVE_BIN);
+		//Add library path to environment
+		String LD_PATH="";
+		if(osName.contains("windows")){
+			LD_PATH=WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "lib64";
 		}else{
-			env.put("LD_LIBRARY_PATH",WFDB_NATIVE_BIN);
+			LD_PATH=WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
+		}
+		if(LD_PATH.isEmpty())
+			throw new Exception("LD_LIBRARY_PATH is empty!");
+		
+		if(osName.contains("macosx")){
+			env.put("DYLD_LIBRARY_PATH",LD_PATH);
+			logger.finer("\n\t***DYLD_LIBRARY_PATH: " + LD_PATH);
+		}else{
+			env.put("LD_LIBRARY_PATH",LD_PATH);
+			logger.finer("\n\t***LD_LIBRARY_PATH: " + LD_PATH);
 		}
 		env.put("WFDBNOSORT","1");
-		if(WFDB_PATH != null){
-			env.put("WFDB_PATH",WFDB_PATH);
-			logger.finer("\n\t***launcher configure with WFDB_PATH: " 
-					+ WFDB_PATH);
-		}
+		
 		launcher.environment().put("WFDBNOSORT","1");
 		logger.finest("\n\t***Setting executing process with command and arguments: " + commandInput);
 		launcher.command(commandInput);
@@ -407,10 +406,12 @@ public class Wfdbexec {
 		variables.add("WFDB Java Package Dir= "+ packageDir);
 		logger.finer("\n\t***WFDB Java Package Dir: " + packageDir);
 
+		/*
 		if(WFDB_PATH != null){
 			variables.add("WFDB PATH= "+ WFDB_PATH);
 			logger.finer("\n\t***WFDB PATH: " + WFDB_PATH);
 		}
+		*/
 		variables.add("EXECUTING_DIR= "+ EXECUTING_DIR);
 		logger.finer("\n\t***Exec dir: " + EXECUTING_DIR);
 		variables.add("osName= " + osName);

@@ -21,9 +21,6 @@ public class QRSDetectionEx1 {
 		String annPath=System.getProperty("user.dir") +
 				System.getProperty("file.separator");
 
-		//Set the annotation to be in the WFDB Path
-		rdann.setWFDBPATH(annPath+":.:http://www.physionet.org/physiobank/database:");
-
 		//Execute command
 		ArrayList<String> x= new ArrayList<String>(); 
 		try {

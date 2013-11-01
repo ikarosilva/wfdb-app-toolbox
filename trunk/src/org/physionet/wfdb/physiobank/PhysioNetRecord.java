@@ -52,7 +52,7 @@ public class PhysioNetRecord {
 			Logger.getLogger(PhysioNetRecord.class.getName());
 
 
-	public PhysioNetRecord(String RecordName){
+	public PhysioNetRecord(String RecordName) throws Exception{
 
 		/*
 		Level debugLevel = Level.FINEST;//use for debugging Level.FINEST;
@@ -82,12 +82,12 @@ public class PhysioNetRecord {
 		}
 	}
 
-	public void setSignalList(){
+	public void setSignalList() throws Exception{
 		setSignalList(null);
 	}
 
 
-	public void setSignalList(String descFilter) {
+	public void setSignalList(String descFilter) throws Exception {
 		//Parse information from wfdbdesc to populate the record list
 		String[] args=new String[1];
 		args[0]=name;
@@ -205,7 +205,7 @@ public class PhysioNetRecord {
 	public String getRecordName(){
 		return name;
 	}
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 
 		// Prints information regarding all databases
