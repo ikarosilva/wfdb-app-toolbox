@@ -88,13 +88,13 @@ public class  MapRecord implements Callable<Double>{
 	}
 
 	public MapRecord(String dataBase,String commandName) 
-			throws InterruptedException{
+			throws Exception{
 		this(dataBase,commandName,UNSPECIFIED_SAMPLE,UNSPECIFIED_SAMPLE); //Start from beginning of the record and leave end unspecified
 	}
 
 
 	public MapRecord(String dataBase,String commandName,
-			String startTime,String endTime) throws InterruptedException{
+			String startTime,String endTime) throws Exception{
 		//Initialize record list
 		PhysioNetDB db = new PhysioNetDB(dataBase);
 		db.setDBRecordList();
@@ -127,7 +127,7 @@ public class  MapRecord implements Callable<Double>{
 	public Double call(){
 		double fail=0;
 		String taskInd;
-		long id=Thread.currentThread().getId();
+		//long id=Thread.currentThread().getId();
 		while ((taskInd = tasks.poll()) != null ){ 
 			//System.out.println("Thread [" + id + "]: Processing: " + taskInd);
 			results[index.get(taskInd)]=compute(taskInd).clone();
@@ -160,7 +160,7 @@ public class  MapRecord implements Callable<Double>{
 	}
 
 
-	public static void main(String[] args){
+	public static void main(String[] args) throws Exception{
 
 		double[][] results=start(args);
 		String[] recList=getRecordList(args);
@@ -172,7 +172,7 @@ public class  MapRecord implements Callable<Double>{
 		}
 	}
 
-	public static String[] getRecordList(String[] args){
+	public static String[] getRecordList(String[] args) throws Exception{
 
 
 		if(args.length<3){
@@ -197,7 +197,7 @@ public class  MapRecord implements Callable<Double>{
 		return recList;
 	}
 
-	public static double[][] start(String[] args){
+	public static double[][] start(String[] args) throws Exception{
 
 		double[][] results = null;
 		

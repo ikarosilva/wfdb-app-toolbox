@@ -89,7 +89,7 @@ public class PhysioNetDB {
 	public String getname() {
 		return name;
 	}
-	public ArrayList<PhysioNetRecord> getDBRecordList(){
+	public ArrayList<PhysioNetRecord> getDBRecordList() throws Exception{
 		if(dbRecordList.isEmpty()){
 			this.setDBRecordList();
 		}
@@ -167,7 +167,7 @@ public class PhysioNetDB {
 		return str;
 	}
 
-	public void printDBRecordList(){
+	public void printDBRecordList() throws Exception{
 
 		this.getDBRecordList();
 		this.printDBInfo();
@@ -227,7 +227,7 @@ public class PhysioNetDB {
 		return desc;
 	}
 
-	public void setDBRecordList(){
+	public void setDBRecordList() throws Exception{
 		String inputLine;
 		BufferedReader in = null;
 		String[] tmpStr;

@@ -151,7 +151,7 @@ public class Score2013 {
 		return score;
 	}
 
-	public static double[] getScore(String[] args) {
+	public static double[] getScore(String[] args) throws Exception {
 
 		// Parse input arguments
 		if(args.length != 4){
@@ -229,7 +229,7 @@ public class Score2013 {
 
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		double[] score = new double[2];
 		score=getScore(args);
