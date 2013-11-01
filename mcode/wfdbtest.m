@@ -1,85 +1,179 @@
-function varargout=wfdbtest
-%This script will test the installation of the WFDB Application Toolbox on
-%client machine.
+function wfdbtest(varargin)
+%This script will test the installation of the WFDB Application Toolbox
 %
 % Written by Ikaro Silva, 2013
 %
 % Version 1.0
 % Since 0.0.1
-% Last Modified: October 30, 2013
 %
 % See also wfdb, rdsamp
-outputs={'good'};
-good=1;
-fprintf('***Starting test of the WFDB Application Toolbox\n')
-fprintf('\tIf you have any problems with this test, please contact: \n')
-fprintf('\t\twfdb-matlab-support@physionet.org \n\n\n')
-%Test 1- Test that libraries, classes, and mcode are in path and are
-%loaded properly
-
-fprintf('**Test 1: Printing Configuration Settings\n')
-wfdbpath=which('wfdbloadlib');
-fprintf('**\tWFDB App Toolbox Path is:\n');
-fprintf('\t\t%s\n',wfdbpath);
-
-try
-    [isloaded,config]=wfdbloadlib;
-    nsm=fieldnames(config);
-    %Print Configuration settings
-    config
-catch
-    fprintf('**\t\tError: Could not load WFDB Java classes.');
-    good=0;
+inputs={'verbose'};
+verbose=1;
+for n=1:nargin
+    if(~isempty(varargin{n}))
+        eval([inputs{n} '=varargin{n};'])
+    end
 end
+
+
+if(verbose)
+    fprintf('***Starting test of the WFDB Application Toolbox\n')
+    fprintf('\tIf you have any problems with this test, please contact: \n')
+    fprintf('\t\twfdb-matlab-support@physionet.org \n\n\n')
+end
+
+%Print Configuration settings
+if(verbose)
+    fprintf('**Printing Configuration Settings:\n')
+end
+wfdbpath=which('wfdbloadlib');
+if(verbose)
+    fprintf('**\tWFDB App Toolbox Path is:\n');
+    fprintf('\t\t%s\n',wfdbpath);
+end
+[isloaded,config]=wfdbloadlib;
+nsm=fieldnames(config);
+if(verbose)
+    config
+end
+
+%Test 1- Test that native libraries can me run from JVM (without MATLAB)
+%and that libcurl can fetch data from PhysioNet
+if(verbose)
+    fprintf('**Testing native library on system JVM...\n')
+end
+sampleLength=10000;
+cur_dir=pwd;
+data_dir=[config.MATLAB_PATH];
+[status,cmdout] = system('java -version');
+is7=isempty(findstr('1.7',cmdout));
+is6=isempty(findstr('1.6',cmdout));
+try
+    cd(data_dir)
+    if(is7)
+        jarname=dir('wfdb-app-JVM7-*');
+    elseif(is6)
+        jarname=dir('wfdb-app-JVM6-*');
+    else
+        error(['Unknown JVM: '  cmdout])
+    end
+    str=['!java -cp ' jarname.name ' org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s1'];
+    display(['Executing: ' str])
+    eval(str);
+catch
+    if(verbose)
+        warning(lasterr);
+    end
+end
+cd(cur_dir)
+
 
 %Test 2- Test2 simple queries to PhysioNet servers
 %loaded properly. This should work regardless of the libcurl installation
-fprintf('**Test 2: Querying PhysioNet for available databases\n')
-try
-    db_list=physionetdb;
-    db_size=length(db_list);
+if(verbose)
+    fprintf('**Querying PhysioNet for available databases...\n')
+end
+db_list=physionetdb;
+db_size=length(db_list);
+if(verbose)
     fprintf(['\t' num2str(db_size) ...
         ' databases available for download (type ''help physionetdb'' for more info).\n'])
-catch
-    fprintf(['**\t\tError: ' lasterr '\n']);
-    good=0;
 end
 
 %Test 3- Test ability to read local data and annotations
-fprintf('** Test 3: Reading local example data and annotation...\n')
+if(verbose)
+    fprintf('**Reading local example data and annotation...\n')
+end
+sampleLength=10000;
+cur_dir=pwd;
+data_dir=[config.MATLAB_PATH filesep 'example' filesep];
+fname='a01';
+
 try
-    sampleLength=10000;
-    cur_dir=pwd;
-    data_dir=[config.MATLAB_PATH filesep 'example' filesep];
-    fname='a01';
     cd(data_dir)
     [tm, signal]=rdsamp(fname,[],sampleLength);
-    [ann]=rdann(fname,'fqrs',[],sampleLength);
-    plot(tm,signal(:,1),'r-','LineWidth',1);grid on; hold on
-    plot(tm(ann),signal(ann,1),'bo','MarkerSize',2,'MarkerFaceColor','b',...
-        'LineWidth',5)
-    close all
+    if(length(tm) ~= sampleLength)
+        error( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
+    end
 catch
     cd(cur_dir)
-    fprintf(['**\t\tError: ' lasterr '\n']);
-    good=0;
-end
-
-%Test 4- Test ability to read local data and annotations
-fprintf('** Test 4: Reading data from PhysioNet server...\n')
-try
-    [tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000);
-    plot(tm,signal(:,1),'r-','LineWidth',1);grid on; hold on
-    close all
-catch
-    fprintf(['**\t\tError: ' lasterr '\n']);
-    good=0;
-end
-
-fprintf('***Finished testing WFDB App Toolbox!\n')
-
-if(nargout>0)
-    for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ';'])
+    if(strfind(lasterr,'Undefined function'))
+        if(verbose)
+            fprintf(['ERROR!!! Toolbox is not on the MATLAB path. Add it to MATLAB path by typing:\n ']);
+            display(['addpath(''' cur_dir ''')']);
+        end
     end
+    str=['cd(' data_dir ');[tm, signal]=rdsamp(' fname ',[],' num2str(sampleLength) ');'];
+    if(verbose)
+        error(['Failed running: ' str]);
+    end
+end
+cd(cur_dir)
+
+
+try
+    cd(data_dir)
+    [ann]=rdann(fname,'fqrs',[],sampleLength);
+    if(isempty(ann))
+        error('Annotations are empty.');
+    end
+catch
+    cd(cur_dir)
+    error(lasterr);
+end
+cd(cur_dir)
+
+%Test 4- Test ability to write local annotations
+if(verbose)
+    fprintf('**Calculating maternal QRS sample data ...\n')
+end
+try
+    cd(data_dir)
+    wqrs(fname,[],[],1)
+    [Mann]=rdann(fname,'wqrs',[],sampleLength);
+    %Remove the generated annotation file
+    delete([data_dir filesep 'a01.wqrs']);
+    if(isempty(Mann))
+        error('Annotations are empty.');
+    end
+catch
+    cd(cur_dir)
+    if(verbose)
+        error(lasterr);
+    end
+end
+cd(cur_dir)
+
+
+%Test 3- Test ability to read records from PhysioNet servers
+if(verbose)
+    fprintf('**Reading data from PhysioNet...\n')
+end
+sampleLength=10;
+try
+    %Check if record does not exist already in current directory
+    recExist=[];
+    try
+        recExist=dir(['mghdb' filesep 'mgh001']);
+    catch
+        %Record does not exist, go on
+    end
+    if(~isempty(recExist))
+        error('Cannot test because record already exists in current directory. Delete record and repeat.')
+    end
+    [tm, ~]=rdsamp('mghdb/mgh001', [1],sampleLength);
+    if(length(tm) ~= sampleLength)
+        error( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
+    end
+catch
+    if(verbose)
+        error(lasterr);
+    end
+end
+
+
+if(verbose)
+    fprintf('***Finished testing WFDB App Toolbox!\n')
+    fprintf(['***Note: You currently have access to ' num2str(db_size) ...
+        ' databases for download via PhysioNet:\n\t Type ''physionetdb'' for a list of the databases or ''help physionetdb'' for more info.\n'])
 end
