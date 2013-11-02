@@ -89,7 +89,7 @@ public class Wfdbexec {
 		this.commandDir=commandDir;
 		set_environment();
 	}
-	
+
 	public void setArguments(String[] args){
 		arguments=args;
 	}
@@ -103,7 +103,7 @@ public class Wfdbexec {
 				+ dir);
 		EXECUTING_DIR=dir;
 	}
-	
+
 	private void gen_exec_arguments() {
 		commandInput = new ArrayList<String>();
 		commandInput.add(commandDir + commandName);
@@ -190,11 +190,11 @@ public class Wfdbexec {
 		String[] stringArr=new String[inputData.length];
 		for(int i=0;i<inputData.length;i++)
 			stringArr[i]=Double.toString(inputData[i][0]);
-		
+
 		return execWithStandardInput(stringArr);
 
 	}
-	
+
 
 	public synchronized ArrayList<String> execToStringList(String[] args) throws Exception {
 		setArguments(args);   
@@ -326,16 +326,20 @@ public class Wfdbexec {
 		}
 		if(LD_PATH.isEmpty())
 			throw new Exception("LD_LIBRARY_PATH is empty!");
-		
+
 		if(osName.contains("macosx")){
 			env.put("DYLD_LIBRARY_PATH",LD_PATH);
 			logger.finer("\n\t***DYLD_LIBRARY_PATH: " + LD_PATH);
+		}else if(osName.contains("windows")){
+			env.put("PATH",LD_PATH);
+			logger.finer("\n\t***PATH: " + LD_PATH);
 		}else{
+			//assumes Linux
 			env.put("LD_LIBRARY_PATH",LD_PATH);
 			logger.finer("\n\t***LD_LIBRARY_PATH: " + LD_PATH);
 		}
 		env.put("WFDBNOSORT","1");
-		
+
 		launcher.environment().put("WFDBNOSORT","1");
 		logger.finest("\n\t***Setting executing process with command and arguments: " + commandInput);
 		launcher.command(commandInput);
@@ -411,7 +415,7 @@ public class Wfdbexec {
 			variables.add("WFDB PATH= "+ WFDB_PATH);
 			logger.finer("\n\t***WFDB PATH: " + WFDB_PATH);
 		}
-		*/
+		 */
 		variables.add("EXECUTING_DIR= "+ EXECUTING_DIR);
 		logger.finer("\n\t***Exec dir: " + EXECUTING_DIR);
 		variables.add("osName= " + osName);

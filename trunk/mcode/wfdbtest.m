@@ -22,6 +22,30 @@ if(verbose)
     fprintf('\t\twfdb-matlab-support@physionet.org \n\n\n')
 end
 
+fprintf('**Checking if MATLAB JVM is running...\n')
+if(usejava('jvm') )
+    ROOT=[matlabroot filesep 'sys' filesep 'java' filesep 'jre' filesep];
+    JVM_PATH=dir([ROOT '*']);
+    rm_fl=[];
+    for i=1:length(JVM_PATH)
+        if(~JVM_PATH(i).isdir || strcmp(JVM_PATH(i).name,'.')|| strcmp(JVM_PATH(i).name,'..'))
+            rm_fl(end+1)=i;
+        end
+    end
+    JVM_PATH(rm_fl)=[];
+    if(~isempty(JVM_PATH))
+        JVM_PATH=[ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep 'java'];
+        str=['!' JVM_PATH ' -version'];
+        display(['Running: ' str]);
+        eval(str);
+    else
+        warning(['Could not find Java runtime environment!!']);
+    end
+else
+    error('MATLAB JVM is not properly configured for toolbox')
+end
+
+
 %Print Configuration settings
 if(verbose)
     fprintf('**Printing Configuration Settings:\n')
@@ -40,12 +64,12 @@ end
 %Test 1- Test that native libraries can me run from JVM (without MATLAB)
 %and that libcurl can fetch data from PhysioNet
 if(verbose)
-    fprintf('**Testing native library on system JVM...\n')
+    fprintf('**Testing native library on MATLAB JVM...\n')
 end
 sampleLength=10000;
 cur_dir=pwd;
 data_dir=[config.MATLAB_PATH];
-[status,cmdout] = system('java -version');
+[status,cmdout] = system([JVM_PATH '-version']);
 is7=isempty(findstr('1.7',cmdout));
 is6=isempty(findstr('1.6',cmdout));
 try
@@ -57,7 +81,7 @@ try
     else
         error(['Unknown JVM: '  cmdout])
     end
-    str=['!java -cp ' jarname.name ' org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s1'];
+    str=['!' JVM_PATH ' -cp ' jarname.name ' org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s1'];
     display(['Executing: ' str])
     eval(str);
 catch
