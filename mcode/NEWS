@@ -1,6 +1,9 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
+0.9.4.1 (04 November 2013):
+	Fixed library path issues with Windows systems.
+	
 0.9.4 (01 November 2013):
 	Updated native libs to WFDB 10.5.20. Added a LightWave interface: WFDBTOOL.
 	Fixed bugs in WRANN, RDANN, RDSAMP. Included libcurl with native libs.
