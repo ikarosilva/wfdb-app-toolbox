@@ -319,11 +319,18 @@ public class Wfdbexec {
 		env = launcher.environment();
 		//Add library path to environment
 		String LD_PATH="";
+
 		if(osName.contains("windows")){
-			LD_PATH=WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "lib64";
+			LD_PATH=env.get("path");
+			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "lib64";
+		}else if(osName.contains("macosx")){
+			LD_PATH=env.get("DYLD_LIBRARY_PATH");
+			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
 		}else{
-			LD_PATH=WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
+			LD_PATH=env.get("LD_LIBRARY_PATH");
+			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
 		}
+		
 		if(LD_PATH.isEmpty())
 			throw new Exception("LD_LIBRARY_PATH is empty!");
 

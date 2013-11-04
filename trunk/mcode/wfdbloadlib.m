@@ -81,6 +81,10 @@ for n=1:nargout
             config.SUPPORT_EMAIL='wfdb-matlab-support@physionet.org';
             config.WFDB_JAVA_VERSION=regexp(config.WFDBJavaPackageDir,filesep,'split');
             config.WFDB_JAVA_VERSION=config.WFDB_JAVA_VERSION{end};
+            
+            %Remove empty spaces from arch name
+            del=strfind(config.osName,' ');
+            config.osName(del)=[];
         end
         eval(['varargout{n}=' outputs{n} ';'])
 end
