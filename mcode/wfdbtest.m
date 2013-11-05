@@ -34,8 +34,13 @@ if(usejava('jvm') )
     end
     JVM_PATH(rm_fl)=[];
     if(~isempty(JVM_PATH))
-        JVM_PATH=[ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep 'java'];
-        str=['!' JVM_PATH ' -version'];
+        if(ispc)
+            %Use quotes to escape white space in Windows
+            JVM_PATH=['"' ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep '"java'];
+        else
+           JVM_PATH=[ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep 'java']; 
+        end
+        str=['system(''' JVM_PATH ' -version'')'];
         display(['Running: ' str]);
         eval(str);
     else
@@ -69,9 +74,9 @@ end
 sampleLength=10000;
 cur_dir=pwd;
 data_dir=[config.MATLAB_PATH];
-[status,cmdout] = system([JVM_PATH '-version']);
-is7=isempty(findstr('1.7',cmdout));
-is6=isempty(findstr('1.6',cmdout));
+[status,cmdout] = system([JVM_PATH ' -version']);
+is7=~isempty(findstr('1.7',cmdout));
+is6=~isempty(findstr('1.6',cmdout));
 try
     cd(data_dir)
     if(is7)
@@ -81,7 +86,7 @@ try
     else
         error(['Unknown JVM: '  cmdout])
     end
-    str=['!' JVM_PATH ' -cp ' jarname.name ' org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s1'];
+    str=['system(''' JVM_PATH ' -cp ' jarname.name ' org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s1'')'];
     display(['Executing: ' str])
     eval(str);
 catch
