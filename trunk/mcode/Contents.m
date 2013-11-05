@@ -1,7 +1,7 @@
 %  WaveForm DataBase (WFDB) Toolbox 
-%  Version 0.9.4.1 
+%  Version 0.9.4.2 
 % 
-%  Last Updated November 4, 2013
+%  Last Updated November 5, 2013
 %
 %
 %This is a set of MATLAB functions and wrappers for reading, writing, and processing
