@@ -1,6 +1,9 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
+0.9.4.2 (05 November 2013):
+	Added more diagnostic information and fixed some issues with using spaces in Windows directories.
+	
 0.9.4.1 (04 November 2013):
 	Fixed library path issues with Windows systems.
 	
