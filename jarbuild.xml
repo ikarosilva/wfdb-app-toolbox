@@ -4,8 +4,8 @@
 	<property name="build.dir"     value="bin"/>
   	<property name="classes.dir" value="${build.dir}/classes"/>
   	<property name="jar.dir"     value="mcode"/>
-  	<property name="jar6name"     value="wfdb-app-JVM6-0-9-4-1.jar"/>
-	<property name="jar7name"     value="wfdb-app-JVM7-0-9-4-1.jar"/>
+  	<property name="jar6name"     value="wfdb-app-JVM6-0-9-4-2.jar"/>
+	<property name="jar7name"     value="wfdb-app-JVM7-0-9-4-2.jar"/>
 
  	 <target name="compile6">
  	 	<delete dir="${build.dir}"/>
