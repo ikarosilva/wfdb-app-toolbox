@@ -9,7 +9,7 @@ please send the entire output of this script.
 
 2) From within MATLAB, cd into the directory and add it to your path:
 
-cd wfdb-app-toolbox-0-0-1;cd mcode
+cd wfdb-app-toolbox-x-x-x;cd mcode
 addpath(pwd);savepath
 wfdbdemo %Optional demoing of the toolbox
 
