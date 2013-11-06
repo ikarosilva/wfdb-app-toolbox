@@ -47,7 +47,7 @@ if(usejava('jvm') )
         warning(['Could not find Java runtime environment!!']);
     end
 else
-    error('MATLAB JVM is not properly configured for toolbox')
+    warning('MATLAB JVM is not properly configured for toolbox')
 end
 
 
@@ -74,17 +74,17 @@ end
 sampleLength=10000;
 cur_dir=pwd;
 data_dir=[config.MATLAB_PATH];
+try
 [status,cmdout] = system([JVM_PATH ' -version']);
 is7=~isempty(findstr('1.7',cmdout));
 is6=~isempty(findstr('1.6',cmdout));
-try
     cd(data_dir)
     if(is7)
         jarname=dir('wfdb-app-JVM7-*');
     elseif(is6)
         jarname=dir('wfdb-app-JVM6-*');
     else
-        error(['Unknown JVM: '  cmdout])
+        warning(['Unknown JVM: '  cmdout])
     end
     str=['system(''' JVM_PATH ' -cp ' jarname.name ' org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s1'')'];
     display(['Executing: ' str])
@@ -122,7 +122,7 @@ try
     cd(data_dir)
     [tm, signal]=rdsamp(fname,[],sampleLength);
     if(length(tm) ~= sampleLength)
-        error( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
+        warning( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
     end
 catch
     cd(cur_dir)
@@ -134,7 +134,7 @@ catch
     end
     str=['cd(' data_dir ');[tm, signal]=rdsamp(' fname ',[],' num2str(sampleLength) ');'];
     if(verbose)
-        error(['Failed running: ' str]);
+        warning(['Failed running: ' str]);
     end
 end
 cd(cur_dir)
@@ -144,11 +144,11 @@ try
     cd(data_dir)
     [ann]=rdann(fname,'fqrs',[],sampleLength);
     if(isempty(ann))
-        error('Annotations are empty.');
+        warning('Annotations are empty.');
     end
 catch
     cd(cur_dir)
-    error(lasterr);
+    warning(lasterr);
 end
 cd(cur_dir)
 
@@ -163,12 +163,12 @@ try
     %Remove the generated annotation file
     delete([data_dir filesep 'a01.wqrs']);
     if(isempty(Mann))
-        error('Annotations are empty.');
+        warning('Annotations are empty.');
     end
 catch
     cd(cur_dir)
     if(verbose)
-        error(lasterr);
+        warning(lasterr);
     end
 end
 cd(cur_dir)
@@ -188,15 +188,15 @@ try
         %Record does not exist, go on
     end
     if(~isempty(recExist))
-        error('Cannot test because record already exists in current directory. Delete record and repeat.')
+        warning('Cannot test because record already exists in current directory. Delete record and repeat.')
     end
     [tm, ~]=rdsamp('mghdb/mgh001', [1],sampleLength);
     if(length(tm) ~= sampleLength)
-        error( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
+        warning( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
     end
 catch
     if(verbose)
-        error(lasterr);
+        warning(lasterr);
     end
 end
 
