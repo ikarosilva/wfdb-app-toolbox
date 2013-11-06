@@ -321,8 +321,8 @@ public class Wfdbexec {
 		String LD_PATH="";
 
 		if(osName.contains("windows")){
-			LD_PATH=env.get("path");
-			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "lib64";
+			LD_PATH=env.get("PATH");
+			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "bin";
 		}else if(osName.contains("macosx")){
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");
 			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
