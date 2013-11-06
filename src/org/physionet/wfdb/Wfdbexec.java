@@ -321,7 +321,7 @@ public class Wfdbexec {
 		String LD_PATH="";
 
 		if(osName.contains("windows")){
-			LD_PATH=env.get("PATH");
+			LD_PATH=env.get("Path");
 			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "bin";
 		}else if(osName.contains("macosx")){
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");
@@ -338,8 +338,8 @@ public class Wfdbexec {
 			env.put("DYLD_LIBRARY_PATH",LD_PATH);
 			logger.finer("\n\t***DYLD_LIBRARY_PATH: " + LD_PATH);
 		}else if(osName.contains("windows")){
-			env.put("PATH",LD_PATH);
-			logger.finer("\n\t***PATH: " + LD_PATH);
+			env.put("Path",LD_PATH);
+			logger.finer("\n\t***Path: " + LD_PATH);
 		}else{
 			//assumes Linux
 			env.put("LD_LIBRARY_PATH",LD_PATH);
