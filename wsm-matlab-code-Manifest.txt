@@ -1,6 +1,6 @@
 Name:  wfdb-app-matlab-code
 Specification-Title: WFDB Java App
-Specification-Version: 0.9.4.2
+Specification-Version: 0.9.4.3
 Specification-Vendor: PhysioNet
  
 
