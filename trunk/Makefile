@@ -28,9 +28,9 @@ JARFLAGS := -jar		\
 #There is really no reason by the *.jar and *.zip should need to have the same
 #version numbers, as they are really modular...But for now we keep them at the same
 #versioning level in order to avoid (or increase?) confusion.
-APP_NAME="wfdb-app-toolbox-0-9-4-2.zip"
-JAR6_NAME="wfdb-app-JVM6-0-9-4-2.jar" 
-JAR7_NAME="wfdb-app-JVM7-0-9-4-2.jar"
+APP_NAME="wfdb-app-toolbox-0-9-4-3.zip"
+JAR6_NAME="wfdb-app-JVM6-0-9-4-3.jar" 
+JAR7_NAME="wfdb-app-JVM7-0-9-4-3.jar"
 	
 #TODO: There are two directories for linux. we need to remove one!	
 clean: 
