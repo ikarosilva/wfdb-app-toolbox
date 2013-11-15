@@ -9,27 +9,24 @@
 # The file will fetch the required files from their resepective sources and comp
 # and compile everything accordingly. It may be necessary to run this file as 
 # with root priveleges.
- 
-#The Makefile should be copied and run from a temporary directory. A 'bin' subdirectory will be 
-#generate with the native binaries. This subdirectory can then be copied to the respective OS
-#folder
-
 
 #TODO: Make OS dependent
 CURL=curl-7.33.0
 WFDB="wfdb-10.5.20"
 INSTALL_DIR:=$(shell pwd)
+BUILD_DIR=build
 
 clean: clean-wfdb clean-curl clean-edr
 	rm -rf ./tmp; \
-	rm -rf ./bin
+	rm -rf ./$(BUILD_DIR)
 tmp:
 	mkdir -p ./tmp/
-bin: tmp
-	rm -rf ./bin/; \
-	mkdir ./bin
+build: tmp
+	rm -rf ./$(BUILD_DIR)/; \
+	mkdir ./$(BUILD_DIR);
 
 ##CURL TARGET
+#TODO: Remove from build dir ??
 clean-curl: 
 	rm -rf ./tmp/$(CURL); \
 	rm -f ./curl.isconfig; \
@@ -43,17 +40,17 @@ curl.isconfig: curl.tar.gz
 	cd ./tmp/; \
 	tar xfvz curl.tar.gz; \
 	cd $(CURL); \
-	./configure --without-ssl --without-zlib --without-libssh2 --disable-ldap; \
+	./configure --prefix=$(INSTALL_DIR)/$(BUILD_DIR) --without-ssl --without-zlib --without-libssh2 --disable-ldap; \
 	touch ../../curl.isconfig
 curl.isbuilt: curl.isconfig
 	cd ./tmp/$(CURL); \
-	chmod a+x curl-config;\
-	make \
-	&& touch ../../curl.isbuilt;\
-	cp -l ./lib/.libs/libcurl.so* $(INSTALL_DIR)/bin/ 
+	make ;\
+	make install \
+	&& touch ../../curl.isbuilt;
 curl: curl.isbuilt
 
 ##WFDB TARGET
+#TODO: remove for build directory as well??
 clean-wfdb: 
 	rm -rf ./tmp/$(WFDB)
 	rm -f ./wfdb.isconfig; \
@@ -66,34 +63,28 @@ wfdb.isconfig: wfdb.tar.gz
 	cd ./tmp; \
 	tar xvfz wfdb.tar.gz; \
 	cd $(WFDB); \
-	./configure --prefix=$(INSTALL_DIR)/tmp --with-libcurl \
+	./configure --prefix=$(INSTALL_DIR)/$(BUILD_DIR) --with-libcurl \
 	&& touch ../../wfdb.isconfig
 wfdb.isbuilt: curl.isbuilt wfdb.isconfig
 	cd ./tmp/;\
-	export LIBRARY_PATH=$(INSTALL_DIR)/tmp/$(CURL)/lib/.libs/ ;\
+	export LIBRARY_PATH=$(INSTALL_DIR)/$(BUILD_DIR)/lib ;\
 	cd ./$(WFDB)/ ;\
-	cp -r ../$(CURL)/include/curl ./build/include/ ;\
-	export PATH=$(PATH):$(INSTALL_DIR)/tmp/$(CURL); \
-	make \
-	&& touch ../../wfdb.isbuilt; \
-	cp -r ./build/bin/* $(INSTALL_DIR)/bin/ ;\
-	cp -r ./build/include/wfdb/* $(INSTALL_DIR)/bin/ ;\
-	cp -rl ./build/lib64/* $(INSTALL_DIR)/bin/ 
+	export PATH=$(PATH):$(INSTALL_DIR)/$(BUILD_DIR)/bin; \
+	make ;\
+	make install \
+	&& touch ../../wfdb.isbuilt
 wfdb: wfdb.isbuilt
 
 ##EDR TARGET
+#TODO: clean build folder as well??
 clean-edr:
-	rm -f ./tmp/edr*; \
 	rm -f edr*; \
-	rm ./bin/edr;
+	rm -f ./$(BUILD_DIR)/edr;
 edr: edr.c wfdb.isbuilt
-	cd ./tmp; \
-	export LIBRARY_PATH=$(INSTALL_DIR)/bin/ ;\
-	export PATH=$(PATH):$(INSTALL_DIR)/tmp ;\
-	gcc -o edr -O edr.c -lm -lwfdb \
-	&& cp edr ../ ;\
-	cp edr ../bin/;
+	gcc -o edr -O edr.c -lm -lwfdb ;\
+	cp edr ./$(BUILD_DIR)/bin;
 edr.c:
-	wget http://www.physionet.org/physiotools/edr/edr.c;\
-	cp erd.c ./tmp
+	wget http://www.physionet.org/physiotools/edr/edr.c
 
+
+#TODO: Remove any files to reference to user name
