@@ -1,6 +1,9 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
+0.9.5 (TBA):
+	Added EDR. 
+	
 0.9.4.3 (06 November 2013):
 	Fixed libcurl and path issue.
 
