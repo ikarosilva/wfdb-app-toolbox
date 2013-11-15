@@ -1,6 +1,6 @@
 function varargout=edr(varargin)
 %
-% edr(recordName,annotationFileName,win,N,N0,signaList,outputAnnotator)
+% edr(recordName,annotationFileName,win,signaList,outputAnnotator)
 %
 %    Wrapper to the EDR function written by George Moody:
 %         http://www.physionet.org/physiotools/edr/edr.c
@@ -32,13 +32,6 @@ function varargout=edr(varargin)
 %      seconds. The default= [ 0.04 0.04], starts the estimation process
 %      0.04 seconds before and 0.04 seconds after the annotated beat.
 %
-% N
-%       A 1x1 integer specifying the sample number at which to stop reading the
-%       record file (default read all = N).
-% N0
-%       A 1x1 integer specifying the sample number at which to start reading the
-%       record file (default 1 = first sample).
-%
 % signaList
 %       A Nx1 vector of integers specifying which ECG signals to analyze.
 %
@@ -52,8 +45,22 @@ function varargout=edr(varargin)
 % Since 0.9.5
 %
 % %Example 1-
-%[tm, signal]=rdsamp('challenge/2013/set-a/a01',1,1000);
-%plot(tm,signal(:,1))
+% %Note!!: This example will generate a subdirectory called mitdb
+% %in your current directory. This is where the QRS and EDR annoations 
+% %will be store and read from while in this directory
+% 
+% display('Generating SQRS annotation...')
+% sqrs('mitdb/100');
+% display('Generating EDR annotation...')
+% edr('mitdb/100','qrs');
+% display('Reading EDR annotation...')
+%[ann,type,subtype,chan,num]=rdann('mitdb/100','edr');
+%display('Ploting Normalized ECG and EDR signals')
+%[tm,signal]=rdsamp('mitdb/100',3000);
+%[ann,type,subtype,chan,num]=rdann('mitdb/100','edr');size(num)
+%num(ann>3000)=[];ann(ann>3000)=[];
+%plot(tm(1:3000),signal(1:3000,1)./max(signal(:,1)));hold on;grid on
+%plot(tm(ann),num/max(num),'ro-');
 %
 %
 % See also WFDBDESC, PHYSIONETDB, RDANN, WRANN SQRS, WQRS
@@ -71,11 +78,9 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','annotationFileName','win','N','N0','signaList','outputAnnotator'};
+inputs={'recordName','annotationFileName','win','signaList','outputAnnotator'};
 outputs={''};
 signalList=[];
-N=[];
-N0=1;
 win=[];
 outputAnnotator=[];
 for n=1:nargin
@@ -84,17 +89,12 @@ for n=1:nargin
     end
 end
 
-wfdb_argument={'-r',recordName,'-i','annotationFileName','-f',['s' num2str(N0-1)]};
+wfdb_argument={'-r',recordName,'-i',annotationFileName};
 
 if(~isempty(win))
     wfdb_argument{end+1}='-d ';
     wfdb_argument{end+1}=[num2str(win(1))];
     wfdb_argument{end+1}=[num2str(win(2))];
-end
-
-if(~isempty(N))
-    wfdb_argument{end+1}='-t';
-    wfdb_argument{end+1}=['s' num2str(N-1)]; %WFDB is 0 based indexed
 end
 
 if(~isempty(signalList))
@@ -110,7 +110,7 @@ if(~isempty(outputAnnotator))
     wfdb_argument{end+1}=outputAnnotato;
 end
 
-javaWfdbExec.execToDoubleArray(wfdb_argument);
+javaWfdbExec.execToStringList(wfdb_argument);
 
 
 

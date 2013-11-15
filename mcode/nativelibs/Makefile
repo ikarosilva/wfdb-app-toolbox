@@ -80,11 +80,16 @@ wfdb: wfdb.isbuilt
 clean-edr:
 	rm -f edr*; \
 	rm -f ./$(BUILD_DIR)/edr;
+edr: LC:=$(shell $(INSTALL_DIR)/$(BUILD_DIR)/bin/curl-config --cflags)
+edr: LL=$(INSTALL_DIR)/$(BUILD_DIR)
 edr: edr.c wfdb.isbuilt
-	gcc -o edr -O edr.c -lm -lwfdb ;\
+	echo $(LC) ;\
+	echo $(LL) ;\
+	gcc $(LC)/curl -o edr -O edr.c -L$(LL)/lib -L$(LL)/lib64 -lm -lwfdb -lcurl
 	cp edr ./$(BUILD_DIR)/bin;
 edr.c:
 	wget http://www.physionet.org/physiotools/edr/edr.c
 
 
 #TODO: Remove any files to reference to user name
+#gcc -I/home/ikaro/workspace/wfdb/build/include/curl  edr.c -o edr -L/home/ikaro/workspace/wfdb/build/lib64 -L/home/ikaro/workspace/wfdb/build/lib -lwfdb  -lm -lcurl
