@@ -38,7 +38,7 @@ if(usejava('jvm') )
             %Use quotes to escape white space in Windows
             JVM_PATH=['"' ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep '"java'];
         else
-           JVM_PATH=[ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep 'java']; 
+            JVM_PATH=[ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep 'java'];
         end
         str=['system(''' JVM_PATH ' -version'')'];
         display(['Running: ' str]);
@@ -66,6 +66,30 @@ if(verbose)
     config
 end
 
+if(verbose)
+    fprintf('**Testing native executables on system...\n')
+end
+
+cur_dir=pwd;
+os_dir=findstr(config.WFDB_NATIVE_BIN,filesep);
+os_dir=config.WFDB_NATIVE_BIN(os_dir(end-1)+1:end-1);
+try
+    eval(['cd ' config.WFDB_NATIVE_BIN filesep 'bin'])
+    switch os_dir
+        case 'linux-amd64'
+            !export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:.;./rdsamp -r mitdb/100 -t s5
+        case 'windows-amd64'
+            eval(['!set PATH=%PATH%;' pwd ';rdsamp.exe -r mitdb/100 -t s5'])
+        case 'macosx-x86_64'
+            !export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:.;./rdsamp -r mitdb/100 -t s5
+        otherwise
+            warning('Unsupported OS architecture!')
+    end
+catch
+    warning(lasterr)
+end
+cd (cur_dir)
+
 %Test 1- Test that native libraries can me run from JVM (without MATLAB)
 %and that libcurl can fetch data from PhysioNet
 if(verbose)
@@ -75,9 +99,9 @@ sampleLength=10000;
 cur_dir=pwd;
 data_dir=[config.MATLAB_PATH];
 try
-[status,cmdout] = system([JVM_PATH ' -version']);
-is7=~isempty(findstr('1.7',cmdout));
-is6=~isempty(findstr('1.6',cmdout));
+    [status,cmdout] = system([JVM_PATH ' -version']);
+    is7=~isempty(findstr('1.7',cmdout));
+    is6=~isempty(findstr('1.6',cmdout));
     cd(data_dir)
     if(is7)
         jarname=dir('wfdb-app-JVM7-*');
