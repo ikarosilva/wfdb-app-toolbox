@@ -62,7 +62,7 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: October 23, 013
+% Last Modified: October 23, 2013
 % Version 1.0.3
 % Since 0.0.1
 %
