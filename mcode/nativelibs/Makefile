@@ -10,13 +10,16 @@
 # and compile everything accordingly. It may be necessary to run this file as 
 # with root priveleges.
 
-#TODO: Make OS dependent
+#Package names and versions
 CURL=curl-7.33.0
 WFDB="wfdb-10.5.20"
+ECGPUWAVE=ecgpuwave-1.3.2
+
+#TODO: Make OS dependent
 INSTALL_DIR:=$(shell pwd)
 BUILD_DIR=build
 
-clean: clean-wfdb clean-curl clean-edr
+clean: clean-wfdb clean-curl clean-edr clean-ecgpuwave
 	rm -rf ./tmp; \
 	rm -rf ./$(BUILD_DIR)
 tmp:
@@ -83,12 +86,32 @@ clean-edr:
 edr: LC:=$(shell $(INSTALL_DIR)/$(BUILD_DIR)/bin/curl-config --cflags)
 edr: LL=$(INSTALL_DIR)/$(BUILD_DIR)
 edr: edr.c wfdb.isbuilt
-	echo $(LC) ;\
-	echo $(LL) ;\
 	gcc $(LC)/curl -o edr -O edr.c -L$(LL)/lib -L$(LL)/lib64 -lm -lwfdb -lcurl
 	cp edr ./$(BUILD_DIR)/bin;
 edr.c:
 	wget http://www.physionet.org/physiotools/edr/edr.c
+
+
+#ECGPU Wave Target
+clean-ecgpuwave: 
+	rm -rf ./tmp/$(WFDB)
+	rm -f ./ecgpuwave.isconfig; \
+	rm -f ./ecgpuwave.isbuilt; \
+	rm -f ecgpuwave.tar.gz
+ecgpuwave.tar.gz:
+	wget http://www.physionet.org/physiotools/ecgpuwave/src/$(ECGPUWAVE).tar.gz ;\
+	mv $(ECGPUWAVE).tar.gz ecgpuwave.tar.gz
+	cp ecgpuwave.tar.gz ./tmp/ecgpuwave.tar.gz;
+	cd ./tmp; \
+	tar xvfz ecgpuwave.tar.gz
+ecgpuwave.isbuilt: C_INCLUDE_PATH:=/usr/include/$(shell gcc -print-multiarch)
+ecgpuwave.isbuilt: LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/lib64 
+ecgpuwave.isbuilt: ecgpuwave.tar.gz
+	cd ./tmp/$(ECGPUWAVE);\
+	export LIBRARY_PATH ;\
+	make \
+	&& touch ../../ecgpuwave.isbuilt
+ecgpuwave: ecgpuwave.isbuilt wfdb
 
 
 #TODO: Remove any files to reference to user name
