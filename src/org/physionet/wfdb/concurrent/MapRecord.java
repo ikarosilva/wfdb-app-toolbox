@@ -146,13 +146,20 @@ public class  MapRecord implements Callable<Double>{
 		//Execute command
 		double[][] inputData=null;
 		ArrayList<String> y;
-		double[] out = null;
+		double[] out=null;
 		try {
 			inputData=rdsamp.execToDoubleArray(arguments);
 			y=exec.execWithStandardInput(inputData);
-			out=new double[y.size()];
-			for(int n=0;n<y.size();n++)
-				out[n]=Double.valueOf(y.get(n));
+			//For case where the command does not output data
+			//such as in those generating annotation files, output NaNs
+			if(y.isEmpty()){
+				out=new double[1];
+				out[0]=Double.NaN;
+			}else{
+				out=new double[y.size()];
+				for(int n=0;n<y.size();n++)
+					out[n]=Double.valueOf(y.get(n));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
