@@ -8,7 +8,9 @@ function varargout=maprecord(varargin)
 % passing the data as a matrix to the standard input of 'executeCommand' 
 % getting the results back as a vector for each record from the standard output of
 % the 'executeCommand' (see examples below for detail). The
-% 'executeCommand' should ouput Mx1 doubles for each record processed.
+% 'executeCommand' should ouput Mx1 doubles for each record processed, if
+% the command does not return any outputs (ie if it writes to file), than
+% NaNs are returned.
 %
 %
 % Required Parameters:
