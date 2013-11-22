@@ -2,7 +2,8 @@ For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
 0.9.5 (TBA):
-	Added WFDBEXEC (runs any installed WFDB native command by a direct system call). 
+	Updated native libs to WFDB 10.5.21. Added WFDBEXEC 
+	(runs WFDB native commands in their native API and by a system call through the JVM). 
     Added EDR. 
 	
 0.9.4.3 (06 November 2013):
