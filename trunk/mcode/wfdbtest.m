@@ -67,7 +67,7 @@ if(verbose)
 end
 
 if(verbose)
-    fprintf('**Testing native executables on system...\n')
+    fprintf('**Testing a WFDB linked executables this system...\n')
 end
 
 cur_dir=pwd;
@@ -86,6 +86,7 @@ try
             warning('Unsupported OS architecture!')
     end
 catch
+    warning('Could not run linked executable')
     warning(lasterr)
 end
 cd (cur_dir)
