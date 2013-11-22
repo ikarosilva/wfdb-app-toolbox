@@ -91,6 +91,17 @@ edr: edr.c wfdb.isbuilt
 edr.c:
 	wget http://www.physionet.org/physiotools/edr/edr.c
 
+#MULTISCALE ENTROPY TARGET
+clean-mse:
+	rm -f mse*; \
+	rm -f ./$(BUILD_DIR)/mse;
+mse: mse.c
+	gcc -o mse -O mse.c -lm
+	cp mse ./$(BUILD_DIR)/bin;
+mse.c:
+	wget http://www.physionet.org/physiotools/mse/mse.c
+	
+
 
 #ECGPU Wave Target
 clean-ecgpuwave: 
@@ -113,7 +124,7 @@ ecgpuwave.isbuilt: ecgpuwave.tar.gz
 	&& touch ../../ecgpuwave.isbuilt
 ecgpuwave: ecgpuwave.isbuilt wfdb
 
-all: tmp build curl wfdb edr
+all: tmp build curl wfdb edr mse
 
 checkin:
 	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/hr* ;\
