@@ -12,8 +12,9 @@
 
 #Package names and versions
 CURL=curl-7.33.0
-WFDB="wfdb-10.5.20"
+WFDB="wfdb-10.5.21"
 ECGPUWAVE=ecgpuwave-1.3.2
+
 
 #TODO: Make OS dependent
 INSTALL_DIR:=$(shell pwd)
@@ -96,6 +97,17 @@ edr.c:
 	wget http://www.physionet.org/physiotools/edr/edr.c
 
 
+#MULTISCALE ENTROPY TARGET
+clean-mse:
+	rm -f mse*; \
+	rm -f ./$(BUILD_DIR)/mse;
+mse: mse.c
+	gcc -o mse -O mse.c -lm
+	cp mse ./$(BUILD_DIR)/bin;
+mse.c:
+	wget http://www.physionet.org/physiotools/mse/mse.c
+	
+	
 #ECGPU Wave Target
 clean-ecgpuwave: 
 	rm -rf ./tmp/$(WFDB)
@@ -108,16 +120,30 @@ ecgpuwave.tar.gz:
 	cp ecgpuwave.tar.gz ./tmp/ecgpuwave.tar.gz;
 	cd ./tmp; \
 	tar xvfz ecgpuwave.tar.gz
-ecgpuwave.isbuilt: C_INCLUDE_PATH:=/usr/include/$(shell gcc -print-multiarch)
-ecgpuwave.isbuilt: LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/lib64 
-ecgpuwave.isbuilt: ecgpuwave.tar.gz
+ecgpuwave-gfortran-addon.zip: ecgpuwave.tar.gz
+	wget http://wfdb-app-toolbox.googlecode.com/svn/trunk/dependencies/ecgpuwave-gfortran-addon.zip ;\
+	cp ecgpuwave-gfortran-addon.zip ./tmp/ecgpuwave-gfortran-addon.zip ;\
+	cd ./tmp; \
+	unzip ecgpuwave-gfortran-addon.zip ;\
+	cp -rvs ./*.f ./$(ECGPUWAVE)/	
+ecgpuwave.isbuilt: C_INCLUDE_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/include
+ecgpuwave.isbuilt: LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/lib 
+ecgpuwave.isbuilt: ecgpuwave-gfortran-addon.zip
 	cd ./tmp/$(ECGPUWAVE);\
 	export LIBRARY_PATH ;\
+	export C_INCLUDE_PATH;\
 	make \
-	&& touch ../../ecgpuwave.isbuilt
-ecgpuwave: ecgpuwave.isbuilt wfdb
+	&& touch ../../ecgpuwave.isbuilt ;\
+	cp -v ecgpuwave.exe $(INSTALL_DIR)/$(BUILD_DIR)/bin;\
+	cp -v /bin/libgcc_s_dw2-1.dll $(INSTALL_DIR)/$(BUILD_DIR)/liba;\
+	cp -v /bin/libgfortran-3.dll $(INSTALL_DIR)/$(BUILD_DIR)/lib;\
+	cp -v /bin/libquadmath-0.dll $(INSTALL_DIR)/$(BUILD_DIR)/lib;\
+ecgpuwave: wfdb.isbuilt ecgpuwave.isbuilt
 
 all: tmp build curl wfdb edr
 
-#TODO: Remove any files to reference to user name
-#gcc -I/home/ikaro/workspace/wfdb/build/include/curl  edr.c -o edr -L/home/ikaro/workspace/wfdb/build/lib64 -L/home/ikaro/workspace/wfdb/build/lib -lwfdb  -lm -lcurl
+checkin:
+	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/hr* ;\
+	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/pschart ;\
+	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/psdf ;\
+	rm -rfv $(INSTALL_DIR)/$(BUILD_DIR)/lib/pkgconfig/libcurl.pc ;\
