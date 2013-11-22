@@ -46,8 +46,8 @@ function varargout=edr(varargin)
 %
 % %Example 1-
 % %Note!!: This example will generate a subdirectory called mitdb
-% %in your current directory. This is where the QRS and EDR annoations 
-% %will be store and read from while in this directory
+% %in your current directory. This is where the QRS and EDR annotations 
+% %will be stored and read relative to the current directory
 % 
 % display('Generating SQRS annotation...')
 % sqrs('mitdb/100');
