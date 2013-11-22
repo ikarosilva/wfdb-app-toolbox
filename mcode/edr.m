@@ -57,7 +57,7 @@ function varargout=edr(varargin)
 %[ann,type,subtype,chan,num]=rdann('mitdb/100','edr');
 %display('Ploting Normalized ECG and EDR signals')
 %[tm,signal]=rdsamp('mitdb/100',[],3000);
-%num(ann>3000)=[];ann(ann>3000)=[];
+%num(ann>3000)=[];
 %plot(tm(1:3000),signal(1:3000,1)./max(signal(:,1)));hold on;grid on
 %plot(tm(ann),num/max(num),'ro-');
 %
