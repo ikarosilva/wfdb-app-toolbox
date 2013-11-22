@@ -21,7 +21,8 @@
 #
 ###########################################################################
 
-
+prefix=/home/ikaro/wfdb-sandbox/build
+exec_prefix=${prefix}
 includedir=${prefix}/include
 cppflag_curl_staticlib=
 
@@ -163,7 +164,7 @@ while test $# -gt 0; do
         ;;
 
     --configure)
-        echo " '--prefix=/home/ikaro/wfdb-sandbox/build' '--without-ssl' '--without-zlib' '--without-libssh2' '--disable-ldap'"
+        echo " '--without-ssl' '--without-zlib' '--without-libssh2' '--disable-ldap'"
         ;;
 
     *)
