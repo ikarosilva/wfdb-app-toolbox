@@ -12,9 +12,9 @@
 
 #Package names and versions
 CURL=curl-7.33.0
-WFDB="wfdb-10.5.20"
+WFDB="wfdb-10.5.21"
 ECGPUWAVE=ecgpuwave-1.3.2
-
+PCKG_DIR="../wfdb-app-toolbox/mcode/nativelibs/linux-amd64"
 #TODO: Make OS dependent
 INSTALL_DIR:=$(shell pwd)
 BUILD_DIR=build
@@ -24,7 +24,7 @@ clean: clean-wfdb clean-curl clean-edr clean-ecgpuwave
 	rm -rf ./$(BUILD_DIR)
 tmp:
 	mkdir -p ./tmp/
-build: tmp
+build: 
 	rm -rf ./$(BUILD_DIR)/; \
 	mkdir ./$(BUILD_DIR);
 
@@ -113,6 +113,21 @@ ecgpuwave.isbuilt: ecgpuwave.tar.gz
 	&& touch ../../ecgpuwave.isbuilt
 ecgpuwave: ecgpuwave.isbuilt wfdb
 
+all: tmp build curl wfdb edr
 
+checkin:
+	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/hr* ;\
+	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/pschart ;\
+	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/psdf ;\
+	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/lib/pkgconfig/libcurl.pc ;\
+	rm -fv $(PCKG_DIR)/bin/* ;\
+	rm -rfv $(PCKG_DIR)/lib/* ;\ 
+	rm -fv $(PCKG_DIR)/lib64/* ;\
+	cp -rv $(INSTALL_DIR)/$(BUILD_DIR)/bin/* $(PCKG_DIR)/bin/ ;\
+	cp -rv $(INSTALL_DIR)/$(BUILD_DIR)/lib/* $(PCKG_DIR)/lib/ ;\ 
+	cp -rv $(INSTALL_DIR)/$(BUILD_DIR)/lib64/* $(PCKG_DIR)/lib64/ ;\
+	
+	
+	
 #TODO: Remove any files to reference to user name
 #gcc -I/home/ikaro/workspace/wfdb/build/include/curl  edr.c -o edr -L/home/ikaro/workspace/wfdb/build/lib64 -L/home/ikaro/workspace/wfdb/build/lib -lwfdb  -lm -lcurl
