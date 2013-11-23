@@ -1,6 +1,6 @@
 function varargout=wfdbexec(varargin)
 %
-% [output]=wfdbexec(commandName,inputArguments)
+% [output]=wfdbexec(commandName,inputArguments,logLevel)
 % [nativeCommands]=wfdbexec()
 %
 % Executes a WFDB native command ('commandName'), with input arguments
@@ -41,7 +41,17 @@ function varargout=wfdbexec(varargin)
 %       usign a command that is already implemente in a MATLAB wrapper, it
 %       maybe helpful to look at that command's MATLAB code.
 %
+%Optional Parameters:
 %
+%       logLevel
+%       1x1 integer that specifies the logleve (verbosity) of the execution process.
+%       Options are:
+%                     0 OFF (Default)
+%                     1 SEVERE
+%                     2 WARNING
+%                     3 INFO
+%                     4 FINEST
+%                     5 ALL
 %
 %Output:
 %
@@ -67,6 +77,8 @@ function varargout=wfdbexec(varargin)
 % out=wfdbexec('rdsamp',{'-r','mitdb/100','-t','s5'})
 %
 % See also WFDB
+
+logLevel=[];
 
 if(nargin==0)
     %With no arguments passed in, we provide the user a list of native
@@ -105,11 +117,17 @@ if(nargin==0)
     end
     varargout{1}=commandList(:);
 else
+    if(nargin>2)
+        logLevel=varargin{3};
+    end
     if(~wfdbloadlib)
         %Add classes to dynamic path
         wfdbloadlib;
     end
     javaWfdbExec=org.physionet.wfdb.Wfdbexec(varargin(1));
+    if(~isempty(logLevel))
+        javaWfdbExec.setLogLevel(logLevel);
+    end
     try
         %System call
         varargout{1}=cell(javaWfdbExec.execToStringList(varargin{2}).toArray);
