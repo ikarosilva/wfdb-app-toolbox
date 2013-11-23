@@ -12,3 +12,4 @@ mcode/*~
 mcode/.__afs*
 mcode/nativelibs/linux-i386/build_wfdbjava.sh
 mcode/nativelibs/Makefile
+mcode/nativelibs/MakefileWindows

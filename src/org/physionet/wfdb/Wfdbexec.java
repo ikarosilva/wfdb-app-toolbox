@@ -323,12 +323,16 @@ public class Wfdbexec {
 		if(osName.contains("windows")){
 			LD_PATH=env.get("Path");
 			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "bin";
+			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "lib";
 		}else if(osName.contains("macosx")){
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");
 			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "bin";
+			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib";
 		}else{
 			LD_PATH=env.get("LD_LIBRARY_PATH");
 			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "bin";
+			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib";
+			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
 		}
 		
 		if(LD_PATH.isEmpty())
