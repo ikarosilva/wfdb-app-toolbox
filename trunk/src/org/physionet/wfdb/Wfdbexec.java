@@ -201,7 +201,7 @@ public class Wfdbexec {
 		return execToStringList();
 	}
 
-	public double[][] execToDoubleArray(String[] args) throws Exception {
+	public double[][] execToDoubleArray(String[] args) {
 		setArguments(args);   
 		gen_exec_arguments();
 
@@ -213,7 +213,13 @@ public class Wfdbexec {
 		double[][] data=null;
 		int isTime=-1;//Index in case one of the columns is time as string
 
-		ProcessBuilder launcher = setLauncher();
+		ProcessBuilder launcher = null;
+		try {
+			launcher = setLauncher();
+		} catch (Exception e1) {
+			System.err.println("***Error in setting the system launcher:" + e1.toString());
+			e1.printStackTrace();
+		}
 		try {
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
@@ -272,7 +278,7 @@ public class Wfdbexec {
 			//Wait to for exit value
 			int exitValue = p.waitFor();
 			if(exitValue != 0){
-				throw new Exception("Command exited with error!");
+				System.err.println("Command exited with non-zero status!!");
 			}
 			//Convert data to Double Array
 			int N=tmpStr.length;
