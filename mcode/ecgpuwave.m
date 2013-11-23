@@ -2,7 +2,7 @@ function ecgpuwave(varargin)
 %
 % ecgpuwave(recordName,annFileName,startTime,stopTime,qrsAnn,pflag,signalList)
 %
-%    Wrapper to the ECGPUWAVE binary written by Pablo Laguna (laguna@posta.unizar.es), Raimon Jan[’e], Eudald Bogatell, and David Vigo Anglada:
+%    Wrapper to the ECGPUWAVE binary written by Pablo Laguna (laguna@posta.unizar.es), Raimon Jan[ï¿½e], Eudald Bogatell, and David Vigo Anglada:
 %         http://www.physionet.org/physiotools/wag/ecgpuw-1.htm
 %
 % ECGPUWAVE analyses an ECG signal from the specified record 'recordName', detecting the QRS complexes
@@ -39,8 +39,8 @@ function ecgpuwave(varargin)
 % References:
 %1. Pan J and Tompkins WJ. A Real-Time QRS Detection Algorithm. IEEE Transactions on Biomedical Engineering 32(3):230-236, 1985.
 %2. Laguna P. New Electrocardiographic Signal Processing Techniques: Application to Long-term Records. Ph. D. dissertation, Science Faculty, University of Zaragoza, 1990.
-%3. Laguna P, Jan[’e] R, Caminal P. Automatic Detection of Wave Boundaries in Multilead ECG Signals: Validation with the CSE Database. Computers and Biomedical Research 27(1):45-60, 1994.
-%4. Jan[’e] R, Blasi A, Garc[’i]a J, and Laguna P. Evaluation of an automatic threshold based detector of waveform limits in Holter ECG with the QT database. Computers in Cardiology 24:295-298 (1997; available at http://www.physionet.org/physiobank/database/qtdb/eval/ )
+%3. Laguna P, Jan[ï¿½e] R, Caminal P. Automatic Detection of Wave Boundaries in Multilead ECG Signals: Validation with the CSE Database. Computers and Biomedical Research 27(1):45-60, 1994.
+%4. Jan[ï¿½e] R, Blasi A, Garc[ï¿½i]a J, and Laguna P. Evaluation of an automatic threshold based detector of waveform limits in Holter ECG with the QT database. Computers in Cardiology 24:295-298 (1997; available at http://www.physionet.org/physiobank/database/qtdb/eval/ )
 %
 % Required Parameters:
 %
@@ -84,7 +84,7 @@ function ecgpuwave(varargin)
 % 
 % %Example - Will go into the WFDB directory of examples to load data
 %curdir=pwd;
-%[~,config]=wfdbloadlib;eval(['cd ' config.WFDB_JAVA_HOME filesep '\example'])
+%[~,config]=wfdbloadlib;eval(['cd ' config.WFDB_JAVA_HOME filesep 'example'])
 %ecgpuwave('100s','test');
 %[tm,signal]=rdsamp('100s');
 %pwaves=rdann('100s','test',[],[],[],'p');
