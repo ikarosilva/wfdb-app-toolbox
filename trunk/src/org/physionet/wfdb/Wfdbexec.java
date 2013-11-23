@@ -75,6 +75,7 @@ public class Wfdbexec {
 	private static Logger logger =
 			Logger.getLogger(Wfdbexec.class.getName());
 	private String commandDir;
+	private long initialWaitTime;
 
 	public Wfdbexec(String commandName){
 		logger.finest("\n\t***Setting exec commandName to: " + commandName);
@@ -98,6 +99,10 @@ public class Wfdbexec {
 		commandName = execName;
 	}
 
+	private void setInitialWaitTime(long tm){
+		initialWaitTime=tm;
+	}
+	
 	public void setExecutingDir(File dir){
 		logger.finer("\n\t***Setting EXECUTING_DIR: " 
 				+ dir);
@@ -131,8 +136,32 @@ public class Wfdbexec {
 			logger.finer("\n\t***Creating read buffer and waiting for exec process...");
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
-
-			logger.finer("\n\t***Reading output.");
+			//Wait for the initial stream in case process is slow
+			logger.finest("\n\t***Waiting for data stream from launcher...");
+			long thisTime=System.currentTimeMillis();
+			long waitTime=thisTime;
+			while (!output.ready()){
+				if((waitTime-thisTime)> initialWaitTime){
+					logger.finest("Process data stream wait time exceeded ("
+							+ initialWaitTime + "  milliseconds )");
+					logger.finest("\n\t***Could not get data stream, exiting...");
+					break;
+				}else {
+					try {
+						logger.finest("Waited " + (waitTime-thisTime) +
+								" ms for data stream (max waiting time= " +
+								initialWaitTime + "ms ) ...");
+					    Thread.sleep(100);
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+					waitTime=System.currentTimeMillis();
+				}
+			}
+			if(output.ready()){
+				logger.finest("\n\t***A was stream initialized, checking if data or err...");
+			}
+			
 			while ((line = output.readLine()) != null){
 				logger.finest("\n\t***Reading output: \n" + line);
 				results.add(line);
@@ -214,13 +243,16 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
+		logger.finest("\n\t***Setting launcher in exectToDoubleArray");
 		try {
 			launcher = setLauncher();
+			logger.finest("\n\t***Launcher created sucessfully in exectToDoubleArray");
 		} catch (Exception e1) {
 			System.err.println("***Error in setting the system launcher:" + e1.toString());
 			e1.printStackTrace();
 		}
 		try {
+			logger.finest("\n\t***Starting launcher in exectToDoubleArray");
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -230,6 +262,33 @@ public class Wfdbexec {
 			char[] tmpCharArr=null;
 			int colInd;
 			int dataCheck=0;
+			
+			//Wait for the initial stream in case process is slow
+			logger.finest("\n\t***Waiting for data stream from launcher...");
+			long thisTime=System.currentTimeMillis();
+			long waitTime=thisTime;
+			
+			while (!output.ready()){
+				if((waitTime-thisTime)> initialWaitTime){
+					logger.finest("Process data stream wait time exceeded ("
+							+ initialWaitTime + "  milliseconds )");
+					logger.finest("\n\t***Could not get data stream, exiting...");
+					break;
+				}else {
+					try {
+						logger.finest("Waited " + (waitTime-thisTime) +
+								" ms for data stream (max waiting time= " +
+								initialWaitTime + "ms ) ...");
+					    Thread.sleep(100);
+					} catch(InterruptedException ex) {
+					    Thread.currentThread().interrupt();
+					}
+					waitTime=System.currentTimeMillis();
+				}
+			}
+			if(output.ready()){
+				logger.finest("\n\t***A was stream initialized, checking if data or err...");
+			}
 			while ((line = output.readLine()) != null){
 				tmpStr=line.trim().split("\\s+");
 				tmpArr=new Double[tmpStr.length];
@@ -363,6 +422,9 @@ public class Wfdbexec {
 		if(EXECUTING_DIR != null){
 			launcher.directory(EXECUTING_DIR);
 		}
+		
+		//Set process initial wait time for data streams
+		setInitialWaitTime(1000);
 		return launcher;
 	}
 
