@@ -57,14 +57,9 @@ function varargout=mxm(varargin)
 
 persistent javaWfdbExec
 
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
+persistent javaWfdbExec
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('mxm');
+    javaWfdbExec=getWfdbClass('mxm');
 end
 
 %Set default pararamter values

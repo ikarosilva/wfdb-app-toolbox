@@ -1,6 +1,6 @@
 function [varargout]=wfdbloadlib(varargin)
 %
-% [isloaded,config]=wfdbloadlib(debugLevel)
+% [isloaded,config]=wfdbloadlib(debugLevel,networkWaitTime)
 %
 % Loads the WDFDB libarary if it has not been loaded already into the
 % MATLAB classpath. And optionally prints configuration environment and debug information
@@ -13,14 +13,33 @@ function [varargout]=wfdbloadlib(varargin)
 %       Java class when output configuration information. Level 0 (no debug information), 
 %       level =5 is maximum level of information output by the class (logger set to finest). Default is level 0.
 %
+% networkWaitTime
+%       (Optional) 1x1 interger representing the longest time in
+%       milliseconds  for which the JVM should wait for a data stream from
+%       PhysioNet (default is =1000  , ie one second). If you need to change this time to a
+%       longer value across the entire toolbox, it is better modify to default value in the source
+%       code below and restart MATLAB. 
+%
 %
 % Written by Ikaro Silva, 2013
 %
 % Since 0.0.1
 %
 
-inputs={'debugLevel'};
+%%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
+%%% Change these values for system wide configuration of the WFDB binaries
+
 debugLevel=0;
+networkWaitTime=1000;
+
+%%%% END OF SYSTEM WIDE CONFIGURATION PARAMETERS
+
+
+
+
+
+
+inputs={'debugLevel','networkWaitTime'};
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -81,6 +100,8 @@ for n=1:nargout
             config.SUPPORT_EMAIL='wfdb-matlab-support@physionet.org';
             config.WFDB_JAVA_VERSION=regexp(config.WFDBJavaPackageDir,filesep,'split');
             config.WFDB_JAVA_VERSION=config.WFDB_JAVA_VERSION{end};
+            config.DEBUG_LEVEL=debugLevel;
+            config.NETWORK_WAIT_TIME=networkWaitTime;
             
             %Remove empty spaces from arch name
             del=strfind(config.osName,' ');

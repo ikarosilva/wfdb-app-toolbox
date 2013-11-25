@@ -83,15 +83,8 @@ function varargout=rdann(varargin)
 % See also wfdbtime, wrann
 
 persistent javaWfdbExec
-
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('rdann');
+    javaWfdbExec=getWfdbClass('rdann');
 end
 
 %Set default pararamter values
@@ -111,20 +104,30 @@ end
 wfdb_argument={'-r',recordName,'-a',annotator};
 
 if(~isempty(N0) && N0>1)
-    wfdb_argument{end+1}='-f';
+    
     %-1 is necessary because WFDB is 0 based indexed.
     %RDANN expects timestamp, so convert from sample to timestamp
     start_time=wfdbtime(recordName,N0-1);
-    wfdb_argument{end+1}=[start_time{1}];
+    if(~isempty(start_time{end}))
+        wfdb_argument{end+1}='-f';
+        wfdb_argument{end+1}=[start_time{1}];
+    else
+        error(['Could not get record header information to find start time.'])
+    end
+    
 end
 
 
 if(~isempty(N))
-    wfdb_argument{end+1}='-t';
-    %-1 is necessary because WFDB is 0 based indexed.    
+    %-1 is necessary because WFDB is 0 based indexed.
     %RDANN expects timestamp, so convert from sample to timestamp
     end_time=wfdbtime(recordName,N-1);
-    wfdb_argument{end+1}=[end_time{1}];
+    if(~isempty(end_time{end}))
+        wfdb_argument{end+1}='-t';
+        wfdb_argument{end+1}=[end_time{1}];
+    else
+        error(['Could not get record header information to find stop time.'])
+    end
 end
 
 if(~isempty(type))
@@ -163,7 +166,7 @@ if(~isempty(str) && strcmp(str(1),'['))
     % [00:11:30.628 09/11/1989]      157     N    0    1    0
     % but not always, the following case is also possible:
     % [00:11:30.628]      157     N    0    1    0
-    % 
+    %
     % So we remove the everything between [ * ]  prior to parsing
     
     for n=1:N

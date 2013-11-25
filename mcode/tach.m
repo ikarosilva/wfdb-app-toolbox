@@ -51,15 +51,8 @@ function varargout=tach(varargin)
 
 
 persistent javaWfdbExec
-
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('tach');
+    javaWfdbExec=getWfdbClass('tach');
 end
 
 %Set default pararamter values

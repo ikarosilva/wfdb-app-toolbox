@@ -71,17 +71,9 @@ function varargout=wqrs(varargin)
 % %Example - Requires write permission to current directory
 %wqrs('challenge/2013/set-a/a01');
 
-
 persistent javaWfdbExec
-
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('wqrs');
+    javaWfdbExec=getWfdbClass('wqrs');
 end
 
 %Set default pararamter values

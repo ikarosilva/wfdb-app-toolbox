@@ -8,11 +8,11 @@ function varargout=ann2rr(varargin)
 %    Reads a WFDB record and Annotation file to return:
 %
 %
-% RR     
+% RR
 %       Nx1 vector of integers representing the duration of the RR
 %       interval in samples.
 %
-% tms     
+% tms
 %       Nx1 vector of integers representing the begining of the RR
 %       interval in samples.
 %
@@ -28,14 +28,14 @@ function varargout=ann2rr(varargin)
 %
 % Optional Parameters are:
 %
-% N 
-%       A 1x1 integer specifying the sample number at which to stop reading the 
+% N
+%       A 1x1 integer specifying the sample number at which to stop reading the
 %       record file (default read all = N).
-% N0 
-%       A 1x1 integer specifying the sample number at which to start reading the 
+% N0
+%       A 1x1 integer specifying the sample number at which to start reading the
 %       annotion file (default 1 = begining of the record).
 %
-% consecutiveOnly 
+% consecutiveOnly
 %       A 1x1 boolean. If true, prints intervals between consecutive valid
 %       annotaions only (default =true).
 %
@@ -48,18 +48,9 @@ function varargout=ann2rr(varargin)
 % %Example
 %[rr,tm]=ann2rr('challenge/2013/set-a/a01','fqrs');
 
-
-
 persistent javaWfdbExec
-
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('ann2rr');
+    javaWfdbExec=getWfdbClass('ann2rr');
 end
 
 %Set default pararamter values
@@ -82,7 +73,7 @@ if(~isempty(N))
     %-1 is necessary because WFDB is 0 based indexed.
     wfdb_argument{end+1}=['s' num2str(N-1)];
 end
-    
+
 if(consecutiveOnly)
     wfdb_argument{end+1}='-c';
 end
@@ -90,7 +81,7 @@ wfdb_argument{end+1}='-V';
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
 for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';'])
 end
 
 

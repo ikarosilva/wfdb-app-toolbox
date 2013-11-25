@@ -66,17 +66,9 @@ function varargout=lomb(varargin)
 %
 % See also RDANN, TACH, SQRS, WQRS
 
-
 persistent javaWfdbExec
-
-if(~wfdbloadlib)rdsamp
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('lomb');
+    javaWfdbExec=getWfdbClass('lomb');
 end
 
 %Set default pararamter values

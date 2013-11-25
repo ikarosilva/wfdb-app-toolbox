@@ -103,40 +103,37 @@ mse.c:
 	
 
 
-#ECGPU Wave Target
+#ECGPU Wave Target 
 clean-ecgpuwave: 
 	rm -rf ./tmp/$(WFDB)
 	rm -f ./ecgpuwave.isconfig; \
 	rm -f ./ecgpuwave.isbuilt; \
 	rm -f ecgpuwave.tar.gz
-ecgpuwave.tar.gz:
+ecgpuwave.tar.gz: 
 	wget http://www.physionet.org/physiotools/ecgpuwave/src/$(ECGPUWAVE).tar.gz ;\
 	mv $(ECGPUWAVE).tar.gz ecgpuwave.tar.gz
 	cp ecgpuwave.tar.gz ./tmp/ecgpuwave.tar.gz;
 	cd ./tmp; \
 	tar xvfz ecgpuwave.tar.gz
-ecgpuwave.isbuilt: C_INCLUDE_PATH:=/usr/include/$(shell gcc -print-multiarch)
-ecgpuwave.isbuilt: LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/lib64 
-ecgpuwave.isbuilt: ecgpuwave.tar.gz
+ecgpuwave-gfortran-addon.zip: ecgpuwave.tar.gz
+	wget http://wfdb-app-toolbox.googlecode.com/svn/trunk/dependencies/ecgpuwave-gfortran-addon.zip ;\
+	cp ecgpuwave-gfortran-addon.zip ./tmp/ecgpuwave-gfortran-addon.zip ;\
+	cd ./tmp; \
+	unzip ecgpuwave-gfortran-addon.zip ;\
+	cp -rv ./*.f ./$(ECGPUWAVE)/	
+ecgpuwave.isbuilt: C_INCLUDE_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/include
+ecgpuwave.isbuilt: LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/lib
+ecgpuwave.isbuilt: ecgpuwave-gfortran-addon.zip
 	cd ./tmp/$(ECGPUWAVE);\
 	export LIBRARY_PATH ;\
+	export C_INCLUDE_PATH;\
 	make \
-	&& touch ../../ecgpuwave.isbuilt
-ecgpuwave: ecgpuwave.isbuilt wfdb
-
-all: tmp build curl wfdb edr mse
-
-checkin:
-	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/hr* ;\
-	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/pschart ;\
-	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/psdf ;\
-	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/lib/pkgconfig/libcurl.pc ;\
-	rm -fv $(PCKG_DIR)/bin/* ;\
-	rm -rfv $(PCKG_DIR)/lib/* ;\ 
-	rm -fv $(PCKG_DIR)/lib64/* ;\
-	cp -rv $(INSTALL_DIR)/$(BUILD_DIR)/bin/* $(PCKG_DIR)/bin/ ;\
-	cp -rv $(INSTALL_DIR)/$(BUILD_DIR)/lib/* $(PCKG_DIR)/lib/ ;\ 
-	cp -rv $(INSTALL_DIR)/$(BUILD_DIR)/lib64/* $(PCKG_DIR)/lib64/ ;\
+	&& touch ../../ecgpuwave.isbuilt ;\
+	cp -v ecgpuwave $(INSTALL_DIR)/$(BUILD_DIR)/bin ;\
+	cp -v /usr/lib/x86_64-linux-gnu/libquadmath.so.0 $(INSTALL_DIR)/$(BUILD_DIR)/lib64 ;\
+	cp -v /lib/x86_64-linux-gnu/libgcc_s.so.1 $(INSTALL_DIR)/$(BUILD_DIR)/lib64 ;\
+	cp -v /usr/lib/x86_64-linux-gnu/libgfortran.so.3 $(INSTALL_DIR)/$(BUILD_DIR)/lib64 
+ecgpuwave: wfdb.isbuilt ecgpuwave.isbuilt
 	
 	
 	
