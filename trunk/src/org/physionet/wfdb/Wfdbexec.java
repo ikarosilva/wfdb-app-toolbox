@@ -99,7 +99,7 @@ public class Wfdbexec {
 		commandName = execName;
 	}
 
-	private void setInitialWaitTime(long tm){
+	public void setInitialWaitTime(long tm){
 		initialWaitTime=tm;
 	}
 	
@@ -287,7 +287,7 @@ public class Wfdbexec {
 				}
 			}
 			if(output.ready()){
-				logger.finest("\n\t***A was stream initialized, checking if data or err...");
+				logger.finest("\n\t***Streamed communication received, checking if error or data...");
 			}
 			while ((line = output.readLine()) != null){
 				tmpStr=line.trim().split("\\s+");

@@ -68,24 +68,26 @@ function varargout=msentropy(varargin)
 %
 % Since 0.9.5
 %
-% %Example
-%[RR,tms]=ann2rr('nsr2db/nsr047','ecg');
-%[y,scale]=msentropy(RR(1:1000));
-%plot(scale,y)
+% %Example 
+% N=30000;
+% noise=randn(N,1);
+% maxScale=10;
+%[entropyNoise,scale1]=msentropy(noise,[],[],[],[],[],[],[],maxScale);
+% %Simulate determistic system with noise-like 2nd order statistics
+% nlinear=zeros(N,1);nlinear(1)=0.2;u=4;
+% for n=2:N;nlinear(n)=u*nlinear(n-1)*(1-nlinear(n-1));end
+%[entropyDeterm,scale2]=msentropy(nlinear,[],[],[],[],[],[],[],maxScale);
+%subplot(2,1,1);
+%plot(noise(1:1000));hold on;grid on;plot(nlinear(1:1000),'r');legend('Stochastic','Deterministic')
+%subplot(2,1,2);
+%plot(scale1,entropyNoise);hold on;grid on;plot(scale2,entropyDeterm,'r');legend('Stochastic','Deterministic')
 %
 %
 % See also WFDBDESC, PHYSIONETDB, RDANN, ANN2RR, MAPRECORD
 
 persistent javaWfdbExec
-
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('mse');
+    javaWfdbExec=getWfdbClass('mse');
 end
 
 %Set default pararamter values

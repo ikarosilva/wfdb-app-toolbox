@@ -56,18 +56,9 @@ function varargout=sqrs(varargin)
 % %Example
 %sqrs('challenge/2013/set-a/a01',[],1000);
 
-
-
 persistent javaWfdbExec
-
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
-end
-
 if(isempty(javaWfdbExec))
-    %Load the Java class in memory if it has not been loaded yet
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec('sqrs');
+    javaWfdbExec=getWfdbClass('sqrs');
 end
 
 %Set default pararamter values
