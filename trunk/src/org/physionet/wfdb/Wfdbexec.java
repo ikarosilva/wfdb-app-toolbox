@@ -230,7 +230,7 @@ public class Wfdbexec {
 		return execToStringList();
 	}
 
-	public double[][] execToDoubleArray(String[] args) {
+	public double[][] execToDoubleArray(String[] args) throws Exception {
 		setArguments(args);   
 		gen_exec_arguments();
 
@@ -319,7 +319,7 @@ public class Wfdbexec {
 								dataCheck++;
 							}catch(Exception e2) {
 								System.err.println("Could not convert to double: " + line);
-								throw(e2);
+								throw new Exception(e2.toString());
 							}
 						}
 					}
