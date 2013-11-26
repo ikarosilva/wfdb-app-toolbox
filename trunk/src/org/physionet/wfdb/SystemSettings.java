@@ -1,5 +1,8 @@
 package org.physionet.wfdb;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -7,32 +10,33 @@ import java.util.logging.Logger;
 public class SystemSettings {
 
 	private final static Logger logger = Logger.getLogger(Wfdbexec.class.getName());
-			
-    @SuppressWarnings("unchecked")
+	private static boolean isLoadedLibs=false;
+	
+	@SuppressWarnings("unchecked")
 	public static String[] getLoadedLibraries(Object o) {
-    	final ClassLoader loader=o.getClass().getClassLoader();
-    	Vector<String> libraries=null;
-            try {
-            	final java.lang.reflect.Field LIBRARIES= 
-            			ClassLoader.class.getDeclaredField("loadedLibraryNames");
-            	LIBRARIES.setAccessible(true);
-                libraries = (Vector<String>) LIBRARIES.get(loader);
-    		} catch (NoSuchFieldException | SecurityException |
-    				IllegalArgumentException | IllegalAccessException e) {
-    			e.printStackTrace();
-    		}
-       logger.finest("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
-        return libraries.toArray(new String[] {});
-    }
-    
-	public static String getfileSeparator(){
-		return System.getProperty("file.separator");
+		final ClassLoader loader=o.getClass().getClassLoader();
+		Vector<String> libraries=null;
+		try {
+			final java.lang.reflect.Field LIBRARIES= 
+					ClassLoader.class.getDeclaredField("loadedLibraryNames");
+			LIBRARIES.setAccessible(true);
+			libraries = (Vector<String>) LIBRARIES.get(loader);
+		} catch (NoSuchFieldException | SecurityException |
+				IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		logger.finest("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
+		return libraries.toArray(new String[] {});
+	}
+
+	public static String getFileSeparator(){
+		return System.getProperty("file.separator");		
 	}
 	public static String getosArch(){
 		logger.finest("\nSystemSetting --Arch-" + System.getProperty("os.arch"));
-	    return System.getProperty("os.arch");
+		return System.getProperty("os.arch");
 	}
-	
+
 	public static String getOsName(){
 		String osName=System.getProperty("os.name");
 		osName=osName.replace(" ","");
@@ -43,15 +47,21 @@ public class SystemSettings {
 		logger.finest("\nSystemSetting --OS-" +osName);
 		return osName;
 	}
-	
-	public static void loadLibCurl(){
-		System.loadLibrary(SystemSettings.getWFDB_NATIVE_BIN()+
-				getWFDB_NATIVE_BIN()+ getfileSeparator() + "lib");
-		logger.finest("\nSystemSetting --loadingLibCurl at: " +
+
+	public static void loadLibs(){
+		if(isLoadedLibs == false){
+		System.load(SystemSettings.getWFDB_NATIVE_BIN()+ 
+				"lib" + getFileSeparator() + "libcurl-4.dll");
+		//System.loadLibrary("libcurl.dll.a");
+		System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
+				"lib" + getFileSeparator() + "libcurl");
+		logger.finest("\nSystemSetting --loadingLibCurl from: " +
 				SystemSettings.getWFDB_NATIVE_BIN()+
-				getWFDB_NATIVE_BIN()+ getfileSeparator() + "lib");
+				"lib" + getFileSeparator() + "libcurl");
+		 	isLoadedLibs=true;
+		}
 	}
-	
+
 	public static String getLD_PATH(){
 		ProcessBuilder launcher = new ProcessBuilder();
 		Map<String,String> env = launcher.environment();
@@ -72,37 +82,51 @@ public class SystemSettings {
 			OsPathName="LD_LIBRARY_PATH";
 		}
 		tmp=WFDB_NATIVE_BIN + "lib" + pathSep + WFDB_NATIVE_BIN + "bin"
-					+pathSep +  WFDB_NATIVE_BIN + "lib64";
+				+pathSep +  WFDB_NATIVE_BIN + "lib64";
 		if(LD_PATH == null){
 			LD_PATH=tmp;
 		}else if(LD_PATH.indexOf(tmp) <0){
 			//Only add if path is not present already
-			LD_PATH=LD_PATH+tmp;
+			LD_PATH=LD_PATH+pathSep+tmp;
 		}
 		logger.finest("\nSystemSetting --Configuring PATH to: " + LD_PATH);
 		env.put(OsPathName,LD_PATH);
 		return LD_PATH;
 	}
-	
+
 	public static String getWFDB_JAVA_HOME(){
 		String packageDir = null;
-		packageDir=Wfdbexec.class.getProtectionDomain().getCodeSource().getLocation().toString();
-		int tmp = packageDir.lastIndexOf(getfileSeparator());
+		try {
+			packageDir=URLDecoder.decode(
+					Wfdbexec.class.getProtectionDomain().getCodeSource().getLocation().getPath(),"utf-8");
+			packageDir = new File(packageDir).getPath();
+		} catch (UnsupportedEncodingException e) {
+			System.err.println("Could not get path location of WFDB JAR file.");
+			e.printStackTrace();
+		}
+		int tmp = packageDir.lastIndexOf(getFileSeparator());
 		packageDir=packageDir.substring(0,tmp+1);
 		packageDir=packageDir.replace("file:","");
 		logger.finest("\nSystemSetting --WFDB HOME: " + packageDir);
 		return packageDir.toString();
 	}
-	
+
 	public synchronized static String getWFDB_NATIVE_BIN() {
 		String WFDB_NATIVE_BIN;
 		String WFDB_JAVA_HOME=getWFDB_JAVA_HOME();
 		//Set path to executables based on system/arch
-		WFDB_NATIVE_BIN= WFDB_JAVA_HOME + "nativelibs" + getfileSeparator() + 
+		WFDB_NATIVE_BIN= WFDB_JAVA_HOME + "mcode" + getFileSeparator() + "nativelibs" + getFileSeparator() + 
 				getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
-				+ getfileSeparator() ;
+				+ getFileSeparator() ;
 		logger.finest("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
 		return WFDB_NATIVE_BIN;
+	}
+
+	public static void main(String[] args) throws Exception {
+		System.out.println(getWFDB_NATIVE_BIN());
+		System.out.println(getWFDB_JAVA_HOME());
+		loadLibs();
+		
 	}
 
 }

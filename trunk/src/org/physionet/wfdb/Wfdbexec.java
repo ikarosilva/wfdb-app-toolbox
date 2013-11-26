@@ -57,7 +57,7 @@ import java.util.logging.Logger;
 public class Wfdbexec {
 
 	private String commandName;
-	private static final String fileSeparator=SystemSettings.getfileSeparator();
+	private static final String fileSeparator=SystemSettings.getFileSeparator();
 	private static final String osArch= SystemSettings.getosArch();
 	private static final String osName=SystemSettings.getOsName();
 	protected static final String WFDB_JAVA_HOME=SystemSettings.getWFDB_JAVA_HOME();
@@ -79,6 +79,7 @@ public class Wfdbexec {
 		logger.finest("\n\t***Setting exec commandName to: " + commandDir + commandName);
 		this.commandName=commandName;
 		this.commandDir=commandDir;
+		SystemSettings.loadLibs();
 	}
 
 	public Wfdbexec(String commandName){
