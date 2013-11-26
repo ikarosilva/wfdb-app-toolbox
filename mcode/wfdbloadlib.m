@@ -10,7 +10,7 @@ function [varargout]=wfdbloadlib(varargin)
 %
 % debugLevel
 %       (Optional) 1x1 integer between 0 and 5 represeting the level of debug information to output from
-%       Java class when output configuration information. Level 0 (no debug information), 
+%       Java class when output configuration information. Level 0 (no debug information),
 %       level =5 is maximum level of information output by the class (logger set to finest). Default is level 0.
 %
 % networkWaitTime
@@ -18,7 +18,7 @@ function [varargout]=wfdbloadlib(varargin)
 %       milliseconds  for which the JVM should wait for a data stream from
 %       PhysioNet (default is =1000  , ie one second). If you need to change this time to a
 %       longer value across the entire toolbox, it is better modify to default value in the source
-%       code below and restart MATLAB. 
+%       code below and restart MATLAB.
 %
 %
 % Written by Ikaro Silva, 2013
@@ -29,6 +29,8 @@ function [varargout]=wfdbloadlib(varargin)
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
 %%% Change these values for system wide configuration of the WFDB binaries
 
+WFDB_PATH=[]; %If empty, will use the default giveng confing.WFDB_PATH
+WFDBCAL=[]; %If empty, will use the default giveng confing.WFDBCAL
 debugLevel=0;
 networkWaitTime=1000;
 
@@ -46,7 +48,8 @@ for n=1:nargin
     end
 end
 
-persistent per_isloaded;
+persistent per_isloaded wfdb_path;
+
 if(isempty(per_isloaded))
     per_isloaded=0;
 end
@@ -71,7 +74,7 @@ if(~per_isloaded)
         %warning(['WFDB classes already in path, only switching persistent variable to true.'])
         per_isloaded=1;
     else
-        %Load class to dynamic class path 
+        %Load class to dynamic class path
         %warning(['Adding WFDB classes to MATLAB''s dynamic class path.'])
         javaaddpath(wfdb_path)
         per_isloaded=1;
@@ -83,29 +86,40 @@ isloaded=per_isloaded;
 %version('-java')
 outputs={'isloaded','config'};
 for n=1:nargout
-        if(n>1)
-            config.MATLAB_VERSION=version;
-            javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config');
-            javaWfdbExec.setLogLevel(debugLevel);
-            config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
-            env=regexp(char(javaWfdbExec.getEnvironment),',','split');
-            for e=1:length(env)
-                tmpstr=regexp(env{e},'=','split');
-                varname=strrep(tmpstr{1},'[','');
-                varname=strrep(varname,' ','');
-                varname=strrep(varname,']','');
-                eval(['config.' varname '=''' tmpstr{2} ''';'])
-            end
-            config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m',''); 
-            config.SUPPORT_EMAIL='wfdb-matlab-support@physionet.org';
-            config.WFDB_JAVA_VERSION=regexp(config.WFDBJavaPackageDir,filesep,'split');
-            config.WFDB_JAVA_VERSION=config.WFDB_JAVA_VERSION{end};
-            config.DEBUG_LEVEL=debugLevel;
-            config.NETWORK_WAIT_TIME=networkWaitTime;
-            
-            %Remove empty spaces from arch name
-            del=strfind(config.osName,' ');
-            config.osName(del)=[];
+    if(n>1)
+        config.MATLAB_VERSION=version;
+        javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config');
+        javaWfdbExec.setLogLevel(debugLevel);
+        config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
+        env=regexp(char(javaWfdbExec.getEnvironment),',','split');
+        for e=1:length(env)
+            tmpstr=regexp(env{e},'=','split');
+            varname=strrep(tmpstr{1},'[','');
+            varname=strrep(varname,' ','');
+            varname=strrep(varname,']','');
+            eval(['config.' varname '=''' tmpstr{2} ''';'])
         end
-        eval(['varargout{n}=' outputs{n} ';'])
+        config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
+        config.SUPPORT_EMAIL='wfdb-matlab-support@physionet.org';
+        wver=regexp(wfdb_path,filesep,'split');
+        config.WFDB_JAVA_VERSION=wver{end};
+        config.DEBUG_LEVEL=debugLevel;
+        config.NETWORK_WAIT_TIME=networkWaitTime;
+        
+        %Remove empty spaces from arch name
+        del=strfind(config.osName,' ');
+        config.osName(del)=[];
+        
+        %Define WFDB Environment variables
+        if(isempty(WFDB_PATH))
+            WFDB_PATH=['. http://physionet.org/physiobank/database'];
+        end
+        if(isempty(WFDBCAL))
+            WFDBCAL=[config.WFDB_JAVA_HOME filesep 'database' filesep 'wfdbcal'];
+        end
+        config.WFDB_PATH=WFDB_PATH;
+        config.WFDBCAL=WFDBCAL;
+        
+    end
+    eval(['varargout{n}=' outputs{n} ';'])
 end

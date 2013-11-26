@@ -46,8 +46,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,42 +57,44 @@ import java.util.logging.Logger;
 public class Wfdbexec {
 
 	private String commandName;
-	protected static String WFDB_JAVA_HOME;
-	//protected static String WFDB_PATH;
-	private static String WFDB_NATIVE_BIN;
-	private static String osArch;
-	private static String osName;
-	private static String fileSeparator;
-	public static final String WFDB_JAVA_VERSION="Beta";
+	private static final String fileSeparator=SystemSettings.getfileSeparator();
+	private static final String osArch= SystemSettings.getosArch();
+	private static final String osName=SystemSettings.getOsName();
+	protected static final String WFDB_JAVA_HOME=SystemSettings.getWFDB_JAVA_HOME();
+	private static final String WFDB_NATIVE_BIN=SystemSettings.getWFDB_NATIVE_BIN();
+	private static final String LD_PATH=SystemSettings.getLD_PATH();
+	private static String WFDB_PATH;
+	private static String WFDBCAL;
 	private List<String> commandInput;
 	protected static Map<String,String> env;
 	protected static File EXECUTING_DIR=null;
 	protected String[] arguments;
-	private static String packageDir="";
 	private int DoubleArrayListCapacity=0;
 	private static Logger logger =
 			Logger.getLogger(Wfdbexec.class.getName());
 	private String commandDir;
 	private long initialWaitTime;
 
-	public Wfdbexec(String commandName){
-		logger.finest("\n\t***Setting exec commandName to: " + commandName);
-		this.commandName=commandName;
-		set_environment();
-		this.commandDir=WFDB_NATIVE_BIN+ "bin" + fileSeparator;
-	}
-
 	public Wfdbexec(String commandName, String commandDir){
 		logger.finest("\n\t***Setting exec commandName to: " + commandDir + commandName);
 		this.commandName=commandName;
 		this.commandDir=commandDir;
-		set_environment();
 	}
 
+	public Wfdbexec(String commandName){
+		this(commandName,WFDB_NATIVE_BIN+ "bin" + fileSeparator);
+	}
+	
 	public void setArguments(String[] args){
 		arguments=args;
 	}
 
+	public void setWFDB_PATH(String str){
+		WFDB_PATH=str;
+	}
+	public void setWFDBCAL(String str){
+		WFDBCAL=str;
+	}
 	protected void setExecName(String execName) {
 		commandName = execName;
 	}
@@ -102,7 +102,7 @@ public class Wfdbexec {
 	public void setInitialWaitTime(long tm){
 		initialWaitTime=tm;
 	}
-	
+
 	public void setExecutingDir(File dir){
 		logger.finer("\n\t***Setting EXECUTING_DIR: " 
 				+ dir);
@@ -121,7 +121,6 @@ public class Wfdbexec {
 		//ensure array capacity when user submits N0 and N
 		//or (default) by querying the signal size
 		//for now, have this happens at the MATLAB wrapper level
-
 	}
 
 	public synchronized ArrayList<String> execToStringList() throws Exception {
@@ -151,9 +150,9 @@ public class Wfdbexec {
 						logger.finest("Waited " + (waitTime-thisTime) +
 								" ms for data stream (max waiting time= " +
 								initialWaitTime + "ms ) ...");
-					    Thread.sleep(100);
+						Thread.sleep(100);
 					} catch(InterruptedException ex) {
-					    Thread.currentThread().interrupt();
+						Thread.currentThread().interrupt();
 					}
 					waitTime=System.currentTimeMillis();
 				}
@@ -161,7 +160,7 @@ public class Wfdbexec {
 			if(output.ready()){
 				logger.finest("\n\t***A was stream initialized, checking if data or err...");
 			}
-			
+
 			while ((line = output.readLine()) != null){
 				logger.finest("\n\t***Reading output: \n" + line);
 				results.add(line);
@@ -184,7 +183,6 @@ public class Wfdbexec {
 		Process process= null;
 		int exitStatus = 1; 
 		ArrayList<String> results=null;
-
 		try {
 			process = launcher.start();
 			if (process != null) {
@@ -211,7 +209,6 @@ public class Wfdbexec {
 				System.err.println(tmp);
 		}
 		return results;
-
 	}
 
 	public synchronized ArrayList<String> execWithStandardInput(double[][] inputData) throws Exception {
@@ -219,7 +216,6 @@ public class Wfdbexec {
 		String[] stringArr=new String[inputData.length];
 		for(int i=0;i<inputData.length;i++)
 			stringArr[i]=Double.toString(inputData[i][0]);
-
 		return execWithStandardInput(stringArr);
 
 	}
@@ -262,12 +258,12 @@ public class Wfdbexec {
 			char[] tmpCharArr=null;
 			int colInd;
 			int dataCheck=0;
-			
+
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
 			long thisTime=System.currentTimeMillis();
 			long waitTime=thisTime;
-			
+
 			while (!output.ready()){
 				if((waitTime-thisTime)> initialWaitTime){
 					logger.finest("Process data stream wait time exceeded ("
@@ -279,9 +275,9 @@ public class Wfdbexec {
 						logger.finest("Waited " + (waitTime-thisTime) +
 								" ms for data stream (max waiting time= " +
 								initialWaitTime + "ms ) ...");
-					    Thread.sleep(100);
+						Thread.sleep(100);
 					} catch(InterruptedException ex) {
-					    Thread.currentThread().interrupt();
+						Thread.currentThread().interrupt();
 					}
 					waitTime=System.currentTimeMillis();
 				}
@@ -383,98 +379,42 @@ public class Wfdbexec {
 		launcher.redirectErrorStream(true);
 		env = launcher.environment();
 		//Add library path to environment
-		String LD_PATH="";
-
-		if(osName.contains("windows")){
-			LD_PATH=env.get("Path");
-			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "bin";
-			LD_PATH=LD_PATH + ";" + WFDB_NATIVE_BIN + "lib;" + WFDB_NATIVE_BIN + "lib";
-		}else if(osName.contains("macosx")){
-			LD_PATH=env.get("DYLD_LIBRARY_PATH");
-			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "bin";
-			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib";
-		}else{
-			LD_PATH=env.get("LD_LIBRARY_PATH");
-			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "bin";
-			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib";
-			LD_PATH=LD_PATH + ":" + WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
-		}
-		
-		if(LD_PATH.isEmpty())
-			throw new Exception("LD_LIBRARY_PATH is empty!");
 
 		if(osName.contains("macosx")){
 			env.put("DYLD_LIBRARY_PATH",LD_PATH);
-			logger.finer("\n\t***DYLD_LIBRARY_PATH: " + LD_PATH);
+			logger.finer("\n\t***setting: DYLD_LIBRARY_PATH: " + LD_PATH);
 		}else if(osName.contains("windows")){
 			env.put("Path",LD_PATH);
-			logger.finer("\n\t***Path: " + LD_PATH);
+			logger.finer("\n\t***setting: Path: " + LD_PATH);
 		}else{
 			//assumes Linux
 			env.put("LD_LIBRARY_PATH",LD_PATH);
-			logger.finer("\n\t***LD_LIBRARY_PATH: " + LD_PATH);
+			logger.finer("\n\tsetting: ***LD_LIBRARY_PATH: " + LD_PATH);
 		}
 		env.put("WFDBNOSORT","1");
-
+		if(WFDB_PATH != null){
+			//null values will use the system if defined
+			env.put("WFDB",WFDB_PATH);
+			logger.finer("\n\tsetting: **WFDB PATH: " + WFDB_PATH);
+		}
+		if(WFDBCAL != null){
+			//null values will to use the system if defined
+			env.put("WFDBCAL",WFDBCAL);
+		}
+		
 		launcher.environment().put("WFDBNOSORT","1");
 		logger.finest("\n\t***Setting executing process with command and arguments: " + commandInput);
 		launcher.command(commandInput);
 		if(EXECUTING_DIR != null){
 			launcher.directory(EXECUTING_DIR);
 		}
-		
+
 		//Set process initial wait time for data streams
 		setInitialWaitTime(1000);
 		return launcher;
 	}
 
 	//Private Methods
-	private synchronized static void set_environment() {
-		osArch = System.getProperty("os.arch");
-		fileSeparator=System.getProperty("file.separator");
-		osName=System.getProperty("os.name");
-		osName=osName.replace(" ","");
-		osName=osName.toLowerCase();
-		if(osName.startsWith("windows")){
-			osName="windows"; //Treat all Windows versions the same for now
-		}
-		String[] tmpDir;
-		String tmpStr=null;
-		try {
-			packageDir=URLDecoder.decode(
-					Wfdbexec.class.getProtectionDomain().getCodeSource().getLocation().getPath()
-					, "UTF-8");
-			if(osName.startsWith("windows")){
-				//On Windows systems, packageDir fileseparator 
-				//do not match with that of the OS
-				if(packageDir.startsWith("/"))
-					packageDir=packageDir.substring(1);
-				packageDir=packageDir.replace("/","\\");
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		if(packageDir.endsWith(".jar")){
-			if(osName.startsWith("windows")){
-				tmpDir=packageDir.split(fileSeparator+fileSeparator);
-			}else{
-				tmpDir=packageDir.split(fileSeparator);
-			}
-			//In JAR package, remove jar directory to get root location
-			tmpStr=fileSeparator+ tmpDir[tmpDir.length-1];
-			WFDB_JAVA_HOME=packageDir.replace(tmpStr,"")+fileSeparator;
-		} else{
-			//Assuming source development in *UNIX
-			WFDB_JAVA_HOME=packageDir.replace("/bin/","/mcode/");
-		}
-
-		//Set path to executables based on system/arch
-		WFDB_NATIVE_BIN= WFDB_JAVA_HOME + "nativelibs" + fileSeparator + 
-				osName.toLowerCase() + "-" + osArch.toLowerCase() 
-				+ fileSeparator ;
-	}
-
-
 	public List<String> getEnvironment(){
 		ArrayList<String> variables= new ArrayList<String>();
 		variables.add("WFDB_JAVA_HOME= " + WFDB_JAVA_HOME);
@@ -482,19 +422,6 @@ public class Wfdbexec {
 
 		variables.add("WFDB_NATIVE_BIN= " + WFDB_NATIVE_BIN);
 		logger.finer("\n\t***WFDB_NATIVE_BINr: " + WFDB_NATIVE_BIN);
-
-		variables.add("WFDB_JAVA_VERSION= "+ WFDB_JAVA_VERSION);
-		logger.finer("\n\t***WFDB_JAVA_VERSION: " + WFDB_JAVA_VERSION);
-
-		variables.add("WFDB Java Package Dir= "+ packageDir);
-		logger.finer("\n\t***WFDB Java Package Dir: " + packageDir);
-
-		/*
-		if(WFDB_PATH != null){
-			variables.add("WFDB PATH= "+ WFDB_PATH);
-			logger.finer("\n\t***WFDB PATH: " + WFDB_PATH);
-		}
-		 */
 		variables.add("EXECUTING_DIR= "+ EXECUTING_DIR);
 		logger.finer("\n\t***Exec dir: " + EXECUTING_DIR);
 		variables.add("osName= " + osName);
@@ -514,9 +441,12 @@ public class Wfdbexec {
 				System.out.println("Environment is null");
 			}else{
 				System.out.println(tmp + " = " + env.get(tmp));
+				System.out.println("Loaded libraries: ");
+				System.out.println(SystemSettings.getLoadedLibraries(this));
 			}
 		}
 	}
+	
 	public void setDoubleArrayListCapacity(int capacity){
 		DoubleArrayListCapacity=capacity;
 	}
@@ -560,6 +490,7 @@ public class Wfdbexec {
 				handlers[index].setLevel( debugLevel );
 			}
 			Logger.getLogger("org.physionet.wfdb.Wfdbexec").setLevel(debugLevel);
+			Logger.getLogger("org.physionet.wfdb.SystemSettings").setLevel(debugLevel);
 		}
 
 		Wfdbexec exec = new Wfdbexec(args[0]);
