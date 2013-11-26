@@ -31,7 +31,7 @@ JARFLAGS := -jar		\
 APP_NAME="wfdb-app-toolbox-0-9-5.zip"
 JAR6_NAME="wfdb-app-JVM6-0-9-5.jar" 
 JAR7_NAME="wfdb-app-JVM7-0-9-5.jar"
-	
+
 #TODO: There are two directories for linux. we need to remove one!	
 clean: 
 	rm -rf ./mcode/example/*~ \
@@ -39,8 +39,8 @@ clean:
 	      ./mcode/*~ \
 	
 	
-package: clean jartest
-	zip -vr $(APP_NAME) mcode -x@zipexclude.lst  
+package: clean jartest unit-test.zip
+	zip -r $(APP_NAME) mcode -x@zipexclude.lst  
 	
 %.java:
 	java $(JARFLAGS) jar6; \
@@ -52,7 +52,10 @@ $(JAR7_NAME): %.java
 	
 jar: $(JAR6_NAME) $(JAR7_NAME)
 
-jartest: $(JAR6_NAME) $(JAR7_NAME)
+unit-test.zip:
+	zip -r $@ UnitTests -x@zipexclude.lst
+
+jartest: $(JAR6_NAME) $(JAR7_NAME) unit-test.zip
 	cd mcode; \
 	java -cp $(JAR6_NAME) org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s5; \
 	java -cp $(JAR7_NAME) org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s5
