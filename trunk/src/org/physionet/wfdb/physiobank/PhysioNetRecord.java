@@ -35,8 +35,6 @@
 package org.physionet.wfdb.physiobank;
 
 import java.util.ArrayList;
-import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,18 +52,6 @@ public class PhysioNetRecord {
 
 	public PhysioNetRecord(String RecordName) throws Exception{
 
-		/*
-		Level debugLevel = Level.FINEST;//use for debugging Level.FINEST;
-		if(debugLevel != null){
-			Handler[] handlers =
-					Logger.getLogger( "" ).getHandlers();
-			for ( int index = 0; index < handlers.length; index++ ) {
-				handlers[index].setLevel( debugLevel );
-			}
-			Logger.getLogger("org.physionet.wfdb.Wfdbexec").setLevel(debugLevel);
-			Logger.getLogger("org.physionet.wfdb.physiobank").setLevel(debugLevel);
-		}
-		*/
 		name=RecordName;
 		signalStringList = new ArrayList<String>();
 		signalList=new ArrayList<PhysioNetSignal>();
@@ -207,21 +193,6 @@ public class PhysioNetRecord {
 	}
 	public static void main(String[] args) throws Exception {
 
-
-		// Prints information regarding all databases
-		// Currently available at PhysioNet
-		/*
-		Level debugLevel = null;//use for debugging Level.FINEST;
-		if(debugLevel != null){
-			Handler[] handlers =
-					Logger.getLogger( "" ).getHandlers();
-			for ( int index = 0; index < handlers.length; index++ ) {
-				handlers[index].setLevel( debugLevel );
-			}
-			Logger.getLogger("org.physionet.wfdb.Wfdbexec").setLevel(debugLevel);
-			Logger.getLogger("org.physionet.wfdb.physiobank").setLevel(debugLevel);
-		}
-		 */
 		PhysioNetRecord re = new PhysioNetRecord(args[0]);
 		ArrayList<PhysioNetSignal> sg= re.getSignalList();
 		for(PhysioNetSignal mysig : sg)
