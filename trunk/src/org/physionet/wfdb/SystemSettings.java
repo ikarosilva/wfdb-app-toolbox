@@ -25,7 +25,7 @@ public class SystemSettings {
 				IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		logger.finest("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
+		System.out.println("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
 		return libraries.toArray(new String[] {});
 	}
 
@@ -33,7 +33,7 @@ public class SystemSettings {
 		return System.getProperty("file.separator");		
 	}
 	public static String getosArch(){
-		logger.finest("\nSystemSetting --Arch-" + System.getProperty("os.arch"));
+		System.out.println("\nSystemSetting --Arch-" + System.getProperty("os.arch"));
 		return System.getProperty("os.arch");
 	}
 
@@ -44,7 +44,7 @@ public class SystemSettings {
 		if(osName.startsWith("windows")){
 			osName="windows"; //Treat all Windows versions the same for now
 		}
-		logger.finest("\nSystemSetting --OS-" +osName);
+		System.out.println("\nSystemSetting --OS-" +osName);
 		return osName;
 	}
 
@@ -55,7 +55,7 @@ public class SystemSettings {
 		//System.loadLibrary("libcurl.dll.a");
 		System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
 				"lib" + getFileSeparator() + "libcurl");
-		logger.finest("\nSystemSetting --loadingLibCurl from: " +
+		System.out.println("\nSystemSetting --loadingLibCurl from: " +
 				SystemSettings.getWFDB_NATIVE_BIN()+
 				"lib" + getFileSeparator() + "libcurl");
 		 	isLoadedLibs=true;
@@ -89,7 +89,7 @@ public class SystemSettings {
 			//Only add if path is not present already
 			LD_PATH=LD_PATH+pathSep+tmp;
 		}
-		logger.finest("\nSystemSetting --Configuring PATH to: " + LD_PATH);
+		System.out.println("\nSystemSetting --Configuring PATH to: " + LD_PATH);
 		env.put(OsPathName,LD_PATH);
 		return LD_PATH;
 	}
@@ -107,7 +107,7 @@ public class SystemSettings {
 		int tmp = packageDir.lastIndexOf(getFileSeparator());
 		packageDir=packageDir.substring(0,tmp+1);
 		packageDir=packageDir.replace("file:","");
-		logger.finest("\nSystemSetting --WFDB HOME: " + packageDir);
+		System.out.println("\nSystemSetting --WFDB HOME: " + packageDir);
 		return packageDir.toString();
 	}
 
@@ -115,10 +115,10 @@ public class SystemSettings {
 		String WFDB_NATIVE_BIN;
 		String WFDB_JAVA_HOME=getWFDB_JAVA_HOME();
 		//Set path to executables based on system/arch
-		WFDB_NATIVE_BIN= WFDB_JAVA_HOME + "mcode" + getFileSeparator() + "nativelibs" + getFileSeparator() + 
+		WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
 				getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
 				+ getFileSeparator() ;
-		logger.finest("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
+		System.out.println("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
 		return WFDB_NATIVE_BIN;
 	}
 
