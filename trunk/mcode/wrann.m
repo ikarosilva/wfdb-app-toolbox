@@ -68,8 +68,8 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: 10/11/2013
-% Version 1.1.1
+% Last Modified: 27/11/2013
+% Version 1.1.2
 % Since 0.0.1
 %
 % See also rdann, rdsamp, wfdbdesc
@@ -122,8 +122,12 @@ if(length(num)==1);
 end
 
 for i=1:L
-    %data{end+1}={char(sprintf('%s  %7ld %6s%5d%5d%5d',annTimeStamp{i},ann(i),annType(i),subType(i),...
-    %    chan(i),num(i)))};
+    deli=strfind(annTimeStamp{i},':');
+    if(deli==2)
+        annTimeStamp{i} = ['0' annTimeStamp{i}];
+    elseif(deli>3)
+        warning(['Unsupported format for annotation: ' annTimeStamp{i}])
+    end
     data{i}=[annTimeStamp{i} ' ' num2str(ann(i)) ' ' annType(i) ' ' ...
         subType(i) ' ' num2str(chan(i)) ' ' num2str(num(i))];
 end
