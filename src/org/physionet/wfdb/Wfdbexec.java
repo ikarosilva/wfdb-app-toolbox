@@ -63,7 +63,7 @@ public class Wfdbexec {
 	protected static final String WFDB_JAVA_HOME=SystemSettings.getWFDB_JAVA_HOME();
 	private static final String WFDB_NATIVE_BIN=SystemSettings.getWFDB_NATIVE_BIN();
 	private static final String LD_PATH=SystemSettings.getLD_PATH();
-	private static String WFDB_PATH;
+	private static String WFDB_PATH="http://physionet.org/physiobank/database";
 	private static String WFDBCAL;
 	private List<String> commandInput;
 	protected static Map<String,String> env;
@@ -91,9 +91,11 @@ public class Wfdbexec {
 	}
 
 	public void setWFDB_PATH(String str){
+		logger.finest("\n\t***Setting WFDB to: " + str);
 		WFDB_PATH=str;
 	}
 	public void setWFDBCAL(String str){
+		logger.finest("\n\t***Setting WFDBCAL to: " + str);
 		WFDBCAL=str;
 	}
 	protected void setExecName(String execName) {
