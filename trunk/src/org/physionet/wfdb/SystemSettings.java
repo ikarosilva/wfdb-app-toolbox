@@ -3,6 +3,7 @@ package org.physionet.wfdb;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -50,11 +51,11 @@ public class SystemSettings {
 
 	public static void loadLibs(){
 		if(isLoadedLibs == false){
-		System.load(SystemSettings.getWFDB_NATIVE_BIN()+ 
-				"lib" + getFileSeparator() + "libcurl-4.dll");
+		//System.load(SystemSettings.getWFDB_NATIVE_BIN()+ 
+		//		"bin" + getFileSeparator() + "libcurl-4.dll");
 		//System.loadLibrary("libcurl.dll.a");
-		System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
-				"lib" + getFileSeparator() + "libcurl");
+		//System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
+		//		"lib" + getFileSeparator() + "libcurl");
 		System.out.println("\nSystemSetting --loadingLibCurl from: " +
 				SystemSettings.getWFDB_NATIVE_BIN()+
 				"lib" + getFileSeparator() + "libcurl");
@@ -115,7 +116,7 @@ public class SystemSettings {
 		String WFDB_NATIVE_BIN;
 		String WFDB_JAVA_HOME=getWFDB_JAVA_HOME();
 		//Set path to executables based on system/arch
-		WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
+		WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "mcode" + getFileSeparator()+"nativelibs" + getFileSeparator() + 
 				getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
 				+ getFileSeparator() ;
 		System.out.println("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
@@ -126,7 +127,15 @@ public class SystemSettings {
 		System.out.println(getWFDB_NATIVE_BIN());
 		System.out.println(getWFDB_JAVA_HOME());
 		loadLibs();
-		
+		Wfdbexec rdsamp=new Wfdbexec("rdsamp");
+		String[] arg={"-r","mitdb/100","-t","s3"};
+		rdsamp.setArguments(arg);
+		System.out.println("executing rdsamp");
+		ArrayList<String> resp = rdsamp.execToStringList();
+		rdsamp.setInitialWaitTime(10000);
+		for(String str: resp)
+			System.out.println("rdsamp: " + str);
+		System.out.println("***Done");
 	}
 
 }
