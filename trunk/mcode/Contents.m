@@ -21,11 +21,12 @@
 %   bxb             - ANSI/AAMI-standard beat-by-beat annotation comparator
 %   edr             - Derives a respiration signal from an ECG signal
 %   ecgpuwave       - Estimation of QRS and P waves from ECG signals
-%   lomb	    - Estimates power spectrum using the Lomb periodogram method	
+%   gqrs            - Estimation of QRS from ECG signals
+%   lomb	        - Estimates power spectrum using the Lomb periodogram method	
 %   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
 %   maprecord       - Performs multithreaded concurent annotation or processing of WFDB records 
 %   mrgann          - Merge annotation files
-%   mse		    - Multi scale entropy estimation
+%   mse		        - Multi scale entropy estimation
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals
 %   rdann           - Read annotation files for WFDB records
 %   rdmimic2wave    - Searches MIMIC II matched waveform records within a clinical time range
@@ -33,11 +34,11 @@
 %   score2013       - Scores entries to the PhysioNet 2013 Fetal ECG challenge
 %   sortann         - Rearrange annotations in canonical order
 %   sqrs            - Finds the QRS complexes of a WFDB ECG record signal
-%   sumann	    - Summarize the contents of a WFDB annotation file
+%   sumann	        - Summarize the contents of a WFDB annotation file
 %   tach            - Calculates instantaneous heart rate of a WFDB ECG record signal
 %   wfdb            - Prints this help information of the Toolbox
 %   wfdbexec        - Executes a system call to any installed native WFDB command.
-%   wabp	    - Arterial blood pressure (ABP) pulse detector
+%   wabp	        - Arterial blood pressure (ABP) pulse detector
 %   wfdbdemo        - Demonstration of the WFDB App Toolbox
 %   wfdbdesc        - Return signal information for about a WFDB record
 %   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information

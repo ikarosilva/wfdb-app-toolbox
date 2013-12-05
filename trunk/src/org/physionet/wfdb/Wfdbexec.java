@@ -79,13 +79,15 @@ public class Wfdbexec {
 		logger.finest("\n\t***Setting exec commandName to: " + commandDir + commandName);
 		this.commandName=commandName;
 		this.commandDir=commandDir;
+		logger.finest("\n\t***Loading System libraries...");
+		SystemSettings.getLD_PATH();
 		SystemSettings.loadLibs();
 	}
 
 	public Wfdbexec(String commandName){
 		this(commandName,WFDB_NATIVE_BIN+ "bin" + fileSeparator);
 	}
-	
+
 	public void setArguments(String[] args){
 		arguments=args;
 	}
@@ -404,7 +406,7 @@ public class Wfdbexec {
 			//null values will to use the system if defined
 			env.put("WFDBCAL",WFDBCAL);
 		}
-		
+
 		launcher.environment().put("WFDBNOSORT","1");
 		logger.finest("\n\t***Setting executing process with command and arguments: " + commandInput);
 		launcher.command(commandInput);
@@ -449,7 +451,7 @@ public class Wfdbexec {
 			}
 		}
 	}
-	
+
 	public void setDoubleArrayListCapacity(int capacity){
 		DoubleArrayListCapacity=capacity;
 	}
