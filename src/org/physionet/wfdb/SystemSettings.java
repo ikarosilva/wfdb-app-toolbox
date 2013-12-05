@@ -12,7 +12,7 @@ public class SystemSettings {
 
 	private final static Logger logger = Logger.getLogger(Wfdbexec.class.getName());
 	private static boolean isLoadedLibs=false;
-	
+
 	@SuppressWarnings("unchecked")
 	public static String[] getLoadedLibraries(Object o) {
 		final ClassLoader loader=o.getClass().getClassLoader();
@@ -26,7 +26,7 @@ public class SystemSettings {
 				IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		System.out.println("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
+		logger.finest("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
 		return libraries.toArray(new String[] {});
 	}
 
@@ -34,7 +34,7 @@ public class SystemSettings {
 		return System.getProperty("file.separator");		
 	}
 	public static String getosArch(){
-		System.out.println("\nSystemSetting --Arch-" + System.getProperty("os.arch"));
+		logger.finest("\nSystemSetting --Arch-" + System.getProperty("os.arch"));
 		return System.getProperty("os.arch");
 	}
 
@@ -45,18 +45,18 @@ public class SystemSettings {
 		if(osName.startsWith("windows")){
 			osName="windows"; //Treat all Windows versions the same for now
 		}
-		System.out.println("\nSystemSetting --OS-" +osName);
+		logger.finest("\nSystemSetting --OS-" +osName);
 		return osName;
 	}
 
 	public static void loadLibs(){
 		if(isLoadedLibs == false){
-		//System.load(SystemSettings.getWFDB_NATIVE_BIN()+ 
-		//		"bin" + getFileSeparator() + "libcurl-4.dll");
+		System.load(SystemSettings.getWFDB_NATIVE_BIN()+ 
+				"lib" + getFileSeparator() + "libcurl-4.dll");
 		//System.loadLibrary("libcurl.dll.a");
-		//System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
-		//		"lib" + getFileSeparator() + "libcurl");
-		System.out.println("\nSystemSetting --loadingLibCurl from: " +
+		System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
+				"lib" + getFileSeparator() + "libcurl");
+		logger.finest("\nSystemSetting --loadingLibCurl from: " +
 				SystemSettings.getWFDB_NATIVE_BIN()+
 				"lib" + getFileSeparator() + "libcurl");
 		 	isLoadedLibs=true;
@@ -90,7 +90,7 @@ public class SystemSettings {
 			//Only add if path is not present already
 			LD_PATH=LD_PATH+pathSep+tmp;
 		}
-		System.out.println("\nSystemSetting --Configuring PATH to: " + LD_PATH);
+		logger.finest("\nSystemSetting --Configuring PATH to: " + LD_PATH);
 		env.put(OsPathName,LD_PATH);
 		return LD_PATH;
 	}
@@ -108,7 +108,7 @@ public class SystemSettings {
 		int tmp = packageDir.lastIndexOf(getFileSeparator());
 		packageDir=packageDir.substring(0,tmp+1);
 		packageDir=packageDir.replace("file:","");
-		System.out.println("\nSystemSetting --WFDB HOME: " + packageDir);
+		logger.finest("\nSystemSetting --WFDB HOME: " + packageDir);
 		return packageDir.toString();
 	}
 
@@ -116,26 +116,18 @@ public class SystemSettings {
 		String WFDB_NATIVE_BIN;
 		String WFDB_JAVA_HOME=getWFDB_JAVA_HOME();
 		//Set path to executables based on system/arch
-		WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "mcode" + getFileSeparator()+"nativelibs" + getFileSeparator() + 
+		WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
 				getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
 				+ getFileSeparator() ;
-		System.out.println("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
+		logger.finest("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
 		return WFDB_NATIVE_BIN;
 	}
 
 	public static void main(String[] args) throws Exception {
 		System.out.println(getWFDB_NATIVE_BIN());
-		System.out.println(getWFDB_JAVA_HOME());
+		//System.out.println(getWFDB_JAVA_HOME());
 		loadLibs();
-		Wfdbexec rdsamp=new Wfdbexec("rdsamp");
-		String[] arg={"-r","mitdb/100","-t","s3"};
-		rdsamp.setArguments(arg);
-		System.out.println("executing rdsamp");
-		ArrayList<String> resp = rdsamp.execToStringList();
-		rdsamp.setInitialWaitTime(10000);
-		for(String str: resp)
-			System.out.println("rdsamp: " + str);
-		System.out.println("***Done");
+
 	}
 
 }
