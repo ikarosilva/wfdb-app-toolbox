@@ -22,8 +22,7 @@ public class SystemSettings {
 					ClassLoader.class.getDeclaredField("loadedLibraryNames");
 			LIBRARIES.setAccessible(true);
 			libraries = (Vector<String>) LIBRARIES.get(loader);
-		} catch (NoSuchFieldException | SecurityException |
-				IllegalArgumentException | IllegalAccessException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		logger.finest("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
@@ -50,9 +49,9 @@ public class SystemSettings {
 	}
 
 	public static void loadLibs(){
-		if(isLoadedLibs == false){
+		if(isLoadedLibs == false && getOsName().contains("windows")){
 		System.load(SystemSettings.getWFDB_NATIVE_BIN()+ 
-				"lib" + getFileSeparator() + "libcurl-4.dll");
+				"lib" + getFileSeparator() + "libcurl");
 		//System.loadLibrary("libcurl.dll.a");
 		System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
 				"lib" + getFileSeparator() + "libcurl");
