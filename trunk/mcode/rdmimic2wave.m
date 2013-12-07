@@ -99,6 +99,7 @@ function varargout=rdmimic2wave(varargin)
 
 inputs={'subjectID','clinicalTimeStamp','dataType','beginWindow','endWindow'};
 outputs={'tm','signal','Fs','recList','sigInfo'};
+subjectID=[];
 beginWindow=60; %beginWindow in minutes!
 endWindow=60; %endWindow in minutes!
 dataType='numerics';
@@ -116,13 +117,7 @@ end
 
 persistent cachedDataType matched_id matched
 
-%Convert timestam to serial data (in days)
-dateFormat='yyyy-mm-dd-HH-MM';
-clinicalDateNum=datenum(clinicalTimeStamp,dateFormat);
 
-%Window to include before and after the measurement (in days)
-beginTime=clinicalDateNum - (beginWindow/(60*24));
-endTime=clinicalDateNum + (endWindow/(60*24));
 
 if(~strcmp(cachedDataType,dataType))
     switch (dataType)
@@ -145,12 +140,30 @@ if(~strcmp(cachedDataType,dataType))
     end
     matched_id=unique(cell2mat(matched_id));
     
-    if(isempty(subjectID))
-        %In this case the user is just querying for a list of matched
-        %records
-       recList=matched_id; 
-    end
+   recList=matched_id; 
+
+    
 end
+
+if(isempty(subjectID))
+    %In this case the user is just querying for a list of matched
+    %records
+    recList=matched_id;
+    for n=1:nargout
+        eval(['varargout{n}=' outputs{n} ''])
+    end
+    return
+    
+end
+    
+%Convert timestam to serial data (in days)
+dateFormat='yyyy-mm-dd-HH-MM';
+clinicalDateNum=datenum(clinicalTimeStamp,dateFormat);
+
+%Window to include before and after the measurement (in days)
+beginTime=clinicalDateNum - (beginWindow/(60*24));
+endTime=clinicalDateNum + (endWindow/(60*24));
+
 
 %If id exists loop through the files to see if any file is within the
 %specific time range of the clinial event
