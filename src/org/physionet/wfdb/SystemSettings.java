@@ -49,17 +49,7 @@ public class SystemSettings {
 	}
 
 	public static void loadLibs(){
-		if(isLoadedLibs == false && getOsName().contains("windows")){
-		System.load(SystemSettings.getWFDB_NATIVE_BIN()+ 
-				"lib" + getFileSeparator() + "libcurl");
-		//System.loadLibrary("libcurl.dll.a");
-		System.out.println("assing: " + SystemSettings.getWFDB_NATIVE_BIN()+
-				"lib" + getFileSeparator() + "libcurl");
-		logger.finest("\nSystemSetting --loadingLibCurl from: " +
-				SystemSettings.getWFDB_NATIVE_BIN()+
-				"lib" + getFileSeparator() + "libcurl");
 		 	isLoadedLibs=true;
-		}
 	}
 
 	public static String getLD_PATH(){
@@ -78,11 +68,9 @@ public class SystemSettings {
 			OsPathName="DYLD_LIBRARY_PATH";
 		}else{
 			LD_PATH=env.get("LD_LIBRARY_PATH");pathSep=":";
-			tmp=WFDB_NATIVE_BIN + "lib:" + WFDB_NATIVE_BIN + "lib64";
 			OsPathName="LD_LIBRARY_PATH";
 		}
-		tmp=WFDB_NATIVE_BIN + "lib" + pathSep + WFDB_NATIVE_BIN + "bin"
-				+pathSep +  WFDB_NATIVE_BIN + "lib64";
+		tmp=WFDB_NATIVE_BIN + "lib" + pathSep + WFDB_NATIVE_BIN + "bin";
 		if(LD_PATH == null){
 			LD_PATH=tmp;
 		}else if(LD_PATH.indexOf(tmp) <0){
