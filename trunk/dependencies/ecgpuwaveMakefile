@@ -45,14 +45,14 @@
 CC=gcc -m32
 F77=gfortran -std=legacy -ffixed-line-length-none -m32
 
-BINDIR=$(BUILD32_DIR)/bin
+BINDIR=$(BUILD32_DIR)/lib
 INCDIR=$(BUILD32_DIR)/include
 
 OFILES= ecgpuwave.o principal.o aldetqrs.o graf.o dades.o impregraf.o \
 	 lgraf.o prosen.o int_qt.o punts.o l_impregraf.o wfdbf.o
 
 ecgpuwave:	ecgpuwave.f $(OFILES)
-	$(F77) -g -o ecgpuwave $(OFILES) -L$(BINDIR) -lwfdb32
+	$(F77) -g -o ecgpuwave $(OFILES) -L$(BINDIR) -lwfdb
 
 install:	ecgpuwave
 	cp ecgpuwave $(BINDIR)
