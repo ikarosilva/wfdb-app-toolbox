@@ -61,8 +61,6 @@ public class Wfdbexec {
 	private static final String osArch= SystemSettings.getosArch();
 	private static final String osName=SystemSettings.getOsName();
 	protected static final String WFDB_JAVA_HOME=SystemSettings.getWFDB_JAVA_HOME();
-	private static final String WFDB_NATIVE_BIN=SystemSettings.getWFDB_NATIVE_BIN();
-	private static final String LD_PATH=SystemSettings.getLD_PATH();
 	private static String WFDB_PATH="http://physionet.org/physiobank/database";
 	private static String WFDBCAL;
 	private List<String> commandInput;
@@ -74,18 +72,23 @@ public class Wfdbexec {
 			Logger.getLogger(Wfdbexec.class.getName());
 	private String commandDir;
 	private long initialWaitTime;
+	private String WFDB_NATIVE_BIN;
+	private String LD_PATH;
+	public static boolean customArchFlag=false;
 
-	public Wfdbexec(String commandName, String commandDir){
+	public Wfdbexec(String commandName, String commandDir,boolean customArchFlag){
 		logger.finest("\n\t***Setting exec commandName to: " + commandDir + commandName);
 		this.commandName=commandName;
 		this.commandDir=commandDir;
+		Wfdbexec.customArchFlag=customArchFlag;
+		WFDB_NATIVE_BIN=SystemSettings.getWFDB_NATIVE_BIN(customArchFlag);
+		LD_PATH=SystemSettings.getLD_PATH(customArchFlag);
 		logger.finest("\n\t***Loading System libraries...");
-		SystemSettings.getLD_PATH();
-		SystemSettings.loadLibs();
+		SystemSettings.getLD_PATH(customArchFlag);
 	}
 
-	public Wfdbexec(String commandName){
-		this(commandName,WFDB_NATIVE_BIN+ "bin" + fileSeparator);
+	public Wfdbexec(String commandName,boolean customArchFlag){
+		this(commandName,SystemSettings.getWFDB_NATIVE_BIN(customArchFlag)+"bin" + fileSeparator,customArchFlag);
 	}
 
 	public void setArguments(String[] args){
@@ -108,6 +111,10 @@ public class Wfdbexec {
 		initialWaitTime=tm;
 	}
 
+	public void setCustomArchFlag(boolean flag){
+		this.customArchFlag=flag;
+	}
+	
 	public void setExecutingDir(File dir){
 		logger.finer("\n\t***Setting EXECUTING_DIR: " 
 				+ dir);
@@ -398,12 +405,10 @@ public class Wfdbexec {
 		}
 		env.put("WFDBNOSORT","1");
 		if(WFDB_PATH != null){
-			//null values will use the system if defined
 			env.put("WFDB",WFDB_PATH);
 			logger.finer("\n\tsetting: **WFDB PATH: " + WFDB_PATH);
 		}
-		if(WFDBCAL != null){
-			//null values will to use the system if defined
+		if(WFDBCAL != null){ 
 			env.put("WFDBCAL",WFDBCAL);
 		}
 
@@ -431,8 +436,12 @@ public class Wfdbexec {
 		logger.finer("\n\t***Exec dir: " + EXECUTING_DIR);
 		variables.add("osName= " + osName);
 		logger.finer("\n\t***OS: " + osName);
+		variables.add("fullOsName= " + System.getProperty("os.name"));
+		logger.finer("\n\t***fullOsName: " + System.getProperty("os.name"));
 		variables.add("osArch= " + osArch);
 		logger.finer("\n\t***OS Arch: " + osArch);
+		variables.add("customArchFlag= " + this.customArchFlag);
+		logger.finer("\n\t***customArchFlag: " + this.customArchFlag);
 		variables.add("OS Version= " + System.getProperty("os.version"));
 		logger.finer("\n\t***OS Version: " + System.getProperty("os.version"));
 		variables.add("JVM Version= " + System.getProperty("java.version"));
@@ -498,7 +507,7 @@ public class Wfdbexec {
 			Logger.getLogger("org.physionet.wfdb.SystemSettings").setLevel(debugLevel);
 		}
 
-		Wfdbexec exec = new Wfdbexec(args[0]);
+		Wfdbexec exec = new Wfdbexec(args[0],Boolean.getBoolean(args[1]));
 		double[][] data = exec.execToDoubleArray(Arrays.copyOfRange(args,1,args.length));
 		for(int row=0;row<data.length;row++){
 			for(int col=0;col<data[0].length;col++){

@@ -48,10 +48,8 @@ public class PhysioNetRecord {
 	private ArrayList<PhysioNetSignal> signalList;
 	private static Logger logger =
 			Logger.getLogger(PhysioNetRecord.class.getName());
-
-
+	
 	public PhysioNetRecord(String RecordName) throws Exception{
-
 		name=RecordName;
 		signalStringList = new ArrayList<String>();
 		signalList=new ArrayList<PhysioNetSignal>();
@@ -77,7 +75,7 @@ public class PhysioNetRecord {
 		//Parse information from wfdbdesc to populate the record list
 		String[] args=new String[1];
 		args[0]=name;
-		Wfdbexec wfdbdesc = new Wfdbexec("wfdbdesc");
+		Wfdbexec wfdbdesc = new Wfdbexec("wfdbdesc", Wfdbexec.customArchFlag);
 		wfdbdesc.setArguments(args);
 		logger.finest("\n\t***Executing wfdb command");
 		ArrayList<String> tmpList= wfdbdesc.execToStringList();

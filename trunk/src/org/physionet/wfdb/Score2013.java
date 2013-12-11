@@ -52,7 +52,7 @@ public class Score2013 {
 	private static double score1(String recName,String refAnn,String testAnn,
 								String T0, String TF){
 		//Generate score1
-		Wfdbexec tach=new Wfdbexec("tach");
+		Wfdbexec tach=new Wfdbexec("tach",false);
 		String[] refArg={"-r",recName,"-a",refAnn,"-f",T0,"-t",TF,"-n","12"};
 		String[] testArg={"-r",recName,"-a",testAnn,"-f",T0,"-t",TF,"-n","12"};
 		double[][] hrFQRS=null;
@@ -78,8 +78,8 @@ public class Score2013 {
 
 	private static String generateRR(String recName,String annName){
 
-		Wfdbexec ann2rr=new Wfdbexec("ann2rr");
-		Wfdbexec patch=new Wfdbexec("patchann");
+		Wfdbexec ann2rr=new Wfdbexec("ann2rr",Wfdbexec.customArchFlag);
+		Wfdbexec patch=new Wfdbexec("patchann",Wfdbexec.customArchFlag);
 		String[] ann2rrArg={"-r",recName,"-a",annName,"-c","-V"};
 		patch.setLogLevel(logLevel);
 		ann2rr.setLogLevel(logLevel);
@@ -125,7 +125,7 @@ public class Score2013 {
 	
 	private static String score2(String recName,String rrAnn,String rrTest,
 								String T0, String TF){
-		Wfdbexec mxm=new Wfdbexec("mxm");
+		Wfdbexec mxm=new Wfdbexec("mxm",Wfdbexec.customArchFlag);
 		String[] arg={"-r",recName,"-a",rrAnn,rrTest,
 				"-f",T0,"-t",TF};
 		mxm.setArguments(arg);
@@ -168,7 +168,7 @@ public class Score2013 {
 
 		//Get first and last reference annotations
 		//Output should be in a format similar to: "0:01.384"
-		Wfdbexec rdann=new Wfdbexec("rdann");
+		Wfdbexec rdann=new Wfdbexec("rdann",Wfdbexec.customArchFlag);
 		String[] annArg={"-r",recName,"-a",refAnn};
 		ArrayList<String> refAnnSamples= new ArrayList<String>();
 		refAnnSamples=rdann.execToStringList(annArg);
