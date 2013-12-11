@@ -184,6 +184,10 @@ if(~isempty(str) && strcmp(str(1),'['))
 else
     %In this case there is only timestamp such as:
     % 0:00.355      355     N    0    0    0
+    str=data(1);
+    if(~isempty(strfind(str,['annopen: can''t read annotator'])))
+        error(str)
+    end
     for n=1:N
         str=char(data(n));
         C=textscan(str,'%s %u %s %u %u %u %[^\n\r]');

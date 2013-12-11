@@ -1,7 +1,7 @@
 %  WaveForm DataBase (WFDB) Toolbox 
 %  Version 0.9.5
 % 
-%  Last Updated November 6, 2013
+%  Last Updated December 6, 2013
 %
 %
 %This is a set of MATLAB functions and wrappers for reading, writing, and processing
@@ -66,19 +66,29 @@
 %   these functions on your work, please look at the help for that function
 %   in order find out how to credit the original paper and authors.
 %
-%   For questions and feedback please contact us at: wfdb-matlab-support@physionet.org
+%   For questions, contributions, and feedback please contact us at: 
+%       wfdb-matlab-support@physionet.org
 %   This source code for the native libraries can be obtained from PhysioNet under
 %   the GNU GPL aggreement.  
 %
-%   Contributors:
+%   Original contributors of open source native code that is available at PhysioNet
+%   are credited in their respective MATLAB wrappers.  In addition, the
+%   following people contributed directly to the development or testing of 
+%   the MATLAB wrappers and the JVM interface:
 %
+%   Joachim Behar
+%   Eudald Bogatell
 %   Michael Craig 
+%   Li-wei Lehman
+%   Sara Mariani
+%   Louis Mayaud
+%   Blaž Merela
 %   Benjamin Moody
 %   George Moody 
 %   Ikaro Silva
+%   Gabriel Squillace
 %   Daniel J. Scott
-%   Wei Zong
 %   
-
-
+%
 %Created by Ikaro Silva 2012
+

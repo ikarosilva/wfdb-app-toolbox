@@ -1,6 +1,6 @@
 function varargout=gqrs(varargin)
 %
-% gqrs(recordName,N,N0,signal,threshold,outpuName,highResolution)
+% gqrs(recordName,N,N0,signal,threshold,outputName,highResolution)
 %
 %    Wrapper to WFDB GQRS:
 %         http://www.physionet.org/physiotools/wag/gqrs-1.htm
@@ -56,7 +56,7 @@ function varargout=gqrs(varargin)
 % Source code by George B. Moody
 %
 % MATLAB wrapper written by Ikaro Silva, 2013
-% Last Modified: -
+% Last Modified:  December 10, 2013
 % Version 1.0
 % See also SQRS, RDANN, WQRS, BXB
 % Since 0.9.5
@@ -75,7 +75,7 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','N','N0','signal','threshold','outpuName','highResolution'};
+inputs={'recordName','N','N0','signal','threshold','outputName','highResolution'};
 N=[];
 N0=1;
 signal=[]; %use application default
@@ -117,7 +117,9 @@ if(~isempty(highResolution))
     end
 end
 
-javaWfdbExec.execToStringList(wfdb_argument);
-
+err=javaWfdbExec.execToStringList(wfdb_argument);
+if(~isempty(strfind(err,['annopen: can''t'])))
+    error(err)
+end
 
 
