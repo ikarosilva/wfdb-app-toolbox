@@ -22,22 +22,21 @@ function [varargout]=wfdbloadlib(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-%
+%         Last Modified: December 11, 2013
 % Since 0.0.1
 %
+% 
 
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
 %%% Change these values for system wide configuration of the WFDB binaries
 
+WFDB_CUSTOMLIB=0; %If you are using your own custom version of the WFDB binaries, set this to true
 WFDB_PATH=[]; %If empty, will use the default giveng confing.WFDB_PATH
 WFDBCAL=[]; %If empty, will use the default giveng confing.WFDBCAL
 debugLevel=0;
 networkWaitTime=1000;
 
 %%%% END OF SYSTEM WIDE CONFIGURATION PARAMETERS
-
-
-
 
 
 
@@ -88,7 +87,7 @@ outputs={'isloaded','config'};
 for n=1:nargout
     if(n>1)
         config.MATLAB_VERSION=version;
-        javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config');
+javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config',WFDB_CUSTOMLIB);
         javaWfdbExec.setLogLevel(debugLevel);
         config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
         env=regexp(char(javaWfdbExec.getEnvironment),',','split');
@@ -119,7 +118,7 @@ for n=1:nargout
         end
         config.WFDB_PATH=WFDB_PATH;
         config.WFDBCAL=WFDBCAL;
-        
+        config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
     end
     eval(['varargout{n}=' outputs{n} ';'])
 end

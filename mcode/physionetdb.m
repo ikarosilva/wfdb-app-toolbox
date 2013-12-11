@@ -23,6 +23,9 @@ function varargout=physionetdb(varargin)
 %          'db_name'. Default is false. Note: requires that the user have
 %          write permission to the current directory.
 %
+%          NOTE: This function currently does not perform any checksum in order
+%          to verify that the files were downloaded properly.
+%
 % Output Parameters
 % db_list -(Optional) Cell array list of elements. If an output
 %          is not provided, results are displayed to the screen.
@@ -33,7 +36,7 @@ function varargout=physionetdb(varargin)
 %
 % Author: Ikaro Silva, 2013
 % Since: 0.0.1
-% Last Modified: December 12, 2013
+% Last Modified: December 9, 2013
 %
 %
 % %Example 1 - List all available databases from PhysioNet into the screen
@@ -43,7 +46,7 @@ function varargout=physionetdb(varargin)
 % physionetdb('ucddb')
 %
 % %Example 3- Download all records for database MITDB
-%  rc=physionetdb('mitdb',1);
+%  physionetdb('mitdb',1);
 persistent isloaded
 
 if(isempty(isloaded) || ~isloaded)
@@ -81,25 +84,26 @@ else
         mkdir(db_name)
         wfdb_url='http://physionet.org/physiobank/database/';
     end
-    if(nargout>0)
-        rec_list=J.getDBRecordList;
-        db_list={};
-        Nstr=num2str(double(rec_list.size));
-        for i=0:double(rec_list.size)-1
-            sig_list=rec_list.get(i).getSignalList;
-            for j=0:double(sig_list.size)-1
-                db_list(end+1)=cell(sig_list.get(j).getRecordName);
-            end
-            if(DoBatchDownload)
-                recName=cell(rec_list.get(i).getRecordName);
-                recName=recName{:};
-                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
-                [filestr1] = urlwrite([wfdb_url recName '.dat'],[recName '.dat']);
-                [filestr2] = urlwrite([wfdb_url recName '.hea'],[recName '.hea']);
+    rec_list=J.getDBRecordList;
+    db_list={};
+    Nstr=num2str(double(rec_list.size));
+    for i=0:double(rec_list.size)-1
+        sig_list=rec_list.get(i).getSignalList;
+        for j=0:double(sig_list.size)-1
+            db_list(end+1)=cell(sig_list.get(j).getRecordName);
+        end
+        if(DoBatchDownload)
+            recName=cell(rec_list.get(i).getRecordName);
+            recName=recName{:};
+            display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
+            [filestr1] = urlwrite([wfdb_url recName '.dat'],[recName '.dat']);
+            [filestr2] = urlwrite([wfdb_url recName '.hea'],[recName '.hea']);
+            if(i==(double(rec_list.size)-1))
+                display(['**Finished downloading records.'])
             end
         end
+    end
+    if(nargout>0)
         varargout(1)={db_list};
-    else
-        J.printDBRecordList
     end
 end

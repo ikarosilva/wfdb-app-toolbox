@@ -50,6 +50,7 @@ function varargout=wrann(varargin)
 %       Nx1 vector of the ints or scalar describing annotaion NUM. Default is 0.
 %
 %
+%
 %%Example- Creates a *.test file in your current directory
 %[ann,type,subtype,chan,num]=rdann('challenge/2013/set-a/a01','fqrs');
 % wrann('challenge/2013/set-a/a01','test',ann,type,subtype,chan,num)
@@ -68,11 +69,11 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: 27/11/2013
-% Version 1.1.2
+% Last Modified: December 10, 2013
+% Version 1.2
 % Since 0.0.1
 %
-% See also rdann, rdsamp, wfdbdesc
+% See also RDANN, RDSAMP, WFDBDESC
 %
 
 persistent javaWfdbExec
@@ -134,5 +135,7 @@ end
 
 
 javaWfdbExec.setArguments(wfdb_argument);
-javaWfdbExec.execWithStandardInput(data);
-
+err=javaWfdbExec.execWithStandardInput(data);
+if(~isempty(strfind(err,['annopen: can''t'])))
+    error(err)
+end

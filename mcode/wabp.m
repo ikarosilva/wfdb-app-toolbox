@@ -5,25 +5,25 @@ function varargout=wabp(varargin)
 %    Wrapper to WFDB WABP:
 %         http://www.physionet.org/physiotools/wag/wabp-1.htm
 %
-% Attempts to locate arterial blood pressure (ABP) pulse waveforms in a continuous ABP signal 
-% in the specified WFDB record "recName". The detector algorithm is based on analysis of the first derivative 
-% of the ABP waveform. The output of WABP is an annotation file (with annotator name WABP) in which all 
+% Attempts to locate arterial blood pressure (ABP) pulse waveforms in a continuous ABP signal
+% in the specified WFDB record "recName". The detector algorithm is based on analysis of the first derivative
+% of the ABP waveform. The output of WABP is an annotation file (with annotator name WABP) in which all
 % detected beats are labelled normal.
-% 
+%
 % WABP can process records containing any number of signals, but it uses only one signal for ABP pulse
-% detection (by default, the lowest-numbered ABP, ART, or BP signal; this can be changed using the 
-% 'signal' option, see below). WABP is optimized for use with adult human ABPs. 
-% It has been designed and tested to work best on signals sampled at 125 Hz. For other ABPs, it may be 
+% detection (by default, the lowest-numbered ABP, ART, or BP signal; this can be changed using the
+% 'signal' option, see below). WABP is optimized for use with adult human ABPs.
+% It has been designed and tested to work best on signals sampled at 125 Hz. For other ABPs, it may be
 % necessary to experiment with the sampling frequency as recorded in the input record’s header file
-% (see WFDBDESC ). 
+% (see WFDBDESC ).
 %
 %
 %
 % CITING CREDIT: To credit this function, please cite the following paper at your work:
 %
-% Zong, W., Heldt, T., Moody, G. B., & Mark, R. G. (2003). 
-% An open-source algorithm to detect onset of arterial blood pressure pulses. 
-% Computers in Cardiology 2003, 30, 259-262. IEEE. 
+% Zong, W., Heldt, T., Moody, G. B., & Mark, R. G. (2003).
+% An open-source algorithm to detect onset of arterial blood pressure pulses.
+% Computers in Cardiology 2003, 30, 259-262. IEEE.
 %
 %
 %Required Parameters:
@@ -32,15 +32,20 @@ function varargout=wabp(varargin)
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
+%
 % Optional Parameters are:
 %
 % beginTime (Optional)
-%       String specifying the begin time in WFDB format. The
+%       String or integer specifying the begin time. The
 %       WFDB time format is described at
 %       http://www.physionet.org/physiotools/wag/intro.htm#time.
+%       If an integer is entered, it  should be between 1
+%       (first sample) and N (last sample).
 %
 % stopTime (Optional)
-%       String specifying the begin time in WFDB format. The
+%       String or integer specifying the begin time. If string, it should be
+%       in WFDB time format, if it is an integer, should be between 1
+%       (first sample) and N (last sample).
 %
 % resample
 %       A 1x1 boolean. If true resamples the signal to 125 Hz (default=0).
@@ -54,8 +59,8 @@ function varargout=wabp(varargin)
 % C Source file revised by George Moody 2010
 %
 % MATLAB Wrapper Written by Ikaro Silva, 2013
-% Last Modified: -
-% Version 1.0
+% Last Modified: December 10, 2013
+% Version 1.1
 %
 % Since 0.9.0
 %
@@ -82,7 +87,7 @@ end
 %Set default pararamter values
 inputs={'recName','beginTime','stopTime','resample','signal'};
 beginTime=[];
-stopTime=1;
+stopTime=[];
 resample=0;
 signal=[];
 for n=1:nargin
@@ -95,12 +100,18 @@ wfdb_argument={'-r',recName};
 
 if(~isempty(beginTime))
     wfdb_argument{end+1}='-f';
-    %-1 is necessary because WFDB is 0 based indexed.
+    %Convert to string if sample number is entered
+    if(isnumeric(beginTime))
+        [beginTime,~]=wfdbtime(recName,beginTime);
+    end
     wfdb_argument{end+1}=beginTime;
 end
 if(~isempty(stopTime))
     wfdb_argument{end+1}='-t';
-    %-1 is necessary because WFDB is 0 based indexed.
+    %Convert to string if sample number is entered
+    if(isnumeric(stopTime))
+        [stopTime,~]=wfdbtime(recName,stopTime);
+    end
     wfdb_argument{end+1}=[stopTime];
 end
 if(resample)
@@ -111,7 +122,10 @@ if(~isempty(signal))
     wfdb_argument{end+1}=num2str(signal-1);
 end
 
-javaWfdbExec.execToStringList(wfdb_argument);
-    
+err=javaWfdbExec.execToStringList(wfdb_argument);
+if(~isempty(strfind(err,['annopen: can''t'])))
+    error(err)
+end
+
 
 
