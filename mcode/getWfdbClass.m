@@ -26,7 +26,7 @@ end
 
     %Load the Java class in memory if it has not been loaded yet
     %with system wide parameters defined by wfdbloadlib.m
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec(commandName);
+	javaWfdbExec=org.physionet.wfdb.Wfdbexec(commandName,config.WFDB_CUSTOMLIB);
     javaWfdbExec.setInitialWaitTime(config.NETWORK_WAIT_TIME); 
     javaWfdbExec.setLogLevel(config.DEBUG_LEVEL);
     javaWfdbExec.setWFDB_PATH(config.WFDB_PATH);
