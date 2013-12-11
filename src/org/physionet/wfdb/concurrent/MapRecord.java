@@ -138,8 +138,8 @@ public class  MapRecord implements Callable<Double>{
 
 	public double[] compute(String record){
 
-		Wfdbexec rdsamp=new Wfdbexec("rdsamp");
-		Wfdbexec exec=new Wfdbexec(commandName,"");
+		Wfdbexec rdsamp=new Wfdbexec("rdsamp",Wfdbexec.customArchFlag);
+		Wfdbexec exec=new Wfdbexec(commandName,"",Wfdbexec.customArchFlag);
 
 		String[] arguments={"-r",record,"-f",startTime,"-t",endTime,"-P"};
 

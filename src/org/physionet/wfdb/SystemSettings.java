@@ -3,7 +3,6 @@ package org.physionet.wfdb;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
@@ -11,7 +10,6 @@ import java.util.logging.Logger;
 public class SystemSettings {
 
 	private final static Logger logger = Logger.getLogger(Wfdbexec.class.getName());
-	private static boolean isLoadedLibs=false;
 
 	@SuppressWarnings("unchecked")
 	public static String[] getLoadedLibraries(Object o) {
@@ -48,29 +46,31 @@ public class SystemSettings {
 		return osName;
 	}
 
-	public static void loadLibs(){
-		 	isLoadedLibs=true;
-	}
-
-	public static String getLD_PATH(){
+	public static String getLD_PATH(boolean customArchFlag){
 		ProcessBuilder launcher = new ProcessBuilder();
 		Map<String,String> env = launcher.environment();
 		String LD_PATH="";
-		String WFDB_NATIVE_BIN=getWFDB_NATIVE_BIN();
+		String WFDB_NATIVE_BIN=getWFDB_NATIVE_BIN(customArchFlag);
 		String osName=getOsName();
 		String tmp="", pathSep="";
 		String OsPathName;
 		if(osName.contains("windows")){
 			LD_PATH=env.get("Path");pathSep=";";
 			OsPathName="PATH";
+			tmp=WFDB_NATIVE_BIN + "lib" + pathSep + WFDB_NATIVE_BIN + "bin";
 		}else if(osName.contains("macosx")){
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");pathSep=":";
 			OsPathName="DYLD_LIBRARY_PATH";
+			tmp=WFDB_NATIVE_BIN + "lib" + pathSep 
+					+ WFDB_NATIVE_BIN + "bin";
 		}else{
 			LD_PATH=env.get("LD_LIBRARY_PATH");pathSep=":";
 			OsPathName="LD_LIBRARY_PATH";
+			tmp=WFDB_NATIVE_BIN + "lib64" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib" + pathSep 
+					+ WFDB_NATIVE_BIN + "bin";
 		}
-		tmp=WFDB_NATIVE_BIN + "lib" + pathSep + WFDB_NATIVE_BIN + "bin";
+
 		if(LD_PATH == null){
 			LD_PATH=tmp;
 		}else if(LD_PATH.indexOf(tmp) <0){
@@ -99,21 +99,24 @@ public class SystemSettings {
 		return packageDir.toString();
 	}
 
-	public synchronized static String getWFDB_NATIVE_BIN() {
+	public synchronized static String getWFDB_NATIVE_BIN(boolean customArchFlag) {
 		String WFDB_NATIVE_BIN;
 		String WFDB_JAVA_HOME=getWFDB_JAVA_HOME();
-		//Set path to executables based on system/arch
-		WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
-				getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
-				+ getFileSeparator() ;
+		//Set path to executables based on system/arch and customArchFlga
+		if(customArchFlag){
+			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + "custom"+ getFileSeparator();
+		}else{
+			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
+					getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
+					+ getFileSeparator() ;
+		}
 		logger.finest("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
 		return WFDB_NATIVE_BIN;
 	}
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(getWFDB_NATIVE_BIN());
+		System.out.println(getWFDB_NATIVE_BIN(false));
 		//System.out.println(getWFDB_JAVA_HOME());
-		loadLibs();
 
 	}
 
