@@ -2,9 +2,15 @@ For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
 0.9.5 (TBA):
-	Updated native libs to WFDB 10.5.21. Added WFDBEXEC 
-	(runs WFDB native commands in their native API and by a system call through the JVM). 
-    Added EDR, GQRS, MSENTROPY. 
+	Updated native libs to WFDB 10.5.22. Added WFDBEXEC 
+	(runs WFDB native commands in their native API and by a system call through the JVM), 
+    EDR, GQRS, MSENTROPY. Added framework for users who want to run their own custom version
+    of the WFDB native binaries. Any user who can successfully compile and run WFDB executables 
+    on their system should be able to use most functionality of this toolbox provided that 
+    they install the binaries in the '/mcode/nativelibs/custom' directory (see README for details).
+    Added WDFB and WFDBCAL environment variables and ability to set and change them. Added 
+    system wide debugging information and variable to allow configuration of maximum network
+    waiting time (default = 1 second).
 	
 0.9.4.3 (06 November 2013):
 	Fixed libcurl and path issue.

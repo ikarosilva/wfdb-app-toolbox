@@ -164,12 +164,11 @@ all: curl wfdb mse edr ecgpuwave
 install: all
 	rm -rv ./bin/* ;\
 	rm -rf ./lib/* ;\
-	rm -rv ./lib64/* ;\
 	cp -r ./$(BUILD_DIR)/bin/* ./bin/ ;\
 	cp -r ./$(BUILD_DIR)/lib/* ./lib/ ;\
 	rm -f ./bin/psfd* ./bin/hrmem* ./bin/cur-config* ./bin/hrfft* ;\
 	rm -f ./bin/pschar* ./bin/hrlomb* ./bin/hrplot* ./bin/setwfdb* ;\
-	rm -f ./bin/cshsetwfdb* ./bin/curl-config* ./lib/libcurl.la* ;\ 
+	rm -f ./bin/cshsetwfdb* ./bin/curl-config* ./lib/libcurl.la* ;\
 	rm -f ./lib/pkgconfig/libcurl.pc*
 
 #Package will clean all temporary files 
@@ -178,6 +177,6 @@ install: all
 package: install
 	rm -rf ./tmp/ ;\
 	rm -rf ./$(BUILD_DIR) ;\
-	rm curl* ecgpuwave* edr* mse* wfdb* *~
+	rm -f curl* ecgpuwave* edr* mse* wfdb* *~
 	
 	
