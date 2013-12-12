@@ -40,6 +40,7 @@ clean:
 	
 	
 package: clean jartest unit-test.zip
+	rm $(APP_NAME) ;\
 	zip -r $(APP_NAME) mcode -x@zipexclude.lst  
 	
 %.java:
