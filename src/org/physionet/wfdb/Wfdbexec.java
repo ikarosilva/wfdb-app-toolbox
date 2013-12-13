@@ -393,8 +393,8 @@ public class Wfdbexec {
 		//Add library path to environment
 
 		if(osName.contains("macosx")){
-			env.put("DYLD_LIBRARY_PATH",LD_PATH);
-			logger.finer("\n\t***setting: DYLD_LIBRARY_PATH: " + LD_PATH);
+			env.put("PATH",LD_PATH);
+			logger.finer("\n\t***setting: PATH: " + LD_PATH);
 		}else if(osName.contains("windows")){
 			env.put("Path",LD_PATH);
 			logger.finer("\n\t***setting: Path: " + LD_PATH);
