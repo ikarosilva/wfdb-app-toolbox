@@ -391,8 +391,9 @@ public class Wfdbexec {
 		launcher.redirectErrorStream(true);
 		env = launcher.environment();
 		//Add library path to environment
-
-		if(osName.contains("macosx")){
+ 		if(osName.contains("macosx")){
+ 			env.put("DYLD_LIBRARY_PATH",LD_PATH);
+			logger.finer("\n\t***setting: DYLD_LIBRARY_PATH: " + LD_PATH);
 			env.put("PATH",LD_PATH);
 			logger.finer("\n\t***setting: PATH: " + LD_PATH);
 		}else if(osName.contains("windows")){
