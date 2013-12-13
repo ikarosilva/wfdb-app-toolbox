@@ -61,7 +61,8 @@ public class SystemSettings {
 		}else if(osName.contains("macosx")){
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");pathSep=":";
 			OsPathName="DYLD_LIBRARY_PATH";
-			tmp=WFDB_NATIVE_BIN + "lib" + pathSep 
+			tmp=WFDB_NATIVE_BIN + "lib64" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib" + pathSep 
 					+ WFDB_NATIVE_BIN + "bin";
 		}else{
 			LD_PATH=env.get("LD_LIBRARY_PATH");pathSep=":";
