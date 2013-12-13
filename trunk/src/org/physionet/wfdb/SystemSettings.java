@@ -76,7 +76,7 @@ public class SystemSettings {
 			LD_PATH=tmp;
 		}else if(LD_PATH.indexOf(tmp) <0){
 			//Only add if path is not present already
-			LD_PATH=LD_PATH+pathSep+tmp;
+			LD_PATH=tmp+pathSep+LD_PATH;
 		}
 		logger.finest("\nSystemSetting --Configuring PATH to: " + LD_PATH);
 		env.put(OsPathName,LD_PATH);
