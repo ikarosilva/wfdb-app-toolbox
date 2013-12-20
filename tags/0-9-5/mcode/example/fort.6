@@ -1,0 +1,11 @@
+ usage: ecgpuwave -r RECORD -a ANNOTATOR [OPTIONS ...]
+ where RECORD specifies the input, ANNOTATOR is the
+ output annotator name, and OPTIONS may include:
+  -f TIME    start at specified TIME
+  -i IANN    read QRS detections from IANN
+  -n PFLAG   specify beats to process (requires -i):
+              all (PFLAG=0; default)
+              normal beats only (PFLAG=1)
+  -s SIGNAL  analyze the specified SIGNAL (0-99):
+              default: SIGNAL= 0
+  -t TIME    stop at specified TIME
