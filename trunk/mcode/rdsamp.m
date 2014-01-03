@@ -44,7 +44,6 @@ function varargout=rdsamp(varargin)
 %
 %
 % rawUnits
-%
 %       A 1x1 boolean (default: false=0). If true, returns tm in samples (Nx1
 %       integets) and returns signal in the original DA units (NxM integers).
 %
@@ -54,7 +53,7 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: October 31, 2013
+% Last Modified: January 3, 2014
 % Version 1.0.2
 %
 % Since 0.0.1
@@ -92,7 +91,7 @@ end
 
 if(~rawUnits)
     %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument={'-r',recordName,'-ps','-f',['s' num2str(N0-1)]};
+    wfdb_argument={'-r',recordName,'-Ps','-f',['s' num2str(N0-1)]};
 else
     wfdb_argument={'-r',recordName,'-f',['s' num2str(N0-1)]};
 end
