@@ -60,7 +60,7 @@ function varargout=wfdbexec(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: November 15, 2013
+% Last Modified: January 7, 2014
 % Version 0.0.1
 % Since 0.9.5
 %
@@ -79,11 +79,14 @@ function varargout=wfdbexec(varargin)
 % See also WFDB
 
 logLevel=[];
+persistent config
 
+if(isempty(config))
+    [~,config]=wfdbloadlib;
+end
 if(nargin==0)
     %With no arguments passed in, we provide the user a list of native
     %commands available for this OS.
-    [~,config]=wfdbloadlib;
     del=findstr(' ',config.WFDB_NATIVE_BIN);
     if(~isempty(del) && del(1)==1)
         config.WFDB_NATIVE_BIN(1)=[];
@@ -124,7 +127,7 @@ else
         %Add classes to dynamic path
         wfdbloadlib;
     end
-    javaWfdbExec=org.physionet.wfdb.Wfdbexec(varargin(1));
+    javaWfdbExec=org.physionet.wfdb.Wfdbexec(varargin(1),strcmp(config.customArchFlag,'true'));
     if(~isempty(logLevel))
         javaWfdbExec.setLogLevel(logLevel);
     end
