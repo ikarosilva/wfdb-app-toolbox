@@ -46,11 +46,11 @@ function varargout=wfdbdesc(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: December 12, 2013
-% Version 1.1
+% Last Modified: January 8, 2014
+% Version 1.2
 %
 % Since 0.0.1
-% See also rdsamp
+% See also RDSAMP
 
 if(~wfdbloadlib)
     %Add classes to dynamic path
@@ -66,7 +66,7 @@ for n=1:nargin
     end
 end
 
-javaPhysioNetRecord=org.physionet.wfdb.physiobank.PhysioNetRecord(recordName);
+javaPhysioNetRecord=javaObject('org.physionet.wfdb.physiobank.PhysioNetRecord',recordName);
 Recinfo=javaPhysioNetRecord.getSignalList();
 
 %TODO: for some reason MATLAB struct() does not convert this Java class...

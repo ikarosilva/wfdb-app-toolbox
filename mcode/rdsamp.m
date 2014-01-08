@@ -67,9 +67,9 @@ function varargout=rdsamp(varargin)
 %
 % See also WFDBDESC, PHYSIONETDB
 
-persistent javaWfdbExec
+persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('rdsamp');
+    [javaWfdbExec,config]=getWfdbClass('rdsamp');
 end
 
 %Set default pararamter values
@@ -149,6 +149,10 @@ if(nargout>2)
 end
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+if(config.inOctave)
+    data=java2mat(data);
+end
+
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end
