@@ -22,10 +22,10 @@ function [varargout]=wfdbloadlib(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-%         Last Modified: December 11, 2013
+%         Last Modified: January 8, 2014
 % Since 0.0.1
 %
-% 
+%
 
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
 %%% Change these values for system wide configuration of the WFDB binaries
@@ -47,17 +47,23 @@ for n=1:nargin
     end
 end
 
-persistent per_isloaded wfdb_path;
-
-if(isempty(per_isloaded))
-    per_isloaded=0;
+persistent isloaded wfdb_path;
+inOctave=is_octave;
+if(isempty(isloaded))
+    isloaded=0;
 end
-if(~per_isloaded)
+if(~isloaded)
     jar_path=which('wfdbloadlib');
     cut=strfind(jar_path,'wfdbloadlib.m');
     wfdb_path=jar_path(1:cut-1);
     
-    ml_jar_version=version('-java');
+    if(~inOctave)
+        ml_jar_version=version('-java');
+    else
+        %In Octave
+        ml_jar_version=javaMethod('getProperty','java.lang.System','java.version');
+        ml_jar_version=['Java ' ml_jar_version];
+    end
     %Check if path has not been added yet
     if(~isempty(strfind(ml_jar_version,'Java 1.6')))
         wfdb_path=[wfdb_path 'wfdb-app-JVM6-0-9-5.jar'];
@@ -67,29 +73,27 @@ if(~per_isloaded)
         error(['Cannot load on unsupported JVM: ' ml_jar_version])
     end
     
-    class_path=javaclasspath('-dynamic');
-    if(~isempty(strfind(class_path,wfdb_path)))
-        %Class already loaded!
-        %warning(['WFDB classes already in path, only switching persistent variable to true.'])
-        per_isloaded=1;
-    else
-        %Load class to dynamic class path
-        %warning(['Adding WFDB classes to MATLAB''s dynamic class path.'])
+    if(~isloaded)
         javaaddpath(wfdb_path)
-        per_isloaded=1;
+        isloaded=1;
     end
     
 end
 
-isloaded=per_isloaded;
-%version('-java')
 outputs={'isloaded','config'};
 for n=1:nargout
     if(n>1)
         config.MATLAB_VERSION=version;
-javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config',WFDB_CUSTOMLIB);
-        javaWfdbExec.setLogLevel(debugLevel);
-        config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
+        config.inOctave=inOctave;
+        if(inOctave)
+            javaWfdbExec=javaObject('org.physionet.wfdb.Wfdbexec','wfdb-config',WFDB_CUSTOMLIB);
+            javaWfdbExec.setLogLevel(debugLevel);
+            config.WFDB_VERSION=char(javaMethod('execToStringList',javaWfdbExec,{'--version'}));
+        else
+            javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config',WFDB_CUSTOMLIB);
+            javaWfdbExec.setLogLevel(debugLevel);
+            config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
+        end
         env=regexp(char(javaWfdbExec.getEnvironment),',','split');
         for e=1:length(env)
             tmpstr=regexp(env{e},'=','split');
@@ -122,3 +126,11 @@ javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config',WFDB_CUSTOMLIB);
     end
     eval(['varargout{n}=' outputs{n} ';'])
 end
+
+%% subfunction that checks if we are in octave
+function r = is_octave ()
+persistent x;
+if (isempty (x))
+    x = exist ('OCTAVE_VERSION', 'builtin')>0;
+end
+r = x;
