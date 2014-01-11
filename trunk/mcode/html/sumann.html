@@ -1,0 +1,57 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: sumann</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: sumann</td>
+            <td class="subheader-left"><a href="matlab:edit sumann">View code for sumann</a></td>
+            <td class="subheader-right"><a href="matlab:doc">Default Topics</a></td>
+         </tr>
+      </table>
+      <div class="title">sumann</div>
+      <div class="helptext"><pre><!--helptext -->  report=sumann(recName,annName,stopTime,qrsAnnotationsOnly)
+ 
+     Wrapper to WFDB <span class="helptopic">sumann</span>:
+          <a href="http://www.physionet.org/physiotools/wag/sumann-1.htm">http://www.physionet.org/physiotools/wag/sumann-1.htm</a>
+ 
+  Reads a WFDB annotation file and summarize its contents.
+  
+  Ouput Parameters:
+ 
+  report 
+        String with the contaning summary of the contents, including the 
+        number of annotations of each type as well the duration and number of 
+       episodes of each rhythm and signal quality.
+ 
+ Input Parameters:
+  recName    
+        String specifying the WFDB record file.
+ 
+  annName    
+        String specifying the reference WFDB annotation file.
+ 
+  stopTime (Optional)
+        String specifying the stop time in WFDB format (default is end of
+        record).
+ 
+  qrsAnnotationsOnly (Optional)
+        1x1 Boolean. If true, summarize QRS annotation only (default = 0).
+ 
+ 
+  Written by Ikaro Silva, 2013
+  Last Modified: -
+  Version 1.0
+  Since 0.9.0
+ 
+  %Example (this will generate a /mitdb/100.qrs file at your directory):
+ 
+  report=sumann('mitdb/100','atr');</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink"> <a href="matlab:doc rdann">rdann</a>, <a href="matlab:doc mxm">mxm</a>, <a href="matlab:doc wfdbtime">wfdbtime</a>, <a href="matlab:doc bxb">bxb</a>
+</div>
+   </body>
+</html>

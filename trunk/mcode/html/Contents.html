@@ -1,0 +1,273 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Contents</title><meta name="generator" content="MATLAB 8.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2014-01-10"><meta name="DC.source" content="Contents.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, tt, code { font-size:12px; }
+pre { margin:0px 0px 20px; }
+pre.error { color:red; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="comment">%  WaveForm DataBase (WFDB) Toolbox</span>
+<span class="comment">%  Version 0.9.5</span>
+<span class="comment">%</span>
+<span class="comment">%  Last Updated December 6, 2013</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%This is a set of MATLAB functions and wrappers for reading, writing, and processing</span>
+<span class="comment">%files in the formats used by PhysioBank databases (among others).</span>
+<span class="comment">%The WFDB Toolbox has support for reading public PhysioNet databases directly from</span>
+<span class="comment">%web. This feature allows your code to analyze a wide range of physiological</span>
+<span class="comment">%signals available from PhysioBank without the need to download entire</span>
+<span class="comment">%records and to store them locally. This toolbox is distributed under the LGPL</span>
+<span class="comment">%license (see LICENSE.txt file in this directory). For more informationa about the</span>
+<span class="comment">%toolbox please go to: http://www.physionet.org</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%  Table of Contents (T0C)</span>
+<span class="comment">% -----------------------</span>
+<span class="comment">%   ann2rr          - Extract a list of intervals from an annotation file</span>
+<span class="comment">%   bxb             - ANSI/AAMI-standard beat-by-beat annotation comparator</span>
+<span class="comment">%   edr             - Derives a respiration signal from an ECG signal</span>
+<span class="comment">%   ecgpuwave       - Estimation of QRS and P waves from ECG signals</span>
+<span class="comment">%   gqrs            - Estimation of QRS from ECG signals</span>
+<span class="comment">%   lomb	        - Estimates power spectrum using the Lomb periodogram method</span>
+<span class="comment">%   mat2wfdb        - Writes a MATLAB variable into a WDFB record file</span>
+<span class="comment">%   maprecord       - Performs multithreaded concurent annotation or processing of WFDB records</span>
+<span class="comment">%   mrgann          - Merge annotation files</span>
+<span class="comment">%   mse		        - Multi scale entropy estimation</span>
+<span class="comment">%   physionetdb     - Get information about all of PhysioNet's available databases and signals</span>
+<span class="comment">%   rdann           - Read annotation files for WFDB records</span>
+<span class="comment">%   rdmimic2wave    - Searches MIMIC II matched waveform records within a clinical time range</span>
+<span class="comment">%   rdsamp          - Read signal files of WFDB records</span>
+<span class="comment">%   score2013       - Scores entries to the PhysioNet 2013 Fetal ECG challenge</span>
+<span class="comment">%   sortann         - Rearrange annotations in canonical order</span>
+<span class="comment">%   sqrs            - Finds the QRS complexes of a WFDB ECG record signal</span>
+<span class="comment">%   sumann	        - Summarize the contents of a WFDB annotation file</span>
+<span class="comment">%   tach            - Calculates instantaneous heart rate of a WFDB ECG record signal</span>
+<span class="comment">%   wfdb            - Prints this help information of the Toolbox</span>
+<span class="comment">%   wfdbexec        - Executes a system call to any installed native WFDB command.</span>
+<span class="comment">%   wabp	        - Arterial blood pressure (ABP) pulse detector</span>
+<span class="comment">%   wfdbdemo        - Demonstration of the WFDB App Toolbox</span>
+<span class="comment">%   wfdbdesc        - Return signal information for about a WFDB record</span>
+<span class="comment">%   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information</span>
+<span class="comment">%   wfdbtest        - Script to test installation of the Toolbox.</span>
+<span class="comment">%   wqrs            - Finds the QRS complexes of a WFDB ECG record signal</span>
+<span class="comment">%   wrann           - Writes annotations for WFDB records into annotation files</span>
+<span class="comment">%   wrsamp          - Writes signal data into WFDB-compatible records</span>
+<span class="comment">%   wfdbupdate      - Checks if this version of the WFDB Toolbox is up-to-date</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%   To credit this toolbox, please cite the following paper at your work:</span>
+<span class="comment">%</span>
+<span class="comment">%   Goldberger AL, Amaral LAN, Glass L, Hausdorff JM, Ivanov PCh, Mark RG, Mietus JE, Moody GB, Peng CK, Stanley HE.</span>
+<span class="comment">%   "PhysioBank, PhysioToolkit, and PhysioNet: Components of a New Research Resource for Complex</span>
+<span class="comment">%   Physiologic Signals."</span>
+<span class="comment">%   Circulation 101(23):e215-e220</span>
+<span class="comment">%   [http://circ.ahajournals.org/cgi/content/full/101/23/e215];</span>
+<span class="comment">%   2000 (June 13).</span>
+<span class="comment">%   PMID: 10851218; doi: 10.1161/01.CIR.101.23.e215</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%   In addition, some of these functions use binary executables compiled</span>
+<span class="comment">%   from open-source third-party code contributed to PhysioNet. When using</span>
+<span class="comment">%   these functions on your work, please look at the help for that function</span>
+<span class="comment">%   in order find out how to credit the original paper and authors.</span>
+<span class="comment">%</span>
+<span class="comment">%   For questions, contributions, and feedback please contact us at:</span>
+<span class="comment">%</span>
+<span class="comment">%       wfdb-matlab-support@physionet.org</span>
+<span class="comment">%</span>
+<span class="comment">%  Or join our community at:</span>
+<span class="comment">%       http://groups.google.com/forum/#!forum/wfdb-app-toolbox</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%   The source code for the native libraries used in this toolbox can be obtained from PhysioNet under</span>
+<span class="comment">%   the GNU GPL aggreement.</span>
+<span class="comment">%</span>
+<span class="comment">%   Original contributors of open source native code that is available at PhysioNet</span>
+<span class="comment">%   are credited in their respective MATLAB wrappers.  In addition, the</span>
+<span class="comment">%   following people contributed directly to the development or testing of</span>
+<span class="comment">%   the MATLAB wrappers and the JVM interface:</span>
+<span class="comment">%</span>
+<span class="comment">%   Joachim Behar</span>
+<span class="comment">%   Eudald Bogatell</span>
+<span class="comment">%   Michael Craig</span>
+<span class="comment">%   Li-wei Lehman</span>
+<span class="comment">%   Sara Mariani</span>
+<span class="comment">%   Louis Mayaud</span>
+<span class="comment">%   Bla&#382; Merela</span>
+<span class="comment">%   Benjamin Moody</span>
+<span class="comment">%   George Moody</span>
+<span class="comment">%   Ikaro Silva</span>
+<span class="comment">%   Gabriel Squillace</span>
+<span class="comment">%   Daniel J. Scott</span>
+<span class="comment">%</span>
+<span class="comment">%</span>
+<span class="comment">%Created by Ikaro Silva 2012</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2013b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%  WaveForm DataBase (WFDB) Toolbox 
+%  Version 0.9.5
+% 
+%  Last Updated December 6, 2013
+%
+%
+%This is a set of MATLAB functions and wrappers for reading, writing, and processing
+%files in the formats used by PhysioBank databases (among others). 
+%The WFDB Toolbox has support for reading public PhysioNet databases directly from 
+%web. This feature allows your code to analyze a wide range of physiological 
+%signals available from PhysioBank without the need to download entire 
+%records and to store them locally. This toolbox is distributed under the LGPL
+%license (see LICENSE.txt file in this directory). For more informationa about the
+%toolbox please go to: http://www.physionet.org 
+%
+%
+% 
+%
+%  Table of Contents (T0C)
+% REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-
+%   ann2rr          - Extract a list of intervals from an annotation file
+%   bxb             - ANSI/AAMI-standard beat-by-beat annotation comparator
+%   edr             - Derives a respiration signal from an ECG signal
+%   ecgpuwave       - Estimation of QRS and P waves from ECG signals
+%   gqrs            - Estimation of QRS from ECG signals
+%   lomb	        - Estimates power spectrum using the Lomb periodogram method	
+%   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
+%   maprecord       - Performs multithreaded concurent annotation or processing of WFDB records 
+%   mrgann          - Merge annotation files
+%   mse		        - Multi scale entropy estimation
+%   physionetdb     - Get information about all of PhysioNet's available databases and signals
+%   rdann           - Read annotation files for WFDB records
+%   rdmimic2wave    - Searches MIMIC II matched waveform records within a clinical time range
+%   rdsamp          - Read signal files of WFDB records
+%   score2013       - Scores entries to the PhysioNet 2013 Fetal ECG challenge
+%   sortann         - Rearrange annotations in canonical order
+%   sqrs            - Finds the QRS complexes of a WFDB ECG record signal
+%   sumann	        - Summarize the contents of a WFDB annotation file
+%   tach            - Calculates instantaneous heart rate of a WFDB ECG record signal
+%   wfdb            - Prints this help information of the Toolbox
+%   wfdbexec        - Executes a system call to any installed native WFDB command.
+%   wabp	        - Arterial blood pressure (ABP) pulse detector
+%   wfdbdemo        - Demonstration of the WFDB App Toolbox
+%   wfdbdesc        - Return signal information for about a WFDB record
+%   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information
+%   wfdbtest        - Script to test installation of the Toolbox.
+%   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
+%   wrann           - Writes annotations for WFDB records into annotation files
+%   wrsamp          - Writes signal data into WFDB-compatible records
+%   wfdbupdate      - Checks if this version of the WFDB Toolbox is up-to-date
+%
+%
+% 
+%   To credit this toolbox, please cite the following paper at your work:
+%    
+%   Goldberger AL, Amaral LAN, Glass L, Hausdorff JM, Ivanov PCh, Mark RG, Mietus JE, Moody GB, Peng CK, Stanley HE. 
+%   "PhysioBank, PhysioToolkit, and PhysioNet: Components of a New Research Resource for Complex 
+%   Physiologic Signals."
+%   Circulation 101(23):e215-e220 
+%   [http://circ.ahajournals.org/cgi/content/full/101/23/e215]; 
+%   2000 (June 13). 
+%   PMID: 10851218; doi: 10.1161/01.CIR.101.23.e215 
+%
+%
+%   In addition, some of these functions use binary executables compiled
+%   from open-source third-party code contributed to PhysioNet. When using
+%   these functions on your work, please look at the help for that function
+%   in order find out how to credit the original paper and authors.
+%
+%   For questions, contributions, and feedback please contact us at: 
+%
+%       wfdb-matlab-support@physionet.org 
+%
+%  Or join our community at: 
+%       http://groups.google.com/forum/#!forum/wfdb-app-toolbox
+%
+%
+%   The source code for the native libraries used in this toolbox can be obtained from PhysioNet under
+%   the GNU GPL aggreement.  
+%
+%   Original contributors of open source native code that is available at PhysioNet
+%   are credited in their respective MATLAB wrappers.  In addition, the
+%   following people contributed directly to the development or testing of 
+%   the MATLAB wrappers and the JVM interface:
+%
+%   Joachim Behar
+%   Eudald Bogatell
+%   Michael Craig 
+%   Li-wei Lehman
+%   Sara Mariani
+%   Louis Mayaud
+%   Blaž Merela
+%   Benjamin Moody
+%   George Moody 
+%   Ikaro Silva
+%   Gabriel Squillace
+%   Daniel J. Scott
+%   
+%
+%Created by Ikaro Silva 2012
+
+
+##### SOURCE END #####
+--></body></html>

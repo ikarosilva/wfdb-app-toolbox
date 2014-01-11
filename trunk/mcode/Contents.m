@@ -9,8 +9,9 @@
 %The WFDB Toolbox has support for reading public PhysioNet databases directly from 
 %web. This feature allows your code to analyze a wide range of physiological 
 %signals available from PhysioBank without the need to download entire 
-%records and to store them locally. For more information please go to
-% http://www.physionet.org 
+%records and to store them locally. This toolbox is distributed under the LGPL
+%license (see LICENSE.txt file in this directory). For more informationa about the
+%toolbox please go to: http://www.physionet.org 
 %
 %
 % 
@@ -67,8 +68,14 @@
 %   in order find out how to credit the original paper and authors.
 %
 %   For questions, contributions, and feedback please contact us at: 
-%       wfdb-matlab-support@physionet.org
-%   This source code for the native libraries can be obtained from PhysioNet under
+%
+%       wfdb-matlab-support@physionet.org 
+%
+%  Or join our community at: 
+%       http://groups.google.com/forum/#!forum/wfdb-app-toolbox
+%
+%
+%   The source code for the native libraries used in this toolbox can be obtained from PhysioNet under
 %   the GNU GPL aggreement.  
 %
 %   Original contributors of open source native code that is available at PhysioNet
