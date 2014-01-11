@@ -1,0 +1,160 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: mat2wfdb</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: mat2wfdb</td>
+            <td class="subheader-left"><a href="matlab:edit mat2wfdb">View code for mat2wfdb</a></td>
+            <td class="subheader-right"><a href="matlab:doc">Default Topics</a></td>
+         </tr>
+      </table>
+      <div class="title">mat2wfdb</div>
+      <div class="helptext"><pre><!--helptext -->  [xbit]=mat2wfdb(X,fname,Fs,bit_res,adu,info,gain,sg_name,baseline,isint)
+ 
+  Convert data readable in matlab into WFDB Physionet format.
+ 
+  Input Paramater are:
+ 
+  X       -(required)  NxM matrix of M signals with N samples each. The
+                       signals can be of type double.The signals are assumed to be
+                       in physical units already and will be converted to
+                       ADU.
+  fname   -(required)  String where the the header (*.hea) and data (*.dat)
+           files will be saved (one single name for both, with no sufix).
+  Fs      -(Optional)  1x1 sampling frequency in Hz (all signals must have
+           been sampled at the same frquency). Default is 1 Hz.
+  bit_res -(Optional)  1xM (or Mx1):scalar determining the bit depth of the conversion for
+                       each signal.
+                       1x1 : If all the signals should have the same bit depth
+           Options are: 8,  16, and 32 ( all are signed types). 16 is the default.
+  adu     -(Optional)  Cell array of strings describing the physical units (default is 'V').
+           If only one string is entered all signals will have the same physical units.
+           If muliplte physical units, the total units entered has to equal M (number of
+           channels).
+  info    -(Optional)  String that will be added to the comment section of the header file.
+  gain    -(Optional) Scalar, if provided, no automatic scaling will be applied before the
+           quantitzation of the signal. If a gain is passed,  in will be the same one set
+           on the header file. The signal will be scaled by this gain prior to the quantization
+           process. Use this options if you want to have a standard gain and quantization
+           process for all signals in a dataset (the function will not attempt to quantitized
+           individual waveforms based on their individual range and baseline).
+ baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
+            value) that would be observed if the analog signal present at the ADC inputs had a
+            level that fell exactly in the middle of the input range of the ADC.
+  sg_name -(Optional) Cell array of strings describing signal names.
+ 
+  isint  -(Optional) Logical value (default=0). Use this option if you know
+            the signal is already quantitized, and you want to remove round-off
+            error by setting the original values to integers prior to fixed
+            point conversion.
+ 
+  Ouput Parameters are:
+ 
+  xbit    -(Optional)  NxM the quantitized signals that written to file (possible
+           rescaled if no gain was provided at input). Useful for comparing
+           and estimating quatitization error with the input double signal X
+           (see examples below).
+ 
+ 
+   NOTE: The signals can have different amplitudes, they will all be scaled to
+   a reference gain, with the scaling factor saved in the *.hea file.
+ 
+ Written by Ikaro Silva 2010
+ Modified by Louis Mayaud 2011
+  Version 1.0
+ 
+  Since 0.0.1
+  
+ 
+ %%%%%%%%%  Example 1 %%%%%%%%%%%%
+ 
+  display('***This example will write a  Ex1.dat and Ex1.hea file to your current directory!')
+  s=input('Hit "ctrl + c" to quit or "Enter" to continue!');
+ 
+  %Generate 3 different signals and convert them to signed 16 bit in WFDB format
+  clear all;clc;close all
+  N=1024;
+  Fs=48000;
+  tm=[0:1/Fs:(N-1)/Fs]';
+  adu='V/mV/V';
+  info='Example 1';
+ 
+ 
+  %First signal a ramp with 2^16 unique levels and is set to (+-) 2^15 (Volts)
+  %Thus the header file should have one quant step equal to (2^15-(-2^15))/(2^16) V.
+  sig1=double(int16(linspace(-2^15,2^15,N)'));
+ 
+  %Second signal is a sine wave with 2^8 unique levels and set to (+-) 1 (mV)
+  %Thus the header file should one quant step equal a (1--1)/(2^16)  adu step
+  sig2=double(int8(sin(2*pi*tm*1000).*(2^7)))./(2^7);
+ 
+  %Third signal is a random binary signal set to to (+-) 1 (V) with DC (to be discarded)
+  %Thus the header file should have one quant step equal a 1/(2^16) adu step.
+  sig3=(rand(N,1) &gt; 0.97)*2 -1 + 2^16;
+ 
+  %Concatenate all signals and convert to WFDB format with default 16 bits (empty brackets)
+  sig=[sig1 sig2 sig3];
+  mat2wfdb(sig,'Ex1',Fs,[],adu,info)
+ 
+  % %
+ 
+  % !rdsamp -r Ex1 &gt; foo
+  % x=dlmread('foo');
+  % subplot(211)
+  % plot(sig)
+  % subplot(212)
+  % plot(x(:,1),x(:,2));hold on;plot(x(:,1),x(:,3),'k');plot(x(:,1),x(:,4),'r')
+ 
+ %%%%%%% End of Example 1%%%%%%%%%
+ 
+ 
+ %%%%%%%%%  Example 2 %%%%%%%%%%%%
+ 
+  %Import a signal from PhysioNet with known units into MATLAB
+  %and check that the generated header file has same info as original
+  %signal
+  sig_name='aftdb/test-set-a/a05.hea';
+  x=rdsamp(sig_name,'sigs',1,'phys',true,'begin','00:00:10','stop','00:02:30','hires',true);
+  info=wfdbdesc(sig_name,1);
+  [xbit]=mat2wfdb(x,'test',info.samplingFrequency,16,info.groups.signals(1).units,...
+   sig_name,[],sg_name);
+  xrecon=rdsamp('test','sigs',1,'phys',true,'begin','00:00:10','stop','00:02:30','hires',true);
+ 
+ 
+ %%%%%%% End of Example 2%%%%%%%%%
+ 
+ 
+ %%%%%%%%%  Example 3- Comparing with WFDB Records %%%%%%%%%%%%
+ clc;close all;clear all
+ x = rdsamp('mitdb/100','phys',true,'hires',true);
+ desc=wfdbdesc('mitdb/100',1);
+ sg_info=desc.groups.signals(2);
+ x(:,1:2)=[];
+ filename='wfdb_test';
+ isint=1;
+ info=[];
+ bit_res=16;
+ Fs=128;
+ adu=[];
+ sg_name={'ECG'};
+ offset=[];
+ gain=[];
+ [xbit]=mat2wfdb(x,filename,Fs,bit_res,adu,info,gain,sg_name,offset,isint);
+ xrecon=rdsamp(filename,'phys',true,'hires',true);
+ xrecon(:,1)=[]; %Get rid of time index
+ [x(:) xrecon(:)]
+ sqrt(mean((x(:)-xrecon(:)).^2))
+ 
+ 
+ 
+ %%End of Example 3</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink"> <a href="matlab:doc wrsamp">wrsamp</a>, <a href="matlab:doc wfdbdesc">wfdbdesc</a></div><!--note--><div class="footerlinktitle">NOTE</div><div class="footerlink"> If you have WFDB installed you can check the conversion by
+  % %uncomenting and this section and running (notice that all signals are scaled
+  % %to unit amplitude during conversion, with the header files keeping the gain info):</div>
+   </body>
+</html>

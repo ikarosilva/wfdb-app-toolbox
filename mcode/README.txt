@@ -43,5 +43,12 @@ delete(install_dir)
 wfdb-matlab-support@physionet.org
 
 *When contacting us about issues with the Toolbox, please send us the output of 
-the "wfdbdemo" script.
+the "wfdbtest" script.
+
+
+
+-------Join our community!! -------
+Join our community at:
+
+https://groups.google.com/forum/#!forum/wfdb-app-toolbox
 
