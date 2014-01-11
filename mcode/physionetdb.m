@@ -1,6 +1,6 @@
 function varargout=physionetdb(varargin)
 %
-% db_list=physionetdb(db_name,DoBatchDownload)
+% db_list=physionetdb(db_name,DoBatchDownload,webBrowserFlag)
 %
 %
 % Lists all the available databases at PhysioNet
@@ -26,6 +26,10 @@ function varargout=physionetdb(varargin)
 %          NOTE: This function currently does not perform any checksum in order
 %          to verify that the files were downloaded properly.
 %
+% webBrowserFlag
+%          Boolean. If true, displays database information in MATLAB's
+%          web browser (default = 0).
+%
 % Output Parameters
 % db_list -(Optional) Cell array list of elements. If an output
 %          is not provided, results are displayed to the screen.
@@ -36,17 +40,24 @@ function varargout=physionetdb(varargin)
 %
 % Author: Ikaro Silva, 2013
 % Since: 0.0.1
-% Last Modified: December 9, 2013
+% Last Modified: January 10, 2014
 %
 %
 % %Example 1 - List all available databases from PhysioNet into the screen
 % physionetdb
 %
-% %Example 2- List all available signals in the ucddb database.
+% %Example 2 - List all available databases from PhysioNet in web browser
+% physionetdb([],[],1)
+%
+% %Example 3- List all available signals in the ucddb database.
 % physionetdb('ucddb')
 %
-% %Example 3- Download all records for database MITDB
+% %Example 4- Download all records for database MITDB
 %  physionetdb('mitdb',1);
+%
+% %Example 5- List all records for database MITDB on a web browser
+% physionetdb('mitdb',[],1);
+%
 persistent isloaded
 
 if(isempty(isloaded) || ~isloaded)
@@ -54,9 +65,10 @@ if(isempty(isloaded) || ~isloaded)
     isloaded=wfdbloadlib;
 end
 
-inputs={'db_name','DoBatchDownload'};
+inputs={'db_name','DoBatchDownload','webBrowser'};
 db_name=[];
 DoBatchDownload=0;
+webBrowser=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -72,9 +84,13 @@ if(isempty(db_name))
         end
         varargout(1)={db_list};
     else
-        for i=0:double(list.size)-1
-            fprintf(char(list.get(i).getDBInfo))
-            fprintf('\n');
+        if(webBrowser)
+            web('http://physionet.org/physiobank/database/DBS')
+        else
+            for i=0:double(list.size)-1
+                fprintf(char(list.get(i).getDBInfo))
+                fprintf('\n');
+            end
         end
     end
 else
@@ -84,22 +100,26 @@ else
         mkdir(db_name)
         wfdb_url='http://physionet.org/physiobank/database/';
     end
-    rec_list=J.getDBRecordList;
     db_list={};
-    Nstr=num2str(double(rec_list.size));
-    for i=0:double(rec_list.size)-1
-        sig_list=rec_list.get(i).getSignalList;
-        for j=0:double(sig_list.size)-1
-            db_list(end+1)=cell(sig_list.get(j).getRecordName);
-        end
-        if(DoBatchDownload)
-            recName=cell(rec_list.get(i).getRecordName);
-            recName=recName{:};
-            display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
-            [filestr1] = urlwrite([wfdb_url recName '.dat'],[recName '.dat']);
-            [filestr2] = urlwrite([wfdb_url recName '.hea'],[recName '.hea']);
-            if(i==(double(rec_list.size)-1))
-                display(['**Finished downloading records.'])
+    if(webBrowser)
+        web(['http://physionet.org/physiobank/database/pbi/' db_name])
+    else
+        rec_list=J.getDBRecordList;
+        Nstr=num2str(double(rec_list.size));
+        for i=0:double(rec_list.size)-1
+            sig_list=rec_list.get(i).getSignalList;
+            for j=0:double(sig_list.size)-1
+                db_list(end+1)=cell(sig_list.get(j).getRecordName);
+            end
+            if(DoBatchDownload)
+                recName=cell(rec_list.get(i).getRecordName);
+                recName=recName{:};
+                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
+                [filestr1] = urlwrite([wfdb_url recName '.dat'],[recName '.dat']);
+                [filestr2] = urlwrite([wfdb_url recName '.hea'],[recName '.hea']);
+                if(i==(double(rec_list.size)-1))
+                    display(['**Finished downloading records.'])
+                end
             end
         end
     end
