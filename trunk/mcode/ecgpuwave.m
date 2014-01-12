@@ -78,7 +78,7 @@ function ecgpuwave(varargin)
 %       A String specifying the ouput annotator name (default = 'edr').
 %
 % Wrapper written by Ikaro Silva, 2013
-% Last Modified: November , 2013
+% Last Modified: January 12 , 2014
 % Version 0.0.1
 %
 % 
@@ -120,20 +120,12 @@ end
 wfdb_argument={'-r',recordName,'-a',annFileName};
 
 if(~isempty(startTime))
-    %Convert time from sample to string
-    if(~ischar(startTime))
-    [startTime,~]=wfdbtime(recordName,startTime);
-    end
     wfdb_argument{end+1}='-f';
-    wfdb_argument{end+1}=startTime;
+    wfdb_argument{end+1}=num2str(startTime-1);
 end
 if(~isempty(stopTime))
-    %Convert time from sample to string
-    if(~ischar(stopTime))
-    [stopTime,~]=wfdbtime(recordName,stopTime);
-    end
     wfdb_argument{end+1}='-t';
-    wfdb_argument{end+1}=stopTime;
+    wfdb_argument{end+1}=num2str(stopTime-1);
 end
 
 if(~isempty(signalList))
