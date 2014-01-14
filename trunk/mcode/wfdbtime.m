@@ -8,22 +8,22 @@ function varargout=wfdbtime(varargin)
 % Converts sample indices from recordName into timeStamp and dateStamps.
 % Returns:
 %
-% timesStamp 
+% timesStamp
 %       Nx1 vector of cell Strings representing times stamps with respect to the
 %       first sample in recordName.
 %
-% dateStamp 
+% dateStamp
 %       Nx1 vector of cell Strings representing date stamps with respect to the
 %       first sample in recordName.
 %
 %
 % Required Parameters:
 %
-% recorName  
+% recorName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
-% samples  
+% samples
 %       Nx1 vector of integers (indices) from signals in recordName (indices are
 %       relatitve to the first sample).
 %
@@ -34,16 +34,16 @@ function varargout=wfdbtime(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: -
-% Version 1.0
+% Last Modified: January 10, 2014
+% Version 1.1
 % Since 0.0.1
 %
-% See also rdann, wfdbdesc
+% See also RDANN, WFDBDESC
 %
 
-persistent javaWfdbExec
+persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('wfdbtime');
+    [javaWfdbExec,config]=getWfdbClass('wfdbtime');
 end
 
 %Set default pararamter values
@@ -68,7 +68,9 @@ for n=3:N+2
 end
 
 data=javaWfdbExec.execToStringList(wfdb_argument).toArray;
-
+if(config.inOctave)
+    char(data(n,1))
+end
 for n=1:length(data)
     str=regexp(data(n,1),'\s+','split');
     timeStamp(n)=str(3);
@@ -76,5 +78,5 @@ for n=1:length(data)
 end
 
 for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';'])
 end
