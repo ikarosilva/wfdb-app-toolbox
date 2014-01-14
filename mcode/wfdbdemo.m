@@ -2,14 +2,15 @@ function wfdbdemo()
 % WFDB App Toolbox Demo
 %
 % Written by Ikaro Silva, 2013
-%
+% Last modified: January 10, 2014
 %
 
-%Read sample ECG signal from MIT-BIH Arrhythmia Database
+echo on
+display('Reading samples ECG signal from MIT-BIH Arrhythmia Database')
 N=10000;
 [tm,ecg]=rdsamp('mitdb/100',1,N);
 
-%Read annotations (human labels) of QRS complexes performend on the signals
+display('Reading and plotting annotations (human labels) of QRS complexes performend on the signals')
 %by cardiologists.
 [ann,type,subtype,chan,num]=rdann('mitdb/100','atr',1,N);
 
@@ -20,7 +21,7 @@ plot(tm(ann(ann<N)+1),ecg(ann(ann<N)+1),'ro');
 
 
 %Stack the ECG signals based on the labeled QRSs
-%and plot 3D version of signal and labels
+display('Ploting 3D version of signal and labels')
 [RR,tms]=ann2rr('mitdb/100','atr',N);
 delay=round(0.1/tm(2));
 M=length(RR);
@@ -38,3 +39,7 @@ shading interp
 plot3(1:M,qrs(:,1),qrs(:,2)+offset,'go-','MarkerFaceColor','g')
 view(120, 30);
 axis off
+
+display('Demoing finished !!')
+display('For more information about the toolbox, type ''wfdb'' at the command prompt!')
+echo off
