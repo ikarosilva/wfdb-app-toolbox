@@ -148,8 +148,7 @@ machine_format='l';
 skip=0;
 
 %Set default parameters
-params={'Fs','bit_res','adu','info','gain','sg_name','baseline','isint'};
-param_offset=nargin-length(params)+1;
+params={'x','fname','Fs','bit_res','adu','info','gain','sg_name','baseline','isint'};
 Fs=1;
 adu=[];
 info=[];
@@ -158,24 +157,19 @@ isint=0;
 baseline=[];
 gain=[];
 sg_name=[];
-x=varargin{1};
-fname=varargin{2};
+x=[];
+fname=[];
 %Convert signal from double to appropiate type
-[N,M]=size(x);
 bit_res = 16 ;
 bit_res_suport=[8 16 32];
 
-for i=param_offset:nargin
+for i=1:nargin
     if(~isempty(varargin{i}))
-        if(isnumeric(varargin{i}))
-            eval([params{i-param_offset+1} '= [' num2str(varargin{i}) '];'])
-        elseif(iscell(varargin{i}))
-            eval([params{i-param_offset+1} '= varargin{i};'])
-        else
-            eval([params{i-param_offset+1} '= ''' varargin{i} ''';'])
-        end
+        eval([params{i} '= varargin{i};'])
     end
 end
+[N,M]=size(x);
+adu=regexp(adu,'/','split');
 
 if(isempty(gain))
     gain=cell(M,1); %Generate empty cells as default
@@ -221,6 +215,9 @@ for m=1:M
     head_str(m+1)={[fname '.dat ' num2str(bit_res) ' ' num2str(bit_gain) '(' ...
         num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 0 ' num2str(ck_sum) ' 0 ' sg_name{m}]};
 end
+if(length(y)<1)
+    error(['Converted data is empty. Exiting without saving file...'])
+end
 
 %Write *.dat file
 fid = fopen([fname '.dat'],'wb',machine_format);
@@ -232,7 +229,7 @@ count=fwrite(fid,y',['int' num2str(bit_res)],skip,machine_format);
 
 if(~count)
     fclose(fid);
-    error(['Could not data write to file: ' fname])
+    error(['Could not data write to file: ' fname])  
 end
 
 fprintf(['Generated *.dat file: ' fname '\n'])
@@ -288,7 +285,7 @@ if(isempty(gain))
     %defined in <wfdb/wfdb.h>) ADC units per physical unit may be assumed.
     
     %Dynamic range of encoding / Dynamic Range of Data --but leave 1 quant level for NaN
-    adc_gain=(2^(bit_res-1)-1)/(rg/2); 
+    adc_gain=(2^(bit_res-1)-1)/(rg/2);
     y=x.*adc_gain;
     
     if(isint)
@@ -299,7 +296,7 @@ if(isempty(gain))
         y=y/df_db;
         adc_gain=adc_gain/df_db;
     end
-       
+    
 else
     %if gain is alreay passed don't do anything to the signal
     %the gain will be used in the header file only
@@ -319,7 +316,7 @@ iswfdbnan=find(y==WFDBNAN); %-12^15 are NaNs in WFDB
 if(~isempty(iswfdbnan))
     y(iswfdbnan)=WFDBNAN-1;
 end
-    
+
 %Set NaNs to WFDBNAN
 y(nan_ind)=WFDBNAN;
 
