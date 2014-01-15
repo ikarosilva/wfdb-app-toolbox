@@ -68,6 +68,7 @@ public class Wfdbexec {
 	protected static File EXECUTING_DIR=null;
 	protected String[] arguments;
 	private int DoubleArrayListCapacity=0;
+	private int FloatArrayListCapacity=0;
 	private static Logger logger =
 			Logger.getLogger(Wfdbexec.class.getName());
 	private String commandDir;
@@ -391,6 +392,155 @@ public class Wfdbexec {
 		return data;
 	}
 
+	public float[][] execSingleArray(String[] args) throws Exception {
+		setArguments(args);   
+		gen_exec_arguments();
+
+		ArrayList<Float[]>  results= new ArrayList<Float[]>();
+		if(FloatArrayListCapacity>0){
+			//Set capacity to ensure more efficiency
+			results.ensureCapacity(FloatArrayListCapacity);
+		}
+		float[][] data=null;
+		int isTime=-1;//Index in case one of the columns is time as string
+
+		ProcessBuilder launcher = null;
+		logger.finest("\n\t***Setting launcher in exectToFloatArray");
+		try {
+			launcher = setLauncher();
+			logger.finest("\n\t***Launcher created sucessfully in exectToFloatArray");
+		} catch (Exception e1) {
+			System.err.println("***Error in setting the system launcher:" + e1.toString());
+			e1.printStackTrace();
+		}
+		try {
+			logger.finest("\n\t***Starting launcher in exectToFloatArray");
+			Process p = launcher.start();
+			BufferedReader output = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+			String line;
+			String[] tmpStr=null;
+			Float[] tmpArr=null;
+			char[] tmpCharArr=null;
+			int colInd;
+			int dataCheck=0;
+
+			//Wait for the initial stream in case process is slow
+			logger.finest("\n\t***Waiting for data stream from launcher...");
+			long thisTime=System.currentTimeMillis();
+			long waitTime=thisTime;
+
+			while (!output.ready()){
+				if((waitTime-thisTime)> initialWaitTime){
+					logger.finest("Process data stream wait time exceeded ("
+							+ initialWaitTime + "  milliseconds )");
+					logger.finest("\n\t***Could not get data stream, exiting...");
+					break;
+				}else {
+					try {
+						logger.finest("Waited " + (waitTime-thisTime) +
+								" ms for data stream (max waiting time= " +
+								initialWaitTime + "ms ) ...");
+						Thread.sleep(100);
+					} catch(InterruptedException ex) {
+						Thread.currentThread().interrupt();
+					}
+					waitTime=System.currentTimeMillis();
+				}
+			}
+			if(output.ready()){
+				logger.finest("\n\t***Streamed communication received, checking if error or data...");
+			}
+			while ((line = output.readLine()) != null){
+				tmpStr=line.trim().split("\\s+");
+				tmpArr=new Float[tmpStr.length];
+				//loop through columns
+				for(colInd=0;colInd<tmpStr.length;colInd++){
+					try{    
+						tmpArr[colInd]= Float.valueOf(tmpStr[colInd]);
+					}catch (NumberFormatException e){
+						//Deal with cases that are not numbers 
+						//but in an expected format
+						if(tmpStr[colInd].equals("-")){
+							//Dealing with NaN , so we need to convert 
+							//WFDB Syntax "-" to Java's Float NaN
+							tmpArr[colInd]=Float.NaN;	
+						}else if((tmpStr[colInd].contains(":"))){
+							//This column is likely a time column
+							//for now, set values to NaN and remove column
+							tmpArr[colInd]=Float.NaN;
+							if(isTime<0){
+								isTime=colInd;
+							}
+							dataCheck++;
+						}else {
+							//Attempt to convert single characters to integers
+							try{
+								tmpCharArr=tmpStr[colInd].toCharArray();
+								tmpArr[colInd]= (float) tmpCharArr[0];
+								dataCheck++;
+							}catch(Exception e2) {
+								System.err.println("Could not convert to double: " + line);
+								throw new Exception(e2.toString());
+							}
+						}
+					}
+				}
+
+				if(results.isEmpty() && dataCheck==tmpStr.length){
+					System.err.println("Error: Cannot convert to double: ");
+					System.err.println(line);
+					throw new NumberFormatException("Cannot convert");
+				}else {
+					results.add(tmpArr);
+				}
+			}
+
+			//Wait to for exit value
+			int exitValue = p.waitFor();
+			if(exitValue != 0){
+				System.err.println("Command exited with non-zero status!!");
+			}
+			//Convert data to Float Array
+			int N=tmpStr.length;
+			if(isTime>-1){
+				N--;
+			}
+			//TODO: find a way to use .toArray in case of column deletion
+			//data=new double[results.size()][N];
+			//data=results.toArray(data); this should replace the loops below
+
+			data=new float[results.size()][N];
+			int index=0;
+			if(isTime>-1) {
+				for(int i=0;i<results.size();i++){
+					Float[] tmpData=new Float[tmpStr.length];
+					tmpData=results.get(i);
+					for(int k=0;k<N;k++){				
+						if(isTime > -1 && k != isTime)
+							index =  (k>isTime) ? (k-1) :k;
+							data[i][index]=tmpData[k];
+					}
+				}
+			} else { //Optimized for case where there is no 
+				//column deletion
+				for(int i=0;i<results.size();i++){
+					Float[] tmpData=new Float[tmpStr.length];
+					tmpData=results.get(i);
+					for(int k=0;k<N;k++){				
+						data[i][k]=tmpData[k];
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}   
+		return data;
+	}
+
+	
 	private synchronized ProcessBuilder setLauncher() throws Exception{
 		ProcessBuilder launcher = new ProcessBuilder();
 		launcher.redirectErrorStream(true);
@@ -469,6 +619,10 @@ public class Wfdbexec {
 
 	public void setDoubleArrayListCapacity(int capacity){
 		DoubleArrayListCapacity=capacity;
+	}
+	
+	public void setFloatArrayListCapacity(int capacity){
+		FloatArrayListCapacity=capacity;
 	}
 
 	public void setLogLevel(int level){
