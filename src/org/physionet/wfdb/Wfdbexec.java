@@ -61,8 +61,8 @@ public class Wfdbexec {
 	private static final String osArch= SystemSettings.getosArch();
 	private static final String osName=SystemSettings.getOsName();
 	protected static final String WFDB_JAVA_HOME=SystemSettings.getWFDB_JAVA_HOME();
-	private static String WFDB_PATH="http://physionet.org/physiobank/database";
-	private static String WFDBCAL;
+	private String WFDB_PATH;
+	private String WFDBCAL;
 	private List<String> commandInput;
 	protected static Map<String,String> env;
 	protected static File EXECUTING_DIR=null;
@@ -85,6 +85,9 @@ public class Wfdbexec {
 		LD_PATH=SystemSettings.getLD_PATH(customArchFlag);
 		logger.finest("\n\t***Loading System libraries...");
 		SystemSettings.getLD_PATH(customArchFlag);
+		//Use white spaces for compatibility with all the operating systems
+		WFDB_PATH=SystemSettings.getDefaultWFDBPath(); 
+		WFDBCAL=SystemSettings.getDefaultWFDBCal(); 
 	}
 
 	public Wfdbexec(String commandName,boolean customArchFlag){
@@ -96,6 +99,8 @@ public class Wfdbexec {
 	}
 
 	public void setWFDB_PATH(String str){
+		//Acording to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
+		//use white space as best option for all the operating systems
 		logger.finest("\n\t***Setting WFDB to: " + str);
 		WFDB_PATH=str;
 	}
