@@ -27,6 +27,22 @@ public class SystemSettings {
 		return libraries.toArray(new String[] {});
 	}
 
+	public static String getPhysioNetDBURL(){
+		return "http://physionet.org/physiobank/database";
+	}
+	
+	public static String getDefaultWFDBPath(){
+		//Acording to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
+	    //use white space as best option for all the operating systems
+		return ". " + " " + SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
+				"database "+ getPhysioNetDBURL();
+	}
+	
+	public static String getDefaultWFDBCal() {
+		return SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
+				"database" + getFileSeparator() + "wfdbcal";
+	}
+	
 	public static String getFileSeparator(){
 		return System.getProperty("file.separator");		
 	}
