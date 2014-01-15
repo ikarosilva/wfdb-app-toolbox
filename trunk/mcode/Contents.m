@@ -27,7 +27,7 @@
 %   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
 %   maprecord       - Performs multithreaded concurent annotation or processing of WFDB records 
 %   mrgann          - Merge annotation files
-%   mse		        - Multi scale entropy estimation
+%   msentropy       - Multi scale entropy estimation
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals
 %   rdann           - Read annotation files for WFDB records
 %   rdmimic2wave    - Searches MIMIC II matched waveform records within a clinical time range
