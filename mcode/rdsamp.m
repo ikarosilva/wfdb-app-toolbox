@@ -44,8 +44,11 @@ function varargout=rdsamp(varargin)
 %
 %
 % rawUnits
-%       A 1x1 boolean (default: false=0). If true, returns tm in samples (Nx1
-%       integets) and returns signal in the original DA units (NxM integers).
+%       A 1x1 integer (default: 0). Returns tm and signal as vectors
+%       according to the following values:
+%               rawUnits=0  -returns tm and signal as integers in samples (signal is in DA units )
+%               rawUnits=1 -returns tm and signal in physical units with double precision
+%               rawUnits=2 -returns tm and signal in physical units with single precision (less memory requirements)
 %
 % highResolution
 %      A 1x1 boolean (default =0). If true, reads the record in high
@@ -53,8 +56,8 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: January 3, 2014
-% Version 1.0.2
+% Last Modified: January 15, 2014
+% Version 1.1
 %
 % Since 0.0.1
 %
@@ -63,7 +66,10 @@ function varargout=rdsamp(varargin)
 %plot(tm,signal(:,1))
 %
 %%Example 2- 
-%[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000);
+%[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],[],1000);
+%
+%%%Example 3- Read single precision data
+%[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],[],100,2);
 %
 % See also WFDBDESC, PHYSIONETDB
 
@@ -148,11 +154,14 @@ if(nargout>2)
     end
 end
 
-data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+if(rawUnits<2)
+    data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+else
+    data=javaWfdbExec.execToSingleArray(wfdb_argument);
+end
 if(config.inOctave)
     data=java2mat(data);
 end
-
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end

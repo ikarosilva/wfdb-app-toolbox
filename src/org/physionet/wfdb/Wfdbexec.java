@@ -392,7 +392,7 @@ public class Wfdbexec {
 		return data;
 	}
 
-	public float[][] execSingleArray(String[] args) throws Exception {
+	public float[][] execToSingleArray(String[] args) throws Exception {
 		setArguments(args);   
 		gen_exec_arguments();
 
