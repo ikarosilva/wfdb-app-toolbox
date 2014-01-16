@@ -118,7 +118,7 @@ if(~isempty(highResolution))
 end
 
 err=javaWfdbExec.execToStringList(wfdb_argument);
-if(~isempty(strfind(err,['annopen: can''t'])))
+if(~isempty(strfind(err.toString,['annopen: can''t'])))
     error(err)
 end
 
