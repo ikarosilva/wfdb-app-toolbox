@@ -34,7 +34,7 @@ function varargout=wfdbtime(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: January 10, 2014
+% Last Modified: January 16, 2014
 % Version 1.1
 % Since 0.0.1
 %
@@ -69,10 +69,18 @@ end
 
 data=javaWfdbExec.execToStringList(wfdb_argument).toArray;
 if(config.inOctave)
-    char(data(n,1))
+    tmpData=data;
+    data=cell(N,1);
+    for i=1:N
+        data(i)=char(tmpData(i));
+    end
+    clear tmpData;
 end
 for n=1:length(data)
     str=regexp(data(n,1),'\s+','split');
+    if(config.inOctave)
+        str=str{:};
+    end
     timeStamp(n)=str(3);
     dateStamp(n)=str(4);
 end
