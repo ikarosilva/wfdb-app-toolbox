@@ -48,9 +48,9 @@ function varargout=ann2rr(varargin)
 % %Example
 %[rr,tm]=ann2rr('challenge/2013/set-a/a01','fqrs');
 
-persistent javaWfdbExec
+persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('ann2rr');
+    [javaWfdbExec,config]=getWfdbClass('ann2rr');
 end
 
 %Set default pararamter values
@@ -80,6 +80,9 @@ end
 wfdb_argument{end+1}='-V';
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+if(config.inOctave)
+    data=java2mat(data);
+end
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end
