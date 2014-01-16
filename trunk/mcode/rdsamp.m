@@ -46,9 +46,11 @@ function varargout=rdsamp(varargin)
 % rawUnits
 %       A 1x1 integer (default: 0). Returns tm and signal as vectors
 %       according to the following values:
-%               rawUnits=0  -returns tm and signal as integers in samples (signal is in DA units )
+%               rawUnits=0 -returns tm and signal as integers in samples (signal is in DA units )
 %               rawUnits=1 -returns tm and signal in physical units with double precision
 %               rawUnits=2 -returns tm and signal in physical units with single precision (less memory requirements)
+%               rawUnits=3 -returns tm and signal as 16 bit integers (short)
+%               rawUnits=4 -returns tm and signal as 32 bit integers (long)
 %
 % highResolution
 %      A 1x1 boolean (default =0). If true, reads the record in high
@@ -154,11 +156,19 @@ if(nargout>2)
     end
 end
 
-if(rawUnits<2)
-    data=javaWfdbExec.execToDoubleArray(wfdb_argument);
-else
-    data=javaWfdbExec.execToSingleArray(wfdb_argument);
+switch rawUnits
+	case 0
+		data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+		case 1
+		data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+		case 2
+		data=javaWfdbExec.execToFloatArray(wfdb_argument);
+		case 3
+		data=javaWfdbExec.execToShortArray(wfdb_argument);
+		case 4
+		data=javaWfdbExec.execToLongArray(wfdb_argument);
 end
+
 if(config.inOctave)
     data=java2mat(data);
 end

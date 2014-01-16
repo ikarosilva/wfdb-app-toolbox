@@ -7,11 +7,12 @@ function varargout=getWfdbClass(varargin)
 % execute the WFDB native binary associate with 'commandName'.
 %
 % Written by Ikaro Silva, November 23, 2013
-%         Last Modified: January 8, 2014
+%         Last Modified: January 16, 2014
 %
 % Since 0.9.5
 % See also WFDBEXEC, WFDB, WFDBLOADLIB
 
+mlock
 persistent config
 if(isempty(config))
     %Add classes to dynamic path
