@@ -55,6 +55,8 @@ curl.isbuilt: curl.isconfig
 curl: curl.isbuilt
 
 ##WFDB TARGET
+#NOTE: Need to modify the variable DEFWFDB in /lib/wfdblib.h so that
+# $(BUILD_DIR)/datase is not included in the path
 clean-wfdb: 
 	rm -rf ./tmp/$(WFDB)
 	rm -f ./wfdb.isconfig; \
@@ -76,9 +78,8 @@ wfdb.isbuilt: curl.isbuilt wfdb.isconfig
 	cd ./tmp/;\
 	cd ./$(WFDB)/ ;\
 	make ;\
-	make install \
 	&& touch ../../wfdb.isbuilt
-wfdb: wfdb.isbuilt
+wfdb: curl wfdb.isbuilt
 
 ##EDR TARGET
 clean-edr:
