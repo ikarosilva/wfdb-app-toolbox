@@ -41,8 +41,8 @@ function varargout=ann2rr(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: -
-% Version 1.0
+% Last Modified: January, 16, 2013
+% Version 1.1
 %
 % Since 0.0.1
 % %Example
