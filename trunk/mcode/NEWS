@@ -1,7 +1,7 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
-0.9.5 (TBA):
+0.9.5 (December 6, 2013):
 	Updated native libs to WFDB 10.5.22. Added WFDBEXEC 
 	(runs WFDB native commands in their native API and by a system call through the JVM), 
     EDR, GQRS, MSENTROPY. Added framework for users who want to run their own custom version

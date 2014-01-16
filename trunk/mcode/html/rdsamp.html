@@ -59,8 +59,11 @@
  
  
   rawUnits
-        A 1x1 boolean (default: false=0). If true, returns tm in samples (Nx1
-        integets) and returns signal in the original DA units (NxM integers).
+        A 1x1 integer (default: 0). Returns tm and signal as vectors
+        according to the following values:
+                rawUnits=0  -returns tm and signal as integers in samples (signal is in DA units )
+                rawUnits=1 -returns tm and signal in physical units with double precision
+                rawUnits=2 -returns tm and signal in physical units with single precision (less memory requirements)
  
   highResolution
        A 1x1 boolean (default =0). If true, reads the record in high
@@ -68,8 +71,8 @@
  
  
   Written by Ikaro Silva, 2013
-  Last Modified: January 3, 2014
-  Version 1.0.2
+  Last Modified: January 15, 2014
+  Version 1.1
  
   Since 0.0.1
  
@@ -78,7 +81,11 @@
  plot(tm,signal(:,1))
  
  %Example 2- 
- [tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000);</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink"> <a href="matlab:doc wfdbdesc">wfdbdesc</a>, <a href="matlab:doc physionetdb">physionetdb</a>
+ [tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],[],1000);
+ 
+ %%Example 3- Read single precision data
+ [tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],[],100,2);</pre></div><!--after help --><!--seeAlso--><div class="footerlinktitle">See also</div><div class="footerlink"> <a href="matlab:doc wfdbdesc">wfdbdesc</a>, <a href="matlab:doc physionetdb">physionetdb</a></div><!--demo--><div class="footerlinktitle">Published output in the Help browser</div><div class="footerlink">
+       <a href="matlab:showdemo rdsamp">showdemo rdsamp</a>
 </div>
    </body>
 </html>
