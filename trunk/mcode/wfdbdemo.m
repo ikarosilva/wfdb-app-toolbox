@@ -5,6 +5,7 @@ function wfdbdemo()
 % Last modified: January 10, 2014
 %
 
+[~,config]=wfdbloadlib;
 echo on
 display('Reading samples ECG signal from MIT-BIH Arrhythmia Database')
 N=10000;
@@ -29,8 +30,8 @@ offset=0.3;
 stack=zeros(M,max(RR))+NaN;
 qrs=zeros(M,2)+NaN;
 for m=1:M
-   stack(m,1:RR(m)+1)=ecg(tms(m)-delay:tms(m)+RR(m)-delay);
-   qrs(m,:)=[delay+1 ecg(tms(m))];
+    stack(m,1:RR(m)+1)=ecg(tms(m)-delay:tms(m)+RR(m)-delay);
+    qrs(m,:)=[delay+1 ecg(tms(m))];
 end
 figure
 [X,Y] = meshgrid(1:max(RR)+1,1:M);
@@ -39,6 +40,7 @@ shading interp
 plot3(1:M,qrs(:,1),qrs(:,2)+offset,'go-','MarkerFaceColor','g')
 view(120, 30);
 axis off
+
 
 display('Demoing finished !!')
 display('For more information about the toolbox, type ''wfdb'' at the command prompt!')
