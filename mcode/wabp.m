@@ -59,7 +59,7 @@ function varargout=wabp(varargin)
 % C Source file revised by George Moody 2010
 %
 % MATLAB Wrapper Written by Ikaro Silva, 2013
-% Last Modified: December 10, 2013
+% Last Modified: January 16, 2013
 % Version 1.1
 %
 % Since 0.9.0
@@ -81,7 +81,7 @@ function varargout=wabp(varargin)
 
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('wabp');
+    [javaWfdbExec]=getWfdbClass('wabp');
 end
 
 %Set default pararamter values
@@ -123,7 +123,7 @@ if(~isempty(signal))
 end
 
 err=javaWfdbExec.execToStringList(wfdb_argument);
-if(~isempty(strfind(err,['annopen: can''t'])))
+if(~isempty(strfind(err.toString,['annopen: can''t'])))
     error(err)
 end
 
