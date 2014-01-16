@@ -22,10 +22,12 @@ function [varargout]=wfdbloadlib(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-%         Last Modified: January 15, 2014
+%         Last Modified: January 16, 2014
 % Since 0.0.1
 %
 %
+mlock
+persistent isloaded wfdb_path;
 
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
 %%% Change these values for system wide configuration of the WFDB binaries
@@ -38,8 +40,6 @@ networkWaitTime=1000;
 
 %%%% END OF SYSTEM WIDE CONFIGURATION PARAMETERS
 
-
-
 inputs={'debugLevel','networkWaitTime'};
 for n=1:nargin
     if(~isempty(varargin{n}))
@@ -47,12 +47,9 @@ for n=1:nargin
     end
 end
 
-persistent isloaded wfdb_path;
+
 inOctave=is_octave;
 if(isempty(isloaded))
-    isloaded=0;
-end
-if(~isloaded)
     jar_path=which('wfdbloadlib');
     cut=strfind(jar_path,'wfdbloadlib.m');
     wfdb_path=jar_path(1:cut-1);
@@ -72,12 +69,8 @@ if(~isloaded)
     else
         error(['Cannot load on unsupported JVM: ' ml_jar_version])
     end
-    
-    if(~isloaded)
-        javaaddpath(wfdb_path)
-        isloaded=1;
-    end
-    
+    javaaddpath(wfdb_path)
+    isloaded=1;
 end
 
 outputs={'isloaded','config'};
@@ -127,10 +120,7 @@ for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end
 
+
 %% subfunction that checks if we are in octave
 function r = is_octave ()
-persistent x;
-if (isempty (x))
-    x = exist ('OCTAVE_VERSION', 'builtin')>0;
-end
-r = x;
+    r = exist ('OCTAVE_VERSION', 'builtin')>0;
