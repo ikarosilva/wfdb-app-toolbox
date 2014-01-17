@@ -14,7 +14,7 @@ function [varargout]=wfdbloadlib(varargin)
 %       level =5 is maximum level of information output by the class (logger set to finest). Default is level 0.
 %
 % networkWaitTime
-%       (Optional) 1x1 interger representing the longest time in
+%       (Optional) 1x1 integer representing the longest time in
 %       milliseconds  for which the JVM should wait for a data stream from
 %       PhysioNet (default is =1000  , ie one second). If you need to change this time to a
 %       longer value across the entire toolbox, it is better modify to default value in the source
@@ -22,20 +22,42 @@ function [varargout]=wfdbloadlib(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-%         Last Modified: January 16, 2014
+%         Last Modified: January 17, 2014
 % Since 0.0.1
 %
 %
 mlock
-persistent isloaded wfdb_path;
+persistent isloaded wfdb_path wfdb_native_path
 
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
 %%% Change these values for system wide configuration of the WFDB binaries
 
-WFDB_CUSTOMLIB=0; %If you are using your own custom version of the WFDB binaries, set this to true
-WFDB_PATH=[]; %If empty, will use the default giveng confing.WFDB_PATH
-WFDBCAL=[]; %If empty, will use the default giveng confing.WFDBCAL
+%If you are using your own custom version of the WFDB binaries, set this to true
+%NOTE: this parameter is completely ignored if the 'WFDB_COMMAND_PATH' parameter
+%described above is set (i.e.: the library will used the WFDB commands located
+% according to the path in 'WFDB_COMMAND_PATH'). 
+%You will need to restart MATLAB/Octave if to sync the changes.
+%The default is to used commands shipped with the toolbox, this location can be obtained by running the command:
+%[~,config]=wfdbloadlib; config.WFDB_NATIVE_BIN
+WFDB_CUSTOMLIB=0;
+
+%WFDB_PATH: If empty, will use the default given confing.WFDB_PATH
+%this is where the toolbox searches  for data files (*.dat, *.hea etc).
+%When unistalling the toolbox, you may wish to clear this directory to save space.
+%See http://www.physionet.org/physiotools/wag/setwfd-1.htm for more details.
+WFDB_PATH=[];
+
+%WFDBCAL: If empty, will use the default giveng confing.WFDBCAL
+%The WFDB library require calibration data in order to convert between sample values
+%(expressed in analog-to-digital converter units, or adus) and physical units.
+%See http://www.physionet.org/physiotools/wag/wfdbca-5.htm for more details.
+WFDBCAL=[];
+
+%debugLevel: Ouput JVM information while running commands
 debugLevel=0;
+
+%networkWaitTime: Setting maximum waiting period for fetching data from
+%PhysioNet servers (default location: http://physionet.org/physiobank).
 networkWaitTime=1000;
 
 %%%% END OF SYSTEM WIDE CONFIGURATION PARAMETERS
