@@ -71,6 +71,7 @@ function varargout=wqrs(varargin)
 % %Example - Requires write permission to current directory
 %wqrs('challenge/2013/set-a/a01');
 
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wqrs');

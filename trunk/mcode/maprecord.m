@@ -74,6 +74,7 @@ function varargout=maprecord(varargin)
 % %Example 2- Maximum Multi-thread execution
 %tic;[mapvalues,recList]=maprecord('aami-ec13','/usr/lib/max');toc
 
+%endOfHelp
 if(~wfdbloadlib)
     %Add classes to dynamic path
     wfdbloadlib;

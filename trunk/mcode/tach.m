@@ -49,7 +49,7 @@ function varargout=tach(varargin)
 %[hr]=tach('challenge/2013/set-a/a01','fqrs'); 
 %plot(hr);grid on;hold on
 
-
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('tach');

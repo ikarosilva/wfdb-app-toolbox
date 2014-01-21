@@ -144,6 +144,7 @@ function [varargout]=mat2wfdb(varargin)
 %
 %
 
+%endOfHelp
 machine_format='l';
 skip=0;
 

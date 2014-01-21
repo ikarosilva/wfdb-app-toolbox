@@ -15,7 +15,7 @@ bin
 lib
 lib64
 
-An example is provided in this folder that was build on Scientific Linux 6. You can use the Makefile in this directory
+An example is provided in this folder that was build on Linux Debian Wheezy. You can use the Makefile in this directory
 as a starting point for compiling all the necessary targets on your architecture or version of WFDB. Once the code has been 
 compiled. Please make sure that you set the flag:
 

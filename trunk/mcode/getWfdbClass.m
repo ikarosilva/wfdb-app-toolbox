@@ -12,6 +12,8 @@ function varargout=getWfdbClass(varargin)
 % Since 0.9.5
 % See also WFDBEXEC, WFDB, WFDBLOADLIB
 
+%endOfHelp
+
 mlock
 persistent config
 if(isempty(config))

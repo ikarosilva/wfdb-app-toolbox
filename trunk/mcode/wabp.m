@@ -78,7 +78,7 @@ function varargout=wabp(varargin)
 % plot(tm(ann),x(ann),'or')
 %
 
-
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     [javaWfdbExec]=getWfdbClass('wabp');

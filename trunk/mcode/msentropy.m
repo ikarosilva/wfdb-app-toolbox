@@ -85,6 +85,7 @@ function varargout=msentropy(varargin)
 %
 % See also WFDBDESC, PHYSIONETDB, RDANN, ANN2RR, MAPRECORD
 
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('mse');

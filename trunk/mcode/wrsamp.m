@@ -66,6 +66,7 @@ function varargout=wrsamp(varargin)
 % See also rdsamp, wfdbdesc
 %
 
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wrsamp');

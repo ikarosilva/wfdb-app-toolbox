@@ -75,6 +75,8 @@ function varargout=rdsamp(varargin)
 %
 % See also WFDBDESC, PHYSIONETDB
 
+%endOfHelp
+
 persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('rdsamp');

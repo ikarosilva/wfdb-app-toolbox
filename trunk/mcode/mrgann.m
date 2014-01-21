@@ -58,6 +58,8 @@ function mrgann(varargin)
 % 
 % See also wfdbtime, wrann
 
+%endOfHelp
+
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('mrgann');

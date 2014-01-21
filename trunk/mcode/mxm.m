@@ -55,6 +55,8 @@ function varargout=mxm(varargin)
 % See also WRANN, RDANN, BXB
 
 
+%endOfHelp
+
 persistent javaWfdbExec
 
 persistent javaWfdbExec

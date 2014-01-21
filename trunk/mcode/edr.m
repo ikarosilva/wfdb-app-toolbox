@@ -39,7 +39,7 @@ function varargout=edr(varargin)
 %       A String specifying the ouput annotator name (default = 'edr').
 %
 %  Wrapper written by Ikaro Silva, 2013
-% Last Modified: November , 2013
+%  Last Modified: January, 21, 2014
 % Version 0.0.1
 %
 % Since 0.9.5
@@ -57,12 +57,14 @@ function varargout=edr(varargin)
 %[ann,type,subtype,chan,num]=rdann('mitdb/100','edr');
 %display('Ploting Normalized ECG and EDR signals')
 %[tm,signal]=rdsamp('mitdb/100',[],3000);
-%num(ann>3000)=[];
+%num(ann>3000)=[];ann(ann>3000)=[];
 %plot(tm(1:3000),signal(1:3000,1)./max(signal(:,1)));hold on;grid on
 %plot(tm(ann),num/max(num),'ro-');
 %
 %
 % See also WFDBDESC, PHYSIONETDB, RDANN, WRANN SQRS, WQRS
+
+%endOfHelp
 
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))

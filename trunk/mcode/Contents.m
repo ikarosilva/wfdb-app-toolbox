@@ -83,6 +83,7 @@
 %   following people contributed directly to the development or testing of 
 %   the MATLAB wrappers and the JVM interface:
 %
+%   Sahar Alkhairy
 %   Joachim Behar
 %   Eudald Bogatell
 %   Michael Craig 
@@ -98,4 +99,6 @@
 %   
 %
 %Created by Ikaro Silva 2012
+
+%endOfHelp
 

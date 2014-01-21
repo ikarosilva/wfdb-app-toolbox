@@ -61,6 +61,7 @@ function [out]=woody(x,varargin)
 % plot(s);hold on;plot(mean(S,2),'r');plot(wood,'g');plot(thor,'k')
 % legend('Signal','Normal Ave','Woody Ave','Thornton Ave');grid on
 
+%endOfHelp
 %Default parameter values
 tol= 0.1;
 max_it=100;

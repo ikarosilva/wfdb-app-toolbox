@@ -48,6 +48,8 @@ function varargout=ann2rr(varargin)
 % %Example
 %[rr,tm]=ann2rr('challenge/2013/set-a/a01','fqrs');
 
+%endOfHelp
+
 persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('ann2rr');

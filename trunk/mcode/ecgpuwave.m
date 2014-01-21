@@ -98,6 +98,7 @@ function ecgpuwave(varargin)
 %
 % See also WFDBDESC, PHYSIONETDB, RDANN, WRANN, SQRS, WQRS, WFDBEXEC
 
+%endOfHelp
 
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))

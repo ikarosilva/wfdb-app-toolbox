@@ -26,6 +26,8 @@ function [varargout]=wfdbloadlib(varargin)
 % Since 0.0.1
 %
 %
+
+%endOfHelp
 mlock
 persistent isloaded wfdb_path wfdb_native_path
 

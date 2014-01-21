@@ -97,6 +97,8 @@ function varargout=rdmimic2wave(varargin)
 %
 % See also rdsamp, wfdbdesc
 
+%endOfHelp
+
 inputs={'subjectID','clinicalTimeStamp','dataType','beginWindow','endWindow'};
 outputs={'tm','signal','Fs','recList','sigInfo'};
 subjectID=[];
