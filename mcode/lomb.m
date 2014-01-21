@@ -66,6 +66,8 @@ function varargout=lomb(varargin)
 %
 % See also RDANN, TACH, SQRS, WQRS
 
+%endOfHelp
+
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('lomb');

@@ -59,6 +59,7 @@ function varargout=bxb(varargin)
 %
 % See also RDANN, MXM, WFDBTIME
 
+%endOfHelp
 
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))

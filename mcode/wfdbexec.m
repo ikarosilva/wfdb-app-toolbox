@@ -78,6 +78,7 @@ function varargout=wfdbexec(varargin)
 %
 % See also WFDB
 
+%endOfHelp
 logLevel=[];
 persistent config
 

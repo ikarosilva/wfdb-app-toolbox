@@ -41,6 +41,7 @@ function varargout=wfdbtime(varargin)
 % See also RDANN, WFDBDESC
 %
 
+%endOfHelp
 persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('wfdbtime');

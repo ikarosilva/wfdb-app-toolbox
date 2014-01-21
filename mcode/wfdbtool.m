@@ -61,6 +61,8 @@ function varargout=wfdbtool(varargin)
 %
 % See also WFDBDESC, PHYSIONETDB, RDANN, WFDBTIME
 
+%endOfHelp
+
 %Set default pararamter values
 inputs={'recordName','N','N0','systemBrowser'};
 outputs={'stat','browser','url'};

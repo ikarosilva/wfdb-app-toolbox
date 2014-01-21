@@ -52,6 +52,7 @@ function varargout=wfdbdesc(varargin)
 % Since 0.0.1
 % See also RDSAMP
 
+%endOfHelp
 if(~wfdbloadlib)
     %Add classes to dynamic path
     wfdbloadlib;

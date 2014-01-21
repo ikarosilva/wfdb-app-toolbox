@@ -76,6 +76,7 @@ function varargout=wrann(varargin)
 % See also RDANN, RDSAMP, WFDBDESC
 %
 
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wrann');

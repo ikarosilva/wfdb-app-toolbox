@@ -45,7 +45,7 @@ function varargout=sortann(varargin)
 %
 % See also RDANN 
 
-
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sortann');

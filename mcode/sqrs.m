@@ -56,6 +56,8 @@ function varargout=sqrs(varargin)
 % %Example
 %sqrs('challenge/2013/set-a/a01',[],1000);
 
+%endOfHelp
+
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sqrs');

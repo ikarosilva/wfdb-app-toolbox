@@ -69,6 +69,8 @@ function varargout=gqrs(varargin)
 % plot(tm,sig(:,1));hold on;grid on
 % plot(tm(ann),sig(ann,1),'ro')
 
+%endOfHelp
+
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('gqrs');

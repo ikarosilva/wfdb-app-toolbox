@@ -58,6 +58,9 @@ function varargout=physionetdb(varargin)
 % %Example 5- List all records for database MITDB on a web browser
 % physionetdb('mitdb',[],1);
 %
+
+%endOfHelp
+
 persistent isloaded
 
 if(isempty(isloaded) || ~isloaded)

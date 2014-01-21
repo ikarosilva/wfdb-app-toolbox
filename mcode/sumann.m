@@ -42,7 +42,7 @@ function varargout=sumann(varargin)
 %
 % See also RDANN, MXM, WFDBTIME, BXB
 
-
+%endOfHelp
 persistent javaWfdbExec
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sumann');

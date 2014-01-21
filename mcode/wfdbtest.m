@@ -7,6 +7,8 @@ function wfdbtest(varargin)
 % Since 0.0.1
 %
 % See also wfdb, rdsamp
+
+%endOfHelp
 inputs={'verbose'};
 verbose=1;
 for n=1:nargin

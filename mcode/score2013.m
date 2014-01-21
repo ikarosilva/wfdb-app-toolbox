@@ -75,6 +75,7 @@ function varargout=score2013(varargin)
 %
 % See also WRANN, TACH, MXM, ANN2RR,
 
+%endOfHelp
 
 persistent javaWfdbExec
 
