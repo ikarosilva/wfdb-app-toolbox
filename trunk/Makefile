@@ -37,20 +37,22 @@ clean:
 	rm -rf ./mcode/example/*~ \
 	       ./mcode/example/*.wqrs \
 	      ./mcode/*~ \
-	
-	
-package: clean jartest unit-test.zip
+
+#Target for HTML doc generation from M-files
+doc:
+	./gen-doc.sh
+
+package: clean doc jartest unit-test.zip
 	rm $(APP_NAME) ;\
 	zip -r $(APP_NAME) mcode -x@zipexclude.lst  
-	
 %.java:
 	java $(JARFLAGS) jar6; \
 	java $(JARFLAGS) jar7
 
 $(JAR6_NAME): %.java
-	
+
 $(JAR7_NAME): %.java
-	
+
 jar: $(JAR6_NAME) $(JAR7_NAME)
 
 unit-test.zip:
@@ -60,6 +62,3 @@ jartest: $(JAR6_NAME) $(JAR7_NAME) unit-test.zip
 	cd mcode; \
 	java -cp $(JAR6_NAME) org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s5; \
 	java -cp $(JAR7_NAME) org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s5
-	
-	
-	
