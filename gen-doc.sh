@@ -21,5 +21,7 @@ do
     echo "Generated file: ./mcode/html/${func}.html"    
 done
 
+#Copy NEWS to HTML as well 
+cp -vf ./mcode/NEWS ./mcode/html/NEWS
 
 echo "Finished generated doc files"
