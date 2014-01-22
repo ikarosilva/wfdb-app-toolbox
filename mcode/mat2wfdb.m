@@ -99,50 +99,6 @@ function [varargout]=mat2wfdb(varargin)
 % % plot(x(:,1),x(:,2));hold on;plot(x(:,1),x(:,3),'k');plot(x(:,1),x(:,4),'r')
 %
 %%%%%%%% End of Example 1%%%%%%%%%
-%
-%
-%%%%%%%%%%  Example 2 %%%%%%%%%%%%
-%
-% %Import a signal from PhysioNet with known units into MATLAB
-% %and check that the generated header file has same info as original
-% %signal
-% sig_name='aftdb/test-set-a/a05.hea';
-% x=rdsamp(sig_name,'sigs',1,'phys',true,'begin','00:00:10','stop','00:02:30','hires',true);
-% info=wfdbdesc(sig_name,1);
-% [xbit]=mat2wfdb(x,'test',info.samplingFrequency,16,info.groups.signals(1).units,...
-%  sig_name,[],sg_name);
-% xrecon=rdsamp('test','sigs',1,'phys',true,'begin','00:00:10','stop','00:02:30','hires',true);
-%
-%
-%%%%%%%% End of Example 2%%%%%%%%%
-%
-%
-%%%%%%%%%%  Example 3- Comparing with WFDB Records %%%%%%%%%%%%
-%clc;close all;clear all
-%x = rdsamp('mitdb/100','phys',true,'hires',true);
-%desc=wfdbdesc('mitdb/100',1);
-%sg_info=desc.groups.signals(2);
-%x(:,1:2)=[];
-%filename='wfdb_test';
-%isint=1;
-%info=[];
-%bit_res=16;
-%Fs=128;
-%adu=[];
-%sg_name={'ECG'};
-%offset=[];
-%gain=[];
-%[xbit]=mat2wfdb(x,filename,Fs,bit_res,adu,info,gain,sg_name,offset,isint);
-%xrecon=rdsamp(filename,'phys',true,'hires',true);
-%xrecon(:,1)=[]; %Get rid of time index
-%[x(:) xrecon(:)]
-%sqrt(mean((x(:)-xrecon(:)).^2))
-%
-%
-%
-%%%End of Example 3
-%
-%
 
 %endOfHelp
 machine_format='l';
