@@ -11,7 +11,8 @@ Below is a series of configuration steps to get Octave to work with the toolbox 
 
 = Details =
 
-#Configure Java for Octave and install Java package
+#Configure Java for Octave and install Java package:
+
 ln -s /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server
 /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/client
 
@@ -21,5 +22,6 @@ octave --eval  "setenv(\"JAVA_HOME\",\"/usr/lib/jvm/java-7-openjdk-amd64\");pkg
 install -forge java;quit;"
 
 #Optional: Test installation:
+
 octave --eval  "s=javaObject(\"java.lang.String\",\"Install
 Good!!\");display(s);quit;"
