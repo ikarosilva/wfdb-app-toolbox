@@ -1,9 +1,12 @@
-#summary One-sentence summary of this page.
+#summary Steps to configure Octave with the toolbox in Debian.
 
 = Introduction =
 
-Summary of configuration steps to get Octave to work with the toolbox 
-in Linux Debian.
+The toolbox requires that the Octave package Java be installed. The package
+website can be found at:
+http://wiki.octave.org/Java_package
+
+Below is a series of configuration steps to get Octave to work with the toolbox in Linux Debian. For other systems please see the Java package link above.
 
 
 = Details =
