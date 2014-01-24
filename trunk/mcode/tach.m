@@ -40,8 +40,8 @@ function varargout=tach(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: -
-% Version 1.0
+% Last Modified: January 24, 2014
+% Version 1.1
 %
 % Since 0.0.1
 %
@@ -50,9 +50,9 @@ function varargout=tach(varargin)
 %plot(hr);grid on;hold on
 
 %endOfHelp
-persistent javaWfdbExec
+persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('tach');
+    [javaWfdbExec,config]=getWfdbClass('tach');
 end
 
 %Set default pararamter values
@@ -82,6 +82,9 @@ if(~isempty(ouputSize))
 end
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+if(config.inOctave)
+    data=java2mat(data);
+end
 for n=1:nargout
         eval(['varargout{n}=' outputs{n} ';'])
 end
