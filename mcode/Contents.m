@@ -80,22 +80,26 @@
 %
 %   Original contributors of open source native code that is available at PhysioNet
 %   are credited in their respective MATLAB wrappers.  In addition, the
-%   following people contributed directly to the development or testing of 
+%   following people contributed to the development or testing of 
 %   the MATLAB wrappers and the JVM interface:
 %
 %   Sahar Alkhairy
 %   Joachim Behar
 %   Eudald Bogatell
+%   Gari D. Clifford
 %   Michael Craig 
+%   Mohammad Ghassemi
 %   Li-wei Lehman
 %   Sara Mariani
 %   Louis Mayaud
 %   Blaž Merela
 %   Benjamin Moody
 %   George Moody 
+%   Shamin Nemati
+%   Erina Katsumata
+%   Daniel J. Scott
 %   Ikaro Silva
 %   Gabriel Squillace
-%   Daniel J. Scott
 %   
 %
 %Created by Ikaro Silva 2012

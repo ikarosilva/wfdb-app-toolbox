@@ -1,6 +1,15 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
+0.9.6 (TBA):
+	Added support to GNU Octave, version 3.6.4 (requires Octave Java package). 
+	Added single, and fixed point, and higher precision options to RDSAMP. 
+	Added a system wide WFDB path configuration to WFDBLOADLIB. The default 
+	search is now the current directory, {WFDB_HOME}/database, and http:[sic]physionet/database. 
+	So databases can be stored in a single centralized location on the user's machine
+	({WFDB_HOME}/database). Added the functionWOODY (average with alignment), and HTML
+	help files.
+
 0.9.5 (December 6, 2013):
 	Updated native libs to WFDB 10.5.22. Added WFDBEXEC 
 	(runs WFDB native commands in their native API and by a system call through the JVM), 
