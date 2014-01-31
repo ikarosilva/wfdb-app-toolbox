@@ -27,20 +27,38 @@ display('Ploting 3D version of signal and labels')
 delay=round(0.1/tm(2));
 M=length(RR);
 offset=0.3;
-stack=zeros(M,max(RR))+NaN;
+stack=zeros(M,min(RR))+NaN;
 qrs=zeros(M,2)+NaN;
 for m=1:M
-    stack(m,1:RR(m)+1)=ecg(tms(m)-delay:tms(m)+RR(m)-delay);
+    stack(m,1:min(RR)+1)=ecg(tms(m)-delay:tms(m)+min(RR)-delay);
     qrs(m,:)=[delay+1 ecg(tms(m))];
 end
+
+%Generate plot inspired by
+%Clifford GD, Azuaje F, McSharry PE, editors.
+%Advanced Methods and Tools for ECG Analysis.
+%1st ed., Norwood, MA, USA: Artech House; 2006. (Engineering in Medicine and Biology; 1).
 figure
-[X,Y] = meshgrid(1:max(RR)+1,1:M);
+[X,Y] = meshgrid(1:min(RR)+1,1:M);
 surf(Y,X,stack);hold on;grid on
 shading interp
 plot3(1:M,qrs(:,1),qrs(:,2)+offset,'go-','MarkerFaceColor','g')
 view(120, 30);
 axis off
 
+%Generate plot inspired by
+% Samenie et al
+% "Filtering Noisy ECG Signals Using Extended Kalman Filter Based on a
+% Modified Dynamic ECG Model"
+% Computers in Cardiology, 2005
+figure
+stack=stack';
+stack=stack(:)+[0:length(stack(:))-1]'.*0.0005;
+theta=linspace(0,M*2*pi,length(stack));
+x=sin(theta);y=cos(theta);
+plot3(x,y,stack,'b')
+grid on
+axis off
 
 display('Demoing finished !!')
 display('For more information about the toolbox, type ''wfdb'' at the command prompt!')
