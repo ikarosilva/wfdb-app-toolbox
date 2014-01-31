@@ -61,11 +61,11 @@ function varargout=physionetdb(varargin)
 
 %endOfHelp
 
-persistent isloaded
+persistent isloaded config
 
 if(isempty(isloaded) || ~isloaded)
     %Add classes to path
-    isloaded=wfdbloadlib;
+    [isloaded,config]=wfdbloadlib;
 end
 
 inputs={'db_name','DoBatchDownload','webBrowser'};
@@ -76,6 +76,9 @@ for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
     end
+end
+if(webBrowser && config.inOctave)
+    error('Web browser option is not available in Octave.')
 end
 
 if(isempty(db_name))
@@ -97,7 +100,7 @@ if(isempty(db_name))
         end
     end
 else
-    J=org.physionet.wfdb.physiobank.PhysioNetDB(db_name);
+    J=javaObject('org.physionet.wfdb.physiobank.PhysioNetDB',db_name);
     if(DoBatchDownload)
         display(['Making directory: ' db_name ' to store record files'])
         mkdir(db_name)
@@ -112,7 +115,11 @@ else
         for i=0:double(rec_list.size)-1
             sig_list=rec_list.get(i).getSignalList;
             for j=0:double(sig_list.size)-1
-                db_list(end+1)=cell(sig_list.get(j).getRecordName);
+                if(config.inOctave)
+                    db_list(end+1)=sig_list.get(j).getRecordName;
+                else
+                    db_list(end+1)=cell(sig_list.get(j).getRecordName);
+                end
             end
             if(DoBatchDownload)
                 recName=cell(rec_list.get(i).getRecordName);
