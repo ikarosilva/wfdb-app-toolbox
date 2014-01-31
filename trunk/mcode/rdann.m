@@ -175,7 +175,7 @@ if(~isempty(str) && strcmp(str(1),'['))
         str=char(data(n));
         del_str=findstr(str,']');
         str(1:del_str)=[];
-        C=textscan(str,'%u %s %u %u %u %[^\n\r]');
+        C=textscan(str,'%u %s %u %u %u %s');
         ann(n)=C{1};
         type(n)=char(C{2});
         subtype(n)=char(C{3});
