@@ -16,6 +16,8 @@
 #This Makefile is not fully functional ! It is provided mainly as a aid for the compilation.
 #See comments on respective targets for more information.
 
+#To check linking run: otool -L ./nativelibs/macosx-x86_64/lib/libwfdb.10.dylib
+
 #Package names and versions
 CURL=curl-7.33.0
 WFDB=wfdb-10.5.22
