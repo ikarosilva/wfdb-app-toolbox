@@ -27,22 +27,34 @@ public class SystemSettings {
 		return libraries.toArray(new String[] {});
 	}
 
+	public static void loadCurl(Boolean customArch){
+		if(getOsName().contains("windows")){
+			//On Windows, load the shipped curl library
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) + 
+					getFileSeparator() + "libcurl-4.dll");
+		}else{
+			//On *unix systems, do nothing for now
+			//System.loadLibrary("curl");
+		}
+         
+	}
+
 	public static String getPhysioNetDBURL(){
 		return "http://physionet.org/physiobank/database";
 	}
-	
+
 	public static String getDefaultWFDBPath(){
 		//Acording to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
-	    //use white space as best option for all the operating systems
+		//use white space as best option for all the operating systems
 		return ". " + " " + SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
 				"database "+ getPhysioNetDBURL();
 	}
-	
+
 	public static String getDefaultWFDBCal() {
 		return SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
 				"database" + getFileSeparator() + "wfdbcal";
 	}
-	
+
 	public static String getFileSeparator(){
 		return System.getProperty("file.separator");		
 	}
@@ -133,8 +145,6 @@ public class SystemSettings {
 
 	public static void main(String[] args) throws Exception {
 		System.out.println(getWFDB_NATIVE_BIN(false));
-		//System.out.println(getWFDB_JAVA_HOME());
-
 	}
 
 }
