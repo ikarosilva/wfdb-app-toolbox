@@ -61,5 +61,5 @@ grid on
 axis off
 
 display('Demoing finished !!')
-display('For more information about the toolbox, type ''wfdb'' at the command prompt!')
+display('For more information about the toolbox, type ''wfdb'' at the command prompt.')
 echo off
