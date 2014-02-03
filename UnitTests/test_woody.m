@@ -1,4 +1,4 @@
-function [tests,pass,perf]=test_woordy(varargin)
+function [tests,pass,perf]=test_woody(varargin)
 
 inputs={'verbose'};
 verbose=0;

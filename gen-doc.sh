@@ -14,10 +14,9 @@ do
     help=`head -n ${lineEnd} ${fname} | sed 's/%//'`
 
     #Generate  HTML for the M file
-    cat ./mcode/html/template.html | sed "s/MYFUNC/${func}/g" > ./mcode/html/${func}2.html
-    echo "${help}" >>./mcode/html/${func}2.html
-    cat ./mcode/html/template_bottom.html >> ./mcode/html/${func}2.html
-
+    cat ./mcode/html/template.html | sed "s/MYFUNC/${func}/g" > ./mcode/html/${func}.html
+    echo "${help}" >>./mcode/html/${func}.html
+    cat ./mcode/html/template_bottom.html >> ./mcode/html/${func}.html
     echo "Generated file: ./mcode/html/${func}.html"    
 done
 

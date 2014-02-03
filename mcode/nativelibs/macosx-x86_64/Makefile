@@ -69,10 +69,14 @@ clean-wfdb:
 	rm -f wfdb.tar.gz
 wfdb.tar.gz:
 	wget http://www.physionet.org/physiotools/wfdb.tar.gz; \
-	cp ./wfdb.tar.gz ./tmp/wfdb.tar.gz;
+	wget http://wfdb-app-toolbox.googlecode.com/svn/trunk/dependencies/darwin-slib.def ;\
+        wget http://wfdb-app-toolbox.googlecode.com/svn/trunk/dependencies/darwin.def ;\
+        cp ./wfdb.tar.gz ./tmp/wfdb.tar.gz
 wfdb.isconfig: wfdb.tar.gz
 	cd ./tmp; \
 	tar xvfz wfdb.tar.gz; \
+	cp -vf ../darwin.def ./$(WFDB)/conf/ ;\
+	cp -vf ../darwin-slib.def ./$(WFDB)/conf/ ;\
 	cd $(WFDB); \
 	./configure --prefix=$(INSTALL_DIR)/$(BUILD_DIR) --with-libcurl \
 	&& touch ../../wfdb.isconfig
@@ -128,6 +132,8 @@ wfdb32.isconfig: wfdb.tar.gz
 	cd ./$(BUILD_DIR32);\
 	tar xvfz wfdb.tar.gz;\
 	mv $(WFDB) ../tmp/$(WFDB32) ;\
+	cp -vf ../darwin.def ../tmp/$(WFDB32)/conf/ ;\ 
+	cp -vf ../darwin-slib.def ../tmp/$(WFDB32)/conf/ ;\
 	cd ../tmp/$(WFDB32) ;\
 	./configure --prefix=$(INSTALL_DIR)/$(BUILD_DIR32) -m32 --without-netfiles \
 	&& touch ../../wfdb32.isconfig
