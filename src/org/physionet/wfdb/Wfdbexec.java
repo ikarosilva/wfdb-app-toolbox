@@ -86,8 +86,6 @@ public class Wfdbexec {
 		Wfdbexec.customArchFlag=customArchFlag;
 		WFDB_NATIVE_BIN=SystemSettings.getWFDB_NATIVE_BIN(customArchFlag);
 		LD_PATH=SystemSettings.getLD_PATH(customArchFlag);
-		logger.finest("\n\t***Loading System libraries...");
-		//Use white spaces for compatibility with all the operating systems
 		WFDB_PATH=SystemSettings.getDefaultWFDBPath(); 
 		WFDBCAL=SystemSettings.getDefaultWFDBCal(); 
 	}
@@ -843,8 +841,13 @@ public class Wfdbexec {
 		ProcessBuilder launcher = new ProcessBuilder();
 		launcher.redirectErrorStream(true);
 		env = launcher.environment();
+		SystemSettings.loadCurl(customArchFlag);
+		
+		//Set Java library Path
+		env.put("java.library.path",LD_PATH);
+		
 		//Add library path to environment
-		if(osName.contains("macosx")){
+		if(osName.contains("mac")){
 			env.put("DYLD_LIBRARY_PATH",LD_PATH);
 			logger.finer("\n\t***setting: DYLD_LIBRARY_PATH: " + LD_PATH);
 			env.put("PATH",LD_PATH);
@@ -912,8 +915,6 @@ public class Wfdbexec {
 				System.out.println("Environment is null");
 			}else{
 				System.out.println(tmp + " = " + env.get(tmp));
-				System.out.println("Loaded libraries: ");
-				System.out.println(SystemSettings.getLoadedLibraries(this));
 			}
 		}
 	}
