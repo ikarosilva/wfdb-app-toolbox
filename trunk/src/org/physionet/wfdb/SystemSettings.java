@@ -11,30 +11,23 @@ public class SystemSettings {
 
 	private final static Logger logger = Logger.getLogger(Wfdbexec.class.getName());
 
-	@SuppressWarnings("unchecked")
-	public static String[] getLoadedLibraries(Object o) {
-		final ClassLoader loader=o.getClass().getClassLoader();
-		Vector<String> libraries=null;
-		try {
-			final java.lang.reflect.Field LIBRARIES= 
-					ClassLoader.class.getDeclaredField("loadedLibraryNames");
-			LIBRARIES.setAccessible(true);
-			libraries = (Vector<String>) LIBRARIES.get(loader);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		logger.finest("\nSystemSetting --libraries: " + libraries.toArray(new String[] {}));
-		return libraries.toArray(new String[] {});
-	}
-
 	public static void loadCurl(Boolean customArch){
+		
 		if(getOsName().contains("windows")){
 			//On Windows, load the shipped curl library
-			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) + 
-					getFileSeparator() + "libcurl-4.dll");
-		}else{
-			//On *unix systems, do nothing for now
-			//System.loadLibrary("curl");
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
+					+ "\\libcurl-4.dll" );
+		}else if(getOsName().contains("mac")){
+			String libCurlName= SystemSettings.getWFDB_NATIVE_BIN(customArch) 
+					+ "bin/libcurl.4.dylib";
+			SecurityManager security = System.getSecurityManager();
+			if(security != null){
+				security.checkLink(libCurlName);
+				logger.finest("security manager is null! ");
+			}
+			logger.finest("\n\t***Loading Curl from: " + libCurlName);
+			System.load(libCurlName);
+			//System.loadLibrary("curl.4");
 		}
          
 	}
@@ -59,7 +52,6 @@ public class SystemSettings {
 		return System.getProperty("file.separator");		
 	}
 	public static String getosArch(){
-		logger.finest("\nSystemSetting --Arch-" + System.getProperty("os.arch"));
 		return System.getProperty("os.arch");
 	}
 
@@ -70,7 +62,6 @@ public class SystemSettings {
 		if(osName.startsWith("windows")){
 			osName="windows"; //Treat all Windows versions the same for now
 		}
-		logger.finest("\nSystemSetting --OS-" +osName);
 		return osName;
 	}
 
@@ -85,19 +76,19 @@ public class SystemSettings {
 		if(osName.contains("windows")){
 			LD_PATH=env.get("Path");pathSep=";";
 			OsPathName="PATH";
-			tmp=WFDB_NATIVE_BIN + "lib" + pathSep + WFDB_NATIVE_BIN + "bin";
+			tmp=WFDB_NATIVE_BIN + "bin" + pathSep + WFDB_NATIVE_BIN + "lib";
 		}else if(osName.contains("macosx")){
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");pathSep=":";
 			OsPathName="DYLD_LIBRARY_PATH";
-			tmp=WFDB_NATIVE_BIN + "lib64" + pathSep 
-					+ WFDB_NATIVE_BIN + "lib" + pathSep 
-					+ WFDB_NATIVE_BIN + "bin";
+			tmp=WFDB_NATIVE_BIN + "bin" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib64" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib";
 		}else{
 			LD_PATH=env.get("LD_LIBRARY_PATH");pathSep=":";
 			OsPathName="LD_LIBRARY_PATH";
-			tmp=WFDB_NATIVE_BIN + "lib64" + pathSep 
-					+ WFDB_NATIVE_BIN + "lib" + pathSep 
-					+ WFDB_NATIVE_BIN + "bin";
+			tmp=WFDB_NATIVE_BIN + "bin" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib64" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib";
 		}
 
 		if(LD_PATH == null){
@@ -106,8 +97,7 @@ public class SystemSettings {
 			//Only add if path is not present already
 			LD_PATH=tmp+pathSep+LD_PATH;
 		}
-		logger.finest("\nSystemSetting --Configuring PATH to: " + LD_PATH);
-		env.put(OsPathName,LD_PATH);
+		logger.finest("\n\t***Default Library " + OsPathName +" is: " + LD_PATH);
 		return LD_PATH;
 	}
 
@@ -124,7 +114,6 @@ public class SystemSettings {
 		int tmp = packageDir.lastIndexOf(getFileSeparator());
 		packageDir=packageDir.substring(0,tmp+1);
 		packageDir=packageDir.replace("file:","");
-		logger.finest("\nSystemSetting --WFDB HOME: " + packageDir);
 		return packageDir.toString();
 	}
 
@@ -139,7 +128,6 @@ public class SystemSettings {
 					getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
 					+ getFileSeparator() ;
 		}
-		logger.finest("\nSystemSetting --WFDB NATIVE BIN: " + WFDB_NATIVE_BIN);
 		return WFDB_NATIVE_BIN;
 	}
 
