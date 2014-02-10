@@ -16,7 +16,7 @@ public class SystemSettings {
 		if(getOsName().contains("windows")){
 			//On Windows, load the shipped curl library
 			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
-					+ "\\libcurl-4.dll" );
+					+ "\\bin\\libcurl-4.dll" );
 		}else if(getOsName().contains("mac")){
 			String libCurlName= SystemSettings.getWFDB_NATIVE_BIN(customArch) 
 					+ "bin/libcurl.4.dylib";
