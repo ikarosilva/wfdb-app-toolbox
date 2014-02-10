@@ -836,13 +836,14 @@ public class Wfdbexec {
 		return data;
 	}
 
-
+	public void loadCurl(){
+		SystemSettings.loadCurl(customArchFlag);
+	}
+	
 	private synchronized ProcessBuilder setLauncher() throws Exception{
 		ProcessBuilder launcher = new ProcessBuilder();
 		launcher.redirectErrorStream(true);
 		env = launcher.environment();
-		SystemSettings.loadCurl(customArchFlag);
-		
 		//Set Java library Path
 		env.put("java.library.path",LD_PATH);
 		
