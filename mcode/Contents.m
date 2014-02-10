@@ -1,7 +1,7 @@
 %  WaveForm DataBase (WFDB) Toolbox 
-%  Version 0.9.5
+%  Version 0.9.6.1
 % 
-%  Last Updated December 6, 2013
+%  Last Updated February 10, 2014
 %
 %
 %This is a set of MATLAB functions and wrappers for reading, writing, and processing
@@ -23,7 +23,7 @@
 %   edr             - Derives a respiration signal from an ECG signal
 %   ecgpuwave       - Estimation of QRS and P waves from ECG signals
 %   gqrs            - Estimation of QRS from ECG signals
-%   lomb	        - Estimates power spectrum using the Lomb periodogram method	
+%   lomb	    - Estimates power spectrum using the Lomb periodogram method	
 %   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
 %   maprecord       - Performs multithreaded concurent annotation or processing of WFDB records 
 %   mrgann          - Merge annotation files
@@ -35,15 +35,16 @@
 %   score2013       - Scores entries to the PhysioNet 2013 Fetal ECG challenge
 %   sortann         - Rearrange annotations in canonical order
 %   sqrs            - Finds the QRS complexes of a WFDB ECG record signal
-%   sumann	        - Summarize the contents of a WFDB annotation file
+%   sumann	    - Summarize the contents of a WFDB annotation file
 %   tach            - Calculates instantaneous heart rate of a WFDB ECG record signal
 %   wfdb            - Prints this help information of the Toolbox
 %   wfdbexec        - Executes a system call to any installed native WFDB command.
-%   wabp	        - Arterial blood pressure (ABP) pulse detector
+%   wabp	    - Arterial blood pressure (ABP) pulse detector
 %   wfdbdemo        - Demonstration of the WFDB App Toolbox
 %   wfdbdesc        - Return signal information for about a WFDB record
 %   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information
-%   wfdbtest        - Script to test installation of the Toolbox.
+%   wfdbtest        - Script to test installation of the Toolbox
+%   woody           - Perform signal averaging with alignment
 %   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   wrann           - Writes annotations for WFDB records into annotation files
 %   wrsamp          - Writes signal data into WFDB-compatible records
@@ -100,6 +101,7 @@
 %   Daniel J. Scott
 %   Ikaro Silva
 %   Gabriel Squillace
+%   Bryan tripp
 %   
 %
 %Created by Ikaro Silva 2012
