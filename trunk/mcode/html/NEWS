@@ -1,6 +1,9 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
+0.9.6.1 (February 10, 2013):
+	Minor bug fixes with JAR files loading libraries.
+
 0.9.6 (February 6, 2013):
 	Added support to GNU Octave version 3.6.4 (requires Octave Java package). 
 	Added single, and fixed point, and higher precision options to RDSAMP. 

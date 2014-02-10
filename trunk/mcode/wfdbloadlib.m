@@ -22,7 +22,7 @@ function [varargout]=wfdbloadlib(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-%         Last Modified: January 17, 2014
+%         Last Modified: February 10, 2014
 % Since 0.0.1
 %
 %
@@ -87,9 +87,9 @@ if(isempty(isloaded))
     end
     %Check if path has not been added yet
     if(~isempty(strfind(ml_jar_version,'Java 1.6')))
-        wfdb_path=[wfdb_path 'wfdb-app-JVM6-0-9-6.jar'];
+        wfdb_path=[wfdb_path 'wfdb-app-JVM6-0-9-6-1.jar'];
     elseif(~isempty(strfind(ml_jar_version,'Java 1.7')))
-        wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-9-6.jar'];
+        wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-9-6-1.jar'];
     else
         error(['Cannot load on unsupported JVM: ' ml_jar_version])
     end
