@@ -1,0 +1,66 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: sumann</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: sumann</td>
+            <td class="subheader-left"><a href="sumann.m">View code for sumann</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">sumann</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=sumann(varargin)
+
+ report=sumann(recName,annName,stopTime,qrsAnnotationsOnly)
+
+    Wrapper to WFDB SUMANN:
+         http://www.physionet.org/physiotools/wag/sumann-1.htm
+
+ Reads a WFDB annotation file and summarize its contents.
+ 
+ Ouput Parameters:
+
+ report 
+       String with the contaning summary of the contents, including the 
+       number of annotations of each type as well the duration and number of 
+      episodes of each rhythm and signal quality.
+
+Input Parameters:
+ recName    
+       String specifying the WFDB record file.
+
+ annName    
+       String specifying the reference WFDB annotation file.
+
+ stopTime (Optional)
+       String specifying the stop time in WFDB format (default is end of
+       record).
+
+ qrsAnnotationsOnly (Optional)
+       1x1 Boolean. If true, summarize QRS annotation only (default = 0).
+
+
+ Written by Ikaro Silva, 2013
+ Last Modified: -
+ Version 1.0
+ Since 0.9.0
+
+ %Example (this will generate a /mitdb/100.qrs file at your directory):
+
+ report=sumann('mitdb/100','atr');
+
+
+
+ See also RDANN, MXM, WFDBTIME, BXB
+</pre></div><!--after help -->
+   </body>
+</html>
