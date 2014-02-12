@@ -134,10 +134,6 @@ public class Wfdbexec {
 			for(String i: arguments)
 				commandInput.add(i);
 		}
-		//TODO: For the RDSAMP case:
-		//ensure array capacity when user submits N0 and N
-		//or (default) by querying the signal size
-		//for now, have this happens at the MATLAB wrapper level
 	}
 
 	public synchronized ArrayList<String> execToStringList() throws Exception {
@@ -842,7 +838,9 @@ public class Wfdbexec {
 	
 	private synchronized ProcessBuilder setLauncher() throws Exception{
 		ProcessBuilder launcher = new ProcessBuilder();
-		launcher.redirectErrorStream(true);
+		//The error stream should not be redirected to the same output stream
+		//because it can affect the parser during warnings
+		launcher.redirectErrorStream(false);
 		env = launcher.environment();
 		//Set Java library Path
 		env.put("java.library.path",LD_PATH);
