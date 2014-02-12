@@ -176,6 +176,21 @@ if(config.inOctave)
 end
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
+    
+    %Perform mino data integrity check by validating with the expected
+    %sizes
+    [N,M]=size(data);
+    if(~isempty(signalList))
+        sList=length(signalList);
+        if(sList ~= (M-1))
+           error(['Received: ' num2str(M-1) ' signals, expected: '  num2str(length(signalList))])
+        end
+    end
+    if(~isempty(ListCapacity))
+        if((ListCapacity+1) ~= N )
+           error(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity+1)])
+        end
+    end
 end
 
 
