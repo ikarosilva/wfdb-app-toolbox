@@ -1,6 +1,10 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
+0.9.7 (TBA)
+       Fixed issues when reading data stream with warning messages. Added data
+       integrity check in RDSAMP.
+
 0.9.6.1 (February 10, 2013):
 	Minor bug fixes with JAR files loading libraries.
 
