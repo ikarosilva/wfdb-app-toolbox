@@ -180,13 +180,13 @@ for n=1:nargout
     %Perform mino data integrity check by validating with the expected
     %sizes
     [N,M]=size(data);
-    if(~isempty(signalList))
+    if(~isempty(signalList) )
         sList=length(signalList);
         if(sList ~= (M-1))
            error(['Received: ' num2str(M-1) ' signals, expected: '  num2str(length(signalList))])
         end
     end
-    if(~isempty(ListCapacity))
+    if(~isempty(ListCapacity) && ~isnan(ListCapacity) )
         if((ListCapacity+1) ~= N )
            error(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity+1)])
         end

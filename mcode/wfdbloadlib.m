@@ -73,6 +73,9 @@ end
 
 
 inOctave=is_octave;
+if(ispc && inOctave)
+	filesep=[filesep filesep]; %Need to escape '\' for regexp in Octave and Windows
+end
 if(isempty(isloaded))
     jar_path=which('wfdbloadlib');
     cut=strfind(jar_path,'wfdbloadlib.m');
