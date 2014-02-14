@@ -78,7 +78,7 @@ public class Wfdbexec {
 	private String WFDB_NATIVE_BIN;
 	private String LD_PATH;
 	public static boolean customArchFlag=false;
-
+	
 	public Wfdbexec(String commandName, String commandDir,boolean customArchFlag){
 		logger.finest("\n\t***Setting exec commandName to: " + commandDir + commandName);
 		this.commandName=commandName;
@@ -87,7 +87,7 @@ public class Wfdbexec {
 		WFDB_NATIVE_BIN=SystemSettings.getWFDB_NATIVE_BIN(customArchFlag);
 		LD_PATH=SystemSettings.getLD_PATH(customArchFlag);
 		WFDB_PATH=SystemSettings.getDefaultWFDBPath(); 
-		WFDBCAL=SystemSettings.getDefaultWFDBCal(); 
+		WFDBCAL=SystemSettings.getDefaultWFDBCal();
 	}
 
 	public Wfdbexec(String commandName,boolean customArchFlag){
@@ -899,12 +899,14 @@ public class Wfdbexec {
 		logger.finer("\n\t***fullOsName: " + System.getProperty("os.name"));
 		variables.add("osArch= " + osArch);
 		logger.finer("\n\t***OS Arch: " + osArch);
-		variables.add("customArchFlag= " + this.customArchFlag);
-		logger.finer("\n\t***customArchFlag: " + this.customArchFlag);
+		variables.add("customArchFlag= " + customArchFlag);
+		logger.finer("\n\t***customArchFlag: " + customArchFlag);
 		variables.add("OS Version= " + System.getProperty("os.version"));
 		logger.finer("\n\t***OS Version: " + System.getProperty("os.version"));
 		variables.add("JVM Version= " + System.getProperty("java.version"));
 		logger.finer("\n\t***JVM Version: " + System.getProperty("java.version"));
+		variables.add("isWindows64bit= " + SystemSettings.isWindows64bit());
+		logger.finer("\n\t***isWindows64bit= " + SystemSettings.isWindows64bit());
 		return variables;
 	}
 
