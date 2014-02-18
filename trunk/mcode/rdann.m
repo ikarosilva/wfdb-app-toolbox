@@ -62,7 +62,7 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: January, 8, 2014
+% Last Modified: February 14, 2014
 % Version 1.0.4
 % Since 0.0.1
 %
@@ -196,7 +196,7 @@ else
         ann(n)=C{2};
         type(n)=char(C{3});
         subtype(n)=char(C{4});
-        chan(n)=C{5};
+        chan(n)=C{5}+1;%Convert to MATLAB indexing
         num(n)=C{6};
         comments(n)=C(7);
     end
