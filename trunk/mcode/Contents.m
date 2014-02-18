@@ -87,6 +87,7 @@
 %   Sahar Alkhairy
 %   Joachim Behar
 %   Eudald Bogatell
+%   Jonas Carlson
 %   Gari D. Clifford
 %   Michael Craig 
 %   Mohammad Ghassemi
