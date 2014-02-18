@@ -78,7 +78,7 @@ function ecgpuwave(varargin)
 %       A String specifying the ouput annotator name (default = 'edr').
 %
 % Wrapper written by Ikaro Silva, 2013
-% Last Modified: January 12 , 2014
+% Last Modified: February 18 , 2014
 % Version 0.0.1
 %
 % 
@@ -106,7 +106,7 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','annFileName','startTime','stopTime','qrsAnn','pflag','signaList'};
+inputs={'recordName','annFileName','startTime','stopTime','qrsAnn','pflag','signalList'};
 startTime=[];
 stopTime=[];
 qrsAnn=[];

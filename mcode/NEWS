@@ -3,7 +3,9 @@ For a detailed list of changes see the repository Log at:
 
 0.9.7 (TBA)
        Fixed issues when reading data stream with warning messages. Added data
-       integrity check in RDSAMP.
+       integrity check in RDSAMP. Fixed issues with ECPUWAVE reading annotations 
+       from passed through signalList. Fixed issue with RDANN returning channels in
+       with 0 indexing.
 
 0.9.6.1 (February 10, 2013):
 	Minor bug fixes with JAR files loading libraries.
