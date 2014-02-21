@@ -386,6 +386,109 @@ public class Wfdbexec {
 		}   
 		return data;
 	}
+	
+	public ArrayList<Double> execToDoubleList(String[] args) throws Exception {
+		setArguments(args);   
+		gen_exec_arguments();
+
+		ArrayList<Double>  results= new ArrayList<Double>();
+		if(DoubleArrayListCapacity>0){
+			//Set capacity to ensure more efficiency
+			results.ensureCapacity(DoubleArrayListCapacity);
+		}
+		int isTime=-1;//Index in case one of the columns is time as string
+
+		ProcessBuilder launcher = null;
+		logger.finest("\n\t***Setting launcher in exectToDoubleArray");
+		try {
+			launcher = setLauncher();
+			logger.finest("\n\t***Launcher created sucessfully in exectToDoubleArray");
+		} catch (Exception e1) {
+			System.err.println("***Error in setting the system launcher:" + e1.toString());
+			e1.printStackTrace();
+		}
+		try {
+			logger.finest("\n\t***Starting launcher in exectToDoubleArray");
+			Process p = launcher.start();
+			BufferedReader output = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
+			String line;
+			String[] tmpStr=null;
+			char[] tmpCharArr=null;
+			int colInd;
+
+			//Wait for the initial stream in case process is slow
+			logger.finest("\n\t***Waiting for data stream from launcher...");
+			long thisTime=System.currentTimeMillis();
+			long waitTime=thisTime;
+
+			while (!output.ready()){
+				if((waitTime-thisTime)> initialWaitTime){
+					logger.finest("Process data stream wait time exceeded ("
+							+ initialWaitTime + "  milliseconds )");
+					logger.finest("\n\t***Could not get data stream, exiting...");
+					break;
+				}else {
+					try {
+						logger.finest("Waited " + (waitTime-thisTime) +
+								" ms for data stream (max waiting time= " +
+								initialWaitTime + "ms ) ...");
+						Thread.sleep(100);
+					} catch(InterruptedException ex) {
+						Thread.currentThread().interrupt();
+					}
+					waitTime=System.currentTimeMillis();
+				}
+			}
+			if(output.ready()){
+				logger.finest("\n\t***Streamed communication received, checking if error or data...");
+			}
+			while ((line = output.readLine()) != null){
+				tmpStr=line.trim().split("\\s+");
+				//loop through columns
+				for(colInd=0;colInd<tmpStr.length;colInd++){
+					try{    
+						results.add(Double.valueOf(tmpStr[colInd]));
+					}catch (NumberFormatException e){
+						//Deal with cases that are not numbers 
+						//but in an expected format
+						if(tmpStr[colInd].equals("-")){
+							//Dealing with NaN , so we need to convert 
+							//WFDB Syntax "-" to Java's Double NaN
+							results.add(Double.NaN);	
+						}else if((tmpStr[colInd].contains(":"))){
+							//This column is likely a time column
+							//for now, set values to NaN and remove column
+							results.add(Double.NaN);
+							if(isTime<0){
+								isTime=colInd;
+							}
+						}else {
+							//Attempt to convert single characters to integers
+							try{
+								tmpCharArr=tmpStr[colInd].toCharArray();
+								results.add((double) tmpCharArr[0]);
+							}catch(Exception e2) {
+								System.err.println("Could not convert to double: " + line);
+								throw new Exception(e2.toString());
+							}
+						}
+					}
+				}
+			}
+			//Wait to for exit value
+			int exitValue = p.waitFor();
+			if(exitValue != 0){
+				System.err.println("Command exited with non-zero status!!");
+			}
+					} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}   
+		return results;
+	}
+
 
 	public float[][] execToFloatArray(String[] args) throws Exception {
 		setArguments(args);   
