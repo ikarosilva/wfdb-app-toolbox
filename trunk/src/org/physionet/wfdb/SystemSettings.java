@@ -136,8 +136,7 @@ public class SystemSettings {
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + "custom"+ getFileSeparator();
 		}else{
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
-					getOsName().toLowerCase() + "-" + getosArch().toLowerCase() 
-					+ getFileSeparator() ;
+					getOsName().toLowerCase()+ getFileSeparator() ;
 		}
 		return WFDB_NATIVE_BIN;
 	}
