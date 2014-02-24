@@ -84,7 +84,7 @@ public class Wfdbexec {
 		this.commandName=commandName;
 		this.commandDir=commandDir;
 		Wfdbexec.customArchFlag=customArchFlag;
-		WFDB_NATIVE_BIN=SystemSettings.getWFDB_NATIVE_BIN(customArchFlag);
+		setWFDB_NATIVE_BIN(SystemSettings.getWFDB_NATIVE_BIN(customArchFlag));
 		LD_PATH=SystemSettings.getLD_PATH(customArchFlag);
 		WFDB_PATH=SystemSettings.getDefaultWFDBPath(); 
 		WFDBCAL=SystemSettings.getDefaultWFDBCal();
@@ -116,6 +116,10 @@ public class Wfdbexec {
 		initialWaitTime=tm;
 	}
 
+	public void setWFDB_NATIVE_BIN(String str){
+		WFDB_NATIVE_BIN=str;
+	}
+	
 	public void setCustomArchFlag(boolean flag){
 		this.customArchFlag=flag;
 	}
@@ -993,7 +997,7 @@ public class Wfdbexec {
 		logger.finer("\n\t***WFDB_JAVA_HOME: " + WFDB_JAVA_HOME);
 
 		variables.add("WFDB_NATIVE_BIN= " + WFDB_NATIVE_BIN);
-		logger.finer("\n\t***WFDB_NATIVE_BINr: " + WFDB_NATIVE_BIN);
+		logger.finer("\n\t***WFDB_NATIVE_BIN: " + WFDB_NATIVE_BIN);
 		variables.add("EXECUTING_DIR= "+ EXECUTING_DIR);
 		logger.finer("\n\t***Exec dir: " + EXECUTING_DIR);
 		variables.add("osName= " + osName);
