@@ -56,7 +56,6 @@ function varargout=wfdbtool(varargin)
 %
 % %Example 1- Read a signal from PhysioNet's Remote server:
 %wfdbtool('challenge/2013/set-a/a01')
-%plot(tm,signal(:,1))
 %
 %
 % See also WFDBDESC, PHYSIONETDB, RDANN, WFDBTIME
