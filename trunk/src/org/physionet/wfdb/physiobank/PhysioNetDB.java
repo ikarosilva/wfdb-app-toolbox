@@ -50,7 +50,7 @@ public class PhysioNetDB {
 	private String name;
 	private String info;
 	private URL url;
-	private static final String DB_URL="http://physionet.org/physiobank/database/pbi/";
+	private static final String DB_URL="http://physionet.org/physiobank/database/";
 	private static final String DB_LIST="http://physionet.org/physiobank/database/DBS";
 	private ArrayList<PhysioNetRecord> dbRecordList;
 	private static Logger logger =
@@ -61,22 +61,6 @@ public class PhysioNetDB {
 		url=setDBURL();
 		info=setInfo();
 		dbRecordList = new ArrayList<PhysioNetRecord>();
-
-		// Prints information regarding all databases
-		// Currently available at PhysioNet
-		/*
-		Level debugLevel = Level.FINEST;//use for debugging Level.FINEST;
-		if(debugLevel != null){
-			Handler[] handlers =
-					Logger.getLogger( "" ).getHandlers();
-			for ( int index = 0; index < handlers.length; index++ ) {
-				handlers[index].setLevel( debugLevel );
-			}
-			Logger.getLogger("org.physionet.wfdb.Wfdbexec").setLevel(debugLevel);
-			Logger.getLogger("org.physionet.wfdb.physiobank").setLevel(debugLevel);
-		}
-		*/
-
 	}
 
 	private PhysioNetDB(String Name,String Info){
@@ -269,16 +253,6 @@ public class PhysioNetDB {
 				return Name1.compareTo(Name2);
 		}
 	};
-
-
-	/*
-	public static void main(String[] args) {
-		PhysioNetDB db = new PhysioNetDB("mitdb");
-		db.setDBRecordList();
-		db.printDBRecordList();
-
-	}
-*/	
 
 	public static List<PhysioNetDB> main() {
 
