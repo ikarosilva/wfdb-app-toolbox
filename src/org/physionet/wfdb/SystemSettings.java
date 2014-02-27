@@ -112,6 +112,10 @@ public class SystemSettings {
 		return LD_PATH;
 	}
 
+	public static int getNumberOfProcessors(){
+		return Runtime.getRuntime().availableProcessors();
+	}
+	
 	public static String getWFDB_JAVA_HOME(){
 		String packageDir = null;
 		try {
