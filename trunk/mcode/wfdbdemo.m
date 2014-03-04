@@ -60,6 +60,12 @@ plot3(x,y,stack,'b')
 grid on
 axis off
 
+%Display information about databases availabe in PhysioNet
+fprintf('**Querying PhysioNet for available databases...\n')
+db_list=physionetdb;
+db_size=length(db_list);
+fprintf(['\tYou currently have access to ' num2str(db_size) ' databases for download in PhysioNet (type ''help physionetdb'' for more info)!\n'])
+
 display('Demoing finished !!')
 display('For more information about the toolbox, type ''wfdb'' at the command prompt.')
 echo off

@@ -3,7 +3,7 @@ function wfdbtest(varargin)
 %
 % Written by Ikaro Silva, 2013
 %
-% Version 1.0
+% Version 1.1
 % Since 0.0.1
 %
 % See also wfdb, rdsamp
@@ -24,7 +24,6 @@ if(verbose)
     fprintf('\t\twfdb-matlab-support@physionet.org \n\n\n')
 end
 
-fprintf('**Checking if MATLAB JVM is running...\n')
 if(usejava('jvm') )
     ROOT=[matlabroot filesep 'sys' filesep 'java' filesep 'jre' filesep];
     JVM_PATH=dir([ROOT '*']);
@@ -71,11 +70,6 @@ cur_dir=pwd;
 os_dir=findstr(config.WFDB_NATIVE_BIN,filesep);
 os_dir=config.WFDB_NATIVE_BIN(os_dir(end-1)+1:end-1);
 
-%Test 1- Test that native libraries can me run from JVM (without MATLAB)
-%and that libcurl can fetch data from PhysioNet
-if(verbose)
-    fprintf('**Testing native library on MATLAB JVM...\n')
-end
 sampleLength=10000;
 cur_dir=pwd;
 data_dir=[config.MATLAB_PATH];
@@ -91,9 +85,6 @@ try
     else
         warning(['Unknown JVM: '  cmdout])
     end
-    str=['system(''' JVM_PATH ' -cp ' jarname.name ' org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s1'')'];
-    display(['Executing: ' str])
-    eval(str);
 catch
     if(verbose)
         warning(lasterr);
@@ -101,8 +92,7 @@ catch
 end
 cd(cur_dir)
 
-
-%Test 2- Test2 simple queries to PhysioNet servers
+%Simple queries to PhysioNet servers
 %loaded properly. This should work regardless of the libcurl installation
 if(verbose)
     fprintf('**Querying PhysioNet for available databases...\n')
@@ -114,7 +104,7 @@ if(verbose)
         ' databases available for download (type ''help physionetdb'' for more info).\n'])
 end
 
-%Test 3- Test ability to read local data and annotations
+%Test ability to read local data and annotations
 if(verbose)
     fprintf('**Reading local example data and annotation...\n')
 end
@@ -179,7 +169,7 @@ end
 cd(cur_dir)
 
 
-%Test 3- Test ability to read records from PhysioNet servers
+%Test ability to read records from PhysioNet servers
 if(verbose)
     fprintf('**Reading data from PhysioNet...\n')
 end
