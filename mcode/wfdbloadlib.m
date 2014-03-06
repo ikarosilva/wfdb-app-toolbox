@@ -73,8 +73,9 @@ end
 
 
 inOctave=is_octave;
+fsep=filesep;
 if(ispc && inOctave)
-	filesep=[filesep filesep]; %Need to escape '\' for regexp in Octave and Windows
+	fsep=['\\']; %Need to escape '\' for regexp in Octave and Windows
 end
 if(isempty(isloaded))
     jar_path=which('wfdbloadlib');
@@ -124,7 +125,7 @@ for n=1:nargout
         end
         config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
         config.SUPPORT_EMAIL='wfdb-matlab-support@physionet.org';
-        wver=regexp(wfdb_path,filesep,'split');
+        wver=regexp(wfdb_path,fsep,'split');
         config.WFDB_JAVA_VERSION=wver{end};
         config.DEBUG_LEVEL=debugLevel;
         config.NETWORK_WAIT_TIME=networkWaitTime;
@@ -138,7 +139,7 @@ for n=1:nargout
             WFDB_PATH=['. ' config.MATLAB_PATH 'database http://physionet.org/physiobank/database'];
         end
         if(isempty(WFDBCAL))
-            WFDBCAL=[config.WFDB_JAVA_HOME filesep 'database' filesep 'wfdbcal'];
+            WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];
         end
         config.WFDB_PATH=WFDB_PATH;
         config.WFDBCAL=WFDBCAL;
