@@ -64,8 +64,9 @@ dateStamp=cell(N,1);
 wfdb_argument=cell(N+2,1);
 wfdb_argument{1}='-r';
 wfdb_argument{2}=recordName;
+samples=num2str(samples);
 for n=3:N+2
-    wfdb_argument{n}=['s' num2str(samples(n-2))];
+    wfdb_argument{n}=['s' samples(n-2,:)];
 end
 
 data=javaWfdbExec.execToStringList(wfdb_argument).toArray;

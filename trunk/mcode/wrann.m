@@ -70,7 +70,7 @@ function varargout=wrann(varargin)
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: March 6, 2014
-% Version 1.2
+% Version 1.2.1
 % Since 0.0.1
 %
 % See also RDANN, RDSAMP, WFDBDESC
@@ -117,11 +117,13 @@ if(length(subType)==1);
     subType=repmat(subType,[1 L]);
 end
 if(length(chan)==1);
-    chan=repmat(chan,[1 L]);
+    chan=repmat(num2str(chan),[1 L]);
 end
 if(length(num)==1);
-    num=repmat(num,[1 L]);
+    num=repmat(num2str(num),[1 L]);
 end
+
+ann=num2str(ann);
 
 for i=1:L
     deli=strfind(annTimeStamp{i},':');
@@ -130,8 +132,8 @@ for i=1:L
     elseif(deli>3)
         warning(['Unsupported format for annotation: ' annTimeStamp{i}])
     end
-    data{i}=[annTimeStamp{i} ' ' num2str(ann(i)) ' ' annType(i) ' ' ...
-        subType(i) ' ' num2str(chan(i)) ' ' num2str(num(i))];
+    data{i}=[annTimeStamp{i} ' ' ann(i,:) ' ' annType(i) ' ' ...
+        subType(i) ' ' chan(i) ' ' num(i)];
 end
 
 
