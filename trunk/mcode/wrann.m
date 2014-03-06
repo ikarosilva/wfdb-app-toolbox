@@ -1,6 +1,6 @@
 function varargout=wrann(varargin)
 %
-% wrann(recordName,annotator,ann,AnnType,subType,chan,num)
+% wrann(recordName,annotator,ann,annType,subType,chan,num)
 %
 %    Wrapper to WFDB WRANN:
 %         http://www.physionet.org/physiotools/wag/wrann-1.htm
@@ -36,7 +36,7 @@ function varargout=wrann(varargin)
 %       sample numbers (indices) with respect to the begining of the
 %       record.
 %
-% AnnType
+% annType
 %       Nx1 vector of the chars or scalar describing annotaion type. Default is 'N'.
 %
 % subType
@@ -69,7 +69,7 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: December 10, 2013
+% Last Modified: March 6, 2014
 % Version 1.2
 % Since 0.0.1
 %
@@ -83,8 +83,8 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','annotator','ann','Anntype','subType','chan','num'};
-AnnType='N';
+inputs={'recordName','annotator','ann','annType','subType','chan','num'};
+annType='N';
 subType='0';
 chan=0;
 num=0;
@@ -110,8 +110,8 @@ del=repmat(' ',size(ann));
 [annTimeStamp]=wfdbtime(recordName,ann);
 L=length(annTimeStamp);
 data=cell(L,1);
-if(length(AnnType)==1);
-    annType=repmat(AnnType,[1 L]);
+if(length(annType)==1);
+    annType=repmat(annType,[1 L]);
 end
 if(length(subType)==1);
     subType=repmat(subType,[1 L]);
