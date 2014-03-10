@@ -15,14 +15,13 @@
 
 #Package names and versions
 CURL=curl-7.33.0
-WFDB=wfdb-10.5.22
+WFDB=wfdb-10.5.23
 ECGPUWAVE=ecgpuwave-1.3.2
 BUILD_DIR=build
-MATLAB=/home/ikaro/MATLAB/R2013b/bin/matlab
+MATLAB=/home/ikaro/MATLAB/R2014a/bin/matlab
 
 INSTALL_DIR:=$(shell pwd)
 BUILD_DIR32=$(BUILD_DIR)32
-WFDB32=$(WFDB)32
 
 clean: clean-wfdb clean-curl clean-edr clean-ecgpuwave
 	rm -rf ./tmp; \
@@ -78,6 +77,7 @@ wfdb.isbuilt: curl.isbuilt wfdb.isconfig
 	cd ./tmp/;\
 	cd ./$(WFDB)/ ;\
 	make ;\
+	make install \
 	&& touch ../../wfdb.isbuilt
 wfdb: curl wfdb.isbuilt
 
@@ -106,7 +106,7 @@ mse.c:
 
 #WFDB 32 - required by ECGPUWAVE
 clean-wfdb32:
-	rm -rf ./tmp/$(WFDB32)
+	rm -rf ./tmp/tmp32/$(WFDB)
 	rm -f ./wfdb32.isconfig; \
 	rm -f ./wfdb32.isbuilt; \
 	rm -rf ./$(BUILD_DIR32) ;\
@@ -116,17 +116,17 @@ wfdb32.isconfig: wfdb.tar.gz
 	cp ./wfdb.tar.gz ./$(BUILD_DIR32)/wfdb.tar.gz ;\
 	cd ./$(BUILD_DIR32);\
 	tar xvfz wfdb.tar.gz;\
-	mv $(WFDB) ../tmp/$(WFDB32) ;\
-	cd ../tmp/$(WFDB32) ;\
+	mv $(WFDB) ../tmp/tmp32/$(WFDB) ;\
+	cd ../tmp/tmp32/$(WFDB) ;\
 	./configure --prefix=$(INSTALL_DIR)/$(BUILD_DIR32) -m32 --without-netfiles \
-	&& touch ../../wfdb32.isconfig
+	&& touch ../../../wfdb32.isconfig
 wfdb32.isbuilt: C_INCLUDE_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/include
 wfdb32.isbuilt: LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/lib
 wfdb32.isbuilt: PATH:=$(INSTALL_DIR)/$(BUILD_DIR)/bin:$(PATH)
 wfdb32.isbuilt: curl.isbuilt wfdb32.isconfig
-	cd ./tmp/$(WFDB32);\
+	cd ./tmp/tmp32/$(WFDB);\
 	make install \
-	&& touch ../../wfdb32.isbuilt
+	&& touch ../../../wfdb32.isbuilt
 wfdb32: wfdb32.isbuilt
 
 
@@ -153,14 +153,17 @@ ecgpuwave-gfortran-addon.zip: ecgpuwave.tar.gz
 	cp -rv ./*.f ./$(ECGPUWAVE)/ ;\
 	cp -rv ./ecgpuwaveMakefile ./$(ECGPUWAVE)/Makefile 
 ecgpuwave.isbuilt: BUILD32_DIR:=$(INSTALL_DIR)/$(BUILD_DIR)
+ecgpuwave.isbuilt: C_INCLUDE_PATH:=$(INSTALL_DIR)/$(BUILD_DIR32)/include
+ecgpuwave.isbuilt: LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR32)/lib
+ecgpuwave.isbuilt: LD_LIBRARY_PATH:=$(INSTALL_DIR)/$(BUILD_DIR32)/lib
 ecgpuwave.isbuilt: wfdb32.isbuilt ecgpuwave-gfortran-addon.zip
 	cd ./tmp/$(ECGPUWAVE);\
 	export BUILD32_DIR;\
-	make ;\
-	cp -v ecgpuwave $(INSTALL_DIR)/$(BUILD_DIR)/bin ;\
-	cp -v /usr/lib32/libquadmath.so.0 $(INSTALL_DIR)/$(BUILD_DIR)/lib ;\
-	cp -v /usr/lib32/libgfortran.so.3 $(INSTALL_DIR)/$(BUILD_DIR)/lib ;\
-	cp -rv $(INSTALL_DIR)/$(BUILD_DIR32)/lib/* $(INSTALL_DIR)/$(BUILD_DIR)/lib ;\
+	make && \
+	cp -v ecgpuwave $(INSTALL_DIR)/$(BUILD_DIR)/bin && \
+	cp -v /usr/lib32/libquadmath.so.0 $(INSTALL_DIR)/$(BUILD_DIR)/lib && \
+	cp -v /usr/lib32/libgfortran.so.3 $(INSTALL_DIR)/$(BUILD_DIR)/lib  && \
+	cp -rv $(INSTALL_DIR)/$(BUILD_DIR32)/lib/* $(INSTALL_DIR)/$(BUILD_DIR)/lib && \
 	touch ../../ecgpuwave.isbuilt 
 ecgpuwave: ecgpuwave.isbuilt
 
