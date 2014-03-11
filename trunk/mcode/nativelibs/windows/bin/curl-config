@@ -21,7 +21,7 @@
 #
 ###########################################################################
 
-prefix=/home/ikaro/wfdb-sandbox/build
+prefix=/home/ikaro/wfdb-app-toolbox/mcode/nativelibs/windows/build
 exec_prefix=${prefix}
 includedir=${prefix}/include
 cppflag_curl_staticlib=
@@ -164,7 +164,7 @@ while test $# -gt 0; do
         ;;
 
     --configure)
-        echo " '--without-ssl' '--without-zlib' '--without-libssh2' '--disable-ldap'"
+        echo " '--prefix=/home/ikaro/wfdb-app-toolbox/mcode/nativelibs/windows/build' '--without-ssl' '--without-zlib' '--without-libssh2' '--disable-ldap'"
         ;;
 
     *)

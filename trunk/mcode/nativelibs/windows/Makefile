@@ -18,7 +18,7 @@
 
 #Package names and versions
 CURL=curl-7.33.0
-WFDB="wfdb-10.5.22"
+WFDB="wfdb-10.5.23"
 ECGPUWAVE=ecgpuwave-1.3.2
 
 INSTALL_DIR:=$(shell pwd)
