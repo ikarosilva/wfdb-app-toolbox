@@ -21,6 +21,9 @@ tests=length(test_string);
 performance=zeros(tests,1)+NaN;
 for n=1:tests
     try
+        if(verbose)
+           display(test_string{n}) 
+        end
         tic
         eval(test_string{n});
         performance(n)=toc;
