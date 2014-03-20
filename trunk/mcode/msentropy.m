@@ -63,7 +63,7 @@ function varargout=msentropy(varargin)
 %       the calculation.
 %
 % Wrapper written by Ikaro Silva, 2013
-% Last Modified: January 30, 2014
+% Last Modified: March 20, 2014
 % Version 0.0.1
 %
 % Since 0.9.5
@@ -172,8 +172,8 @@ if(M<4)
     error(['Error calculating MSE:' out{:}])
 end
 info=out(1:3);
-out(1:5)=[];
-M=M-5;
+out(1:4)=[];
+M=M-4;
 scale=zeros(M,1)+NaN;
 y=zeros(M,1)+NaN;
 for m=1:M
