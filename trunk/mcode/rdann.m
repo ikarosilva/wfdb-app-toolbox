@@ -62,8 +62,8 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: February 14, 2014
-% Version 1.0.4
+% Last Modified: March 20, 2014
+% Version 1.0.5
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -158,7 +158,8 @@ subtype=zeros(N,1);
 chan=zeros(N,1);
 num=zeros(N,1);
 comments=cell(N,1);
-str=char(data(1));
+data=char(data);
+str=data(1,:);
 if(~isempty(strfind(str,'init: can''t open header for record')))
     error(str)
 end
@@ -172,7 +173,7 @@ if(~isempty(str) && strcmp(str(1),'['))
     % So we remove the everything between [ * ]  prior to parsing
     
     for n=1:N
-        str=char(data(n));
+        str=data(n,:);
         del_str=findstr(str,']');
         str(1:del_str)=[];
         C=textscan(str,'%u %s %u %u %u %s');
@@ -191,7 +192,7 @@ else
         error(str)
     end
     for n=1:N
-        str=char(data(n));
+        str=data(n,:);
         C=textscan(str,'%s %u %s %u %u %u %s');
         ann(n)=C{2};
         type(n)=char(C{3});
