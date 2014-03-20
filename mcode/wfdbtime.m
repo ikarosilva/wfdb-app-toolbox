@@ -29,12 +29,12 @@ function varargout=wfdbtime(varargin)
 %
 %
 %%Example
-%[timeStamp,dateStamp]=wfdbtime('challenge/2013/set-a/a01',[1 10 30])
+%[timeStamp,dateStamp]=wfdbtime('challenge/2013/set-a/a01',[1 10 30]')
 %
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: January 16, 2014
+% Last Modified: March 11, 2014
 % Version 1.1
 % Since 0.0.1
 %

@@ -10,5 +10,5 @@ end
 
 
 %Test the examples 
-test_string={'[timeStamp,dateStamp]=wfdbtime(''challenge/2013/set-a/a01'',[1 10 30]);'};
+test_string={'[timeStamp,dateStamp]=wfdbtime(''challenge/2013/set-a/a01'',[1 10 30]');'};
 [tests,pass,perf]=test_wrapper(test_string,[],verbose);
