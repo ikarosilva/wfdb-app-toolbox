@@ -44,13 +44,12 @@ function varargout=rdsamp(varargin)
 %
 %
 % rawUnits
-%       A 1x1 integer (default: 0). Returns tm and signal as vectors
+%       A 1x1 integer (default: 1). Returns tm and signal as vectors
 %       according to the following values:
-%               rawUnits=0 -returns tm and signal as integers in samples (signal is in DA units )
-%               rawUnits=1 -returns tm and signal in physical units with double precision
-%               rawUnits=2 -returns tm and signal in physical units with single precision (less memory requirements)
-%               rawUnits=3 -returns tm and signal as 16 bit integers (short)
-%               rawUnits=4 -returns tm and signal as 32 bit integers (long)
+%               rawUnits=1 -returns tm and signal in physical units with 64 bit (double) floating point precision
+%               rawUnits=2 -returns tm and signal in physical units with 32 bit (single) floating point  precision
+%               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
+%               rawUnits=4 -returns both tm and signal as 32 bit integers (long). Use Fs to convert tm to seconds.
 %
 % highResolution
 %      A 1x1 boolean (default =0). If true, reads the record in high
@@ -58,8 +57,8 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: January 15, 2014
-% Version 1.1
+% Last Modified: March 11, 2014
+% Version 1.2
 %
 % Since 0.0.1
 %
@@ -67,7 +66,7 @@ function varargout=rdsamp(varargin)
 %[tm, signal]=rdsamp('challenge/2013/set-a/a01',1,1000);
 %plot(tm,signal(:,1))
 %
-%%Example 2- 
+%%Example 2-
 %[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],[],1000);
 %
 %%%Example 3- Read single precision data
@@ -90,7 +89,7 @@ N=[];
 N0=1;
 ListCapacity=[]; %Use to pre-allocate space for reading
 siginfo=[];
-rawUnits=0;
+rawUnits=1;
 Fs=[];
 highResolution=0;
 for n=1:nargin
@@ -99,7 +98,7 @@ for n=1:nargin
     end
 end
 
-if(~rawUnits)
+if(rawUnits==1 <3)
     %-1 is necessary because WFDB is 0 based indexed.
     wfdb_argument={'-r',recordName,'-Ps','-f',['s' num2str(N0-1)]};
 else
@@ -134,7 +133,7 @@ if(~isempty(signalList))
     wfdb_argument{end+1}='-s ';
     %-1 is necessary because WFDB is 0 based indexed.
     for sInd=1:length(signalList)
-    wfdb_argument{end+1}=[num2str(signalList(sInd)-1)];
+        wfdb_argument{end+1}=[num2str(signalList(sInd)-1)];
     end
 end
 
@@ -147,8 +146,8 @@ if(nargout>2)
         [siginfo,~]=wfdbdesc(recordName);
     end
     if(~isempty(siginfo))
-    %Its is possible where this is not true in rare cases where
-    %there is no signal length information on the header file
+        %Its is possible where this is not true in rare cases where
+        %there is no signal length information on the header file
         if(isempty(signalList))
             Fs=siginfo(1).SamplingFrequency;
         else
@@ -159,16 +158,16 @@ if(nargout>2)
 end
 
 switch rawUnits
-	case 0
-		data=javaWfdbExec.execToDoubleArray(wfdb_argument);
-		case 1
-		data=javaWfdbExec.execToDoubleArray(wfdb_argument);
-		case 2
-		data=javaWfdbExec.execToFloatArray(wfdb_argument);
-		case 3
-		data=javaWfdbExec.execToShortArray(wfdb_argument);
-		case 4
-		data=javaWfdbExec.execToLongArray(wfdb_argument);
+    case 1
+        data=javaWfdbExec.execToDoubleArray(wfdb_argument);
+    case 2
+        data=javaWfdbExec.execToFloatArray(wfdb_argument);
+    case 3
+        data=javaWfdbExec.execToShortArray(wfdb_argument);
+    case 4
+        data=javaWfdbExec.execToLongArray(wfdb_argument);
+    otherwise
+        error(['Unknown rawUnits option: ' num2str(rawUnits)])
 end
 
 if(config.inOctave)
@@ -183,12 +182,12 @@ for n=1:nargout
     if(~isempty(signalList) )
         sList=length(signalList);
         if(sList ~= (M-1))
-           error(['Received: ' num2str(M-1) ' signals, expected: '  num2str(length(signalList))])
+            error(['Received: ' num2str(M-1) ' signals, expected: '  num2str(length(signalList))])
         end
     end
     if(~isempty(ListCapacity) && ~isnan(ListCapacity) )
         if((ListCapacity+1) ~= N )
-           error(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity+1)])
+            error(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity+1)])
         end
     end
 end
