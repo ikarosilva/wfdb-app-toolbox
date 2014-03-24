@@ -10,10 +10,10 @@ mcode/challenge/*
 mcode/slpdb/*
 mcode/*~
 mcode/.__afs*
-mcode/nativelibs/linux-amd64/tmp/*
-mcode/nativelibs/linux-amd64/build/*
-mcode/nativelibs/windows-amd64/tmp/*
-mcode/nativelibs/windows-amd64/build/*
-mcode/nativelibs/macosx-amd64/tmp/*
-mcode/nativelibs/macosx-amd64/build/*
+mcode/nativelibs/linux/tmp/*
+mcode/nativelibs/linux/build/*
+mcode/nativelibs/windows/tmp/*
+mcode/nativelibs/windows/build/*
+mcode/nativelibs/macosx/tmp/*
+mcode/nativelibs/macosx/build/*
 
