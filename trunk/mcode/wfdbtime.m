@@ -24,8 +24,8 @@ function varargout=wfdbtime(varargin)
 %       in the current directory.
 %
 % samples
-%       Nx1 vector of integers (indices) from signals in recordName (indices are
-%       relatitve to the first sample).
+%       Nx1 vector of integers (indices) of samples from the signal in recordName (indices are
+%       relative to the first sample).
 %
 %
 %%Example
@@ -34,7 +34,7 @@ function varargout=wfdbtime(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: March 11, 2014
+% Last Modified: March 24, 2014
 % Version 1.1
 % Since 0.0.1
 %
@@ -64,9 +64,9 @@ dateStamp=cell(N,1);
 wfdb_argument=cell(N+2,1);
 wfdb_argument{1}='-r';
 wfdb_argument{2}=recordName;
-samples=num2str(samples);
-for n=3:N+2
-    wfdb_argument{n}=['s' samples(n-2,:)];
+samples=num2str(samples(:));
+for n=1:N
+    wfdb_argument{n+2}=['s' samples(n,:)];
 end
 
 data=javaWfdbExec.execToStringList(wfdb_argument).toArray;
