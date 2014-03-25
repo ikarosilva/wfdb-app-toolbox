@@ -56,16 +56,6 @@ public class SystemSettings {
 		return System.getProperty("os.arch");
 	}
 
-	static boolean isWindows64bit(){
-		boolean is64bit=true;
-		if (System.getProperty("os.name").contains("Windows")) {
-			is64bit = (System.getenv("ProgramFiles(x86)") != null);
-		} else {
-			is64bit = (System.getProperty("os.arch").indexOf("64") != -1);
-		}
-		return is64bit;
-	}
-
 	public static String getOsName(){
 		String osName=System.getProperty("os.name");
 		osName=osName.replace(" ","");

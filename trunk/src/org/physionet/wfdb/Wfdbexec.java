@@ -1012,8 +1012,6 @@ public class Wfdbexec {
 		logger.finer("\n\t***OS Version: " + System.getProperty("os.version"));
 		variables.add("JVM Version= " + System.getProperty("java.version"));
 		logger.finer("\n\t***JVM Version: " + System.getProperty("java.version"));
-		variables.add("isWindows64bit= " + SystemSettings.isWindows64bit());
-		logger.finer("\n\t***isWindows64bit= " + SystemSettings.isWindows64bit());
 		return variables;
 	}
 
