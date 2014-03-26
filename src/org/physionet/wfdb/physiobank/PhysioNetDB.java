@@ -50,7 +50,7 @@ public class PhysioNetDB {
 	private String name;
 	private String info;
 	private URL url;
-	private static final String DB_URL="http://physionet.org/physiobank/database/";
+	private static final String DB_URL="http://physionet.org/physiobank/database/pbi/";
 	private static final String DB_LIST="http://physionet.org/physiobank/database/DBS";
 	private ArrayList<PhysioNetRecord> dbRecordList;
 	private static Logger logger =
@@ -179,9 +179,11 @@ public class PhysioNetDB {
 	}
 
 	private URL setDBURL() {
-		logger.finer("\n\t***Setting URL: \n\t" + DB_URL + name);
+		logger.finer("\n\t***URL Input: \n\t" + name);
 		try {
-			return new URL(DB_URL + name.replaceAll("/","_"));
+			URL url=new URL(DB_URL + name.replaceAll("/","_"));
+			logger.finer("\n\t***Parsed URL: \n\t" + url.toString());
+			return url;
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 			return null;
@@ -217,12 +219,13 @@ public class PhysioNetDB {
 		String[] tmpStr;
 		String recname="";
 		ArrayList<String> recList = null;
+		logger.finest("\n\t***Getting record list from: \n\t" + url);
 		try {
 			in = new BufferedReader(
 					new InputStreamReader(url.openStream()));
 			while ((inputLine = in.readLine()) != null){
 				tmpStr=inputLine.split("\\t");
-				logger.finest("\n\t***Reading URL: \n\t" + inputLine);
+				logger.finest("\n\t***Reading record data: \n\t" + inputLine);
 				if(tmpStr[0].compareTo(recname) != 0){
 					//New record, save the last one and
 					if(!recname.isEmpty()){
