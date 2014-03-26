@@ -129,7 +129,7 @@ for n=1:nargout
         config.WFDB_JAVA_VERSION=wver{end};
         config.DEBUG_LEVEL=debugLevel;
         config.NETWORK_WAIT_TIME=networkWaitTime;
-        
+        config.MATLAB_ARCH=computer('arch');
         %Remove empty spaces from arch name
         del=strfind(config.osName,' ');
         config.osName(del)=[];
