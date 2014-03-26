@@ -86,7 +86,7 @@ if(isempty(db_name))
     if(nargout>0)
         db_list={};
         for i=0:double(list.size)-1
-            db_list(end+1)=cell(list.get(i).getDBInfo);
+            db_list(end+1)={list.get(i).getDBInfo};
         end
         varargout(1)={db_list};
     else
