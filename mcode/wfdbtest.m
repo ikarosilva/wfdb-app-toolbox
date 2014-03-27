@@ -20,8 +20,6 @@ end
 
 if(verbose)
     fprintf('***Starting test of the WFDB Application Toolbox\n')
-    fprintf('\tIf you have any problems with this test, please contact: \n')
-    fprintf('\t\twfdb-matlab-support@physionet.org \n\n\n')
 end
 
 if(usejava('jvm') )
@@ -41,9 +39,6 @@ if(usejava('jvm') )
         else
             JVM_PATH=[ROOT JVM_PATH.name filesep 'jre' filesep 'bin' filesep 'java'];
         end
-        str=['system(''' JVM_PATH ' -version'')'];
-        display(['Running: ' str]);
-        eval(str);
     else
         warning(['Could not find Java runtime environment!!']);
     end
@@ -66,6 +61,17 @@ nsm=fieldnames(config);
 if(verbose)
     config
 end
+
+%Print warning with respect to any unsupported component
+if(isempty(strfind(config.MATLAB_VERSION,'2013')) && ~config.inOctave)
+    warning(['!! You are using an unsupported version of MATLAB: ' config.MATLAB_VERSION])
+end
+if(strfind(config.osName,'macosx') && isempty(config.OSVersion,'10.9'))
+    warning(['!! You are using an unsupported Mac OS : ' config.MATLAB_VERSION])
+    warning(['!! The WFDB Toolbox is only supported on Mac OS X 10.9'])
+end
+
+
 cur_dir=pwd;
 os_dir=findstr(config.WFDB_NATIVE_BIN,filesep);
 os_dir=config.WFDB_NATIVE_BIN(os_dir(end-1)+1:end-1);
