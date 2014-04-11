@@ -64,13 +64,12 @@ function varargout=rdsamp(varargin)
 
 
  rawUnits
-       A 1x1 integer (default: 0). Returns tm and signal as vectors
+       A 1x1 integer (default: 1). Returns tm and signal as vectors
        according to the following values:
-               rawUnits=0 -returns tm and signal as integers in samples (signal is in DA units )
-               rawUnits=1 -returns tm and signal in physical units with double precision
-               rawUnits=2 -returns tm and signal in physical units with single precision (less memory requirements)
-               rawUnits=3 -returns tm and signal as 16 bit integers (short)
-               rawUnits=4 -returns tm and signal as 32 bit integers (long)
+               rawUnits=1 -returns tm and signal in physical units with 64 bit (double) floating point precision
+               rawUnits=2 -returns tm and signal in physical units with 32 bit (single) floating point  precision
+               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
+               rawUnits=4 -returns both tm and signal as 32 bit integers (long). Use Fs to convert tm to seconds.
 
  highResolution
       A 1x1 boolean (default =0). If true, reads the record in high
@@ -78,20 +77,20 @@ function varargout=rdsamp(varargin)
 
 
  Written by Ikaro Silva, 2013
- Last Modified: January 15, 2014
- Version 1.1
+ Last Modified: March 24, 2014
+ Version 1.2
 
  Since 0.0.1
 
  %Example 1- Read a signal from PhysioNet's Remote server:
-[tm, signal]=rdsamp('challenge/2013/set-a/a01',1,1000);
+[tm, signal]=rdsamp('challenge/2013/set-a/a01',1000);
 plot(tm,signal(:,1))
 
-%Example 2- 
-[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],[],1000);
+%Example 2-Read 1000 samples from 3 signals
+[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000);
 
-%%Example 3- Read single precision data
-[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],[],100,2);
+%%Example 3- Read 1000 samples from 3 signlas in single precision format
+[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
 
  See also WFDBDESC, PHYSIONETDB
 </pre></div><!--after help -->

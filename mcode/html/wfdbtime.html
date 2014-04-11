@@ -44,17 +44,17 @@ function varargout=wfdbtime(varargin)
        in the current directory.
 
  samples
-       Nx1 vector of integers (indices) from signals in recordName (indices are
-       relatitve to the first sample).
+       Nx1 vector of integers (indices) of samples from the signal in recordName (indices are
+       relative to the first sample).
 
 
 %Example
-[timeStamp,dateStamp]=wfdbtime('challenge/2013/set-a/a01',[1 10 30])
+[timeStamp,dateStamp]=wfdbtime('challenge/2013/set-a/a01',[1 10 30]')
 
 
 
  Written by Ikaro Silva, 2013
- Last Modified: January 16, 2014
+ Last Modified: March 24, 2014
  Version 1.1
  Since 0.0.1
 
