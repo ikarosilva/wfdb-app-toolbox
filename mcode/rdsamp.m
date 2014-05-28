@@ -49,7 +49,7 @@ function varargout=rdsamp(varargin)
 %               rawUnits=1 -returns tm and signal in physical units with 64 bit (double) floating point precision
 %               rawUnits=2 -returns tm and signal in physical units with 32 bit (single) floating point  precision
 %               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
-%               rawUnits=4 -returns both tm and signal as 32 bit integers (long). Use Fs to convert tm to seconds.
+%               rawUnits=4 -returns both tm and signal as 64 bit integers (long). Use Fs to convert tm to seconds.
 %
 % highResolution
 %      A 1x1 boolean (default =0). If true, reads the record in high
@@ -57,7 +57,7 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: March 24, 2014
+% Last Modified: May 28, 2014
 % Version 1.2
 %
 % Since 0.0.1
@@ -98,7 +98,7 @@ for n=1:nargin
     end
 end
 
-if(rawUnits==1 <3)
+if(rawUnits <3)
     %-1 is necessary because WFDB is 0 based indexed.
     wfdb_argument={'-r',recordName,'-Ps','-f',['s' num2str(N0-1)]};
 else
