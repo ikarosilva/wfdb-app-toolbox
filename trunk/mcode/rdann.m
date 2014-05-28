@@ -175,7 +175,7 @@ if(~isempty(str) && strcmp(str(1),'['))
         str=char(data(n));
         del_str=findstr(str,']');
         str(1:del_str)=[];
-        C=textscan(str,'%u %s %u %u %u %s');
+        C=textscan(str,'%u %s %u %u %u %s %*[^\n]');
         ann(n)=C{1};
         type(n)=char(C{2});
         subtype(n)=char(C{3});
@@ -192,7 +192,7 @@ else
     end
     for n=1:N
         str=char(data(n));
-        C=textscan(str,'%s %u %s %u %u %u %s');
+        C=textscan(str,'%s %u %s %u %u %u %s %*[^\n]');
         ann(n)=C{2};
         type(n)=char(C{3});
         subtype(n)=char(C{4});
