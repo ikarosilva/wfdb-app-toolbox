@@ -37,7 +37,7 @@ function varargout=rdsamp(varargin)
 %       named in the signalList (default: read all signals).
 % N
 %       A 1x1 integer specifying the sample number at which to stop reading the
-%       record file (default read all = N).
+%       record file (default read all the samples = N).
 % N0
 %       A 1x1 integer specifying the sample number at which to start reading the
 %       record file (default 1 = first sample).
