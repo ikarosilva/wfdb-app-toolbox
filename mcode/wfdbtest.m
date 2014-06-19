@@ -3,6 +3,8 @@ function wfdbtest(varargin)
 %
 % Written by Ikaro Silva, 2013
 %
+% Last Modified: June 19, 2014
+%
 % Version 1.1
 % Since 0.0.1
 %
@@ -66,7 +68,7 @@ end
 if(isempty(strfind(config.MATLAB_VERSION,'2013')) && ~config.inOctave)
     warning(['!! You are using an unsupported version of MATLAB: ' config.MATLAB_VERSION])
 end
-if(strfind(config.osName,'macosx') && isempty(config.OSVersion,'10.9'))
+if(~isempty(regexp(config.osName,'macosx','once')) && isempty(regexp(config.OSVersion,'10.9','once')))
     warning(['!! You are using an unsupported Mac OS : ' config.MATLAB_VERSION])
     warning(['!! The WFDB Toolbox is only supported on Mac OS X 10.9'])
 end
