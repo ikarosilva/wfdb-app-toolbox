@@ -10,13 +10,15 @@ function varargout=rdsamp(varargin)
 %
 % signal
 %       NxM matrix (doubles) of M signals with each signal being N samples long.
-%       Signal dataype will be either in double int16 format
+%       Signal data type will be either in double int16 format
 %       depending on the flag passed to the function (according to
 %       the boolean flags below).
 %
 % tm
-%       Nx1 vector of doubles representing the sampling intervals
-%       (elapsed time in seconds).
+%       Nx1 vector of doubles representing the sampling intervals.
+%       Depending on input flags (see below), this vector can either be a 
+%       vector of integers (sampling number), or a vector of elapsed time 
+%       in seconds  ( with up to millisecond precision only). 
 %
 % Fs    (Optional)
 %       1x1 Double, sampling frequency in Hz of the first signal in signalList
@@ -46,8 +48,8 @@ function varargout=rdsamp(varargin)
 % rawUnits
 %       A 1x1 integer (default: 1). Returns tm and signal as vectors
 %       according to the following values:
-%               rawUnits=1 -returns tm and signal in physical units with 64 bit (double) floating point precision
-%               rawUnits=2 -returns tm and signal in physical units with 32 bit (single) floating point  precision
+%               rawUnits=1 -returns tm ( with millisecond precision only ) and signal in physical units with 64 bit (double) floating point precision
+%               rawUnits=2 -returns tm ( with millisecond precision only ) and signal in physical units with 32 bit (single) floating point  precision
 %               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
 %               rawUnits=4 -returns both tm and signal as 64 bit integers (long). Use Fs to convert tm to seconds.
 %
@@ -57,7 +59,7 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: May 28, 2014
+% Last Modified: June 23, 2014
 % Version 1.2
 %
 % Since 0.0.1
