@@ -69,7 +69,7 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: March 6, 2014
+% Last Modified: June 27, 2014
 % Version 1.2.1
 % Since 0.0.1
 %
@@ -123,7 +123,7 @@ if(length(num)==1);
     num=repmat(num2str(num),[1 L]);
 end
 
-ann=num2str(ann);
+ann=num2str(reshape(ann, [], 1));
 
 for i=1:L
     deli=strfind(annTimeStamp{i},':');
