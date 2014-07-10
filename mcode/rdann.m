@@ -61,9 +61,21 @@ function varargout=rdann(varargin)
 %       empty, which gets all annotations).
 %
 %
+%
+% **OPTIMIZATION NOTE: This function has been optimized for cases in which
+% only the annotation sample vector is required, ie for function calls of
+% the type:
+%
+%  ann=rdann(recordName,annotator,C,N,N0,type);
+%
+%  For these cases, no string parsing is required and the formatting is
+%  done at the Java level, increasing substantially the processing speed.
+%
+%
+%
 % Written by Ikaro Silva, 2013
-% Last Modified: March 27, 2014
-% Version 1.0.4
+% Last Modified: July 5, 2014
+% Version 1.1.0
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -84,9 +96,10 @@ function varargout=rdann(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
+persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('rdann');
+    [~,config]=wfdbloadlib;
 end
 
 %Set default pararamter values
@@ -145,66 +158,77 @@ if(~isempty(C))
 end
 
 
-%TODO: Improve the parsing of data. To avoid doing this at the ML wrapper
-%level! The parsing assumes each line starts with a "[" and that not "["
-%occurs at the comment.
-%outputs={ann,type,subtype,chan,num,comments};
-data=javaWfdbExec.execToStringList(wfdb_argument);
-data=data.toArray();
-N=length(data);
-ann=zeros(N,1);
-type=zeros(N,1);
-subtype=zeros(N,1);
-chan=zeros(N,1);
-num=zeros(N,1);
-comments=cell(N,1);
-str=char(data(1));
-if(~isempty(strfind(str,'init: can''t open header for record')))
-    error(str)
-end
-if(~isempty(str) && strcmp(str(1),'['))
-    %In this case it is possible that there is a data stamp
-    % right after the timestamp such as:
-    % [00:11:30.628 09/11/1989]      157     N    0    1    0
-    % but not always, the following case is also possible:
-    % [00:11:30.628]      157     N    0    1    0
-    %
-    % So we remove the everything between [ * ]  prior to parsing
-    
-    for n=1:N
-        str=char(data(n));
-        del_str=findstr(str,']');
-        str(1:del_str)=[];
-        C=textscan(str,'%u %s %u %u %u %s');
-        ann(n)=C{1};
-        type(n)=char(C{2});
-        subtype(n)=char(C{3});
-        chan(n)=C{4};
-        num(n)=C{5};
-        comments(n)=C(6);
+if(nargout ==1)
+    %Optmize the parsing for cases in which we are interested only in the sample number
+    %annotation values
+    ann=javaWfdbExec.execToDoubleArray(wfdb_argument);
+    if(config.inOctave)
+        ann=java2mat(ann);
     end
+    ann=ann(:,1);
 else
-    %In this case there is only timestamp such as:
-    % 0:00.355      355     N    0    0    0
-    str=data(1);
-    if(~isempty(strfind(str,['annopen: can''t read annotator'])))
+    
+    %TODO: Improve the parsing of data. To avoid doing this at the ML wrapper
+    %level! The parsing assumes each line starts with a "[" and that not "["
+    %occurs at the comment.
+    %outputs={ann,type,subtype,chan,num,comments};
+    dataJava=javaWfdbExec.execToStringList(wfdb_argument);
+    data=dataJava.toArray();
+    N=length(data);
+    ann=zeros(N,1);
+    type=zeros(N,1);
+    subtype=zeros(N,1);
+    chan=zeros(N,1);
+    num=zeros(N,1);
+    comments=cell(N,1);
+    str=char(data(1));
+    if(~isempty(strfind(str,'init: can''t open header for record')))
         error(str)
     end
-    for n=1:N
-        str=char(data(n));
-        C=textscan(str,'%s %u %s %u %u %u %s');
-        ann(n)=C{2};
-        type(n)=char(C{3});
-        subtype(n)=char(C{4});
-        chan(n)=C{5}+1;%Convert to MATLAB indexing
-        num(n)=C{6};
-        comments(n)=C(7);
+    if(~isempty(str) && strcmp(str(1),'['))
+        %In this case it is possible that there is a data stamp
+        % right after the timestamp such as:
+        % [00:11:30.628 09/11/1989]      157     N    0    1    0
+        % but not always, the following case is also possible:
+        % [00:11:30.628]      157     N    0    1    0
+        %
+        % So we remove the everything between [ * ]  prior to parsing
+        for n=1:N
+            str=char(data(n));
+            del_str=findstr(str,']');
+            str(1:del_str)=[];
+            C=textscan(str,'%u %s %u %u %u %s');
+            ann(n)=C{1};
+            type(n)=char(C{2});
+            subtype(n)=char(C{3});
+            chan(n)=C{4};
+            num(n)=C{5};
+            comments(n)=C(6);
+        end
+    else
+        %In this case there is only timestamp such as:
+        % 0:00.355      355     N    0    0    0
+        str=data(1);
+        if(~isempty(strfind(str,['annopen: can''t read annotator'])))
+            error(str)
+        end
+        for n=1:N
+            str=char(data(n));
+            C= textscan(str,'%s %u %s %u %u %u %s');
+            ann(n)=C{2};
+            type(n)=char(C{3});
+            subtype(n)=char(C{4});
+            chan(n)=C{5}+1;%Convert to MATLAB indexing
+            num(n)=C{6};
+            comments(n)=C(7);
+        end
     end
+    type=char(type);
+    subtype=char(subtype);
 end
 
 ann=ann+1; %Convert to MATLAB indexing
-type=char(type);
-subtype=char(subtype);
+
 
 
 for n=1:nargout
