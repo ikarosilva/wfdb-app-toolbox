@@ -48,8 +48,8 @@ function varargout=rdsamp(varargin)
 % rawUnits
 %       A 1x1 integer (default: 1). Returns tm and signal as vectors
 %       according to the following values:
-%               rawUnits=1 -returns tm ( with millisecond precision only ) and signal in physical units with 64 bit (double) floating point precision
-%               rawUnits=2 -returns tm ( with millisecond precision only ) and signal in physical units with 32 bit (single) floating point  precision
+%               rawUnits=1 -returns tm ( millisecond precision only! ) and signal in physical units with 64 bit (double) floating point precision
+%               rawUnits=2 -returns tm ( millisecond precision only! ) and signal in physical units with 32 bit (single) floating point  precision
 %               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
 %               rawUnits=4 -returns both tm and signal as 64 bit integers (long). Use Fs to convert tm to seconds.
 %
