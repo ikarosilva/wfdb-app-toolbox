@@ -3,23 +3,38 @@ package org.physionet.wfdb;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.CodeSource;
 import java.util.Map;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 public class SystemSettings {
 
 	private final static Logger logger = Logger.getLogger(Wfdbexec.class.getName());
+	public final static boolean inJar= detectJar();
+
+	private static boolean detectJar(){
+		boolean isJar=true;
+		try
+		{
+			CodeSource cs = SystemSettings.class.getProtectionDomain().getCodeSource();
+			isJar = cs.getLocation().toURI().getPath().endsWith(".jar");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return isJar;
+	}
 
 	public static void loadCurl(Boolean customArch){
-		
+
 		if(getOsName().contains("windows")){
 			//On Windows, load the shipped curl library
 			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
 					+ "\\bin\\libcurl-4.dll" );
 		}else if(getOsName().contains("mac")){
 			String libCurlName= SystemSettings.getWFDB_NATIVE_BIN(customArch) 
-					+ "bin/libcurl.4.dylib";
+			+ "bin/libcurl.4.dylib";
 			SecurityManager security = System.getSecurityManager();
 			if(security != null){
 				security.checkLink(libCurlName);
@@ -29,7 +44,7 @@ public class SystemSettings {
 			System.load(libCurlName);
 			//System.loadLibrary("curl.4");
 		}
-         
+
 	}
 
 	public static String getPhysioNetDBURL(){
@@ -40,12 +55,12 @@ public class SystemSettings {
 		//Acording to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
 		//use white space as best option for all the operating systems
 		return ". " + " " + SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
-				"database "+ getPhysioNetDBURL();
+		"database "+ getPhysioNetDBURL();
 	}
 
 	public static String getDefaultWFDBCal() {
 		return SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
-				"database" + getFileSeparator() + "wfdbcal";
+		"database" + getFileSeparator() + "wfdbcal";
 	}
 
 	public static String getFileSeparator(){
@@ -65,7 +80,7 @@ public class SystemSettings {
 		}
 		return osName;
 	}
-	
+
 	public static String getLD_PATH(boolean customArchFlag){
 		ProcessBuilder launcher = new ProcessBuilder();
 		Map<String,String> env = launcher.environment();
@@ -82,14 +97,14 @@ public class SystemSettings {
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");pathSep=":";
 			OsPathName="DYLD_LIBRARY_PATH";
 			tmp=WFDB_NATIVE_BIN + "bin" + pathSep 
-					+ WFDB_NATIVE_BIN + "lib64" + pathSep 
-					+ WFDB_NATIVE_BIN + "lib";
+			+ WFDB_NATIVE_BIN + "lib64" + pathSep 
+			+ WFDB_NATIVE_BIN + "lib";
 		}else{
 			LD_PATH=env.get("LD_LIBRARY_PATH");pathSep=":";
 			OsPathName="LD_LIBRARY_PATH";
 			tmp=WFDB_NATIVE_BIN + "bin" + pathSep 
-					+ WFDB_NATIVE_BIN + "lib64" + pathSep 
-					+ WFDB_NATIVE_BIN + "lib";
+			+ WFDB_NATIVE_BIN + "lib64" + pathSep 
+			+ WFDB_NATIVE_BIN + "lib";
 		}
 
 		if(LD_PATH == null){
@@ -105,7 +120,7 @@ public class SystemSettings {
 	public static int getNumberOfProcessors(){
 		return Runtime.getRuntime().availableProcessors();
 	}
-	
+
 	public static String getWFDB_JAVA_HOME(){
 		String packageDir = null;
 		try {
@@ -129,8 +144,14 @@ public class SystemSettings {
 		if(customArchFlag){
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + "custom"+ getFileSeparator();
 		}else{
+			if(inJar){
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
-					getOsName().toLowerCase()+ getFileSeparator() ;
+			getOsName().toLowerCase()+ getFileSeparator() ;
+			}else{
+				//In case we are running from Eclipse or another IDE without compiling the JAR
+				WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "mcode" + getFileSeparator()+ 
+				"nativelibs" + getFileSeparator() + getOsName().toLowerCase()+ getFileSeparator() ;
+			}
 		}
 		return WFDB_NATIVE_BIN;
 	}

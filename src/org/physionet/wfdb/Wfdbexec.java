@@ -99,7 +99,7 @@ public class Wfdbexec {
 	}
 
 	public void setWFDB_PATH(String str){
-		//Acording to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
+		//According to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
 		//use white space as best option for all the operating systems
 		logger.finest("\n\t***Setting WFDB to: " + str);
 		WFDB_PATH=str;
@@ -164,9 +164,6 @@ public class Wfdbexec {
 					break;
 				}else {
 					try {
-						logger.finest("Waited " + (waitTime-thisTime) +
-								" ms for data stream (max waiting time= " +
-								initialWaitTime + "ms ) ...");
 						Thread.sleep(100);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
