@@ -286,9 +286,6 @@ public class Wfdbexec {
 					break;
 				}else {
 					try {
-						logger.finest("Waited " + (waitTime-thisTime) +
-								" ms for data stream (max waiting time= " +
-								initialWaitTime + "ms ) ...");
 						Thread.sleep(100);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
@@ -431,9 +428,6 @@ public class Wfdbexec {
 					break;
 				}else {
 					try {
-						logger.finest("Waited " + (waitTime-thisTime) +
-								" ms for data stream (max waiting time= " +
-								initialWaitTime + "ms ) ...");
 						Thread.sleep(100);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
@@ -537,9 +531,6 @@ public class Wfdbexec {
 					break;
 				}else {
 					try {
-						logger.finest("Waited " + (waitTime-thisTime) +
-								" ms for data stream (max waiting time= " +
-								initialWaitTime + "ms ) ...");
 						Thread.sleep(100);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
@@ -685,9 +676,6 @@ public class Wfdbexec {
 					break;
 				}else {
 					try {
-						logger.finest("Waited " + (waitTime-thisTime) +
-								" ms for data stream (max waiting time= " +
-								initialWaitTime + "ms ) ...");
 						Thread.sleep(100);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
@@ -834,9 +822,6 @@ public class Wfdbexec {
 					break;
 				}else {
 					try {
-						logger.finest("Waited " + (waitTime-thisTime) +
-								" ms for data stream (max waiting time= " +
-								initialWaitTime + "ms ) ...");
 						Thread.sleep(100);
 					} catch(InterruptedException ex) {
 						Thread.currentThread().interrupt();
