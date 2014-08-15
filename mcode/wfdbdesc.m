@@ -46,8 +46,10 @@ function varargout=wfdbdesc(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: January 8, 2014
-% Version 1.2
+% 
+% Modified by Poitr Podziemski, August 12, 2014
+%
+% Version 1.3
 %
 % Since 0.0.1
 % See also RDSAMP
@@ -84,13 +86,6 @@ Fs=zeros(Recinfo.size,1)+NaN;
 for n=0:(Recinfo.size-1)
     rec=Recinfo.get(n);
     for m=1:M
-        if(isnumeric(m)==1)
-            try
-                eval(['siginfo(' num2str(n+1) ').' field{m} '=double(java.lang.Double.valueOf((rec.get' field{m} '.toString)));' ])
-            catch
-                eval(['siginfo(' num2str(n+1) ').' field{m} '=NaN;' ])
-            end
-        else
             eval(['siginfo(' num2str(n+1) ').' field{m} '=char(rec.get' field{m} ');' ])
             if(strcmp(field{m},'SamplingFrequency'))
                %Attempt to parse and convert to a number
@@ -101,10 +96,12 @@ for n=0:(Recinfo.size-1)
                    %Parsing failed, leave Fs as NaN
                end
             end
-        end
+        
     end
 end
 
 for n=1:nargout
         eval(['varargout{n}=' outputs{n} ';'])
 end
+
+
