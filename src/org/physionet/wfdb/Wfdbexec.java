@@ -225,6 +225,43 @@ public class Wfdbexec {
 		return results;
 	}
 
+	public synchronized ArrayList<String> execWithStandardInput(byte[] inputData) throws Exception {
+
+		gen_exec_arguments();
+		ProcessBuilder launcher = setLauncher();
+		launcher.redirectErrorStream(true);
+		Process process= null;
+		int exitStatus = 1; 
+		ArrayList<String> results=null;
+		try {
+			process = launcher.start();
+			if (process != null) {
+				OutputReader or= new OutputReader(process.getInputStream()) ;
+				InputWriter iw= new	InputWriter(process.getOutputStream(), inputData);
+				iw.start();	
+				or.start();
+				iw.join();
+				or.join();
+				results=or.getResults();
+			}
+			exitStatus=process.waitFor();
+		} catch (IOException e) {
+			System.err.println("Either couldn't read from the template file or couldn't write to the OutputStream.");
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		process.destroy();
+		if(exitStatus != 0){
+			System.err.println("Process exited with errors!! Error code = "
+					+exitStatus);
+			for(String tmp : results)
+				System.err.println(tmp);
+		}
+		return results;
+	}
+	
+	
 	public synchronized ArrayList<String> execWithStandardInput(double[][] inputData) throws Exception {
 
 		String[] stringArr=new String[inputData.length];
