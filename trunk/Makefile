@@ -17,7 +17,8 @@ BUILDFILE := ./jarbuild.xml
 ECLIPSEPATH := /lib64/eclipse/plugins/
 ANTPATH := org.eclipse.ant.core.antRunner
 #EQUINOXPATH := $(ECLIPSEPATH)org.eclipse.equinox.launcher_1.3.0.v20120522-1813.jar
-EQUINOXPATH := ~/Downloads/adt-bundle-linux-x86_64-20130729/eclipse/plugins/org.eclipse.equinox.launcher_1.3.0.v20120522-1813.jar
+#EQUINOXPATH := ~/Downloads/adt-bundle-linux-x86_64-20130729/eclipse/plugins/org.eclipse.equinox.launcher_1.3.0.v20120522-1813.jar
+EQUINOXPATH := /opt/eclipse/plugins/org.eclipse.equinox.launcher_1.3.0.v20140415-2008.jar
 JARFLAGS := -jar		\
 		  $(EQUINOXPATH)		\
 		  -application $(ANTPATH)	\
