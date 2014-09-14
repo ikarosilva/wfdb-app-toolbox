@@ -81,9 +81,21 @@ function varargout=rdann(varargin)
        empty, which gets all annotations).
 
 
+
+ **OPTIMIZATION NOTE: This function has been optimized for cases in which
+ only the annotation sample vector is required, ie for function calls of
+ the type:
+
+  ann=rdann(recordName,annotator,C,N,N0,type);
+
+  For these cases, no string parsing is required and the formatting is
+  done at the Java level, increasing substantially the processing speed.
+
+
+
  Written by Ikaro Silva, 2013
- Last Modified: March 27, 2014
- Version 1.0.4
+ Last Modified: July 5, 2014
+ Version 1.1.0
  Since 0.0.1
 
  %Example 1- Read a signal and annotation from PhysioNet's Remote server:

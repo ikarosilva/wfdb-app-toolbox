@@ -59,7 +59,7 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: June 23, 2014
+% Last Modified: September 13, 2014
 % Version 1.2
 %
 % Since 0.0.1
@@ -100,6 +100,10 @@ for n=1:nargin
     end
 end
 
+%Remove file extension if present
+if(length(recordName)>4 && strcmp(recordName(end-3:end),'.dat'))
+    recordName=recordName(1:end-4);
+end
 if(rawUnits <3)
     %-1 is necessary because WFDB is 0 based indexed.
     wfdb_argument={'-r',recordName,'-Ps','-f',['s' num2str(N0-1)]};

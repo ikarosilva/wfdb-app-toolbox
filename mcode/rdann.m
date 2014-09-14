@@ -74,8 +74,8 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: July 5, 2014
-% Version 1.1.0
+% Last Modified: September 13, 2014
+% Version 1.1.1
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -114,6 +114,11 @@ for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
     end
+end
+
+%Remove file extension if present
+if(length(recordName)>4 && strcmp(recordName(end-3:end),'.dat'))
+    recordName=recordName(1:end-4);
 end
 
 wfdb_argument={'-r',recordName,'-a',annotator};
