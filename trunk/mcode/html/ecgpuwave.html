@@ -46,6 +46,12 @@ function ecgpuwave(varargin)
  WFON ("(") and WFOFF (")") annotations. The num field of each WFON and WFOFF annotation designates
  the type of waveform with which it is associated: 0 for a P wave, 1 for a QRS complex, or 2 for a T wave.
 
+ WARNING: 
+   If ECGPUWAVE is used without providing an annotator file for the R peaks it relies on a Pan-Tompkins detector. 
+   This detector may not be optimized for your particular signal, and thus may need to be tuned, yielding anempty annotation
+   file. In this case, you may want to first run a QRS detector to generate an appropriate QRS annotation file, 
+   which you can then check manually prior to calling ECGPUWAVE with the
+   'qrsAnn' option described below.
 
  IMPORTANT NOTE:
      A patch to the original Fortran source files was provided by Roberto Sassi in
@@ -98,7 +104,7 @@ function ecgpuwave(varargin)
        A String specifying the ouput annotator name (default = 'edr').
 
  Wrapper written by Ikaro Silva, 2013
- Last Modified: February 18 , 2014
+ Last Modified: May 29 , 2014
  Version 0.0.1
 
  
