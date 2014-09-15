@@ -37,7 +37,7 @@ function varargout=wfdb2mat(varargin)
 %
 %
 % Written by Ikaro Silva, 2014
-% Last Modified: September 12, 2014
+% Last Modified: September 15, 2014
 % Version 0.1
 %
 % Since 0.9.7

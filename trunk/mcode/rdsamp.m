@@ -59,7 +59,7 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: September 13, 2014
+% Last Modified: September 15, 2014
 % Version 1.2
 %
 % Since 0.0.1
