@@ -16,9 +16,9 @@ function varargout=rdsamp(varargin)
 %
 % tm
 %       Nx1 vector of doubles representing the sampling intervals.
-%       Depending on input flags (see below), this vector can either be a 
-%       vector of integers (sampling number), or a vector of elapsed time 
-%       in seconds  ( with up to millisecond precision only). 
+%       Depending on input flags (see below), this vector can either be a
+%       vector of integers (sampling number), or a vector of elapsed time
+%       in seconds  ( with up to millisecond precision only).
 %
 % Fs    (Optional)
 %       1x1 Double, sampling frequency in Hz of the first signal in signalList
@@ -130,11 +130,6 @@ if(~isempty(N))
     ListCapacity=N-N0;
 end
 
-if(~isempty(ListCapacity))
-    %Ensure list capacity if information is available
-    javaWfdbExec.setDoubleArrayListCapacity(ListCapacity);
-end
-
 if(~isempty(signalList))
     wfdb_argument{end+1}='-s ';
     %-1 is necessary because WFDB is 0 based indexed.
@@ -165,12 +160,28 @@ end
 
 switch rawUnits
     case 1
+        if(~isempty(ListCapacity))
+            %Ensure list capacity if information is available
+            javaWfdbExec.setDoubleArrayListCapacity(ListCapacity);
+        end
         data=javaWfdbExec.execToDoubleArray(wfdb_argument);
     case 2
+        if(~isempty(ListCapacity))
+            %Ensure list capacity if information is available
+            javaWfdbExec.setFloatArrayListCapacity(ListCapacity);
+        end
         data=javaWfdbExec.execToFloatArray(wfdb_argument);
     case 3
+        if(~isempty(ListCapacity))
+            %Ensure list capacity if information is available
+            javaWfdbExec.setShortArrayListCapacity(ListCapacity);
+        end
         data=javaWfdbExec.execToShortArray(wfdb_argument);
     case 4
+        if(~isempty(ListCapacity))
+            %Ensure list capacity if information is available
+            javaWfdbExec.setLongArrayListCapacity(ListCapacity);
+        end
         data=javaWfdbExec.execToLongArray(wfdb_argument);
     otherwise
         error(['Unknown rawUnits option: ' num2str(rawUnits)])
