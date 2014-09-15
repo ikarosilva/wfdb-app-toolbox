@@ -33,7 +33,7 @@ function varargout=wfdbdesc(varargin)
 % Fs   (Optional)
 %       Nx1 vector of doubles representing the sampling frequency of each
 %       signal in Hz (if the 'SamplingFrequency' string is parsable).
-%   
+%
 % Required Parameters:
 %
 % recorName
@@ -46,7 +46,7 @@ function varargout=wfdbdesc(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% 
+%
 % Modified by Poitr Podziemski, August 12, 2014
 %
 % Version 1.3
@@ -86,22 +86,25 @@ Fs=zeros(Recinfo.size,1)+NaN;
 for n=0:(Recinfo.size-1)
     rec=Recinfo.get(n);
     for m=1:M
-            eval(['siginfo(' num2str(n+1) ').' field{m} '=char(rec.get' field{m} ');' ])
-            if(strcmp(field{m},'SamplingFrequency'))
-               %Attempt to parse and convert to a number
-               tmpFs=siginfo(n+1).SamplingFrequency;
-               try
-                   Fs(n+1)=str2num(regexprep(tmpFs,'\s+Hz',''));
-               catch
-                   %Parsing failed, leave Fs as NaN
-               end
+        eval(['siginfo(' num2str(n+1) ').' field{m} '=char(rec.get' field{m} ');' ])
+        if(isnumeric(m)==1)
+            eval(['siginfo(' num2str(n+1) ').' field{m} '=str2num(siginfo(' num2str(n+1) ').' field{m} ');' ])
+        end
+        if(strcmp(field{m},'SamplingFrequency'))
+            %Attempt to parse and convert to a number
+            tmpFs=siginfo(n+1).SamplingFrequency;
+            try
+                Fs(n+1)=str2num(regexprep(tmpFs,'\s+Hz',''));
+            catch
+                %Parsing failed, leave Fs as NaN
             end
+        end
         
     end
 end
 
 for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';'])
 end
 
 

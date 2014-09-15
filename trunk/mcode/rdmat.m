@@ -45,7 +45,9 @@ function varargout=rdmat(varargin)
 %
 % %Example:
 % wfdb2mat('mitdb/200')
-%[tm,signal,Fs,siginfo]=rdmat('200m');
+%tic;[tm,signal,Fs,siginfo]=rdmat('200m');toc
+%tic;[tm2,signal2]=rdsamp('200m');toc
+% sum(abs(signal-signal2))
 %
 %
 % See also RDSAMP, RDMAT
@@ -60,18 +62,21 @@ for n=1:nargin
     end
 end
 
-outputs={'tm','signal','Fs','siginfo'};
+outputs={'tm','val','Fs','siginfo'};
 matName = strcat(recordName, '.mat');
 load(matName);
 [siginfo,Fs]=wfdbdesc(recordName);
 
 val(val==-32768) = NaN;
-
 for i = 1:size(val, 1)
-    val(i, :) = (val(i, :) - siginfo(i).Baseline ) / siginfo(i).Gain;
+    %Parse siginfo assuming signal gain is the first number and ignore Physical unit strings 
+    %following the gain
+    gain=regexp(siginfo(i).Gain,' ', 'split');
+    val(i, :) = (val(i, :) - siginfo(i).Baseline ) / str2num(gain{1});
 end
 
-tm = (1:size(val, 2))./Fs;
+val=val'; %Reshape to the Toolbox's standard format
+tm = (1:size(val, 2))./Fs(1);
 
 
 for n=1:nargout
