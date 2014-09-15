@@ -151,7 +151,7 @@ public class Wfdbexec {
 			Process p = launcher.start();
 			logger.finer("\n\t***Creating read buffer and waiting for exec process...");
 			BufferedReader output = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
+					p.getInputStream(),"US-ASCII"));
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
 			long thisTime=System.currentTimeMillis();
@@ -302,7 +302,7 @@ public class Wfdbexec {
 			logger.finest("\n\t***Starting launcher in exectToDoubleArray");
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
+					p.getInputStream(),"US-ASCII"));
 			String line;
 			String[] tmpStr=null;
 			Double[] tmpArr=null;
