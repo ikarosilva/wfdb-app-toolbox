@@ -47,9 +47,9 @@ function varargout=wfdbdesc(varargin)
 %
 % Written by Ikaro Silva, 2013
 %
-% Modified by Poitr Podziemski, August 12, 2014
+% Modified by Ikaro Silva, September 15, 2014
 %
-% Version 1.3
+% Version 1.4
 %
 % Since 0.0.1
 % See also RDSAMP
