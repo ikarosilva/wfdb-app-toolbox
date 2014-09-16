@@ -15,10 +15,10 @@
 
 #Package names and versions
 CURL=curl-7.33.0
-WFDB=wfdb-10.5.23
+WFDB=wfdb-10.5.24
 ECGPUWAVE=ecgpuwave-1.3.2
 BUILD_DIR=build
-MATLAB=/home/ikaro/MATLAB/R2014a/bin/matlab
+MATLAB=matlab
 
 INSTALL_DIR:=$(shell pwd)
 BUILD_DIR32=$(BUILD_DIR)32
@@ -63,7 +63,7 @@ clean-wfdb:
 	rm -f wfdb.tar.gz
 wfdb.tar.gz:
 	wget http://www.physionet.org/physiotools/wfdb.tar.gz; \
-	cp ./wfdb.tar.gz ./tmp/wfdb.tar.gz;
+	cp -p ./wfdb.tar.gz ./tmp/wfdb.tar.gz;
 wfdb.isconfig: wfdb.tar.gz
 	cd ./tmp; \
 	tar xvfz wfdb.tar.gz; \
@@ -174,13 +174,10 @@ all: curl wfdb mse edr wfdb32 ecgpuwave
 #The install target will copy the contents of the build directory
 #to the current lib lib64 and bin directories and remove configuration specific files
 install: all
-	rm -rv ./bin/* ;\
-	rm -rf ./lib/* ;\
-	rm -rv ./lib64/* ;\
 	cp -r ./$(BUILD_DIR)/bin/* ./bin/ ;\
 	cp -r ./$(BUILD_DIR)/lib/* ./lib/ ;\
 	cp -r ./$(BUILD_DIR)/lib64/* ./lib64/ ;\
-	rm -f ./bin/psfd ./bin/hrmem ./bin/cur-config ./bin/hrfft ./bin/pschar ./bin/hrlomb ./bin/hrplot ./bin/setwfdb ./bin/cshsetwfdb ./bin/curl-config ./lib/libcurl.la ./lib/pkgconfig/libcurl.pc
+	rm -f ./bin/psfd ./bin/hrmem ./bin/cur-config ./bin/hrfft ./bin/pschar ./bin/hrlomb ./bin/hrplot ./bin/setwfdb ./bin/cshsetwfdb ./bin/curl-config /lib/pkgconfig/libcurl.pc
 
 #Test will run the MATLAB Unit tests headlessly 
 #This requires the complete code repository and that the Makefile
