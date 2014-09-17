@@ -20,6 +20,12 @@ function varargout=wqrs(varargin)
 %    directory as the annotation file.
 %
 %
+% CITING CREDIT: To credit this function, please cite the following paper at your work:
+%
+% Zong, W., G. B. Moody, and D. Jiang."A robust open-source algorithm to detect onset 
+% and duration of QRS complexes." Computers in Cardiology, 2003. IEEE, 2003.
+%
+%
 % Required Parameters:
 %
 % recorName
