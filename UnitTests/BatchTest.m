@@ -25,10 +25,10 @@ for m=1:M
     fprintf(['Testing Suite (%s/%s):  %s() ...\n'],num2str(m), num2str(M),test_suite{m});
     eval(['[tests,pass,perf]=' test_suite{m} '();'])
     fprintf(['\tTested: %s\tPassed: %s\tTotal Time= %s\n'],num2str(tests),...
-        num2str(pass),num2str(nansum(nansum(perf))));
+        num2str(pass),num2str(sum(sum(perf))));
     total=total+tests;
     total_failed=total_failed+ (tests-pass);
-    total_time=total_time+nansum(perf);
+    total_time=total_time+sum(perf);
     if(pass < tests)
         failed(end+1)=test_suite(m);
     end
