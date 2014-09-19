@@ -36,9 +36,9 @@ function varargout=rdsamp(varargin)
 
  tm
        Nx1 vector of doubles representing the sampling intervals.
-       Depending on input flags (see below), this vector can either be a 
-       vector of integers (sampling number), or a vector of elapsed time 
-       in seconds  ( with up to millisecond precision only). 
+       Depending on input flags (see below), this vector can either be a
+       vector of integers (sampling number), or a vector of elapsed time
+       in seconds  ( with up to millisecond precision only).
 
  Fs    (Optional)
        1x1 Double, sampling frequency in Hz of the first signal in signalList
@@ -79,13 +79,13 @@ function varargout=rdsamp(varargin)
 
 
  Written by Ikaro Silva, 2013
- Last Modified: June 23, 2014
+ Last Modified: September 15, 2014
  Version 1.2
 
  Since 0.0.1
 
  %Example 1- Read a signal from PhysioNet's Remote server:
-[tm, signal]=rdsamp('challenge/2013/set-a/a01',1000);
+[tm, signal]=rdsamp('mitdb/100',[],1000);
 plot(tm,signal(:,1))
 
 %Example 2-Read 1000 samples from 3 signals
