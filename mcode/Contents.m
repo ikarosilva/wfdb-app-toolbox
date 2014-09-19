@@ -78,7 +78,7 @@
 %
 %
 %   The source code for the native libraries used in this toolbox can be obtained from PhysioNet under
-%   the GNU GPL aggreement.  
+%   the GNU GPL agreement.  
 %
 %   The original contributors of any open source native code that is available at PhysioNet
 %   and is used by the Toolbox are credited in their respective MATLAB wrappers. In addition, the
