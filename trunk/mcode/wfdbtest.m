@@ -22,6 +22,8 @@ end
 
 if(verbose)
     fprintf('***Starting test of the WFDB Application Toolbox\n')
+    fprintf('***If you experience any issues, please see our FAQ at:\n')
+    fprintf('http://physionet.org/physiotools/matlab/wfdb-app-matlab/faq.shtml\n')
 end
 
 if(usejava('jvm') )
@@ -65,12 +67,12 @@ if(verbose)
 end
 
 %Print warning with respect to any unsupported component
-if(isempty(strfind(config.MATLAB_VERSION,'2013')) && ~config.inOctave)
-    warning(['!! You are using an unsupported version of MATLAB: ' config.MATLAB_VERSION])
+if(isempty(strfind(config.MATLAB_VERSION,'2014')) && ~config.inOctave)
+    warning(['You are using an unsupported version of MATLAB: ' config.MATLAB_VERSION])
 end
 if(~isempty(regexp(config.osName,'macosx','once')) && isempty(regexp(config.OSVersion,'10.9','once')))
-    warning(['!! You are using an unsupported Mac OS : ' config.MATLAB_VERSION])
-    warning(['!! The WFDB Toolbox is only supported on Mac OS X 10.9'])
+    warning(['You are using an unsupported Mac OS : ' config.MATLAB_VERSION])
+    warning(['The WFDB Toolbox is only supported on Mac OS X 10.9'])
 end
 
 
