@@ -1,6 +1,6 @@
 function varargout=wrann(varargin)
 %
-% wrann(recordName,annotator,ann,annType,subType,chan,num)
+% wrann(recordName,annotator,ann,annType,subType,chan,num,comments)
 %
 %    Wrapper to WFDB WRANN:
 %         http://www.physionet.org/physiotools/wag/wrann-1.htm
@@ -37,18 +37,19 @@ function varargout=wrann(varargin)
 %       record.
 %
 % annType
-%       Nx1 vector of the chars or scalar describing annotaion type. Default is 'N'.
+%       Nx1 vector of the chars or scalar describing annotation type. Default is 'N'.
 %
 % subType
-%       Nx1 vector of the chars or scalar describing annotaion subtype. Default is
-%       '0'.
+%       Nx1 vector of the chars or scalar describing annotation subtype. Default is 0.
 %
 % chan
-%       Nx1 vector of the ints or scalar describing annotaion subtype. Default is 0.
+%       Nx1 vector of the ints or scalar describing annotation CHAN. Default is 0.
 %
 % num
-%       Nx1 vector of the ints or scalar describing annotaion NUM. Default is 0.
+%       Nx1 vector of the ints or scalar describing annotation NUM. Default is 0.
 %
+% comments
+%       Nx1 vector of the chars or scalar describing annotation comments. Default is ''.
 %
 %
 %%Example- Creates a *.test file in your current directory
@@ -69,8 +70,8 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: June 27, 2014
-% Version 1.2.1
+% Last Modified: September 22, 2014
+% Version 1.3
 % Since 0.0.1
 %
 % See also RDANN, RDSAMP, WFDBDESC
@@ -83,11 +84,12 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','annotator','ann','annType','subType','chan','num'};
+inputs={'recordName','annotator','ann','annType','subType','chan','num','comments'};
 annType='N';
 subType='0';
 chan=0;
 num=0;
+comments=' ';
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -119,11 +121,26 @@ end
 if(length(chan)==1);
     chan=repmat(num2str(chan),[1 L]);
 end
+if(isnumeric(chan))
+    chan=num2str(chan);
+end
 if(length(num)==1);
     num=repmat(num2str(num),[1 L]);
 end
+if(isnumeric(num))
+    num=num2str(num);
+end
+if(length(comments)==1);
+    comments=num2cell(repmat(num2str(comments),[1 L]));
+end
 
 ann=num2str(reshape(ann, [], 1));
+if(iscell(comments{1}))
+    %For compatiblitiy with output of RDANN
+    for i=1:L
+        comments{i}=cell2mat(comments{i});
+    end
+end
 
 for i=1:L
     deli=strfind(annTimeStamp{i},':');
@@ -132,8 +149,9 @@ for i=1:L
     elseif(deli>3)
         warning(['Unsupported format for annotation: ' annTimeStamp{i}])
     end
+    
     data{i}=[annTimeStamp{i} ' ' ann(i,:) ' ' annType(i) ' ' ...
-        subType(i) ' ' chan(i) ' ' num(i)];
+        subType(i) ' ' chan(i) ' ' num(i) ' ' comments{i}];
 end
 
 
