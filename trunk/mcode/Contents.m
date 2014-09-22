@@ -43,6 +43,7 @@
 %   wabp	        - Arterial blood pressure (ABP) pulse detector
 %   wfdbdemo        - Demonstration of the WFDB App Toolbox
 %   wfdbdesc        - Return signal information for about a WFDB record
+%   wfdbloadlib     - Load WFDB library and displays Toolbox configuration.
 %   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information
 %   wfdbtest        - Script to test installation of the Toolbox
 %   woody           - Perform signal averaging with alignment
