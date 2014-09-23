@@ -74,8 +74,8 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: September 13, 2014
-% Version 1.1.1
+% Last Modified: September 23, 2014
+% Version 1.2
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -202,7 +202,7 @@ else
             str=char(data(n));
             del_str=findstr(str,']');
             str(1:del_str)=[];
-            C=textscan(str,'%u %s %u %u %u %s');
+            C=textscan(str,'%u %s %s %u %u %s');
             ann(n)=C{1};
             type(n)=char(C{2});
             subtype(n)=char(C{3});
@@ -219,7 +219,7 @@ else
         end
         for n=1:N
             str=char(data(n));
-            C= textscan(str,'%s %u %s %u %u %u %s');
+            C= textscan(str,'%s %u %s %s %u %u %s');
             ann(n)=C{2};
             type(n)=char(C{3});
             subtype(n)=char(C{4});
