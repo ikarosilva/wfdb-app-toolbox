@@ -70,7 +70,7 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: September 22, 2014
+% Last Modified: September 23, 2014
 % Version 1.3
 % Since 0.0.1
 %
@@ -109,7 +109,7 @@ del=repmat(' ',size(ann));
 %printf("%6s%5d%5d%5d", annstr(annot.anntyp), annot.subtyp,annot.chan, annot.num);
 %printf("\t%s", annot.aux + 1)
 
-[annTimeStamp]=wfdbtime(recordName,ann);
+[annTimeStamp,annDateStamp]=wfdbtime(recordName,ann);
 L=length(annTimeStamp);
 data=cell(L,1);
 if(length(annType)==1);
@@ -142,19 +142,19 @@ if(iscell(comments{1}))
     end
 end
 
+padDate=~strcmp(annDateStamp{1}(1),'[');
 for i=1:L
-    deli=strfind(annTimeStamp{i},':');
-    if(deli==2)
-        annTimeStamp{i} = ['0' annTimeStamp{i}];
-    elseif(deli>3)
-        warning(['Unsupported format for annotation: ' annTimeStamp{i}])
+    if(padDate)
+        deli=strfind(annTimeStamp{i},':');
+        if(deli==2)
+            annDateStamp{i} = ['0' annDateStamp{i}];
+        end
     end
-    
-    data{i}=[annTimeStamp{i} ' ' ann(i,:) ' ' annType(i) ' ' ...
+    data{i}=[annDateStamp{i} ' ' ann(i,:) ' ' annType(i) ' ' ...
         subType(i) ' ' chan(i) ' ' num(i) ' ' comments{i}];
 end
 
-
+data
 javaWfdbExec.setArguments(wfdb_argument);
 err=javaWfdbExec.execWithStandardInput(data);
 if(~isempty(strfind(err.toString,['annopen: can''t'])))
