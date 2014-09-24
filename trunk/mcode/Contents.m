@@ -93,6 +93,7 @@
 %   and the JVM interface:
 %
 %   Sahar Alkhairy
+%   Fernando Andreotti Lage
 %   Joachim Behar
 %   Eudald Bogatell
 %   Jonas Carlson
@@ -104,8 +105,9 @@
 %   Louis Mayaud
 %   Blaž Merela
 %   Benjamin Moody
-%   George Moody 
+%   George B. Moody 
 %   Shamin Nemati
+%   Alexander Noack
 %   Piotr Podziemski
 %   Erina Katsumata
 %   Aled Rowen
