@@ -70,8 +70,8 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: September 23, 2014
-% Version 1.3
+% Last Modified: October 1, 2014
+% Version 1.3.1
 % Since 0.0.1
 %
 % See also RDANN, RDSAMP, WFDBDESC
@@ -97,6 +97,11 @@ for n=1:nargin
 end
 
 wfdb_argument={'-r',recordName,'-a',annotator};
+
+%Exit if any annotatinos have a NaN
+if(any(isnan(ann(:))))
+   error('Annotation array contains NaNs...not able to write file!');
+end
 
 %Convert all the annoation to 0 based index and then to strings, in order to set as standard input
 ann=ann-1;
