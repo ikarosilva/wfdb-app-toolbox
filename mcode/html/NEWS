@@ -1,6 +1,8 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
+0.9.8 (TBA)
+
 0.9.7 (October 8, 2014)
        Updated WFDB library to 10.5.24. Added method to change the Toolbox binary path at runtime.
        Added data integrity check in RDSAMP and added extra data type options. 
@@ -10,10 +12,10 @@ For a detailed list of changes see the repository Log at:
        returning channels in with 0 indexing. WFDBTEST now also checks if user is running 
        on supported version of MATLAB or Mac OS X. 
 
-0.9.6.1 (February 10, 2013):
+0.9.6.1 (February 10, 2014):
 	Minor bug fixes with JAR files loading libraries.
 
-0.9.6 (February 6, 2013):
+0.9.6 (February 6, 2014):
 	Added support to GNU Octave version 3.6.4 (requires Octave Java package). 
 	Added single, and fixed point, and higher precision options to RDSAMP. 
 	Added a system wide WFDB path configuration to WFDBLOADLIB. The default 
