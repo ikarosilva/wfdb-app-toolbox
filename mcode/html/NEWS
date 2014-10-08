@@ -1,8 +1,8 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
-0.9.7 (TBA)
-       Updated WFDB library to 10.5.23. Added method to change the Toolbox binary path at runtime.
+0.9.7 (October 8, 2014)
+       Updated WFDB library to 10.5.24. Added method to change the Toolbox binary path at runtime.
        Added data integrity check in RDSAMP and added extra data type options. 
        Improved performance in WRANN, and WFDBTIME. Changed API in PHYSIONETDB.
        Fixed issues with ECPUWAVE reading annotations passed through signalList. Removed 
