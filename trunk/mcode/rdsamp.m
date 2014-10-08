@@ -190,10 +190,23 @@ end
 if(config.inOctave)
     data=java2mat(data);
 end
+
+%When reading one signal only check if Fs is correct,
+%because it may not be for multiresolution signals
+if(length(signalList)==1 && rawUnits<3 )
+    Fstest=1/(data(2,1)-data(1,1));
+    err=abs(Fs-Fstest);
+    if(err>1)
+        warning([ 'Sampling frequency maybe incorrect! ' ...
+            'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)])
+        Fs=Fstest;
+    end
+end
+
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
     
-    %Perform mino data integrity check by validating with the expected
+    %Perform minor data integrity check by validating with the expected
     %sizes
     [N,M]=size(data);
     if(~isempty(signalList) )
