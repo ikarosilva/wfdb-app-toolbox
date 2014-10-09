@@ -188,7 +188,13 @@ ecgpuwave.isbuilt: wfdb32.isbuilt ecgpuwave-gfortran-addon.zip
 ecgpuwave: ecgpuwave.isbuilt
 
 
-all: curl wfdb mse edr wfdb32 ecgpuwave	
+dfa.c:
+	wget http://www.physionet.org/physiotools/dfa/dfa.c 
+dfa: dfa.c
+	gcc -o dfa -O dfa.c -lm
+
+
+all: curl wfdb mse edr wfdb32 ecgpuwave	dfa
 
 
 #The install target will copy the contents of the build directory
@@ -197,6 +203,7 @@ install:
 	rm -rv ./bin/* ;\
 	rm -rf ./lib/* ;\
 	rm -rf ./lib64/* ;\
+	mv dfa ./bin/ ;\
 	cp -R ./$(BUILD_DIR)/bin/* ./bin/ ;\
 	cp -R ./$(BUILD_DIR)/lib/* ./lib/ ;\
 	cp -R ./$(BUILD_DIR)/lib64/* ./lib64/ ;\

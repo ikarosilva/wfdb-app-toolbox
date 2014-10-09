@@ -149,7 +149,12 @@ ecgpuwave.isbuilt: ecgpuwave-gfortran-addon.zip
 	touch ../../ecgpuwave.isbuilt
 ecgpuwave: wfdb ecgpuwave.isbuilt
 
-all: curl wfdb edr mse ecgpuwave
+dfa.c:
+	wget http://www.physionet.org/physiotools/dfa/dfa.c 
+dfa: dfa.c
+	gcc -o dfa -O dfa.c -lm
+	
+all: curl wfdb edr mse ecgpuwave dfa
 
 checkin:
 	rm -fv $(INSTALL_DIR)/$(BUILD_DIR)/bin/hr* ;\
@@ -166,6 +171,7 @@ install: all
 	rm -rf ./lib/* ;\
 	cp -r ./$(BUILD_DIR)/bin/* ./bin/ ;\
 	cp -r ./$(BUILD_DIR)/lib/* ./lib/ ;\
+	mv dfa ./bin/ ;\
 	rm -f ./bin/psfd* ./bin/hrmem* ./bin/cur-config* ./bin/hrfft* ;\
 	rm -f ./bin/pschar* ./bin/hrlomb* ./bin/hrplot* ./bin/setwfdb* ;\
 	rm -f ./bin/cshsetwfdb* ./bin/curl-config* ./lib/libcurl.la* ;\
