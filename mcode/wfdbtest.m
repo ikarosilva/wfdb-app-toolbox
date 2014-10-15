@@ -3,9 +3,9 @@ function wfdbtest(varargin)
 %
 % Written by Ikaro Silva, 2013
 %
-% Last Modified: June 19, 2014
+% Last Modified: October 15, 2014
 %
-% Version 1.1
+% Version 1.2
 % Since 0.0.1
 %
 % See also wfdb, rdsamp
@@ -83,24 +83,6 @@ os_dir=config.WFDB_NATIVE_BIN(os_dir(end-1)+1:end-1);
 sampleLength=10000;
 cur_dir=pwd;
 data_dir=[config.MATLAB_PATH];
-try
-    [status,cmdout] = system([JVM_PATH ' -version']);
-    is7=~isempty(findstr('1.7',cmdout));
-    is6=~isempty(findstr('1.6',cmdout));
-    cd(data_dir)
-    if(is7)
-        jarname=dir('wfdb-app-JVM7-*');
-    elseif(is6)
-        jarname=dir('wfdb-app-JVM6-*');
-    else
-        warning(['Unknown JVM: '  cmdout])
-    end
-catch
-    if(verbose)
-        warning(lasterr);
-    end
-end
-cd(cur_dir)
 
 %Simple queries to PhysioNet servers
 %loaded properly. This should work regardless of the libcurl installation
