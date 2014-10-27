@@ -44,6 +44,7 @@
 %   wfdbloadlib     - Load WFDB library and displays Toolbox configuration.
 %   wfdbtime        - Converts sample index to WFDB Time based on WFDB record information
 %   wfdbtest        - Script to test installation of the Toolbox
+%   wfdbtool        - Launches PhysioNet's Signal and Annotation Viewer ( LightWave )
 %   woody           - Perform signal averaging with alignment
 %   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   wrann           - Writes annotations for WFDB records into annotation files
