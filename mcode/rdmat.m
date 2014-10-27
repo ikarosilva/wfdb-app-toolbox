@@ -50,7 +50,7 @@ function varargout=rdmat(varargin)
 % sum(abs(signal-signal2))
 %
 %
-% See also RDSAMP, RDMAT
+% See also RDSAMP, WFDB2MAT
 
 %endOfHelp
 
