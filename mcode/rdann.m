@@ -200,15 +200,27 @@ else
         % So we remove the everything between [ * ]  prior to parsing
         for n=1:N
             str=char(data(n));
-            del_str=findstr(str,']');
-            str(1:del_str)=[];
-            C=textscan(str,'%u %s %s %u %u %s');
-            ann(n)=C{1};
-            type(n)=char(C{2});
-            subtype(n)=char(C{3});
-            chan(n)=C{4};
-            num(n)=C{5};
-            comments(n)=C(6);
+            if(~isempty(str))
+                del_str=findstr(str,']');
+                str(1:del_str)=[];
+                C=textscan(str,'%u %s %s %u %u %s');
+                ann(n)=C{1};
+                type(n)=char(C{2});
+                if(sum(C{3}{:}>47 | C{3}{:}<58) )
+                    %Dealing with numeric subtypes, convert to numeric
+                    %string
+                    subtype(n)=str2num(C{3}{:});
+                else
+                    subtype(n)=C{3}{:};
+                end
+                chan(n)=C{4};
+                if(~isempty(C{5}))
+                    num(n)=C{5};
+                end
+                if(~isempty(C{6}))
+                    comments(n)=C(6);
+                end
+            end
         end
     else
         %In this case there is only timestamp such as:
@@ -220,10 +232,16 @@ else
         for n=1:N
             str=char(data(n));
             if(~isempty(str))
-                C= textscan(str,'%s %u %s %u %u %u %s');
+                C= textscan(str,'%s %u %s %s %u %u %s');
                 ann(n)=C{2};
                 type(n)=C{3}{:};
-                subtype(n)=C{4};
+                if(sum(C{4}{:}>47 | C{4}{:}<58) )
+                    %Dealing with numeric subtypes, convert to numeric
+                    %string
+                    subtype(n)=str2num(C{4}{:});
+                else
+                    subtype(n)=C{4}{:};
+                end
                 chan(n)=C{5}+1;%Convert to MATLAB indexing
                 if(~isempty(C{6}))
                     num(n)=C{6};
