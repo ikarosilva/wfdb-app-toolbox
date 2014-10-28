@@ -74,8 +74,8 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: September 23, 2014
-% Version 1.2
+% Last Modified: October 28, 2014
+% Version 1.3
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -219,13 +219,19 @@ else
         end
         for n=1:N
             str=char(data(n));
-            C= textscan(str,'%s %u %s %s %u %u %s');
-            ann(n)=C{2};
-            type(n)=char(C{3});
-            subtype(n)=char(C{4});
-            chan(n)=C{5}+1;%Convert to MATLAB indexing
-            num(n)=C{6};
-            comments(n)=C(7);
+            if(~isempty(str))
+                C= textscan(str,'%s %u %s %u %u %u %s');
+                ann(n)=C{2};
+                type(n)=C{3}{:};
+                subtype(n)=C{4};
+                chan(n)=C{5}+1;%Convert to MATLAB indexing
+                if(~isempty(C{6}))
+                    num(n)=C{6};
+                end
+                if(~isempty(C{7}))
+                    comments(n)=C(7);
+                end
+            end
         end
     end
     type=char(type);
