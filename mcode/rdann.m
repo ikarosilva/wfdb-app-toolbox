@@ -203,7 +203,7 @@ else
             if(~isempty(str))
                 del_str=findstr(str,']');
                 str(1:del_str)=[];
-                C=textscan(str,'%u %s %s %u %u %s');
+                C=textscan(str,'%u %s %s %u %u %[^\n\r]');
                 ann(n)=C{1};
                 type(n)=char(C{2});
                 if(sum(C{3}{:}>47 & C{3}{:}<58) )
@@ -232,7 +232,7 @@ else
         for n=1:N
             str=char(data(n));
             if(~isempty(str))
-                C= textscan(str,'%s %u %s %s %u %u %s');
+                C= textscan(str,'%s %u %s %s %u %u %[^\n\r]');
                 ann(n)=C{2};
                 type(n)=C{3}{:};
                 if(sum(C{4}{:}>47 & C{4}{:}<58) )
