@@ -206,7 +206,7 @@ else
                 C=textscan(str,'%u %s %s %u %u %s');
                 ann(n)=C{1};
                 type(n)=char(C{2});
-                if(sum(C{3}{:}>47 | C{3}{:}<58) )
+                if(sum(C{3}{:}>47 & C{3}{:}<58) )
                     %Dealing with numeric subtypes, convert to numeric
                     %string
                     subtype(n)=str2num(C{3}{:});
@@ -235,7 +235,7 @@ else
                 C= textscan(str,'%s %u %s %s %u %u %s');
                 ann(n)=C{2};
                 type(n)=C{3}{:};
-                if(sum(C{4}{:}>47 | C{4}{:}<58) )
+                if(sum(C{4}{:}>47 & C{4}{:}<58) )
                     %Dealing with numeric subtypes, convert to numeric
                     %string
                     subtype(n)=str2num(C{4}{:});
