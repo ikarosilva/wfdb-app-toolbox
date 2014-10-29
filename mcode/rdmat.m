@@ -61,6 +61,8 @@ function varargout=rdmat(varargin)
 %Set default pararameter values
 inputs={'recordName'};
 defGain=200; %Default value for missing gains
+wfdbNaN=-32768; %This should be the case for all WFDB signal format types currently supported by RDMAT
+
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -129,18 +131,19 @@ end
 fclose(fid);
 
 load([recordName '.mat']);
-
-%We should check that -32768 == NaN for all WFDB signal format types
-val(val==-32768) = NaN;
+val(val==wfdbNaN)= NaN;
 for m = 1:M
-    %Parse siginfo assuming signal gain is the first number and ignore Physical unit strings
-    %following the gain
+    %Convert from digital units to physical units.
+    % Mapping should be similar to that of rdsamp.c:
+    % http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
     val(m, :) = (val(m, :) - siginfo(m).Baseline ) / siginfo(m).Gain;
 end
 
-val=val'; %Reshape to the Toolbox's standard format
+%Reshape to the Toolbox's standard format
+val=val'; 
+
 %Generate time vector
-[N,L]=size(val);
+N=size(val,1);
 tm =linspace(0,(N-1)/Fs,N);
 
 
