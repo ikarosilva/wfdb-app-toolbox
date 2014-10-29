@@ -92,7 +92,7 @@ Fs=info{3};
 siginfo=[];
 for m = 1:M
     str=fgetl(fid);
-    info=textscan(str,'%s %s %s %u %u %f %u %u %[^\n\r]');
+    info=textscan(str,'%s %s %s %u %u %f %u %u %s');
     gain=info{3}{:};
     
     %Get Signal Units if present
