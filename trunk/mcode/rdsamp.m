@@ -59,8 +59,8 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: October 8, 2014
-% Version 1.3
+% Last Modified: October 30, 2014
+% Version 1.4
 %
 % Since 0.0.1
 %
@@ -73,6 +73,11 @@ function varargout=rdsamp(varargin)
 %
 %%%Example 3- Read 1000 samples from 3 signlas in single precision format
 %[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
+%
+%
+%%%Example 4- Read a multiresolution signal with 32 samples per frame
+% [tm,sig] = rdsamp('drivedb/drive02',[1],[],[],[],1);
+%
 %
 % See also WFDBDESC, PHYSIONETDB
 
@@ -122,14 +127,6 @@ if(isempty(N))
     end
 end
 
-if(~isempty(N))
-    %Its is possible where this is not true in rare cases where
-    %there is no signal length information on the header file
-    wfdb_argument{end+1}='-t';
-    wfdb_argument{end+1}=['s' num2str(N)];
-    ListCapacity=N-N0;
-end
-
 if(~isempty(signalList))
     wfdb_argument{end+1}='-s ';
     %-1 is necessary because WFDB is 0 based indexed.
@@ -140,7 +137,32 @@ end
 
 if(highResolution)
     wfdb_argument{end+1}=['-H'];
+    %In this case overwrite N, multiply by the maximum number of samples
+    %per frame
+    maxFrame=1;
+    for i=1:length(siginfo)
+        ind=strfind(siginfo(1).Format,'samples per frame');
+        if(~isempty(ind))
+           str= siginfo(1).Format(1:ind-1);
+           ind2=strfind(siginfo(1).Format,'(');
+           str=str(ind2+1:end);
+           frm=str2num(str);
+           if(frm>maxFrame)
+               maxFrame=frm;
+           end
+        end
+    end
+    N=N*maxFrame;
 end
+
+if(~isempty(N))
+    %Its is possible where this is not true in rare cases where
+    %there is no signal length information on the header file
+    wfdb_argument{end+1}='-t';
+    wfdb_argument{end+1}=['s' num2str(N)];
+    ListCapacity=N-N0;
+end
+
 
 if(nargout>2)
     if(isempty(siginfo))
