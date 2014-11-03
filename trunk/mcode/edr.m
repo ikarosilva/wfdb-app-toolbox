@@ -1,6 +1,6 @@
-function y=edr_new(varargin)
+function y=edr(varargin)
 % 
-% y = edr_new(data_type,signal,r_peaks,fs,pqoff, jpoff, gain_ecg, channel)
+% y = edr(data_type,signal,r_peaks,fs,pqoff, jpoff, gain_ecg, channel)
 %
 % ECG-derived Respiratory (EDR) signal computation from given
 % single-lead ECG signal based on the signed area under the QRS complex.
@@ -56,7 +56,7 @@ function y=edr_new(varargin)
 % please report bugs/questions at sara.mariani@wyss.harvard.edu
 % 
 % Example - Extract EDR signal from ECG in PhysioNet's Remote server:
-% signal='challenge/2013/set-a/a01';
+% signal='challenge/2013/set-a/f1o02';
 % r_peaks='fqrs';
 % data_type=1;
 % edr=edr_new(data_type,signal,r_peaks);
