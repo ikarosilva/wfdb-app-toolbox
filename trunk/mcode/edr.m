@@ -106,7 +106,9 @@ elseif data_type==1 %wfdb record
     % read the signal
     wfdb2mat(signal);
     pp=strfind(signal,'/');
+    if ~isempty(pp)
     signal=signal(pp(end)+1:end);
+    end
     [~,sig,fs]=rdmat([signal 'm']);
     ECGm=sig(:,channel);
     fs=fs(channel);
