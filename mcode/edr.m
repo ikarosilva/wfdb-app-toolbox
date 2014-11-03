@@ -56,10 +56,11 @@ function y=edr(varargin)
 % please report bugs/questions at sara.mariani@wyss.harvard.edu
 % 
 % Example - Extract EDR signal from ECG in PhysioNet's Remote server:
-% signal='challenge/2013/set-a/f1o02';
-% r_peaks='fqrs';
+% signal='f1o02';
+% r_peaks='ecg';
 % data_type=1;
-% edr=edr_new(data_type,signal,r_peaks);
+% channel=2;
+% edr=edr_new(data_type,signal,r_peaks,[],[],[],channel);
 %
 % see also: ecgpuwave, gqrs
 %
