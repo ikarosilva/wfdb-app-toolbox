@@ -60,7 +60,7 @@ function y=edr(varargin)
 % r_peaks='ecg';
 % data_type=1;
 % channel=2;
-% edr=edr_new(data_type,signal,r_peaks,[],[],[],channel);
+% edr=edr(data_type,signal,r_peaks,[],[],[],channel);
 %
 % see also: ecgpuwave, gqrs
 %
