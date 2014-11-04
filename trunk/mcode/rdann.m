@@ -74,8 +74,8 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: October 28, 2014
-% Version 1.3
+% Last Modified: November 4, 2014
+% Version 1.4
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -182,7 +182,7 @@ else
     N=length(data);
     ann=zeros(N,1);
     type=zeros(N,1);
-    subtype=zeros(N,1);
+    subtype=char(zeros(N,1));
     chan=zeros(N,1);
     num=zeros(N,1);
     comments=cell(N,1);
@@ -206,13 +206,7 @@ else
                 C=textscan(str,'%u %s %s %u %u %[^\n\r]');
                 ann(n)=C{1};
                 type(n)=char(C{2});
-                if(sum(C{3}{:}>47 & C{3}{:}<58) )
-                    %Dealing with numeric subtypes, convert to numeric
-                    %string
-                    subtype(n)=str2num(C{3}{:});
-                else
-                    subtype(n)=C{3}{:};
-                end
+                subtype(n)=C{3}{:};
                 chan(n)=C{4};
                 if(~isempty(C{5}))
                     num(n)=C{5};
@@ -235,13 +229,7 @@ else
                 C= textscan(str,'%s %u %s %s %u %u %[^\n\r]');
                 ann(n)=C{2};
                 type(n)=C{3}{:};
-                if(sum(C{4}{:}>47 & C{4}{:}<58) )
-                    %Dealing with numeric subtypes, convert to numeric
-                    %string
-                    subtype(n)=str2num(C{4}{:});
-                else
-                    subtype(n)=C{4}{:};
-                end
+                subtype(n)=C{4}{:};
                 chan(n)=C{5}+1;%Convert to MATLAB indexing
                 if(~isempty(C{6}))
                     num(n)=C{6};
@@ -253,7 +241,6 @@ else
         end
     end
     type=char(type);
-    subtype=char(subtype);
 end
 
 ann=ann+1; %Convert to MATLAB indexing
