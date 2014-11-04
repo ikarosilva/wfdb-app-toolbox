@@ -40,7 +40,8 @@ function varargout=wrann(varargin)
 %       Nx1 vector of the chars or scalar describing annotation type. Default is 'N'.
 %
 % subType
-%       Nx1 vector of the chars or scalar describing annotation subtype. Default is 0.
+%       Nx1 vector of the chars or scalar describing annotation subtype.
+%       Default is '0'.
 %
 % chan
 %       Nx1 vector of the ints or scalar describing annotation CHAN. Default is 0.
@@ -70,8 +71,8 @@ function varargout=wrann(varargin)
 %wrann('mitdb/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: October 1, 2014
-% Version 1.3.1
+% Last Modified: November 4, 2014
+% Version 1.4
 % Since 0.0.1
 %
 % See also RDANN, RDSAMP, WFDBDESC
@@ -148,6 +149,7 @@ if(iscell(comments{1}))
 end
 
 padDate=~strcmp(annDateStamp{1}(1),'[');
+tab=char(9);
 for i=1:L
     if(padDate)
         deli=strfind(annTimeStamp{i},':');
@@ -156,10 +158,9 @@ for i=1:L
         end
     end
     data{i}=[annDateStamp{i} ' ' ann(i,:) ' ' annType(i) ' ' ...
-        subType(i) ' ' chan(i) ' ' num(i) ' ' comments{i}];
+        subType(i) ' ' chan(i) ' ' num(i) tab comments{i}];
 end
 
-data
 javaWfdbExec.setArguments(wfdb_argument);
 err=javaWfdbExec.execWithStandardInput(data);
 if(~isempty(strfind(err.toString,['annopen: can''t'])))
