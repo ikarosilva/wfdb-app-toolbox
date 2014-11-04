@@ -1,51 +1,51 @@
 function y=edr(varargin)
-% 
+%
 % y = edr(data_type,signal,r_peaks,fs,pqoff, jpoff, gain_ecg, channel)
 %
 % ECG-derived Respiratory (EDR) signal computation from given
 % single-lead ECG signal based on the signed area under the QRS complex.
-% 
+%
 % Required Parameters:
 %
-% data_type  
+% data_type
 %       A 1x1 integer specifying the file data_type
 %       0 --> if Matlab file
 %       1 --> if record in MIT format
 %
-% signal  
+% signal
 %       A Nx1 integer array containing the ECG signal in mV (if data_type=0)
 %       OR a char string containing record name (if data_type=1)
 %
 % fs
 %       A 1x1 integer specifying the sampling frequency in hz (for Matlab variables only)
-%       
-% r_peaks 
+%
+% r_peaks
 %
 %       A Mx1 integer array containing locations of r peaks on signal in s
 %       OR a char string containing the extension of the annotation file
 %       with r peaks in samples (e.g. "qrs") (if data_type=1)
 %
-% optional parameters: 
+% optional parameters:
 %
-% gain_ecg  
+% gain_ecg
 %       A 1x1 integer specifying dig_max/phy_max (default=1)
-%       
-% channel 
-%       A 1x1 integer>1 (default=1) indicating ECG channel (if data_type=1)
-%                  
-% pqoff 
-%       A 1x1 integer>0 specifying average distance between PQ junction and
-%       R peak, in samples 
 %
-% jpoff 
+% channel
+%       A 1x1 integer>1 (default=1) indicating ECG channel (if data_type=1)
+%
+% pqoff
+%       A 1x1 integer>0 specifying average distance between PQ junction and
+%       R peak, in samples
+%
+% jpoff
 %       A 1x1 integer>0 specifying average distance between R peak and
 %       J point, in samples
 %
-% output: 
+% output:
 %
-% y 
+% y
 %       A Mx2 integer matrix containing time in seconds and edr
-%         
+%
 % This code was written by Sara Mariani at the Wyss Institute at Harvard
 % based on the open-source PhysioNet code edr.c
 % (http://www.physionet.org/physiotools/edr/)
@@ -54,14 +54,30 @@ function y=edr(varargin)
 % Author: Sara Mariani
 %
 % please report bugs/questions at sara.mariani@wyss.harvard.edu
-% 
+%
 % Example - Extract EDR signal from ECG in PhysioNet's Remote server:
 % signal='f1o02';
 % r_peaks='ecg';
 % data_type=1;
 % channel=2;
-% edr=edr(data_type,signal,r_peaks,[],[],[],channel);
-%
+% y=edr(data_type,signal,r_peaks,[],[],[],channel);
+% wfdb2mat('f1o02')
+% [~,signal,Fs,~]=rdmat('f1o02m');
+% resp=signal(:,1);
+% resp=resp-mean(resp);
+% resp=resp*200;
+% sec=length(resp)/Fs;
+% xax=[.25:.25:sec];
+% r=interp1(y(:,1), y(:,2), xax, 'spline');
+% B=fir1(100,[.1 .5],'bandpass');
+% edr_filt=filtfilt(B,1,r);
+% figure
+% plot(xax,edr_filt)
+% hold on
+% plot([1:length(resp)]/Fs,resp,'r')
+% legend('edr','respiratory signal')
+% xlabel('time (s)')
+
 % see also: ecgpuwave, gqrs
 %
 % endOfHelp
@@ -80,25 +96,25 @@ if nargin<3
 end
 
 for n=1:nargin
-        eval([inputs{n} '=varargin{n};'])
+    eval([inputs{n} '=varargin{n};'])
 end
 for n=nargin+1:8
     eval([inputs{n} '=[];'])
 end
 
 % check format and obtain all the features I need
-if data_type==0 %matlab   
-
+if data_type==0 %matlab
+    
     if  isempty(gain_ecg)
-        gain_ecg=1; 
-    end 
+        gain_ecg=1;
+    end
     ECGm=signal*gain_ecg;
     if isempty(r_peaks)
         error('R peaks locations not provided')
     else
-    tqrs=round(r_peaks*fs); %samples where I have the R peak
+        tqrs=round(r_peaks*fs); %samples where I have the R peak
     end
-
+    
 elseif data_type==1 %wfdb record
     if isempty(channel)
         channel=1;
@@ -107,34 +123,39 @@ elseif data_type==1 %wfdb record
     wfdb2mat(signal);
     pp=strfind(signal,'/');
     if ~isempty(pp)
-    signal=signal(pp(end)+1:end);
+        signal2=signal(pp(end)+1:length(signal));
+    else signal2=signal;
     end
-    [~,sig,fs]=rdmat([signal 'm']);
-    ECGm=sig(:,channel);
+[~,sig,fs]=rdmat([signal2 'm']);
+ECGm=sig(:,channel);
+if numel(fs)>1
     fs=fs(channel);
-    % read the header
-    siginfo=wfdbdesc(signal);
-    siginfo=siginfo(:,channel);
-    gainstring=siginfo.Gain;
-    sp=strfind(gainstring,' ');
-    try
-        gain_ecg=str2num(gainstring(1:sp-1));
-    catch
-        gain_ecg=1;
-    end 
-    if strfind(gainstring(end-1),'m')
-        gain_ecg=gain_ecg*1000;
-    end
-   
-    ECGm=ECGm*gain_ecg;
-    % read r_peaks if annotation file
-    if ischar(r_peaks)
-        [ann,ty]=rdann(signal,r_peaks);
-        tqrs=ann(ty=='N');
-        r_peaks=ann/fs;
-    else
-        tqrs=round(r_peaks*fs); %samples where I have the R peak
-    end
+end
+% read the header
+signal
+siginfo=wfdbdesc(signal);
+siginfo=siginfo(:,channel);
+gainstring=siginfo.Gain;
+sp=strfind(gainstring,' ');
+try
+    gain_ecg=str2num(gainstring(1:sp-1));
+catch
+    gain_ecg=1;
+end
+if strfind(gainstring(end-1),'m')
+    gain_ecg=gain_ecg*1000;
+end
+
+ECGm=ECGm*gain_ecg;
+% read r_peaks if annotation file
+if ischar(r_peaks)
+    [ann,ty]=rdann(signal,r_peaks);
+    tqrs=ann(ty=='N');
+    r_peaks=tqrs/fs;
+else
+    tqrs=round(r_peaks*fs); %samples where I have the R peak
+end
+
 else error('format data_type must be 0 or 1')
 end
 
@@ -181,7 +202,7 @@ for i=2:length(tqrs)-1
     snar(i)=sum(win);
 end
 if tqrs(end)+jpoff>length(sb)
-win=sb(tqrs(end)-pqoff:end);
+    win=sb(tqrs(end)-pqoff:end);
 else
     win=sb(tqrs(end)-pqoff:tqrs(end)+jpoff);
 end
@@ -195,32 +216,36 @@ xc=0;
 x=snar;
 r=zeros(size(x));
 for i=25:length(x)
-d=x(i)-xm;
-if xc<500
-    xc=xc+1;
-    dn=d/xc;
-else 
-    dn=d/xc;
-    if dn>xdmax
-        dn=xdmax;
-    elseif dn<-xdmax
-        dn=-xdmax;
+    d=x(i)-xm;
+    if xc<500
+        xc=xc+1;
+        dn=d/xc;
+    else
+        dn=d/xc;
+        if dn>xdmax
+            dn=xdmax;
+        elseif dn<-xdmax
+            dn=-xdmax;
+        end
     end
-end
-xm=xm+dn;
-xd=xd+abs(dn)-xd/(xc);
-if xd<1
-    xd=1;
-end
-xdmax=3*xd/(xc);
-r(i)=d/xd;
+    xm=xm+dn;
+    xd=xd+abs(dn)-xd/(xc);
+    if xd<1
+        xd=1;
+    end
+    xdmax=3*xd/(xc);
+    r(i)=d/xd;
 end
 y=r*50;
 while (max(y)>127 || min(y)<-128)
-y(y<-128)=y(y<-128)+255;
-y(y>127)=y(y>127)-255;
+    y(y<-128)=y(y<-128)+255;
+    y(y>127)=y(y>127)-255;
 end
-figure
+
+scrsz = get(0,'ScreenSize');
+figure('Position',...
+    [0.05*scrsz(3) 0.05*scrsz(4) 0.8*scrsz(3) 0.89*scrsz(4)],...
+    'Color',[1 1 1]);
 ax(1)=subplot(211);
 plot([1:length(sample)]/fs,sample)
 hold on
@@ -282,14 +307,14 @@ J=zeros(50,1);
 for j=1:50
     % search to the left
     try
-    w=bline(round(tqrs(j)-tlim2*fs):tqrs(j)-1);
+        w=bline(round(tqrs(j)-tlim2*fs):tqrs(j)-1);
     catch
         display(j)
         w=bline(1:tqrs(j)-1);
     end
     f=find(w);
     if numel(f)>0
-    PQ(j)=length(w)-max(f)+1;
+        PQ(j)=length(w)-max(f)+1;
     else
         PQ(j)=length(w);
     end
@@ -297,7 +322,7 @@ for j=1:50
     w=bline(tqrs(j)+1:round(tqrs(j)+tlim3*fs));
     f=find(w);
     if numel(f)>0
-    J(j)=min(f);
+        J(j)=min(f);
     else
         J(j)=length(w);
     end
