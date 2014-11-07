@@ -164,5 +164,5 @@ end
 javaWfdbExec.setArguments(wfdb_argument);
 err=javaWfdbExec.execWithStandardInput(data);
 if(~isempty(strfind(err.toString,['annopen: can''t'])))
-    error(err)
+    error(char(err.toString))
 end
