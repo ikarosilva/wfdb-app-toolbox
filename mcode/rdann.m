@@ -206,8 +206,20 @@ else
                 C=textscan(str,'%u %s %s %u %u %[^\n\r]');
                 ann(n)=C{1};
                 type(n)=char(C{2});
-                subtype(n)=C{3}{:};
-                chan(n)=C{4};
+                try
+                    subtype(n)=C{3}{:};
+                catch
+                    warning(['Ignoring annotation subtype. Annotation subtype has multiple characters: ' ...
+                        C{3}{:}]);
+                    subtype(n)='0';
+                end
+                try
+                    chan(n)=C{4}+1;%Convert to MATLAB indexing
+                catch
+                    warning(['Ignoring channel label. Channel label has multiple characters: ' ...
+                        C{4}]);
+                    chan(n)='0';
+                end
                 if(~isempty(C{5}))
                     num(n)=C{5};
                 end
@@ -229,8 +241,20 @@ else
                 C= textscan(str,'%s %u %s %s %u %u %[^\n\r]');
                 ann(n)=C{2};
                 type(n)=C{3}{:};
-                subtype(n)=C{4}{:};
-                chan(n)=C{5}+1;%Convert to MATLAB indexing
+                try
+                    subtype(n)=C{4}{:};
+                catch
+                    warning(['Ignoring annotation subtype. Annotation subtype has multiple characters: ' ...
+                        C{4}{:}]);
+                    subtype(n)='0';
+                end
+                try
+                    chan(n)=C{5}+1;%Convert to MATLAB indexing
+                catch
+                    warning(['Ignoring channel label. Channel label has multiple characters: ' ...
+                        C{5}]);
+                    chan(n)='0';
+                end
                 if(~isempty(C{6}))
                     num(n)=C{6};
                 end
