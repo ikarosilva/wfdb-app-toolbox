@@ -49,7 +49,6 @@
 %   wqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   wrann           - Writes annotations for WFDB records into annotation files
 %   wrsamp          - Writes signal data into WFDB-compatible records
-%   wfdbupdate      - Checks if this version of the WFDB Toolbox is up-to-date
 %
 %
 % 
