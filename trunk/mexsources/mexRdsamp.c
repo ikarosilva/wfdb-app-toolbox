@@ -18,28 +18,28 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include "matrix.h"
 
-char *pname;
-long maxSamples = 0L;
-int reallocIncrement= 50000;   /* allow the input buffer to grow (the increment is arbitrary) */
+double* dynamicData;
+unsigned long nSamples;
+long nsig;
+long maxSamples =2000000;
+long reallocIncrement= 1000000;   /* allow the input buffer to grow (the increment is arbitrary) */
 /* input data buffer; to be allocated and returned
  * channel samples will be interleaved
  */
 
-main(int argc, char *argv[],long *input_data,unsigned long *nSamples,long *nsig)
-{
-	pname =argv[0];
-	*nSamples = 0L; /* Number of samples read */
-	char *record = NULL, *search = NULL, *prog_name();
+void rdsamp(int argc, char *argv[]){
+	char* pname ="mexRdsamp1";
+	char *record = NULL, *search = NULL;
 	char *invalid, speriod[16], tustr[16];
 	int  highres = 0, i, isiglist, nosig = 0, s,
-			*sig = NULL;
+	*sig = NULL;
 	WFDB_Frequency freq;
-	WFDB_Sample *sample;
+	WFDB_Sample *datum;
 	WFDB_Siginfo *info;
 	WFDB_Time from = 0L, maxl = 0L, to = 0L;
-
-	for (i = 1 ; i < argc; i++) {
+	for(i = 1 ; i < argc; i++){
 		if (*argv[i] == '-') switch (*(argv[i]+1)) {
 		case 'f':	/* starting time */
 			if (++i >= argc) {
@@ -110,15 +110,18 @@ main(int argc, char *argv[],long *input_data,unsigned long *nSamples,long *nsig)
 		mexPrintf("No record name\n");
 		return;
 	}
-	if ((*nsig = isigopen(record, NULL, 0)) <= 0) return;
-	if ((sample = malloc(*nsig * sizeof(WFDB_Sample))) == NULL ||
-			(info = malloc(*nsig * sizeof(WFDB_Siginfo))) == NULL) {
+
+	if ((nsig = isigopen(record, NULL, 0)) <= 0) return;
+
+	if ((datum = malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+			(info = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
 		mexPrintf( "%s: insufficient memory\n", pname);
 		return;
 	}
-	if ((*nsig = isigopen(record, info, *nsig)) <= 0)
+
+	if ((nsig = isigopen(record, info, nsig)) <= 0)
 		return;
-	for (i = 0; i < *nsig; i++)
+	for (i = 0; i < nsig; i++)
 		if (info[i].gain == 0.0) info[i].gain = WFDB_DEFGAIN;
 	if (highres)
 		setgvmode(WFDB_HIGHRES);
@@ -142,14 +145,14 @@ main(int argc, char *argv[],long *input_data,unsigned long *nSamples,long *nsig)
 			}
 			sig[i] = s;
 		}
-		*nsig = nosig;
+		nsig = nosig;
 	}
 	else {	/* print samples from all signals */
-		if ((sig = (int *)malloc((unsigned)(*nsig)*sizeof(int))) == NULL) {
+		if ((sig = (int *) malloc( (unsigned) nsig*sizeof(int) ) ) == NULL) {
 			mexPrintf( "%s: insufficient memory\n", pname);
 			return;
 		}
-		for (i = 0; i < *nsig; i++)
+		for (i = 0; i < nsig; i++)
 			sig[i] = i;
 	}
 
@@ -167,43 +170,40 @@ main(int argc, char *argv[],long *input_data,unsigned long *nSamples,long *nsig)
 		to = from + maxl;
 
 	/* Read in the data in raw units */
-	long *tmp;
-	while ((to == 0L || from < to) && getvec(sample) >= 0) {
-		for (i = 0; i < *nsig; i++){
-			if (*nSamples >= maxSamples) {
+	mexPrintf("creating output matrix for %u signals and %u samples\n",
+			nsig,maxSamples);
+
+	if ( (dynamicData= mxRealloc(dynamicData,maxSamples * nsig * sizeof(double)) ) == NULL) {
+		mexPrintf("Unable to allocate enough memory to read record!");
+		mxFree(dynamicData);
+		return;
+	}
+
+
+	mexPrintf("reading %u signals\n",nsig);
+	while ((to == 0 || from < to) && getvec(datum) >= 0) {
+		for (i = 0; i < nsig; i++){
+			if (nSamples >= maxSample!s) {
 				/*Reallocate memory */
-				if ((tmp = realloc(input_data, maxSamples * sizeof(long))) == NULL) {
+				mexPrintf("nSamples=%u\n",nSamples);
+				maxSamples=maxSamples+ (reallocIncrement * nsig );
+				mexPrintf("reallocating output matrix to %u\n", maxSamples);
+				if ((dynamicData = mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
 					mexPrintf("Unable to allocate enough memory to read record!");
-					free(input_data);
-					free(tmp);
+					mxFree(dynamicData);
 					return;
 				}
-				input_data = tmp;
 			}
-			input_data[*nSamples] = (long) sample[sig[i]];
-			*nSamples++;
-		}
+			/* Convert data to physical units */
+			dynamicData[nSamples] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
+		}/* End of Channel loop */
+
+		nSamples++;
 	}
+	mexPrintf("datum[0]=%f datum[1]=%f\n",datum[sig[0]],datum[sig[1]]);
+	return;
 }
 
 
-/*
-void load_data()
-{
-	double y;
-	while (scanf("%lf", &y) == 1) {
-		if (npts >= maxdat) {
-			double *s;
-			if ((s = realloc(input_data, maxdat * sizeof(double))) == NULL) {
-				fprintf(stderr,"corrint: insufficient memory, exiting program!");
-				exit(-1);
-			}
-			input_data = s;
-		}
-		input_data[npts] = y;
-		npts++;
-	}
-	return (npts);
-}
 
- */
+

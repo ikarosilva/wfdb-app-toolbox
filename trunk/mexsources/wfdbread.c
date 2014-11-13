@@ -8,14 +8,18 @@
  *
  *=================================================================*/
 
-/* To compile run in MATLAB:
+/* To compile:
  *
+ *  1) Make  sure MATLAB starts with the proper
+ *  Environment settings (PATH, LD_LIBRARY_PATH) and that
+ *  wfdb.h and libwfdb.so are in the current directory.
+ *
+ * 2) From the command prompt run:
  * 
- *    mex -v wfdbread.c
+ *    mex wfdbread.c libwfdb.so
  *
  *
  */
-
 
 #include <math.h>
 #include "mex.h"
@@ -26,35 +30,22 @@
 void mexFunction( int nlhs, mxArray *plhs[], 
 		int nrhs, const mxArray*prhs[] )
 { 
-	double *yp;
-	double *t,*y;
-	size_t m,n;
-
 	/* Check for proper number of arguments */
 	if (nrhs < 1) {
-		mexErrMsgIdAndTxt( "MATLAB:yprime:invalidNumInputs",
+		mexErrMsgIdAndTxt( "MATLAB:wfdbread:invalidNumInputs",
 				"WFDB Record Name required.");
 	}
 
 	/* Get record name */
 	char *rec_name;
-	unsigned long *nSamples;
-	long *nsig;
-	long* input_data; /*To be allocated by mexRdsamp.c*/
-
 	size_t reclen;
 	reclen = mxGetN(prhs[0])*sizeof(mxChar)+1;
 	rec_name = malloc(sizeof(long));
-	nsig = malloc(sizeof(long));
-	if (nsig == NULL || rec_name ==NULL) {
-		mexPrintf("Unable to allocate enough memory to read record!");
-		return;
-	}
 
 	int status;
 	status = mxGetString(prhs[0], rec_name, (mwSize)reclen);
 
-	/*Run WFDB Code */
+	/*Call WFDB Code */
 	int argc=5;
 	char *argv[argc];
 	argv[0]="mexRdsamp.c";
@@ -63,20 +54,18 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	argv[3] = "-t";
 	argv[4] = "s5";
 
-	main(argc,argv,input_data,nSamples,nsig);
+	rdsamp(argc,argv);
 
-	/* Deallocate requested memory */
-	mxFree(rec_name);
-	free(nSamples);
-	free(nsig);
-	free(input_data);
+    /* Create a 0-by-0 mxArray; memory
+     * will be allocated dynamically by rdsamp */
+    plhs[0] = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
 
+    /* Set output variable to the allocated memory space */
+    mxSetPr(plhs[0],dynamicData);
+    mxSetM(plhs[0],nSamples);
+    mxSetN(plhs[0],nsig);
+    /* free local memory */
+	free(rec_name);
 	return;
 
 }
-
-
-
-
-
-
