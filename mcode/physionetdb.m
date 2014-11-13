@@ -40,7 +40,7 @@ function varargout=physionetdb(varargin)
 %
 % Author: Ikaro Silva, 2013
 % Since: 0.0.1
-% Last Modified: January 10, 2014
+% Last Modified: November 13, 2014
 %
 %
 % %Example 1 - List all available databases from PhysioNet into the screen
@@ -50,7 +50,7 @@ function varargout=physionetdb(varargin)
 % physionetdb([],[],1)
 %
 % %Example 3- List all available signals in the ucddb database.
-% physionetdb('ucddb')
+% db_list=physionetdb('ucddb')
 %
 % %Example 4- Download all records for database MITDB
 %  physionetdb('mitdb',1);
