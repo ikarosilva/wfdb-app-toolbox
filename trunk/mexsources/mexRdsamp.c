@@ -183,7 +183,7 @@ void rdsamp(int argc, char *argv[]){
 	mexPrintf("reading %u signals\n",nsig);
 	while ((to == 0 || from < to) && getvec(datum) >= 0) {
 		for (i = 0; i < nsig; i++){
-			if (nSamples >= maxSample!s) {
+			if (nSamples >= maxSamples) {
 				/*Reallocate memory */
 				mexPrintf("nSamples=%u\n",nSamples);
 				maxSamples=maxSamples+ (reallocIncrement * nsig );
