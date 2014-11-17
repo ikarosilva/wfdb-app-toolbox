@@ -17,7 +17,13 @@ function varargout=rdmat(varargin)
 % Fs
 %       A 1x1 integer specifying the sampling frequency in Hz for the entire record.
 %siginfo
-%       A LxN cell array specify the signal siginfo.
+%       A LxN cell array specifying the signal siginfo. Currently it is a
+%       structure with the following fields:
+%       
+%        siginfo.Units
+%        siginfo.Baseline
+%        siginfo.Gain
+%        siginfo.Description
 %
 % NOTE:
 %       You can use the WFDB2MAT command in order to convert the record data into a *.mat file,
@@ -40,8 +46,8 @@ function varargout=rdmat(varargin)
 %
 %
 % Written by Ikaro Silva, 2014
-% Last Modified: October 29, 2014
-% Version 1
+% Last Modified: November 17, 2014
+% Version 1.1
 %
 % Since 0.9.7
 %
@@ -125,6 +131,11 @@ for m = 1:M
         gain=defGain;
     end
     siginfo(m).Gain=double(gain);
+    
+    
+    %Get Signal Descriptor
+    siginfo(m).Description=info{9}{:};
+    
 end
 fclose(fid);
 
