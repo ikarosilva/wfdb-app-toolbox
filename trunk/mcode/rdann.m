@@ -23,7 +23,9 @@ function varargout=rdann(varargin)
 %       Nx1 vector of the chars describing annotation type.
 %
 % subtype
-%       Nx1 vector of the chars describing annotation subtype.
+%       Nx1 vector of the chars describing annotation subtype. 
+%       For a list of standard annotation codes used by PhyioNet, please see:
+%             http://www.physionet.org/physiobank/annotations.shtml
 %
 % chan
 %       Nx1 vector of the ints describing annotation subtype.
