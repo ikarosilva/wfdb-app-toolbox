@@ -240,7 +240,11 @@ else
         for n=1:N
             str=char(data(n));
             if(~isempty(str))
-                C= textscan(str,'%s %u %s %s %u %u %[^\n\r]');
+                if(config.inOctave)
+                    C= textscan(str,'%s %u %s %s %u %u %s');
+                else
+                    C= textscan(str,'%s %u %s %s %u %u %[^\n\r]');
+                end
                 ann(n)=C{2};
                 type(n)=C{3}{:};
                 try
