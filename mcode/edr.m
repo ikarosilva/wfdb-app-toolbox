@@ -1,6 +1,6 @@
 function y=edr(varargin)
 %
-% y = edr(data_type,signal,r_peaks,fs,pqoff, jpoff, gain_ecg, channel)
+% y = edr(data_type,signal,r_peaks,fs,pqoff, jpoff, gain_ecg, channel, show)
 %
 % ECG-derived Respiratory (EDR) signal computation from given
 % single-lead ECG signal based on the signed area under the QRS complex.
@@ -41,6 +41,11 @@ function y=edr(varargin)
 %       A 1x1 integer>0 specifying average distance between R peak and
 %       J point, in samples
 %
+% show
+%       A 1x1 boolean if true, generates a plot of the estimated
+%       respiration signal (default = 0).
+%
+%
 % output:
 %
 % y
@@ -51,7 +56,8 @@ function y=edr(varargin)
 % (http://www.physionet.org/physiotools/edr/)
 % by George Moody
 %
-% Author: Sara Mariani
+% Author: Sara Mariani, 2014
+% Last Modified: November 17, 2014
 %
 % please report bugs/questions at sara.mariani@wyss.harvard.edu
 %
@@ -60,7 +66,8 @@ function y=edr(varargin)
 % r_peaks='ecg';
 % data_type=1;
 % channel=2;
-% y=edr(data_type,signal,r_peaks,[],[],[],channel);
+% show=1;
+% y=edr(data_type,signal,r_peaks,[],[],[],channel,show);
 % wfdb2mat('f1o02')
 % [~,signal,Fs,~]=rdmat('fantasia/f1o02m');
 % resp=signal(:,1);
@@ -77,7 +84,7 @@ function y=edr(varargin)
 % plot([1:length(resp)]/Fs,resp,'r')
 % legend('edr','respiratory signal')
 % xlabel('time (s)')
-
+%
 % see also: ecgpuwave, gqrs
 %
 % endOfHelp
@@ -85,12 +92,12 @@ function y=edr(varargin)
 
 
 %Set default pararameter values
-inputs={'data_type','signal','r_peaks','fs','pqoff','jpoff', 'gain_ecg', 'channel'};
-
-if nargin>8
+inputs={'data_type','signal','r_peaks','fs','pqoff','jpoff', 'gain_ecg', 'channel' ,'show'};
+show=0;
+Ninputs=length(inputs);
+if nargin>Ninputs
     error('Too many input arguments')
 end
-
 if nargin<3
     error('Not enough input arguments')
 end
@@ -98,7 +105,7 @@ end
 for n=1:nargin
     eval([inputs{n} '=varargin{n};'])
 end
-for n=nargin+1:8
+for n=nargin+1:Ninputs
     eval([inputs{n} '=[];'])
 end
 
@@ -126,36 +133,36 @@ elseif data_type==1 %wfdb record
         signal2=signal(pp(end)+1:length(signal));
     else signal2=signal;
     end
-[~,sig,fs]=rdmat([signal2 'm']);
-ECGm=sig(:,channel);
-if numel(fs)>1
-    fs=fs(channel);
-end
-% read the header
-signal
-siginfo=wfdbdesc(signal);
-siginfo=siginfo(:,channel);
-gainstring=siginfo.Gain;
-sp=strfind(gainstring,' ');
-try
-    gain_ecg=str2num(gainstring(1:sp-1));
-catch
-    gain_ecg=1;
-end
-if strfind(gainstring(end-1),'m')
-    gain_ecg=gain_ecg*1000;
-end
-
-ECGm=ECGm*gain_ecg;
-% read r_peaks if annotation file
-if ischar(r_peaks)
-    [ann,ty]=rdann(signal,r_peaks);
-    tqrs=ann(ty=='N');
-    r_peaks=tqrs/fs;
-else
-    tqrs=round(r_peaks*fs); %samples where I have the R peak
-end
-
+    [~,sig,fs]=rdmat([signal2 'm']);
+    ECGm=sig(:,channel);
+    if numel(fs)>1
+        fs=fs(channel);
+    end
+    % read the header
+    signal
+    siginfo=wfdbdesc(signal);
+    siginfo=siginfo(:,channel);
+    gainstring=siginfo.Gain;
+    sp=strfind(gainstring,' ');
+    try
+        gain_ecg=str2num(gainstring(1:sp-1));
+    catch
+        gain_ecg=1;
+    end
+    if strfind(gainstring(end-1),'m')
+        gain_ecg=gain_ecg*1000;
+    end
+    
+    ECGm=ECGm*gain_ecg;
+    % read r_peaks if annotation file
+    if ischar(r_peaks)
+        [ann,ty]=rdann(signal,r_peaks);
+        tqrs=ann(ty=='N');
+        r_peaks=tqrs/fs;
+    else
+        tqrs=round(r_peaks*fs); %samples where I have the R peak
+    end
+    
 else error('format data_type must be 0 or 1')
 end
 
@@ -242,28 +249,34 @@ while (max(y)>127 || min(y)<-128)
     y(y>127)=y(y>127)-255;
 end
 
-scrsz = get(0,'ScreenSize');
-figure('Position',...
-    [0.05*scrsz(3) 0.05*scrsz(4) 0.8*scrsz(3) 0.89*scrsz(4)],...
-    'Color',[1 1 1]);
-ax(1)=subplot(211);
-plot([1:length(sample)]/fs,sample)
-hold on
-plot([1:length(baseline)]/fs,baseline,'g')
-plot((tqrs-pqoff)/fs,mean(ECGm)*ones(size(tqrs)),'*m')
-plot((tqrs+jpoff)/fs,mean(ECGm)*ones(size(tqrs)),'*c')
-legend('filtered ecg','baseline','window start','window end')
-set(gca,'fontsize',18)
-xlabel('time (s)','fontsize',18)
-ylim([mean(ECGm)-5*std(ECGm) mean(ECGm)+5*std(ECGm)])
-ax(2)=subplot(212);
-plot(r_peaks,y,'r')
-title('edr','fontsize',18)
-set(gca,'fontsize',18)
-xlabel('time (s)','fontsize',18)
-linkaxes(ax,'x')
-y=[r_peaks y];
+if(show)
+    scrsz = get(0,'ScreenSize');
+    figure('Position',...
+        [0.05*scrsz(3) 0.05*scrsz(4) 0.8*scrsz(3) 0.89*scrsz(4)],...
+        'Color',[1 1 1]);
+    ax(1)=subplot(211);
+    plot([1:length(sample)]/fs,sample)
+    hold on
+    plot([1:length(baseline)]/fs,baseline,'g')
+    plot((tqrs-pqoff)/fs,mean(ECGm)*ones(size(tqrs)),'*m')
+    plot((tqrs+jpoff)/fs,mean(ECGm)*ones(size(tqrs)),'*c')
+    legend('filtered ecg','baseline','window start','window end')
+    set(gca,'fontsize',18)
+    xlabel('time (s)','fontsize',18)
+    ylim([mean(ECGm)-5*std(ECGm) mean(ECGm)+5*std(ECGm)])
+    ax(2)=subplot(212);
+    plot(r_peaks,y,'r')
+    title('edr','fontsize',18)
+    set(gca,'fontsize',18)
+    xlabel('time (s)','fontsize',18)
+    linkaxes(ax,'x')
+    y=[r_peaks y];
 end
+end
+
+
+%%%% Helper function %%%%%%
+
 
 function[pqoff, jpoff]=boundaries(sample, baseline, tqrs, fs)
 % estimate the noise level
