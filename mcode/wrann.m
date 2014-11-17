@@ -38,6 +38,8 @@ function varargout=wrann(varargin)
 %
 % annType
 %       Nx1 vector of the chars or scalar describing annotation type. Default is 'N'.
+%       For a list of standard annotation codes used by PhyioNet, please see:
+%             http://www.physionet.org/physiobank/annotations.shtml
 %
 % subType
 %       Nx1 vector of the chars or scalar describing annotation subtype.
