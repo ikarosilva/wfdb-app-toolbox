@@ -76,10 +76,8 @@ function y=edr(varargin)
 % sec=length(resp)/Fs;
 % xax=[.25:.25:sec];
 % r=interp1(y(:,1), y(:,2), xax, 'spline');
-% B=fir1(100,[.1 .5],'bandpass');
-% edr_filt=filtfilt(B,1,r);
 % figure
-% plot(xax,edr_filt)
+% plot(xax,r)
 % hold on
 % plot([1:length(resp)]/Fs,resp,'r')
 % legend('edr','respiratory signal')
