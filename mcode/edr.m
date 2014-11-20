@@ -69,7 +69,7 @@ function y=edr(varargin)
 % show=1;
 % y=edr(data_type,signal,r_peaks,[],[],[],channel,show);
 % wfdb2mat('f1o02')
-% [~,signal,Fs,~]=rdmat('fantasia/f1o02m');
+% [~,signal,Fs,~]=rdmat('f1o02m');
 % resp=signal(:,1);
 % resp=resp-mean(resp);
 % resp=resp*200;
@@ -268,8 +268,8 @@ if(show)
     set(gca,'fontsize',18)
     xlabel('time (s)','fontsize',18)
     linkaxes(ax,'x')
-    y=[r_peaks y];
 end
+ y=[r_peaks y];
 end
 
 
