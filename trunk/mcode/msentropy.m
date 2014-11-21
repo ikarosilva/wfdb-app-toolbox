@@ -83,7 +83,7 @@ function varargout=msentropy(varargin)
 %plot(scale1,entropyNoise);hold on;grid on;plot(scale2,entropyDeterm,'r');legend('Stochastic','Deterministic')
 %
 %
-% See also WFDBDESC, PHYSIONETDB, RDANN, ANN2RR, MAPRECORD
+% See also SURROGATE, DFA, WFDBDESC, PHYSIONETDB, RDANN, ANN2RR, MAPRECORD
 
 %endOfHelp
 persistent javaWfdbExec config

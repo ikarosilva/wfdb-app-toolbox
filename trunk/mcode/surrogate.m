@@ -1,6 +1,6 @@
-function Y=surrogate(x,m)
+function Y=surrogate(x,M)
 %
-% Y=shuffle(x,M)
+% Y=surrogate(x,M)
 %
 % Generates M amplitude adjusted phase shuffled surrogate time series from x. 
 % Useufel for testing the underlying assumption that the null hypothesis consists
@@ -34,7 +34,9 @@ function Y=surrogate(x,m)
 % Since 0.9.8
 %
 %
-% See also msentropy
+%
+% 
+% See also MSENTROPY, SURROGATE
 
 %endOfHelp
 

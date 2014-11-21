@@ -17,6 +17,7 @@
 % -----------------------
 %   ann2rr          - Extract a list of intervals from an annotation file
 %   bxb             - ANSI/AAMI-standard beat-by-beat annotation comparator
+%   dfa             - Detrended Fluctuation Analysis
 %   edr             - Derives a respiration signal from an ECG signal
 %   ecgpuwave       - Estimation of QRS and P waves from ECG signals
 %   gqrs            - Estimation of QRS from ECG signals
