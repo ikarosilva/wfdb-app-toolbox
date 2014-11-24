@@ -18,6 +18,7 @@
 %   ann2rr          - Extract a list of intervals from an annotation file
 %   bxb             - ANSI/AAMI-standard beat-by-beat annotation comparator
 %   dfa             - Detrended Fluctuation Analysis
+%   corrint         - Correlation Integral Analysis
 %   edr             - Derives a respiration signal from an ECG signal
 %   ecgpuwave       - Estimation of QRS and P waves from ECG signals
 %   gqrs            - Estimation of QRS from ECG signals
@@ -36,6 +37,7 @@
 %   sqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   sumann	        - Summarize the contents of a WFDB annotation file
 %   tach            - Calculates instantaneous heart rate of a WFDB ECG record signal
+%   visgraph        - Visibility Graph Analysis
 %   wfdb            - Prints this help information of the Toolbox
 %   wfdb2mat        - Converts a record *.dat file into a *.mat file. 
 %   wfdbexec        - Executes a system call to any installed native WFDB command.

@@ -2,7 +2,7 @@ clear all;close all;clc
 
 
 %Generate differen time series based on different process for analysis
-N=1000; %Number of points for each process
+N=500; %Number of points for each process
 model_names={'one','two','three','four','five'};
 
 %Model One - Linear Auto Regressive model with measurement noise
