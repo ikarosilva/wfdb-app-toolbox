@@ -85,6 +85,10 @@ end
 M=length(out);
 k=zeros(M,1)+NaN;
 logP=zeros(M,1)+NaN;
+if(length(out{end})==1)
+    out(end)=[];
+    M=M-1;
+end
 for m=1:M
     str=out{m};
     sep=regexp(str,'\s');
