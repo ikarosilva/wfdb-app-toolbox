@@ -101,7 +101,7 @@ function varargout=corrint(varargin)
 % model_names={'linearModel','nonlinearModel'};
 % 
 % %Linear Auto Regressive model with measurement noise
-% linear_model=zeros(N,1);
+% linearModel=zeros(N,1);
 % x=77;
 % linearModel(1)=x;
 % for n=2:N
@@ -157,7 +157,7 @@ function varargout=corrint(varargin)
 % distanceThreshold=[];
 % embeddedDim=4;
 % estimationMode='smooth';
-% figure(5)
+% figure(4)
 % K=[1:20 25 30 50 70 100];
 % D=length(K);
 % surrN=10;
