@@ -46,8 +46,8 @@ function varargout=rdmat(varargin)
 %
 %
 % Written by Ikaro Silva, 2014
-% Last Modified: November 17, 2014
-% Version 1.1
+% Last Modified: November 26, 2014
+% Version 1.2
 %
 % Since 0.9.7
 %
@@ -90,7 +90,7 @@ while(strcmp(str(1),'#'))
 end
 
 %Process Record Line Info
-info=textscan(str,'%s %u %f %u');
+info=textscan(str,'%s %u %f %u %s %s');
 M=info{2}; %Number of signals present
 Fs=info{3};
 
