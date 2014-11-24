@@ -4,7 +4,7 @@ For a detailed list of changes see the repository Log at:
 0.9.8 (TBA)
 	   Several features added and bug fixes. New implementation of the EDR function
 	   by Sara Mariani. Removed WFDBUPDATE. Added the following new functions : 
-	   DFA, SURROGATE, WFDBTOOL, and PBSEARCH.
+	   CORRINT, DFA, PBSEARCH, SURROGATE, VISGRAPH, and WFDBTOOL.
 	   
 0.9.7 (October 8, 2014)
        Updated WFDB library to 10.5.24. Added method to change the Toolbox binary path at runtime.
