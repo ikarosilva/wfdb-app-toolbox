@@ -18,71 +18,92 @@
       <div class="helptext"><pre><!--helptext -->
 
 
-function varargout=edr(varargin)
+function y=edr(varargin)
 
- edr(recordName,annotationFileName,win,signaList,outputAnnotator)
+ y = edr(data_type,signal,r_peaks,fs,pqoff, jpoff, gain_ecg, channel, show)
 
-    Wrapper to the EDR function written by George Moody:
-         http://www.physionet.org/physiotools/edr/edr.c
+ ECG-derived Respiratory (EDR) signal computation from given
+ single-lead ECG signal based on the signed area under the QRS complex.
 
- Estimates a respiratory signal from an ECG signa using information on the
- QRS complex. No output variable is generated in the MATLAB workspace.
- Instead, an output annotation file is generate in the current directory
- with an *.edr extension but with same input record name. In the generated *.edr
- annotation files, the 'num' field of each beat annotation is replaced by
- an EDR sample.
-
- Reference: "Derivation of respiratory signals from multi-lead ECGs", pp. 113-116, Computers in Cardiology
-1985.
-  
  Required Parameters:
 
- recordName
-       String specifying the name of the record.
+ data_type
+       A 1x1 integer specifying the file data_type
+       0 --> if Matlab file
+       1 --> if record in MIT format
 
- annotationFileName
-       String specifying the name of the annotation file in which each
-       beat (QRS complex) to be used by EDR has been labelled.
+ signal
+       A Nx1 integer array containing the ECG signal in mV (if data_type=0)
+       OR a char string containing record name (if data_type=1)
 
+ fs
+       A 1x1 integer specifying the sampling frequency in hz (for Matlab variables only)
 
- Optional Parameters are:
+ r_peaks
 
- win
-      A 2x1 vector of double specifying the window start and end times  in
-      seconds. The default= [ 0.04 0.04], starts the estimation process
-      0.04 seconds before and 0.04 seconds after the annotated beat.
+       A Mx1 integer array containing locations of r peaks on signal in s
+       OR a char string containing the extension of the annotation file
+       with r peaks in samples (e.g. "qrs") (if data_type=1)
 
- signaList
-       A Nx1 vector of integers specifying which ECG signals to analyze.
+ optional parameters:
 
- outputAnnotator
-       A String specifying the ouput annotator name (default = 'edr').
+ gain_ecg
+       A 1x1 integer specifying dig_max/phy_max (default=1)
 
-  Wrapper written by Ikaro Silva, 2013
-  Last Modified: January, 21, 2014
- Version 0.0.1
+ channel
+       A 1x1 integer>1 (default=1) indicating ECG channel (if data_type=1)
 
- Since 0.9.5
+ pqoff
+       A 1x1 integer>0 specifying average distance between PQ junction and
+       R peak, in samples
 
- %Example 1-
- %Note!!: This example will generate a subdirectory called mitdb
- %in your current directory. This is where the QRS and EDR annotations 
- %will be stored and read relative to the current directory
- 
- display('Generating SQRS annotation...')
- sqrs('mitdb/100');
- display('Generating EDR annotation...')
- edr('mitdb/100','qrs');
- display('Reading EDR annotation...')
-[ann,type,subtype,chan,num]=rdann('mitdb/100','edr');
-display('Ploting Normalized ECG and EDR signals')
-[tm,signal]=rdsamp('mitdb/100',[],3000);
-num(ann>3000)=[];ann(ann>3000)=[];
-plot(tm(1:3000),signal(1:3000,1)./max(signal(:,1)));hold on;grid on
-plot(tm(ann),num/max(num),'ro-');
+ jpoff
+       A 1x1 integer>0 specifying average distance between R peak and
+       J point, in samples
+
+ show
+       A 1x1 boolean if true, generates a plot of the estimated
+       respiration signal (default = 0).
 
 
- See also WFDBDESC, PHYSIONETDB, RDANN, WRANN SQRS, WQRS
+ output:
+
+ y
+       A Mx2 integer matrix containing time in seconds and edr
+
+ This code was written by Sara Mariani at the Wyss Institute at Harvard
+ based on the open-source PhysioNet code edr.c
+ (http://www.physionet.org/physiotools/edr/)
+ by George Moody
+
+ Author: Sara Mariani, 2014
+ Last Modified: November 17, 2014
+
+ please report bugs/questions at sara.mariani@wyss.harvard.edu
+
+ Example - Extract EDR signal from ECG in PhysioNet's Remote server:
+ signal='fantasia/f1o02';
+ r_peaks='ecg';
+ data_type=1;
+ channel=2;
+ show=1;
+ y=edr(data_type,signal,r_peaks,[],[],[],channel,show);
+ wfdb2mat('f1o02')
+ [~,signal,Fs,~]=rdmat('f1o02m');
+ resp=signal(:,1);
+ resp=resp-mean(resp);
+ resp=resp*200;
+ sec=length(resp)/Fs;
+ xax=[.25:.25:sec];
+ r=interp1(y(:,1), y(:,2), xax, 'spline');
+ figure
+ plot(xax,r)
+ hold on
+ plot([1:length(resp)]/Fs,resp,'r')
+ legend('edr','respiratory signal')
+ xlabel('time (s)')
+
+ see also: ecgpuwave, gqrs
 </pre></div><!--after help -->
    </body>
 </html>
