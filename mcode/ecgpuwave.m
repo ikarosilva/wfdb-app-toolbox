@@ -80,8 +80,6 @@ function ecgpuwave(varargin)
 % signalList
 %     A Nx1 vector of integers specifying which signals in 'recordName' are
 %     to be analyzed (default = [0].
-% outputAnnotator
-%       A String specifying the ouput annotator name (default = 'edr').
 %
 % Wrapper written by Ikaro Silva, 2013
 % Last Modified: May 29 , 2014
