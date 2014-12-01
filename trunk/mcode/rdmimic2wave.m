@@ -90,7 +90,10 @@ function varargout=rdmimic2wave(varargin)
 %legend(sigInfo(2).Description)
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: -
+% Last Modified: December 1, 2014
+%
+% Version 1.1
+%
 % Since 0.9.0
 %
 %
@@ -174,7 +177,8 @@ if(~isempty(matched_pid))
     
     %Get all records that match the patient and search for a record
     %that includes the clinical time
-    eval(['recs=regexp(regexp(matched,''(\<s' num2str(subjectID) '.*)'',''match''),''\n'',''split'');'])
+    strSubjectID=sprintf('%05d',subjectID);
+    eval(['recs=regexp(regexp(matched,''(\<s' strSubjectID '.*)'',''match''),''\n'',''split'');'])
     recs=recs{:};
     N=length(recs);
     for n=1:N
