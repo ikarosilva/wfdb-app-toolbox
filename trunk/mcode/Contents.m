@@ -78,11 +78,7 @@
 %   these functions on your work, please look at the help for that function
 %   in order find out how to credit the original paper and authors.
 %
-%   For questions, contributions, and feedback please contact us at: 
-%
-%       wfdb-matlab-support@physionet.org 
-%
-%  Or join our community at: 
+%   For questions, contributions, and feedback post at our community Forum: 
 %       http://groups.google.com/forum/#!forum/wfdb-app-toolbox
 %
 %

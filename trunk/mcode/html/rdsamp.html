@@ -79,8 +79,8 @@ function varargout=rdsamp(varargin)
 
 
  Written by Ikaro Silva, 2013
- Last Modified: September 15, 2014
- Version 1.2
+ Last Modified: October 30, 2014
+ Version 1.4
 
  Since 0.0.1
 
@@ -93,6 +93,11 @@ plot(tm,signal(:,1))
 
 %%Example 3- Read 1000 samples from 3 signlas in single precision format
 [tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
+
+
+%%Example 4- Read a multiresolution signal with 32 samples per frame
+ [tm,sig] = rdsamp('drivedb/drive02',[1],[],[],[],1);
+
 
  See also WFDBDESC, PHYSIONETDB
 </pre></div><!--after help -->

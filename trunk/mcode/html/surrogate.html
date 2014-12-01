@@ -1,0 +1,62 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: surrogate</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: surrogate</td>
+            <td class="subheader-left"><a href="surrogate.m">View code for surrogate</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">surrogate</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function Y=surrogate(x,M)
+
+ Y=surrogate(x,M)
+
+ Generates M amplitude adjusted phase shuffled surrogate time series from x. 
+ Useufel for testing the underlying assumption that the null hypothesis consists
+ of linear dynamics with possibly non-linear, monotonically increasing,
+ measurement function.
+
+ Required Input Parameters:
+
+ x
+       Nx1 vector of doubles
+
+ M
+       1x1 scalar specifying the number of surrogate time series to
+       generate.
+
+ Required Output Parameters:
+
+ Y
+       NxM vector of doubles
+
+
+
+ References:
+
+[1] Kaplan, Daniel, and Leon Glass. Understanding nonlinear dynamics. Vol. 19. Springer, 1995.
+
+
+ Written by Ikaro Silva, 2014
+ Last Modified: November 20, 2014
+ Version 1.0
+ Since 0.9.8
+
+
+
+ 
+ See also MSENTROPY, SURROGATE
+</pre></div><!--after help -->
+   </body>
+</html>

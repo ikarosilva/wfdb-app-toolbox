@@ -43,7 +43,9 @@ function varargout=rdann(varargin)
        Nx1 vector of the chars describing annotation type.
 
  subtype
-       Nx1 vector of the chars describing annotation subtype.
+       Nx1 vector of the chars describing annotation subtype. 
+       For a list of standard annotation codes used by PhyioNet, please see:
+             http://www.physionet.org/physiobank/annotations.shtml
 
  chan
        Nx1 vector of the ints describing annotation subtype.
@@ -94,8 +96,8 @@ function varargout=rdann(varargin)
 
 
  Written by Ikaro Silva, 2013
- Last Modified: September 23, 2014
- Version 1.2
+ Last Modified: November 4, 2014
+ Version 1.4
  Since 0.0.1
 
  %Example 1- Read a signal and annotation from PhysioNet's Remote server:

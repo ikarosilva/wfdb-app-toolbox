@@ -52,7 +52,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	argv[1] = "-r";
 	argv[2] = rec_name;
 	argv[3] = "-t";
-	argv[4] = "s5";
+	argv[4] = " ";
 
 	rdsamp(argc,argv);
 
