@@ -13,7 +13,7 @@ function pbsearch
 %
 % Since 0.9.8
 %
-% %Example 1- Read a signal from PhysioNet's Remote server:
+% %Example - Launch MATLAB webrowser at PhsyioNet's record search tool
 %  pbsearch
 %
 % See also WFDBDESC, PHYSIONETDB

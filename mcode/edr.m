@@ -84,8 +84,8 @@ function y=edr(varargin)
 % xlabel('time (s)')
 %
 % see also: ecgpuwave, gqrs
-%
-% endOfHelp
+
+%endOfHelp
 
 
 
