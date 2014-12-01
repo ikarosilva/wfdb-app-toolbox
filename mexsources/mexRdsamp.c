@@ -179,7 +179,7 @@ void rdsamp(int argc, char *argv[]){
 		return;
 	}
 
-
+	mexPrintf("reading from %u  to %u \n",from,to);
 	mexPrintf("reading %u signals\n",nsig);
 	while ((to == 0 || from < to) && getvec(datum) >= 0) {
 		for (i = 0; i < nsig; i++){
@@ -195,7 +195,11 @@ void rdsamp(int argc, char *argv[]){
 				}
 			}
 			/* Convert data to physical units */
-			dynamicData[nSamples] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
+			/*dynamicData[nSamples]
+			 		 =( (double) datum[sig[i]] - info[sig[i]].baseline )
+			 		  / info[sig[i]].gain;
+			 */
+
 		}/* End of Channel loop */
 
 		nSamples++;
@@ -203,7 +207,3 @@ void rdsamp(int argc, char *argv[]){
 	mexPrintf("datum[0]=%f datum[1]=%f\n",datum[sig[0]],datum[sig[1]]);
 	return;
 }
-
-
-
-

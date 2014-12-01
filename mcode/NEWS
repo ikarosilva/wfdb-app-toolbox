@@ -1,9 +1,9 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
-0.9.8 (TBA)
+0.9.8 (December 1, 2014)
 	   Several features added and bug fixes. New implementation of the EDR function
-	   by Sara Mariani. Removed WFDBUPDATE. Added the following new functions : 
+	   by Sara Mariani. Removed WFDBUPDATE and SCORE2013. Added the following new functions : 
 	   CORRINT, DFA, PBSEARCH, SURROGATE, VISGRAPH, and WFDBTOOL.
 	   
 0.9.7 (October 8, 2014)
