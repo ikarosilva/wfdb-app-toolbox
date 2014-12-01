@@ -1,0 +1,103 @@
+
+_______________________________________________________________________________
+Copyright (c) 2009 by Michael Craig, All Rights Reserved
+Contact M. Craig (mic@mit.edu)
+
+   This library (wfdb-swig-matlab) is free software; you can redistribute
+   it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307  USA
+
+_______________________________________________________________________________
+
+This file describes how to manually install WFDB Tools for MATLAB.
+
+To begin, you will need the following files:
+
+  wfdb-swig.jar
+  wfdb-swig-matlab-${OS}.jar
+  wsm-matlab-code.jar
+  wfdb-nativelibs-${OS}-${ARCH}.jar
+
+where ${OS} is one of "linux", "macosx", or "windows" (without quotes) and
+${ARCH} is one of "amd64", "i386", "x86", and "ppc" (again without quotes).
+Note that nativelibs are not available for all combinations of ${OS} and
+${ARCH}; currently the following combinations are supported:
+
+  linux   amd64
+  linux   i386
+  macosx  i386
+  macosx  ppc
+  windows amd64
+  windows x86
+
+These files can be downloaded from
+http://physioforge.csail.mit.edu/wfdbtools/wfdb-swig-matlab/ or built from
+source code.
+
+${ARCH} should match the architecture of the JVM that your MATLAB installation
+is using; you can find it by running the following command in MATLAB:
+
+  java.lang.System.getProperty('os.arch')
+
+You will need to create a directory to store wfdb-swig-matlab; call it
+${WSMROOT}. Unjar wsm-matlab-code.jar, wfdb-swig.jar, and
+wfdb-swig-matlab-${OS}.jar into ${WSMROOT}. Make the subdir.
+${WSMROOT}/lib-${ARCH} and unjar wfdb-nativelibs-${OS}-${ARCH}.jar into it.
+You can remove any files in ${WSMROOT}/lib-${ARCH} whose names do not end
+in -${ARCH}. Now you need to strip the -${ARCH} suffixes from those remaining
+files; on a *nix system you can do so as:
+
+  $ for i in *${ARCH}; do mv $i `basename $i "-${ARCH}"`; done
+
+Now you need to update MATLAB-specific files. Call the root directory of your
+MATLAB installation ${MATLABROOT}. Files
+${MATLABROOT}/toolbox/local/librarypath.txt and
+${MATLABROOT}/toolbox/local/classpath.txt should exist; if not, create them
+(if ${MATLABROOT}/toolbox/local does not exist, something is probably wrong
+with your MATLAB installation!) Add the following line to librarypath.txt:
+
+${WSMROOT}/lib-${ARCH}
+
+(with ${WSMROOT} and ${ARCH} properly substituted, of course.) Add the
+following two lines to classpath.txt:
+
+${WSMROOT}/wfdb.jar
+${WSMROOT}/wsm-classes.jar
+
+(again with ${WSMROOT} properly substituted.)
+
+Finally, you need to update MATLAB's path, adding both these two directories:
+
+  ${WSMROOT}
+  ${WSMROOT}/util
+
+The easiest way to do this is with the command PATHTOOL in MATLAB. You might
+also try the following sequence of MATLAB commands:
+
+  addpath('${WSMROOT}');
+  addpath('${WSMROOT}/util');
+  try
+    savepath;
+  catch
+    path2rc;
+  end
+
+(with ${WSMROOT} substituted, as usual.)
+
+That's it! WFDB Tools for MATLAB should be ready to go. If you are still having
+problems, consult the web page,
+http://physioforge.csail.mit.edu/wfdbtools/wfdb-swig-matlab/ and feel free
+to use the "contact us" link to ask for help.
+

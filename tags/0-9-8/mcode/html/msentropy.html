@@ -1,0 +1,109 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: msentropy</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: msentropy</td>
+            <td class="subheader-left"><a href="msentropy.m">View code for msentropy</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">msentropy</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=msentropy(varargin)
+
+ [y,scale,info]=msentropy(x,dn,dm,dr,N,N0,minM,maxM,maxScale,minR,maxR)
+
+    Wrapper to the Multiscale Entropy C code written by Madalena Costa (mcosta@fas.harvard.edu):
+         http://physionet.org/physiotools/mse/mse-1.htm
+
+ Calculates the multi scale entropy of a signal 'x'. A tutorial on Mulsticale
+ entropy is available at:
+ http://www.physionet.org/physiotools/mse/tutorial/
+
+
+ Please cite these publications when referencing this material:
+     Costa M., Goldberger A.L., Peng C.-K. Multiscale entropy analysis of biological signals. Phys Rev E 2005;71:021906.
+     Costa M., Goldberger A.L., Peng C.-K. Multiscale entropy analysis of physiologic time series. Phys Rev Lett 2002; 89:062102.
+
+ Also include the standard citation for PhysioNet:
+     Goldberger AL, Amaral LAN, Glass L, Hausdorff JM, Ivanov PCh, Mark RG,
+     Mietus JE, Moody GB, Peng C-K, Stanley HE. PhysioBank, PhysioToolkit, and PhysioNet: components of a new research resource for complex physiologic signals. Circulation 101(23):e215-e220 [Circulation Electronic Pages; http://circ.ahajournals.org/cgi/content/full/101/23/e215]; 2000 (June 13)
+
+ Readers of may also wish to read:
+     Costa M, Peng C-K, Goldberger AL, Hausdorff JM. Multiscale entropy analysis of human gait dynamics. Physica A 2003;330:53-60.
+
+ Required Parameters:
+
+ x
+       Nx1 vector of doubles in which to caculate the multiscale entropy.
+
+ Optional Parameters are:
+ dn
+       1x1 double. Sets the scale increment to dn (1-40; default: 1).
+ dm
+       1x1 double. Sets the m increment to dm (1-10; default: 1).
+ dr
+       1x1 double. Sets the scale increment to dr (>0; default: 0.05).
+ N
+       1x1 integer. Stop the analysis with row N.
+       By default, analysis ends at row 39999, or at the end of the data set if there are fewer rows.
+ N0
+       1x1 integer. Begin the analysis with row N0.
+       By default, analysis begins with row 1.
+ minM
+       1x1 integer betwee 1-10. Set the minimum pattern length for SampEn to minN (1-10; default: 2).
+ maxM
+        1x1 integer betwee 1-10. Set the maximum m to maxM (1-10; default: 2).
+ maxScale
+        1x1 integer betwee 1-40. Set the maximum scale for coarse-graining to maxScale (1-40; default: 20).
+ minR
+        1x1 double >0. Set the minimum similarity criterion for SampEn to minR (>0; default: 0.15).
+ maxR
+        1x1 double > 0. Set the maximum m to maxR (>0; default: 0.15).
+
+
+ Outputs:
+ y
+       A 1xM vector of doubles corresponding to estimated sample entropies at each scale.
+ scale
+       A 1xM vector of integers specifying the scales in which 'y' was
+       estimated.
+
+ info
+       An optional 3x1 cell array of strings providing loggin and verbose information from
+       the calculation.
+
+ Wrapper written by Ikaro Silva, 2013
+ Last Modified: March 20, 2014
+ Version 0.0.1
+
+ Since 0.9.5
+
+ %Example
+ N=30000;
+ noise=randn(N,1);
+ maxScale=10;
+[entropyNoise,scale1]=msentropy(noise,[],[],[],[],[],[],[],maxScale);
+ %Simulate determistic system with noise-like 2nd order statistics
+ nlinear=zeros(N,1);nlinear(1)=0.2;u=4;
+ for n=2:N;nlinear(n)=u*nlinear(n-1)*(1-nlinear(n-1));end
+[entropyDeterm,scale2]=msentropy(nlinear,[],[],[],[],[],[],[],maxScale);
+subplot(2,1,1);
+plot(noise(1:1000));hold on;grid on;plot(nlinear(1:1000),'r');legend('Stochastic','Deterministic')
+subplot(2,1,2);
+plot(scale1,entropyNoise);hold on;grid on;plot(scale2,entropyDeterm,'r');legend('Stochastic','Deterministic')
+
+
+ See also SURROGATE, DFA, WFDBDESC, PHYSIONETDB, RDANN, ANN2RR, MAPRECORD
+</pre></div><!--after help -->
+   </body>
+</html>

@@ -1,0 +1,108 @@
+
+
+REDUX
+=====
+
+- install MinGW
+  - use the automated installer, MinGW-5.1.4.exe
+
+- install MSYS
+  - first use the automated installer for the "current release" (the
+    old version), MSYS-1.0.10.exe
+  - next, install the packages from the "technology preview,"
+    MSYS-1.0.11
+    - the following are from the "MSYS Base System:"
+      - MSYS-1.0.11-20090120-dll.tar.gz
+      - bash-3.1-MSYS-1.0.11-1.tar.bz2
+      - coreutils-5.97-MSYS-1.0.11-snapshot.tar.bz2
+      - make-3.81-MSYS-1.0.11-2.tar.bz2
+      - gawk-3.1.5-MSYS-1.0.11-1.tar.bz2
+      - msysCORE-1.0.11-20080826.tar.gz
+    - the following are from the "MSYS Supplementary Tools:"
+      - autoconf2.5-2.61-1-bin.tar.bz2
+      - autoconf-4-1-bin.tar.bz2
+      - autogen-5.9.2-MSYS-1.0.11-1-dev.tar.gz
+      - automake1.10-1.10-1-bin.tar.bz2
+      - automake-3-1-bin.tar.bz2
+      - crypt-1.1-1-MSYS-1.0.11-1.tar.bz2
+      - libtool1.5-1.5.25a-1-bin.tar.bz2
+      - perl-5.6.1-MSYS-1.0.11-1.tar.bz2
+      - openssl-0.9.8g-1-MSYS-1.0.11-2-dev.tar.gz
+        - there seems to be a bug in one of the headers;
+          FIXME (X509_NAME)
+      - openssl-0.9.8g-1-MSYS-1.0.11-2-dll098.tar.gz
+
+- install libglib (for pkg-config):
+  - can be downloaded from:
+      http://ftp.gnome.org/pub/gnome/binaries/win32/glib/2.18/glib_2.18.4-1_win32.zip
+
+- install pkg-config (run by curl's configure script to find gnutls):
+  - can be downloaded from:
+      http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config-0.23.2.zip
+
+- install libgpg-error (FIXME: url)
+
+- install libgcrypt (FIXME: url)
+
+- install gnutls4win (FIXME: url)
+  - ./configure --disable-openssl-compatibility
+
+- install libcurl (with SSL):
+  - download from http://curl.haxx.se/dlwiz/?type=source
+  - ./configure --with-libssh2=/usr/local --with-ssl="" --disable-ldap
+    - FIXME: i get strange errors about the typedef of X509_NAME in
+             openssl/ossl_typ.h if ldap.c tries to get compiled; i
+             haven't figured this out yet.
+    - FIXME: compile this with zlib
+
+  - FIXME: ./configure --without-ssl --without-libssh2 --with-gnutls=/usr/local
+
+- edit /mingw/include/stdlib.h:
+  - edit the line:
+    "inline double __cdecl __MINGW_NOTHROW strtod (const char*
+     __restrict__ __nptr, char** __restrict__ __endptr)";
+    change "inline" to "__inline__"
+    - FIXME: figure out exactly what's going on here (ANSI compliance-related)
+
+- install swigwin (http://www.swig.org/download.html)
+  - after running configure, edit CCache/Makefile:
+    - from the "install" target, remove dep. $(PACKAGE_NAME).1
+      - FIXME: this means the man pages won't get installed
+      - the "make install" will also give an error trying to install
+        the man pages, but that's OK
+
+- install wfdb:
+  - ./configure --with-libcurl
+    - FIXME: some of the tests during "make check" seem to fail, but this
+             does not actually seem to be a problem for wfdb-swig-matlab
+
+- install java (jdk)
+
+- install wfdb-swig, wfdb-java only:
+  - make sure JAVA_HOME is set
+  - edit wfdb-java/conf/configure.ac:
+    - add the line:
+        CPPFLAGS="${CPPFLAGS} -I\"{JAVA_HOME}/include\"
+           -I\"{JAVA_HOME}/include/win32\" -I/usr/include"
+      after "AC_PROG_JAR"
+  - FIXME: edit build/Makefile:
+    - add "-Wl,--kill-at" to the def. for LTCOMPILE and "--kill-at" to
+      the def. for LINK
+    - add "-D_JNI_IMPLEMENTATION_" to the def. for DEFS
+    - FIXME: this could probably go in configure.ac too, i just
+      haven't tested it yet
+  - after running make, i found that i needed to compile the dll directly:
+    - in wfdb-java/build, run:   
+        gcc -g -O2 -Wl,--kill-at -shared -o wfdbjava.dll .libs/wfdb_java_wrap.o \
+        -lwfdb -L/usr/local/lib -L/bin
+
+- the dll's to take away from this are (in reverse dependency order):
+  - wfdbjava.dll
+  - wfdb-10.4.dll
+  - libcurl-4.dll
+  - libgnutls-26.dll
+  - libgcrypt-11.dll
+  - libgpg-error-0.dll
+
+- NOTE: using msys-1.0.dll with JNI appears to cause (fatal) problems...
+

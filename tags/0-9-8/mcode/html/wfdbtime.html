@@ -1,0 +1,64 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: wfdbtime</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: wfdbtime</td>
+            <td class="subheader-left"><a href="wfdbtime.m">View code for wfdbtime</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">wfdbtime</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=wfdbtime(varargin)
+
+ [timeStamp,dateStamp]=wfdbtime(recordName,samples)
+
+    Wrapper to WFDB WFDBTIME:
+         http://www.physionet.org/physiotools/wag/wfdbti-1.htm
+
+ Converts sample indices from recordName into timeStamp and dateStamps.
+ Returns:
+
+ timesStamp
+       Nx1 vector of cell Strings representing times stamps with respect to the
+       first sample in recordName.
+
+ dateStamp
+       Nx1 vector of cell Strings representing date stamps with respect to the
+       first sample in recordName.
+
+
+ Required Parameters:
+
+ recorName
+       String specifying the name of the record in the WFDB path or
+       in the current directory.
+
+ samples
+       Nx1 vector of integers (indices) of samples from the signal in recordName (indices are
+       relative to the first sample).
+
+
+%Example
+[timeStamp,dateStamp]=wfdbtime('challenge/2013/set-a/a01',[1 10 30]')
+
+
+
+ Written by Ikaro Silva, 2013
+ Last Modified: March 24, 2014
+ Version 1.1
+ Since 0.0.1
+
+ See also RDANN, WFDBDESC
+</pre></div><!--after help -->
+   </body>
+</html>

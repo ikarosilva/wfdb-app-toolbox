@@ -1,0 +1,72 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: ann2rr</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: ann2rr</td>
+            <td class="subheader-left"><a href="ann2rr.m">View code for ann2rr</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">ann2rr</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=ann2rr(varargin)
+
+ [RR,tms]=ann2rr(recordName,annotator,N,N0,consecutiveOnly)
+
+    Wrapper to WFDB ANN2RR:
+         http://www.physionet.org/physiotools/wag/ann2rr-1.htm
+
+    Reads a WFDB record and Annotation file to return:
+
+
+ RR
+       Nx1 vector of integers representing the duration of the RR
+       interval in samples.
+
+ tms
+       Nx1 vector of integers representing the begining of the RR
+       interval in samples.
+
+ Required Parameters:
+
+ recorName
+       String specifying the name of the record in the WFDB path or
+       in the current directory.
+
+ annotator  -
+       String specifying the name of the annotation file in the WFDB path or
+       in the current directory.
+
+ Optional Parameters are:
+
+ N
+       A 1x1 integer specifying the sample number at which to stop reading the
+       record file (default read all = N).
+ N0
+       A 1x1 integer specifying the sample number at which to start reading the
+       annotion file (default 1 = begining of the record).
+
+ consecutiveOnly
+       A 1x1 boolean. If true, prints intervals between consecutive valid
+       annotaions only (default =true).
+
+
+ Written by Ikaro Silva, 2013
+ Last Modified: January, 16, 2013
+ Version 1.1
+
+ Since 0.0.1
+ %Example
+[rr,tm]=ann2rr('challenge/2013/set-a/a01','fqrs');
+</pre></div><!--after help -->
+   </body>
+</html>

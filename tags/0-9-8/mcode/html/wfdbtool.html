@@ -1,0 +1,84 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: wfdbtool</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: wfdbtool</td>
+            <td class="subheader-left"><a href="wfdbtool.m">View code for wfdbtool</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">wfdbtool</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=wfdbtool(varargin)
+
+ [stat,browser,url]=wfdbtool(recordName,N,N0,systemBrowser)
+
+  MATLAB interface to PhysioNet's LightWAVE. LightWAVE is a lightweight
+  waveform and annotation viewer and editor. You can use it to view any of
+  the recordings of physiologic signals and time series in PhysioNet,
+  together with their annotations (event markers).
+
+  NOTE: This tool is currently supported only in MATLAB 2013b or higher. On some system
+      (such as Linux) the MATLAB default browser may not worker properly
+      with LightWAVE. In this case you may want to try setting the
+      'systemBrowser' to 1 (true).
+
+ Required Input Parameters:
+
+ recorName
+       String specifying the name of the record in the WFDB path or
+       in the current directory.
+
+ Optional Input Parameters are:
+
+ N
+       A 1x1 integer specifying the sample number at which to stop displaying the
+       record file. Default is enough samples to cover 10 seconds.
+ N0
+       A 1x1 integer specifying the sample number at which to start displaying the
+       record file (default 1 = first sample).Default is beginning of
+       record.
+
+ systemBrowser
+      A 1x1 boolean. If true, uses the system browser. Default = 0.
+
+
+ Optional Outputs are:
+
+ stat
+     A  returns the status of the web command in the variable STAT. STAT = 0 indicates successful execution. STAT = 1
+     indicates that the browser was not found. STAT = 2 indicates that the
+     browser was found, but could not be launched.
+
+ browser
+     Returns a handle to the last active web browser.
+
+ url
+     Returns the URL of the current location.
+
+ %Example 1
+
+
+ Written by Ikaro Silva, 2013
+ Last Modified: October 30, 2013
+ Version 1.0
+
+ Since 0.9.4
+
+ %Example 1- Read a signal from PhysioNet's Remote server:
+wfdbtool('challenge/2013/set-a/a01')
+
+
+ See also WFDBDESC, PHYSIONETDB, RDANN, WFDBTIME
+</pre></div><!--after help -->
+   </body>
+</html>

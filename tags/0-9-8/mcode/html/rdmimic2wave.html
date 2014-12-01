@@ -1,0 +1,125 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: rdmimic2wave</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: rdmimic2wave</td>
+            <td class="subheader-left"><a href="rdmimic2wave.m">View code for rdmimic2wave</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">rdmimic2wave</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=rdmimic2wave(varargin)
+
+ [tm,signal,Fs,recList,sigInfo]=rdmimic2wave(subjectID,clinicalTimeStamp,dataType,beginMinute,endMinute)
+
+
+
+ Output Parameters:
+
+ tm
+       Nx1 vector of doubles representing time in minutes if a match is
+       found, otherwise tm is empty. The time of the first index is an offset 
+       from beginMinute. So that the total duration in minutes is:
+
+       tm(end) - tm(1) = endMinute - beginMinute
+
+       And the time of the clinical event (clinicalTimeStamp) in the waveform signal is given by
+       (to the closest minute):
+
+       timeStamp = tm(1) + beginMinute
+
+
+ signal
+       NxM vector of doubles representing the signals from dataType that
+       match the timeStamp. If no match is found an empty matrix is
+       returned.
+
+ Optional Ouput:
+
+ Fs
+       A 1x1 double representing the sampling frequency (in Hz).
+
+recList
+       A Lx1 double specifying a list of valid subjectIDs  or matched record. You can use this
+       field to find which IDs are in the matched waveform list (see below). If the
+       subjectID is defined in the function signature, recList will be
+       equal to the first found matched record if it exists.
+
+
+sigInfo
+       A Mx1 structure containing meta information about the waverforms in the 'signal' output. 
+
+
+ Input Parameters:
+
+ subjectID
+       A 1x1 Double specifying a valid MIMIC II subject ID. For a list
+       of valid subjectID with matched waveform use this to query:
+
+       [~,~,~,recList]=rdmimic2wave([],[],dataType);
+
+       Once you have a valid subjectID and pass it to RDMIMI2WAVE, recList
+       will return the string name of the first matched record if any (empty otherwise).
+
+
+ clinicalTimeStamp
+      String specifying the clinical  time of the event. This string
+      should have the following format (as described in
+       http://www.physionet.org/physiobank/database/mimic2wdb/matched/) :
+
+      'YYYY-MM-DD-hh-mm'
+
+      Where:
+           YYYY = surrogate year
+           MM = month (01-12)
+           DD = day (01-31)
+           hh = real hour (00-23)
+           mm = minute (00-59)
+
+ dataType (Optional)
+     String specifying what time of high resolution waveform to fetch.
+     Options are: 'numerics' and 'waveform'. Default is 'numerics'.
+
+
+ beginMinute (Optional)
+     1x1 Double specifying time in minutes of
+     how much of the signal to get before clinicalTimeStamp occured.
+     Default is 60 minutes.
+
+ endMinute (Optional)
+     1x1 Double specifying time in minutes of
+     how much of the signal to get after clinicalTimeStamp occured.
+     Default is 60 minutes.
+
+
+
+ % Example:
+[tm,signal,Fs,recList,sigInfo]=rdmimic2wave(32805,'2986-12-15-10-00',[],0,2);
+plot(tm,signal(:,2))
+title(['Found data in record: ' recList]) 
+legend(sigInfo(2).Description)
+
+ Written by Ikaro Silva, 2013
+ Last Modified: December 1, 2014
+
+ Version 1.1
+
+ Since 0.9.0
+
+
+
+ See also rdsamp, wfdbdesc
+
+</pre></div><!--after help -->
+   </body>
+</html>
