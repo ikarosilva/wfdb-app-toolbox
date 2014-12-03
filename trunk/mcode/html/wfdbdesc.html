@@ -38,7 +38,7 @@ function varargout=wfdbdesc(varargin)
        Description             : Signal Description (String)
        SamplingFrequency       : Sampling Frequency w/ Units (String)
        File                    : File name (String)
-       SignalIndex             : Signal Index (Integer)
+       SignalIndex             : Zero Based Signal Index (Integer)
        StartTime               : Start Time (String WFDB Time)
        Group                   : Group (Integer)
        AdcResolution           : Bit resolution of the singal (String)
@@ -48,7 +48,7 @@ function varargout=wfdbdesc(varargin)
        Format                  : WFDB's Format of the samples (String)
        Gain                    : ADC units per physical unit (String)
        InitialValue            : Value of sample 1 in the signal (Integer)
-
+       IO                      : IO Type  (String)
 
  Fs   (Optional)
        Nx1 vector of doubles representing the sampling frequency of each
@@ -67,9 +67,9 @@ function varargout=wfdbdesc(varargin)
 
  Written by Ikaro Silva, 2013
 
- Modified by Ikaro Silva, September 15, 2014
+ Modified by Ikaro Silva, December 3, 2014
 
- Version 1.4
+ Version 2.0
 
  Since 0.0.1
  See also RDSAMP
