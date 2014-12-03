@@ -39,8 +39,8 @@ delete(install_dir)
 
 
 
--------CONTACT: For help, feedback, and support please contact us at the following email: 
-wfdb-matlab-support@physionet.org
+-------CONTACT: For help, feedback, and support please contact us at the community Forum: 
+https://groups.google.com/forum/#!forum/wfdb-app-toolbox
 
 *When contacting us about issues with the Toolbox, please send us the output of 
 the "wfdbtest" script.
