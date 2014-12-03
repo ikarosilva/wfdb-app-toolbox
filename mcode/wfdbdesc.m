@@ -18,7 +18,7 @@ function varargout=wfdbdesc(varargin)
 %       Description             : Signal Description (String)
 %       SamplingFrequency       : Sampling Frequency w/ Units (String)
 %       File                    : File name (String)
-%       SignalIndex             : Signal Index (Integer)
+%       SignalIndex             : Zero Based Signal Index (Integer)
 %       StartTime               : Start Time (String WFDB Time)
 %       Group                   : Group (Integer)
 %       AdcResolution           : Bit resolution of the singal (String)
@@ -28,7 +28,7 @@ function varargout=wfdbdesc(varargin)
 %       Format                  : WFDB's Format of the samples (String)
 %       Gain                    : ADC units per physical unit (String)
 %       InitialValue            : Value of sample 1 in the signal (Integer)
-%
+%       IO                      : IO Type  (String)
 %
 % Fs   (Optional)
 %       Nx1 vector of doubles representing the sampling frequency of each
@@ -47,60 +47,114 @@ function varargout=wfdbdesc(varargin)
 %
 % Written by Ikaro Silva, 2013
 %
-% Modified by Ikaro Silva, September 15, 2014
+% Modified by Ikaro Silva, December 3, 2014
 %
-% Version 1.4
+% Version 2.0
 %
 % Since 0.0.1
 % See also RDSAMP
 
 %endOfHelp
-if(~wfdbloadlib)
-    %Add classes to dynamic path
-    wfdbloadlib;
+
+persistent javaWfdbExec config
+if(isempty(javaWfdbExec))
+    [javaWfdbExec,config]=getWfdbClass('wfdbdesc');
 end
 
 %Set default pararamter values
 inputs={'recordName'};
 outputs={'siginfo','Fs'};
+
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
     end
 end
 
-javaPhysioNetRecord=javaObject('org.physionet.wfdb.physiobank.PhysioNetRecord',recordName);
-Recinfo=javaPhysioNetRecord.getSignalList();
-
-%TODO: for some reason MATLAB struct() does not convert this Java class...
-%For now  looping to get all the data.
-field={'LengthSamples','LengthTime','RecordName','RecordIndex','Description',...
-    'SamplingFrequency','File','SignalIndex','StartTime','Group', 'AdcResolution',...
-    'AdcZero','Baseline','CheckSum','Format','Gain','InitialValue'};
-isnumeric=[1 0 0 1 0 0 0 1 0 1 0 1 1 1 0 0 1];
-
-M=length(field);
+wfdb_argument={recordName};
+data=char(javaWfdbExec.execToStringList(wfdb_argument));
+lines=[1 strfind(data,',')];
 siginfo=[];
-Fs=zeros(Recinfo.size,1)+NaN;
+Fs=[];
+L=length(lines);
 
-for n=0:(Recinfo.size-1)
-    rec=Recinfo.get(n);
-    for m=1:M
-        eval(['siginfo(' num2str(n+1) ').' field{m} '=char(rec.get' field{m} ');' ])
-        if(isnumeric(m)==1)
-            eval(['siginfo(' num2str(n+1) ').' field{m} '=str2num(siginfo(' num2str(n+1) ').' field{m} ');' ])
-        end
-        if(strcmp(field{m},'SamplingFrequency'))
-            %Attempt to parse and convert to a number
-            tmpFs=siginfo(n+1).SamplingFrequency;
-            try
-                Fs(n+1)=str2num(regexprep(tmpFs,'\s+Hz',''));
-            catch
-                %Parsing failed, leave Fs as NaN
-            end
-        end
-        
+%Define record Wide parameters
+RecordName=[];
+StartTime =[];
+LengthSamples=[];
+LengthTime=[];
+SamplingFrequency =[];
+
+%index for each signal
+ind=0;
+for n=1:L-1
+    str=(data(lines(n):lines(n+1)-1));
+    str=str(2:end); %Remove comma
+    if(~isempty(strfind(str,'Record')))
+        C=textscan(str,'%s%s');
+        RecordName=C{2};
+    elseif(~isempty(strfind(str,'Starting time:')))
+        C=textscan(str,'%s:%s');
+        StartTime =C{2};
+    elseif(~isempty(strfind(str,'Length:')))
+        %Should happen only once
+        ind1=strfind(str,'(');
+        ind2=strfind(str,'sample intervals)');
+        LengthSamples=str2num(str(ind1:ind2));
+        C=textscan(str,'%s%s%s%s%s');
+        LengthTime=C{2};
+    elseif(~isempty(strfind(str,'Sampling frequency:')))
+        C=textscan(str,'%s%s%u%s');
+        SamplingFrequency =C{3};
+    elseif(~isempty(strfind(str,'Group')))
+        %In this case we are seeing a new signal, enter record wide
+        %fields as well
+        ind=ind+1;
+        C=textscan(str,'%s%d');
+        siginfo(ind).Group=C{2};
+        siginfo(ind).RecordName=RecordName;
+        siginfo(ind).StartTime =StartTime;
+        siginfo(ind).LengthSamples=LengthSamples;
+        siginfo(ind).LengthTime=LengthTime;
+        siginfo(ind).SamplingFrequency =SamplingFrequency;
+        Fs(end+1)=SamplingFrequency;
+    elseif(~isempty(strfind(str,'Signal')))
+        C=textscan(str,'%s%d:');
+        siginfo(ind).SignalIndex=C{2};
+    elseif(~isempty(strfind(str,'File:')))
+        C=textscan(str,'%s%s');
+        siginfo(ind).File=C{2};
+    elseif(~isempty(strfind(str,'Description:')))
+        C=textscan(str,'%s%s');
+        siginfo(ind).Description=C{2};
+    elseif(~isempty(strfind(str,'Gain:')))
+        C=textscan(str,'%s%s%s');
+        siginfo(ind).Gain=[C{2} C{3}];
+    elseif(~isempty(strfind(str,'Initial value:')))
+        C=textscan(str,'%s:%d');
+        siginfo(ind).InitialValue=C{2};
+    elseif(~isempty(strfind(str,'Storage format:')))
+        C=textscan(str,'%s:%s');
+        siginfo(ind).Format=C{2};
+    elseif(~isempty(strfind(str,'I/O:')))
+        C=textscan(str,'%s:%s');
+        siginfo(ind).IO=C{2};
+    elseif(~isempty(strfind(str,'ADC resolution:')))
+        C=textscan(str,'%s:%s');
+        siginfo(ind).AdcResolution=C{2};
+    elseif(~isempty(strfind(str,'ADC zero:')))
+        C=textscan(str,'%s:%f');
+        siginfo(ind).AdcZero=C{2};
+    elseif(~isempty(strfind(str,'Baseline:')))
+        C=textscan(str,'%s:%d');
+        siginfo(ind).Baseline=C{2};
+    elseif(~isempty(strfind(str,'Checksum:')))
+        C=textscan(str,'%s:%d');
+        siginfo(ind).CheckSum=C{2};
+    else
+        %Skip unused field
     end
+    
 end
 
 for n=1:nargout
