@@ -22,7 +22,7 @@ function [varargout]=wfdbloadlib(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-%         Last Modified: February 10, 2014
+%         Last Modified: December 3, 2014
 % Since 0.0.1
 %
 %
@@ -43,7 +43,7 @@ persistent isloaded wfdb_path wfdb_native_path
 %[~,config]=wfdbloadlib; config.WFDB_NATIVE_BIN
 WFDB_CUSTOMLIB=0;
 
-%WFDB_PATH: If empty, will use the default given confing.WFDB_PATH
+%WFDB_PATH: If empty, will use the default given config.WFDB_PATH
 %this is where the toolbox searches  for data files (*.dat, *.hea etc).
 %When unistalling the toolbox, you may wish to clear this directory to save space.
 %See http://www.physionet.org/physiotools/wag/setwfd-1.htm for more details.
@@ -136,7 +136,7 @@ for n=1:nargout
         
         %Define WFDB Environment variables
         if(isempty(WFDB_PATH))
-            WFDB_PATH=['. ' config.MATLAB_PATH 'database http://physionet.org/physiobank/database'];
+            WFDB_PATH=['. ' 'file:// ' config.MATLAB_PATH 'database http://physionet.org/physiobank/database'];
         end
         if(isempty(WFDBCAL))
             WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];
