@@ -20,7 +20,8 @@ function varargout=rdann(varargin)
 %       To convert this vector to a string of time stamps see WFDBTIME.
 %
 % type
-%       Nx1 vector of the chars describing annotation type.
+%       NxT vector of the chars describing annotation type. Usually 
+%       (but not always) T is 1.
 %
 % subtype
 %       Nx1 vector of the chars describing annotation subtype. 
@@ -76,8 +77,8 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: November 4, 2014
-% Version 1.4
+% Last Modified: December 4, 2014
+% Version 2
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -183,7 +184,7 @@ else
     data=dataJava.toArray();
     N=length(data);
     ann=zeros(N,1);
-    type=zeros(N,1);
+    type=[];             % Size to be defined at runtime
     subtype=char(zeros(N,1));
     chan=zeros(N,1);
     num=zeros(N,1);
@@ -207,7 +208,11 @@ else
                 str(1:del_str)=[];
                 C=textscan(str,'%u %s %s %u %u %[^\n\r]');
                 ann(n)=C{1};
-                type(n)=char(C{2});
+                if(isempty(type))
+                    T=size(C{2},2);
+                    type=zeros(N,T);
+                end
+                type(n,:)=char(C{2});
                 try
                     subtype(n)=C{3}{:};
                 catch
@@ -246,7 +251,11 @@ else
                     C= textscan(str,'%s %u %s %s %u %u %[^\n\r]');
                 end
                 ann(n)=C{2};
-                type(n)=C{3}{:};
+                if(isempty(type))
+                    T=size(C{3}{:},2);
+                    type=zeros(N,T);
+                end
+                type(n,:)=C{3}{:};
                 try
                     subtype(n)=C{4}{:};
                 catch
