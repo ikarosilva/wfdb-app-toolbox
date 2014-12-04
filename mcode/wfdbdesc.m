@@ -92,15 +92,15 @@ for n=1:L-1
     str=str(2:end); %Remove comma
     if(~isempty(strfind(str,'Record')))
         C=textscan(str,'%s%s');
-        RecordName=C{2};
+        RecordName=C{2}{:};
     elseif(~isempty(strfind(str,'Starting time:')))
-        C=textscan(str,'%s:%s');
-        StartTime =C{2};
+        ind1=strfind(str,':');
+        StartTime =str(ind1+2:end);
     elseif(~isempty(strfind(str,'Length:')))
         %Should happen only once
         ind1=strfind(str,'(');
         ind2=strfind(str,'sample intervals)');
-        LengthSamples=str2num(str(ind1:ind2));
+        LengthSamples=str2num(str(ind1+1:ind2-1));
         C=textscan(str,'%s%s%s%s%s');
         LengthTime=C{2};
     elseif(~isempty(strfind(str,'Sampling frequency:')))
@@ -115,41 +115,41 @@ for n=1:L-1
         siginfo(ind).RecordName=RecordName;
         siginfo(ind).StartTime =StartTime;
         siginfo(ind).LengthSamples=LengthSamples;
-        siginfo(ind).LengthTime=LengthTime;
+        siginfo(ind).LengthTime=LengthTime{:};
         siginfo(ind).SamplingFrequency =SamplingFrequency;
         Fs(end+1)=SamplingFrequency;
     elseif(~isempty(strfind(str,'Signal')))
         C=textscan(str,'%s%d:');
         siginfo(ind).SignalIndex=C{2};
     elseif(~isempty(strfind(str,'File:')))
-        C=textscan(str,'%s%s');
-        siginfo(ind).File=C{2};
+        ind1=strfind(str,':');
+        siginfo(ind).File=str(ind1+2:end);
     elseif(~isempty(strfind(str,'Description:')))
-        C=textscan(str,'%s%s');
-        siginfo(ind).Description=C{2};
+        ind1=strfind(str,':');
+        siginfo(ind).Description=str(ind1+2:end);
     elseif(~isempty(strfind(str,'Gain:')))
-        C=textscan(str,'%s%s%s');
-        siginfo(ind).Gain=[C{2} C{3}];
+        ind1=strfind(str,':');
+        siginfo(ind).Gain=str(ind1+2:end);
     elseif(~isempty(strfind(str,'Initial value:')))
-        C=textscan(str,'%s:%d');
-        siginfo(ind).InitialValue=C{2};
+        C=textscan(str,'%s%s%f');
+        siginfo(ind).InitialValue=C{3};
     elseif(~isempty(strfind(str,'Storage format:')))
-        C=textscan(str,'%s:%s');
-        siginfo(ind).Format=C{2};
+        ind1=strfind(str,':');
+        siginfo(ind).Format=str(ind1+2:end);
     elseif(~isempty(strfind(str,'I/O:')))
-        C=textscan(str,'%s:%s');
-        siginfo(ind).IO=C{2};
+        ind1=strfind(str,':');
+        siginfo(ind).IO=str(ind1+2:end);
     elseif(~isempty(strfind(str,'ADC resolution:')))
-        C=textscan(str,'%s:%s');
-        siginfo(ind).AdcResolution=C{2};
+        ind1=strfind(str,':');
+        siginfo(ind).AdcResolution=str(ind1+2:end);
     elseif(~isempty(strfind(str,'ADC zero:')))
-        C=textscan(str,'%s:%f');
-        siginfo(ind).AdcZero=C{2};
+        ind1=strfind(str,':');
+        siginfo(ind).AdcZero=str2num(str(ind1+2:end));
     elseif(~isempty(strfind(str,'Baseline:')))
-        C=textscan(str,'%s:%d');
+        C=textscan(str,'%s%f');
         siginfo(ind).Baseline=C{2};
     elseif(~isempty(strfind(str,'Checksum:')))
-        C=textscan(str,'%s:%d');
+        C=textscan(str,'%s%f');
         siginfo(ind).CheckSum=C{2};
     else
         %Skip unused field

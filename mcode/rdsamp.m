@@ -21,9 +21,8 @@ function varargout=rdsamp(varargin)
 %       in seconds  ( with up to millisecond precision only).
 %
 % Fs    (Optional)
-%       1x1 Double, sampling frequency in Hz of the first signal in signalList
-%       (default =1).
-%
+%       1xM Double, sampling frequency in Hz of all the signals in the
+%       record.
 %
 % Required Parameters:
 %
@@ -59,8 +58,8 @@ function varargout=rdsamp(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: October 30, 2014
-% Version 1.4
+% Last Modified: December 4, 2014
+% Version 1.5
 %
 % Since 0.0.1
 %
@@ -166,17 +165,7 @@ end
 
 if(nargout>2)
     if(isempty(siginfo))
-        [siginfo,~]=wfdbdesc(recordName);
-    end
-    if(~isempty(siginfo))
-        %Its is possible where this is not true in rare cases where
-        %there is no signal length information on the header file
-        if(isempty(signalList))
-            Fs=siginfo(1).SamplingFrequency;
-        else
-            Fs=siginfo(signalList(1)).SamplingFrequency;
-        end
-        Fs=str2double(regexprep(Fs,'Hz',''));
+        [siginfo,Fs]=wfdbdesc(recordName);
     end
 end
 
