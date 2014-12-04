@@ -20,11 +20,11 @@ function varargout=rdann(varargin)
 %       To convert this vector to a string of time stamps see WFDBTIME.
 %
 % type
-%       NxT vector of the chars describing annotation type. Usually 
+%       NxT vector of the chars describing annotation type. Usually
 %       (but not always) T is 1.
 %
 % subtype
-%       Nx1 vector of the chars describing annotation subtype. 
+%       Nx1 vector of the chars describing annotation subtype.
 %       For a list of standard annotation codes used by PhyioNet, please see:
 %             http://www.physionet.org/physiobank/annotations.shtml
 %
@@ -212,7 +212,8 @@ else
                     T=size(C{2},2);
                     type=zeros(N,T);
                 end
-                type(n,:)=char(C{2});
+                CN=length(char(C{2}));
+                type(n,1:CN)=char(C{2});
                 try
                     subtype(n)=C{3}{:};
                 catch
@@ -255,7 +256,8 @@ else
                     T=size(C{3}{:},2);
                     type=zeros(N,T);
                 end
-                type(n,:)=C{3}{:};
+                CN=length(C{3}{:});
+                type(n,1:CN)=C{3}{:};
                 try
                     subtype(n)=C{4}{:};
                 catch
