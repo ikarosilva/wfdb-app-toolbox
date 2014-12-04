@@ -204,7 +204,7 @@ if(~isempty(matched_pid))
             %Get record length and check its duration
             recList=[dBName recName{:}];
             sigInfo=wfdbdesc(recList);
-            Fs=str2double(regexprep(sigInfo(1).SamplingFrequency,' Hz',''));
+            Fs=sigInfo(1).SamplingFrequency;
             waveLengthSamples=sigInfo(1).LengthSamples;
             
             %Get the starting/ending offsets in samples wrt the beginning of
