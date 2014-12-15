@@ -22,7 +22,7 @@ function varargout = wfdbRecordViewer(varargin)
 
 % Edit the above text to modify the response to help wfdbRecordViewer
 
-% Last Modified by GUIDE v2.5 15-Dec-2014 12:31:50
+% Last Modified by GUIDE v2.5 15-Dec-2014 15:07:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -268,14 +268,16 @@ set(gca,'FontWeight','bold')
 xlabel('Time (seconds)')
 
 %Plot annotations in analysis window
-if(~isempty(annDiff) & (get(handles.AnalysisMenu,'Value')==1))
+if(~isempty(annDiff) & (get(handles.AnalysisMenu,'Value')==2))
     axes(handles.AnalysisAxes);
     df=annDiff((ann1>ind_start) & (ann1<ind_end));
     plot(tm(tmp_ann1),df,'k*-')
     text(tm(tmp_ann1(1)),max(df),'Ann Diff','FontWeight','bold','FontSize',12)
     grid on
     ylabel('Diff (seconds)')
+    xlim([tm(ind_start) tm(ind_end)])
 end
+
 
 
 function analysisplot(handles)
@@ -356,7 +358,7 @@ end
 
 function AnalysisMenu_Callback(hObject, eventdata, handles)
 
-if(get(handles.AnalysisMenu,'Value')==1)
+if(get(handles.AnalysisMenu,'Value')==2)
     global tm  signals ann1 ann2 annDiff info
     h = waitbar(0,'Comparing Annotations. Please wait...');
     annDiff=[];
@@ -386,3 +388,12 @@ loadAnnotationList(records{current_record},handles)
 Ann1Menu_Callback(hObject, eventdata, handles)
 Ann2Menu_Callback(hObject, eventdata, handles)
 AnalysisMenu_Callback(hObject, eventdata, handles)
+
+
+% --- Executes on button press in TagButton.
+function TagButton_Callback(hObject, eventdata, handles)
+
+global records current_record
+h = waitbar(0,['Generating tag file: ' records{current_record} '.tag']);
+wrann(records{current_record},'tag',1);
+close(h)
