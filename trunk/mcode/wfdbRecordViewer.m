@@ -22,7 +22,7 @@ function varargout = wfdbRecordViewer(varargin)
 
 % Edit the above text to modify the response to help wfdbRecordViewer
 
-% Last Modified by GUIDE v2.5 15-Dec-2014 15:07:09
+% Last Modified by GUIDE v2.5 16-Dec-2014 17:33:09
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -143,7 +143,7 @@ delete(handles.figure1)
 % --- Executes on selection change in RecorListMenu.
 function RecorListMenu_Callback(hObject, eventdata, handles)
 
-global current_record records 
+global current_record records
 current_record=get(handles.RecorListMenu,'Value');
 Refresh(hObject, eventdata, handles)
 
@@ -167,7 +167,7 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 function loadRecord(fname)
-global tm signal info
+global tm signal info tm_step
 h = waitbar(0,'Loading Data. Please wait...');
 try
     [tm,signal]=rdmat(fname);
@@ -175,6 +175,7 @@ catch
     [tm,signal]=rdsamp(fname);
 end
 info=wfdbdesc(fname);
+
 close(h)
 
 function loadAnn1(fname,annName)
@@ -219,7 +220,7 @@ set(handles.Ann2Menu,'String',annotations)
 
 
 function wfdbplot(handles)
-global tm signal info tm_step ann1 ann2 annDiff
+global tm signal info tm_step ann1 ann2 annDiff ann1RR
 axes(handles.axes1);
 cla;
 
@@ -246,17 +247,28 @@ SCALE(SCALE==0)=1;
 sig=offset.*sig./repmat(SCALE,[N 1]);
 OFFSET=offset.*[1:CH];
 sig=sig + repmat(OFFSET,[N 1]);
+msize=5;
 
 for ch=1:CH;
     plot(tm(ind_start:ind_end),sig(ind_start:ind_end,ch))
     hold on ; grid on
     if(~isempty(ann1))
         tmp_ann1=ann1((ann1>ind_start) & (ann1<ind_end));
-        plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',5,'MarkerFaceColor','g')
+        if(length(tmp_ann1)<30)
+            msize=8;
+        else
+            msize=5;
+        end
+        plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
     end
     if(~isempty(ann2))
         tmp_ann2=ann2((ann2>ind_start) & (ann2<ind_end));
-        plot(tm(tmp_ann2),OFFSET(ch),'r*','MarkerSize',5,'MarkerFaceColor','r')
+        if(length(tmp_ann2)<30)
+            msize=8;
+        else
+            msize=5;
+        end
+        plot(tm(tmp_ann2),OFFSET(ch),'r*','MarkerSize',msize,'MarkerFaceColor','r')
     end
     text(tm(ind_start),ch*offset+0.8*offset,info(ch).Description,'FontWeight','bold','FontSize',12)
     
@@ -276,6 +288,20 @@ if(~isempty(annDiff) & (get(handles.AnalysisMenu,'Value')==2))
     grid on
     ylabel('Diff (seconds)')
     xlim([tm(ind_start) tm(ind_end)])
+end
+
+%Plot RR series in analysis window
+if(~isempty(ann1RR) & (get(handles.AnalysisMenu,'Value')==3))
+    axes(handles.AnalysisAxes);
+    ind=(ann1(1:end-1)>ind_start) & (ann1(1:end-1)<ind_end);
+    tm_ind=ann1(ind);
+    df=ann1RR(ind);
+    plot(tm(tm_ind),df,'k*-')
+    text(tm(tm_ind(1)),max(df),'RR Series','FontWeight','bold','FontSize',12)
+    grid on
+    ylabel('Interval (seconds)')
+    xlim([tm(ind_start) tm(ind_end)])
+    
 end
 
 
@@ -359,7 +385,7 @@ end
 function AnalysisMenu_Callback(hObject, eventdata, handles)
 
 if(get(handles.AnalysisMenu,'Value')==2)
-    global tm  signals ann1 ann2 annDiff info
+    global ann1 ann2 annDiff info
     h = waitbar(0,'Comparing Annotations. Please wait...');
     annDiff=[];
     %Compare annotation with ann1menu being the reference
@@ -371,6 +397,15 @@ if(get(handles.AnalysisMenu,'Value')==2)
     end
     close(h)
     wfdbplot(handles)
+elseif (get(handles.AnalysisMenu,'Value')==3)
+    global ann1 ann1RR info 
+    h = waitbar(0,'Generating RR Series. Please wait...');
+    
+    %Compare annotation with ann1menu being the reference
+    ann1RR=diff(ann1)./double(info(1).SamplingFrequency);
+    close(h)
+    wfdbplot(handles)
+    
 end
 
 
