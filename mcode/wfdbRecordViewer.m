@@ -22,7 +22,7 @@ function varargout = wfdbRecordViewer(varargin)
 
 % Edit the above text to modify the response to help wfdbRecordViewer
 
-% Last Modified by GUIDE v2.5 16-Dec-2014 17:33:09
+% Last Modified by GUIDE v2.5 17-Dec-2014 13:15:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -240,9 +240,9 @@ end
 [~,ind_start]=min(abs(tm-tm_start));
 [~,ind_end]=min(abs(tm-tm_end));
 
-DC=min(signal(ind_start:ind_end,:));
+DC=min(signal(ind_start:ind_end,:),[],1);
 sig=signal - repmat(DC,[N 1]);
-SCALE=max(sig(ind_start:ind_end,:));
+SCALE=max(sig(ind_start:ind_end,:),[],1);
 SCALE(SCALE==0)=1;
 sig=offset.*sig./repmat(SCALE,[N 1]);
 OFFSET=offset.*[1:CH];
@@ -254,21 +254,25 @@ for ch=1:CH;
     hold on ; grid on
     if(~isempty(ann1))
         tmp_ann1=ann1((ann1>ind_start) & (ann1<ind_end));
-        if(length(tmp_ann1)<30)
-            msize=8;
-        else
-            msize=5;
+        if(~isempty(tmp_ann1))
+            if(length(tmp_ann1)<30)
+                msize=8;
+            else
+                msize=5;
+            end
+            plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
         end
-        plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
     end
     if(~isempty(ann2))
         tmp_ann2=ann2((ann2>ind_start) & (ann2<ind_end));
-        if(length(tmp_ann2)<30)
-            msize=8;
-        else
-            msize=5;
+        if(~isempty(tmp_ann1))
+            if(length(tmp_ann2)<30)
+                msize=8;
+            else
+                msize=5;
+            end
+            plot(tm(tmp_ann2),OFFSET(ch),'r*','MarkerSize',msize,'MarkerFaceColor','r')
         end
-        plot(tm(tmp_ann2),OFFSET(ch),'r*','MarkerSize',msize,'MarkerFaceColor','r')
     end
     text(tm(ind_start),ch*offset+0.8*offset,info(ch).Description,'FontWeight','bold','FontSize',12)
     
@@ -280,7 +284,7 @@ set(gca,'FontWeight','bold')
 xlabel('Time (seconds)')
 
 %Plot annotations in analysis window
-if(~isempty(annDiff) & (get(handles.AnalysisMenu,'Value')==2))
+if(~isempty(annDiff) & (get(handles.AnnotationMenu,'Value')==2))
     axes(handles.AnalysisAxes);
     df=annDiff((ann1>ind_start) & (ann1<ind_end));
     plot(tm(tmp_ann1),df,'k*-')
@@ -291,7 +295,7 @@ if(~isempty(annDiff) & (get(handles.AnalysisMenu,'Value')==2))
 end
 
 %Plot RR series in analysis window
-if(~isempty(ann1RR) & (get(handles.AnalysisMenu,'Value')==3))
+if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
     axes(handles.AnalysisAxes);
     ind=(ann1(1:end-1)>ind_start) & (ann1(1:end-1)<ind_end);
     tm_ind=ann1(ind);
@@ -382,34 +386,86 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-function AnalysisMenu_Callback(hObject, eventdata, handles)
+function AnnotationMenu_Callback(hObject, eventdata, handles)
 
-if(get(handles.AnalysisMenu,'Value')==2)
-    global ann1 ann2 annDiff info
-    h = waitbar(0,'Comparing Annotations. Please wait...');
-    annDiff=[];
-    %Compare annotation with ann1menu being the reference
-    N=length(ann1);
-    Fs=double(info(1).SamplingFrequency);
-    if(~isempty(ann2))
-        [A1,A2]=meshgrid(ann1,ann2);
-        annDiff=min(abs(A1-A2))./Fs;
-    end
-    close(h)
-    wfdbplot(handles)
-elseif (get(handles.AnalysisMenu,'Value')==3)
-    global ann1 ann1RR info 
-    h = waitbar(0,'Generating RR Series. Please wait...');
-    
-    %Compare annotation with ann1menu being the reference
-    ann1RR=diff(ann1)./double(info(1).SamplingFrequency);
-    close(h)
-    wfdbplot(handles)
-    
+global ann1 ann1RR info tm
+tips=0;
+Fs=double(info(1).SamplingFrequency);
+annStr=get(handles.AnnotationMenu,'String');
+index=get(handles.AnnotationMenu,'Value');
+switch(annStr{index})
+    case 'Plot Annotation Differences'
+        h = waitbar(0,'Comparing Annotations. Please wait...');
+        annDiff=[];
+        %Compare annotation with ann1menu being the reference
+        N=length(ann1);
+        if(~isempty(ann2))
+            [A1,A2]=meshgrid(ann1,ann2);
+            annDiff=min(abs(A1-A2))./Fs;
+        end
+        close(h)
+        wfdbplot(handles)
+        
+    case 'Plot RR Series Ann1'
+        h = waitbar(0,'Generating RR Series. Please wait...');
+        %Compare annotation with ann1menu being the reference
+        ann1RR=diff(ann1)./double(info(1).SamplingFrequency);
+        close(h)
+        wfdbplot(handles)
+        
+    case 'Add sample to Ann1'
+        
+        %Get closest sample using ginput
+        if(tips)
+            helpdlg('Right click to add multiple annotations. Hit Enter when done.','Adding Annotations');
+        end
+        axes(handles.axes1);
+        [x,~]= ginput;
+        
+        %Convert to samples ann to ann1
+        x=round(x*Fs);
+        ann1=sort([ann1;x]);
+        %Refresh annotation plot
+        wfdbplot(handles)
+        
+    case 'Remove sample from Ann1'
+        
+        %Get closest sample using ginput
+        if(tips)
+            helpdlg('Right click on annotations to remove multiple. Hit Enter when done.','Removing Annotations');
+        end
+        axes(handles.axes1);
+        [x,~]= ginput;
+        rmN=length(x);
+        rm_ind=zeros(rmN,1);
+        for n=1:rmN
+            [~,tmp_ind]=min(abs(x(n)-tm(ann1)));
+            rm_ind(n)=tmp_ind;
+        end
+        if~(isempty(rm_ind))
+            ann1(rm_ind)=[];
+        end
+        %Refresh annotation plot
+        wfdbplot(handles)
+        
+    case 'Edit sample in Ann1'
+        
+    case 'Add Ann2 to Ann2'
+        
+    case 'Save modified Ann1'
+        global records current_record
+        defaultAnn=get(handles.Ann1Menu,'String');
+        defaultInd=get(handles.Ann1Menu,'Value');
+        defName={[defaultAnn{defaultInd} '_x']};
+        newAnn=inputdlg('Enter new annotation name:','Save Annotation',1,defName);
+        h=waitbar(0,['Saving annotation file: ' records{current_record} newAnn{1}]);
+        wrann(records{current_record},newAnn{1},ann1);
+        close(h)
+        
 end
 
 
-function AnalysisMenu_CreateFcn(hObject, eventdata, handles)
+function AnnotationMenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
