@@ -181,13 +181,21 @@ close(h)
 function loadAnn1(fname,annName)
 global ann1
 h = waitbar(0,'Loading Annotations. Please wait...');
-[ann1,type,subtype,chan,num,comments]=rdann(fname,annName);
+if(strcmp(fname,'none'))
+    ann1=[];
+else
+    [ann1,type,subtype,chan,num,comments]=rdann(fname,annName);
+end
 close(h)
 
 function loadAnn2(fname,annName)
 global ann2
 h = waitbar(0,'Loading Annotations. Please wait...');
-[ann2,type,subtype,chan,num,comments]=rdann(fname,annName);
+if(strcmp(fname,'none'))
+    ann1=[];
+else
+    [ann2,type,subtype,chan,num,comments]=rdann(fname,annName);
+end
 close(h)
 
 function loadAnnotationList(fname,handles)
@@ -230,9 +238,17 @@ offset=0.5;
 
 %Get time info
 center=get(handles.slider1,'Value');
+maxSlide=get(handles.slider1,'Max');
+minSlide=get(handles.slider1,'Min');
 if(tm_step == ( tm(end)-tm(1) ))
     tm_start=tm(1);
     tm_end=tm(end);
+elseif(center==maxSlide)
+    tm_end=tm(end);
+    tm_start=tm_end - tm_step;
+elseif(center==minSlide)
+    tm_start=tm(1);
+    tm_end=tm_start + tm_step;
 else
     tm_start=center - tm_step/2;
     tm_end=center + tm_step/2;
@@ -265,7 +281,7 @@ for ch=1:CH;
     end
     if(~isempty(ann2))
         tmp_ann2=ann2((ann2>ind_start) & (ann2<ind_end));
-        if(~isempty(tmp_ann1))
+        if(~isempty(tmp_ann2))
             if(length(tmp_ann2)<30)
                 msize=8;
             else
@@ -301,7 +317,11 @@ if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
     tm_ind=ann1(ind);
     df=ann1RR(ind);
     plot(tm(tm_ind),df,'k*-')
-    text(tm(tm_ind(1)),max(df),'RR Series','FontWeight','bold','FontSize',12)
+    try
+        text(tm(tm_ind(1)),max(df),'RR Series','FontWeight','bold','FontSize',12)
+    catch
+        deb=1;
+    end
     grid on
     ylabel('Interval (seconds)')
     xlim([tm(ind_start) tm(ind_end)])
@@ -319,7 +339,7 @@ function analysisplot(handles)
 function TimeScaleSelection_Callback(hObject, eventdata, handles)
 global tm_step tm
 
-TM_SC=[tm(end)-tm(1) 60*2 30*2 10*2 5*2 1*2];
+TM_SC=[tm(end)-tm(1) 120 60 30 15 10 5 1];
 index = get(handles.TimeScaleSelection, 'Value');
 %Normalize step to time range
 stp=TM_SC(index)/TM_SC(1);
@@ -355,10 +375,8 @@ global ann1 records current_record
 
 ind = get(handles.Ann1Menu, 'Value');
 annStr=get(handles.Ann1Menu, 'String');
-if(ind ~=1)
-    loadAnn1(records{current_record},annStr{ind})
-    wfdbplot(handles)
-end
+loadAnn1(records{current_record},annStr{ind})
+wfdbplot(handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -374,10 +392,9 @@ global ann2 records current_record
 
 ind = get(handles.Ann2Menu, 'Value');
 annStr=get(handles.Ann2Menu, 'String');
-if(ind ~=1)
-    loadAnn2(records{current_record},annStr{ind})
-    wfdbplot(handles)
-end
+loadAnn2(records{current_record},annStr{ind})
+wfdbplot(handles)
+
 
 % --- Executes during object creation, after setting all properties.
 function Ann2Menu_CreateFcn(hObject, eventdata, handles)
@@ -413,11 +430,10 @@ switch(annStr{index})
         close(h)
         wfdbplot(handles)
         
-    case 'Add sample to Ann1'
-        
+    case 'Add samples to Ann1'
         %Get closest sample using ginput
         if(tips)
-            helpdlg('Right click to add multiple annotations. Hit Enter when done.','Adding Annotations');
+            helpdlg('Left click to add multiple annotations. Hit Enter when done.','Adding Annotations');
         end
         axes(handles.axes1);
         [x,~]= ginput;
@@ -428,11 +444,11 @@ switch(annStr{index})
         %Refresh annotation plot
         wfdbplot(handles)
         
-    case 'Remove sample from Ann1'
+    case 'Delete samples in Ann1'
         
         %Get closest sample using ginput
         if(tips)
-            helpdlg('Right click on annotations to remove multiple. Hit Enter when done.','Removing Annotations');
+            helpdlg('Left click on annotations to remove multiple. Hit Enter when done.','Removing Annotations');
         end
         axes(handles.axes1);
         [x,~]= ginput;
@@ -449,8 +465,36 @@ switch(annStr{index})
         wfdbplot(handles)
         
     case 'Edit sample in Ann1'
+        %Modify closest sample using ginput
+        if(tips)
+            helpdlg('Left click on waveform will shift closest annotation to the clicked point. Hit Enter when done.','Adding Annotations');
+        end
+        axes(handles.axes1);
+        [x,~]= ginput;
+        editN=length(x);
+        edit_ind=zeros(editN,1);
+        for n=1:editN
+            [~,tmp_ind]=min(abs(x(n)-tm(ann1)));
+            edit_ind(n)=tmp_ind;
+        end
+        if~(isempty(edit_ind))
+            ann1(edit_ind)=round(x*Fs);
+        end
+        %Refresh annotation plot
+        wfdbplot(handles)
         
     case 'Add Ann2 to Ann2'
+        global ann2
+        if(tips)
+            helpdlg('Left click on waveform to select start and end of region to add from Ann2 to Ann1. Hit Enter when done.','Adding Annotations');
+        end
+        axes(handles.axes1);
+        [x,~]= ginput;
+        [~,start_ind]=min(abs(x(1)-tm(ann2)));
+        [~,end_ind]=min(abs(x(2)-tm(ann2)));
+        ann1=sort([ann1;ann2(start_ind:end_ind)]);
+        %Refresh annotation plot
+        wfdbplot(handles)
         
     case 'Save modified Ann1'
         global records current_record
