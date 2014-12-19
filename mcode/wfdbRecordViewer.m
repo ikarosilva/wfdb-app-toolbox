@@ -502,7 +502,7 @@ switch(annStr{index})
         defaultInd=get(handles.Ann1Menu,'Value');
         defName={[defaultAnn{defaultInd} '_x']};
         newAnn=inputdlg('Enter new annotation name:','Save Annotation',1,defName);
-        h=waitbar(0,['Saving annotation file: ' records{current_record} newAnn{1}]);
+        h=waitbar(0,['Saving annotation file: ' records{current_record} '.' newAnn{1}]);
         wrann(records{current_record},newAnn{1},ann1);
         close(h)
         
