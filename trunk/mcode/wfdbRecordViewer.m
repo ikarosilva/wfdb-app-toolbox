@@ -64,7 +64,7 @@ tmp=dir('*.hea');
 
 N=length(tmp);
 records=cell(N,1);
-current_record=[];
+current_record=1;
 for n=1:N
     fname=tmp(n).name;
     records(n)={fname(1:end-4)};
@@ -290,7 +290,9 @@ for ch=1:CH;
             plot(tm(tmp_ann2),OFFSET(ch),'r*','MarkerSize',msize,'MarkerFaceColor','r')
         end
     end
-    text(tm(ind_start),ch*offset+0.8*offset,info(ch).Description,'FontWeight','bold','FontSize',12)
+    if(~isempty(info(ch).Description))
+        text(tm(ind_start),ch*offset+0.8*offset,info(ch).Description,'FontWeight','bold','FontSize',12)
+    end
     
 end
 set(gca,'YTick',[])
