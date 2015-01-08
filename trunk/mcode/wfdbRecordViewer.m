@@ -326,7 +326,9 @@ if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
     end
     grid on
     ylabel('Interval (seconds)')
-    xlim([tm(ind_start) tm(ind_end)])
+    if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
+        xlim([tm(ind_start) tm(ind_end)])
+    end
     
 end
 
@@ -432,7 +434,7 @@ switch(annStr{index})
         close(h)
         wfdbplot(handles)
         
-    case 'Add samples to Ann1'
+    case 'Add annotations to Ann1'
         %Get closest sample using ginput
         if(tips)
             helpdlg('Left click to add multiple annotations. Hit Enter when done.','Adding Annotations');
@@ -446,7 +448,7 @@ switch(annStr{index})
         %Refresh annotation plot
         wfdbplot(handles)
         
-    case 'Delete samples in Ann1'
+    case 'Delete annotations from Ann1'
         
         %Get closest sample using ginput
         if(tips)
@@ -466,7 +468,21 @@ switch(annStr{index})
         %Refresh annotation plot
         wfdbplot(handles)
         
-    case 'Edit sample in Ann1'
+    case 'Delete annotations in a range from Ann1'
+        
+        %Get closest sample using ginput
+        if(tips)
+            helpdlg('Left click on start and end regions. Hit Enter when done.','Removing Annotations');
+        end
+        axes(handles.axes1);
+        [x,~]= ginput;
+        [~,start_ind]=min(abs(x(end-1)-tm(ann1)));
+        [~,end_ind]=min(abs(x(end)-tm(ann1)));
+        ann1(start_ind:end_ind)=[];
+        %Refresh annotation plot
+        wfdbplot(handles)
+        
+    case 'Edit annotations in Ann1'
         %Modify closest sample using ginput
         if(tips)
             helpdlg('Left click on waveform will shift closest annotation to the clicked point. Hit Enter when done.','Adding Annotations');
@@ -485,7 +501,7 @@ switch(annStr{index})
         %Refresh annotation plot
         wfdbplot(handles)
         
-    case 'Add Ann2 to Ann2'
+    case 'Add annotations in a range from Ann2 to Ann2'
         global ann2
         if(tips)
             helpdlg('Left click on waveform to select start and end of region to add from Ann2 to Ann1. Hit Enter when done.','Adding Annotations');
@@ -498,7 +514,7 @@ switch(annStr{index})
         %Refresh annotation plot
         wfdbplot(handles)
         
-    case 'Save modified Ann1'
+    case 'Save modified annotations of Ann1'
         global records current_record
         defaultAnn=get(handles.Ann1Menu,'String');
         defaultInd=get(handles.Ann1Menu,'Value');
