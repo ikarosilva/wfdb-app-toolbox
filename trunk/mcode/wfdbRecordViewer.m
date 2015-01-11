@@ -317,13 +317,16 @@ if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
     Nann=length(ann1);
     axes(handles.AnalysisAxes);
     ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
-    ind2=find(ind==1)+1;
-    del_ind=find(ind2> Nann);
-    if(~isempty(del_ind))
-        ind(ind2(del_ind)-1)=[];
-        ind2(del_ind)=[];
+    ind=find(ind==1)+1;
+    if(ind(end)> Nann)
+        ind(end)=[];
     end
-    tm_ind=ann1(ind2);
+    tm_ind=ann1(ind);
+    del_ind=find(tm_ind>N);
+    if(~isempty(del_ind))
+       ind(ann1(ind)==tm_ind(del_ind))=[];
+       tm_ind(del_ind)=[];
+    end
     plot(tm(tm_ind),ann1RR(ind),'k*-')
     try
         text(tm(tm_ind(1)),max(df),'RR Series','FontWeight','bold','FontSize',12)
