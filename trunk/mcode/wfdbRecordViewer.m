@@ -314,9 +314,15 @@ end
 
 %Plot RR series in analysis window
 if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
+    Nann=length(ann1);
     axes(handles.AnalysisAxes);
     ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
     ind2=find(ind==1)+1;
+    del_ind=find(ind2> Nann);
+    if(~isempty(del_ind))
+        ind(ind2(del_ind)-1)=[];
+        ind2(del_ind)=[];
+    end
     tm_ind=ann1(ind2);
     plot(tm(tm_ind),ann1RR(ind),'k*-')
     try
