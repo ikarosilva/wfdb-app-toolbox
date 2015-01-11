@@ -315,10 +315,10 @@ end
 %Plot RR series in analysis window
 if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
     axes(handles.AnalysisAxes);
-    ind=(ann1(1:end-1)>ind_start) & (ann1(1:end-1)<ind_end);
-    tm_ind=ann1(ind);
-    df=ann1RR(ind);
-    plot(tm(tm_ind),df,'k*-')
+    ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
+    ind2=find(ind==1)+1;
+    tm_ind=ann1(ind2);
+    plot(tm(tm_ind),ann1RR(ind),'k*-')
     try
         text(tm(tm_ind(1)),max(df),'RR Series','FontWeight','bold','FontSize',12)
     catch
