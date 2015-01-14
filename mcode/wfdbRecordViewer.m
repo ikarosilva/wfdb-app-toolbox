@@ -318,7 +318,7 @@ if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
     axes(handles.AnalysisAxes);
     ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
     ind=find(ind==1)+1;
-    if(ind(end)> Nann)
+    if(~isempty(ind) && ind(end)> Nann)
         ind(end)=[];
     end
     tm_ind=ann1(ind);
@@ -326,6 +326,11 @@ if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
     if(~isempty(del_ind))
        ind(ann1(ind)==tm_ind(del_ind))=[];
        tm_ind(del_ind)=[];
+    end
+    if(~isempty(ind) && ind(end)>length(ann1RR))
+        del_ind=find(ind>length(ann1RR));
+        ind(del_ind)=[];
+        tm_ind(del_ind)=[];
     end
     plot(tm(tm_ind),ann1RR(ind),'k*-')
     try
@@ -355,6 +360,9 @@ global tm_step tm
 TM_SC=[tm(end)-tm(1) 120 60 30 15 10 5 1];
 index = get(handles.TimeScaleSelection, 'Value');
 %Normalize step to time range
+if(TM_SC(index)>TM_SC(1))
+   index=1; 
+end
 stp=TM_SC(index)/TM_SC(1);
 set(handles.slider1,'SliderStep',[stp stp*10]);
 tm_step=TM_SC(1).*stp(1);
@@ -419,6 +427,7 @@ end
 function AnnotationMenu_Callback(hObject, eventdata, handles)
 
 global ann1 ann1RR info tm
+
 tips=0;
 Fs=double(info(1).SamplingFrequency);
 annStr=get(handles.AnnotationMenu,'String');
@@ -549,7 +558,7 @@ loadRecord(records{current_record})
 loadAnnotationList(records{current_record},handles)
 Ann1Menu_Callback(hObject, eventdata, handles)
 Ann2Menu_Callback(hObject, eventdata, handles)
-AnalysisMenu_Callback(hObject, eventdata, handles)
+%AnalysisMenu_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in TagButton.
