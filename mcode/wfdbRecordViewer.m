@@ -22,7 +22,7 @@ function varargout = wfdbRecordViewer(varargin)
 
 % Edit the above text to modify the response to help wfdbRecordViewer
 
-% Last Modified by GUIDE v2.5 17-Dec-2014 13:15:23
+% Last Modified by GUIDE v2.5 23-Jan-2015 16:01:12
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -51,7 +51,7 @@ function wfdbRecordViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm tm_step
+global current_record records tm tm_step signalDescription
 
 % Choose default command line output for wfdbRecordViewer
 handles.output = hObject;
@@ -75,6 +75,7 @@ end
 set(handles.RecorListMenu,'String',records)
 set(handles.RecorListMenu,'Value',current_record)
 loadRecord(records{current_record})
+set(handles.signalList,'String',signalDescription)
 loadAnnotationList(records{current_record},handles);
 set(handles.slider1,'Max',tm(end))
 set(handles.slider1,'Min',tm(1))
@@ -83,7 +84,6 @@ sliderStep=get(handles.slider1,'SliderStep');
 tm_step=(tm(end)-tm(1)).*sliderStep(1);
 
 wfdbplot(handles)
-analysisplot(handles)
 
 
 
@@ -167,7 +167,7 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 function loadRecord(fname)
-global tm signal info tm_step
+global tm signal info tm_step signalDescription analysisSignal analysisTime
 h = waitbar(0,'Loading Data. Please wait...');
 try
     [tm,signal]=rdmat(fname);
@@ -175,7 +175,13 @@ catch
     [tm,signal]=rdsamp(fname);
 end
 info=wfdbdesc(fname);
-
+R=length(info);
+analysisSignal=[];
+analysisTime=[];
+signalDescription=cell(R,1);
+for r=1:R
+    signalDescription(r)={info(r).Description};
+end
 close(h)
 
 function loadAnn1(fname,annName)
@@ -228,7 +234,7 @@ set(handles.Ann2Menu,'String',annotations)
 
 
 function wfdbplot(handles)
-global tm signal info tm_step ann1 ann2 annDiff ann1RR
+global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal analysisTime analysisUnits
 axes(handles.axes1);
 cla;
 
@@ -263,7 +269,6 @@ SCALE(SCALE==0)=1;
 sig=offset.*sig./repmat(SCALE,[N 1]);
 OFFSET=offset.*[1:CH];
 sig=sig + repmat(OFFSET,[N 1]);
-msize=5;
 
 for ch=1:CH;
     plot(tm(ind_start:ind_end),sig(ind_start:ind_end,ch))
@@ -300,6 +305,7 @@ set(gca,'YTickLabel',[])
 set(gca,'FontSize',10)
 set(gca,'FontWeight','bold')
 xlabel('Time (seconds)')
+xlim([tm(ind_start) tm(ind_end)])
 
 %Plot annotations in analysis window
 if(~isempty(annDiff) & (get(handles.AnnotationMenu,'Value')==2))
@@ -312,45 +318,46 @@ if(~isempty(annDiff) & (get(handles.AnnotationMenu,'Value')==2))
     xlim([tm(ind_start) tm(ind_end)])
 end
 
-%Plot RR series in analysis window
-if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
-    Nann=length(ann1);
+%Plot custom signal in the analysis window
+if(~isempty(analysisSignal))
     axes(handles.AnalysisAxes);
-    ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
-    ind=find(ind==1)+1;
-    if(~isempty(ind) && ind(end)> Nann)
-        ind(end)=[];
+    plot(analysisTime,analysisSignal,'k')
+    grid on;
+    xlim([tm(ind_start) tm(ind_end)])
+    if(~isempty(analysisUnits))
+       ylabel(analysisUnits) 
     end
-    tm_ind=ann1(ind);
-    del_ind=find(tm_ind>N);
-    if(~isempty(del_ind))
-       ind(ann1(ind)==tm_ind(del_ind))=[];
-       tm_ind(del_ind)=[];
-    end
-    if(~isempty(ind) && ind(end)>length(ann1RR))
-        del_ind=find(ind>length(ann1RR));
-        ind(del_ind)=[];
-        tm_ind(del_ind)=[];
-    end
-    plot(tm(tm_ind),ann1RR(ind),'k*-')
-    try
+else
+    %Plot RR series in analysis window
+    if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
+        Nann=length(ann1);
+        axes(handles.AnalysisAxes);
+        ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
+        ind=find(ind==1)+1;
+        if(~isempty(ind) && ind(end)> Nann)
+            ind(end)=[];
+        end
+        tm_ind=ann1(ind);
+        del_ind=find(tm_ind>N);
+        if(~isempty(del_ind))
+            ind(ann1(ind)==tm_ind(del_ind))=[];
+            tm_ind(del_ind)=[];
+        end
+        if(~isempty(ind) && ind(end)>length(ann1RR))
+            del_ind=find(ind>length(ann1RR));
+            ind(del_ind)=[];
+            tm_ind(del_ind)=[];
+        end
+        plot(tm(tm_ind),ann1RR(ind),'k*-')
         text(tm(tm_ind(1)),max(df),'RR Series','FontWeight','bold','FontSize',12)
-    catch
-        deb=1;
+        grid on
+        ylabel('Interval (seconds)')
+        if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
+            xlim([tm(ind_start) tm(ind_end)])
+        end
+        
     end
-    grid on
-    ylabel('Interval (seconds)')
-    if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
-        xlim([tm(ind_start) tm(ind_end)])
-    end
-    
 end
-
-
-
-function analysisplot(handles)
-
-
 
 
 % --- Executes on selection change in TimeScaleSelection.
@@ -361,7 +368,7 @@ TM_SC=[tm(end)-tm(1) 120 60 30 15 10 5 1];
 index = get(handles.TimeScaleSelection, 'Value');
 %Normalize step to time range
 if(TM_SC(index)>TM_SC(1))
-   index=1; 
+    index=1;
 end
 stp=TM_SC(index)/TM_SC(1);
 set(handles.slider1,'SliderStep',[stp stp*10]);
@@ -426,7 +433,7 @@ end
 
 function AnnotationMenu_Callback(hObject, eventdata, handles)
 
-global ann1 ann1RR info tm
+global ann1 ann1RR info tm ann2
 
 tips=0;
 Fs=double(info(1).SamplingFrequency);
@@ -560,11 +567,167 @@ Ann1Menu_Callback(hObject, eventdata, handles)
 Ann2Menu_Callback(hObject, eventdata, handles)
 %AnalysisMenu_Callback(hObject, eventdata, handles)
 
+% --- Executes on selection change in SignalMenu.
+function SignalMenu_Callback(hObject, eventdata, handles)
+% hObject    handle to SignalMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
-% --- Executes on button press in TagButton.
-function TagButton_Callback(hObject, eventdata, handles)
+% Hints: contents = cellstr(get(hObject,'String')) returns SignalMenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from SignalMenu
 
-global records current_record
-h = waitbar(0,['Generating tag file: ' records{current_record} '.tag']);
-wrann(records{current_record},'tag',1);
+global tm signal info analysisSignal analysisTime analysisUnits
+contents = cellstr(get(hObject,'String'));
+ind=get(handles.signalList,'Value');
+str= contents{get(hObject,'Value')};
+
+%Get Raw Signal
+analysisTime=tm;
+analysisSignal=signal(:,ind);
+analysisUnits=strsplit(info(ind).Gain,'/');
+if(length(analysisUnits)>1)
+    analysisUnits=analysisUnits{2};
+else
+    analysisUnits=[];
+end
+Fs=double(info(ind).SamplingFrequency);
+
+switch str 
+    
+    case 'Plot Raw Signal'
+    wfdbplot(handles);
+    
+    case 'Apply General Filter'
+    [analysisSignal]=wfdbFilter(analysisSignal);
+    wfdbplot(handles);
+    
+    case '60/50 Hz Notch Filter'
+    [analysisSignal]=wfdbNotch(analysisSignal,Fs);
+    wfdbplot(handles);
+    
+    case 'Resonator'
+    [analysisSignal]=wfdbResonator(analysisSignal,Fs);
+    wfdbplot(handles);
+    
+    
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function SignalMenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to SignalMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in signalList.
+function signalList_Callback(hObject, eventdata, handles)
+% hObject    handle to signalList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns signalList contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from signalList
+
+
+% --- Executes during object creation, after setting all properties.
+function signalList_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to signalList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function [analysisSignal]=wfdbFilter(analysisSignal)
+
+%Set Low-pass default values
+dlgParam.prompt={'Filter Design Function (should return "a" and "b", for use by FILTFILT ):'};
+dlgParam.defaultanswer={'b=fir1(48,[0.1 0.5]);a=1;'};
+dlgParam.name='Filter Design Command';
+dlgParam.numlines=1;
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+h = waitbar(0,'Filtering Data. Please wait...');
+try
+    eval([answer{1} ';']);
+    analysisSignal=filtfilt(b,a,analysisSignal);
+catch
+    errordlg(['Unable to filter data! Error: ' lasterr])
+end
 close(h)
+
+
+function [analysisSignal]=wfdbNotch(analysisSignal,Fs)
+% References:
+% *Rangayyan (2002), "Biomedical Signal Analysis", IEEE Press Series in BME
+% 
+% *Hayes (1999), "Digital Signal Processing", Schaum's Outline
+%Set Low-pass default values
+dlgParam.prompt={'Control Paramter (0 < r < 1 ):','Notch Frequency (Hz):'};
+dlgParam.defaultanswer={'0.995','60'};
+dlgParam.name='Notch Filter Design';
+dlgParam.numlines=1;
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+h = waitbar(0,'Filtering Data. Please wait...');
+r = str2num(answer{1});   % Control parameter. 0 < r < 1.
+fn= str2num(answer{2});
+
+cW = cos(2*pi*fn/Fs); 
+b=[1 -2*cW 1];
+a=[1 -2*r*cW r^2];
+try
+    eval([answer{1} ';']);
+    analysisSignal=filtfilt(b,a,analysisSignal);
+catch
+    errordlg(['Unable to filter data! Error: ' lasterr])
+end
+close(h)
+
+
+function [analysisSignal]=wfdbResonator(analysisSignal,Fs)
+% References:
+% *Rangayyan (2002), "Biomedical Signal Analysis", IEEE Press Series in BME
+% 
+% *Hayes (1999), "Digital Signal Processing", Schaum's Outline
+%Set Low-pass default values
+dlgParam.prompt={'Resonating Frequency (Hz):','Q factor:'};
+dlgParam.defaultanswer={num2str(Fs/5),'50'};
+dlgParam.name='Resonator Filter Design';
+dlgParam.numlines=1;
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+h = waitbar(0,'Filtering Data. Please wait...');
+fn= str2num(answer{1});
+K= str2num(answer{2});
+
+%Similar  to 'Q1' but more accurate
+%For details see IEEE SP 2008 (5), pg 113
+beta=1+K;
+f=pi*fn/Fs;
+numA=tan(pi/4 - f);
+denA=sin(2*f)+cos(2*f)*numA;
+A=numA/denA;
+b=[1 -2*A A.^2];
+a=[ (beta + K*(A^2)) -2*A*(beta+K) ((A^2)*beta + K)];
+
+try
+    eval([answer{1} ';']);
+    analysisSignal=filtfilt(b,a,analysisSignal);
+catch
+    errordlg(['Unable to filter data! Error: ' lasterr])
+end
+close(h)
+   
