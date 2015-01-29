@@ -22,7 +22,7 @@ function varargout = wfdbRecordViewer(varargin)
 
 % Edit the above text to modify the response to help wfdbRecordViewer
 
-% Last Modified by GUIDE v2.5 23-Jan-2015 16:01:12
+% Last Modified by GUIDE v2.5 29-Jan-2015 15:29:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -325,7 +325,7 @@ if(~isempty(analysisSignal))
     grid on;
     xlim([tm(ind_start) tm(ind_end)])
     if(~isempty(analysisUnits))
-       ylabel(analysisUnits) 
+        ylabel(analysisUnits)
     end
 else
     %Plot RR series in analysis window
@@ -592,24 +592,31 @@ else
 end
 Fs=double(info(ind).SamplingFrequency);
 
-switch str 
+switch str
     
     case 'Plot Raw Signal'
-    wfdbplot(handles);
-    
+        wfdbplot(handles);
+        
     case 'Apply General Filter'
-    [analysisSignal]=wfdbFilter(analysisSignal);
-    wfdbplot(handles);
-    
+        [analysisSignal]=wfdbFilter(analysisSignal);
+        wfdbplot(handles);
+        
     case '60/50 Hz Notch Filter'
-    [analysisSignal]=wfdbNotch(analysisSignal,Fs);
-    wfdbplot(handles);
-    
-    case 'Resonator'
-    [analysisSignal]=wfdbResonator(analysisSignal,Fs);
-    wfdbplot(handles);
-    
-    
+        [analysisSignal]=wfdbNotch(analysisSignal,Fs);
+        wfdbplot(handles);
+        
+    case 'Resonator Filter'
+        [analysisSignal]=wfdbResonator(analysisSignal,Fs);
+        wfdbplot(handles);
+        
+    case 'Custom Function'
+        [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs);
+        wfdbplot(handles);
+        
+    case 'Spectogram Analysis'
+        [analysisSignal,analysisTime]=wfdbSpect(analysisSignal,analysisTime,Fs);
+        
+        
 end
 
 
@@ -672,7 +679,7 @@ close(h)
 function [analysisSignal]=wfdbNotch(analysisSignal,Fs)
 % References:
 % *Rangayyan (2002), "Biomedical Signal Analysis", IEEE Press Series in BME
-% 
+%
 % *Hayes (1999), "Digital Signal Processing", Schaum's Outline
 %Set Low-pass default values
 dlgParam.prompt={'Control Paramter (0 < r < 1 ):','Notch Frequency (Hz):'};
@@ -685,7 +692,7 @@ h = waitbar(0,'Filtering Data. Please wait...');
 r = str2num(answer{1});   % Control parameter. 0 < r < 1.
 fn= str2num(answer{2});
 
-cW = cos(2*pi*fn/Fs); 
+cW = cos(2*pi*fn/Fs);
 b=[1 -2*cW 1];
 a=[1 -2*r*cW r^2];
 try
@@ -700,7 +707,7 @@ close(h)
 function [analysisSignal]=wfdbResonator(analysisSignal,Fs)
 % References:
 % *Rangayyan (2002), "Biomedical Signal Analysis", IEEE Press Series in BME
-% 
+%
 % *Hayes (1999), "Digital Signal Processing", Schaum's Outline
 %Set Low-pass default values
 dlgParam.prompt={'Resonating Frequency (Hz):','Q factor:'};
@@ -729,5 +736,54 @@ try
 catch
     errordlg(['Unable to filter data! Error: ' lasterr])
 end
+close(h)figure
+surf(analysisTime,analysisYAxis,analysisSignal,'EdgeColor','none');
+axis xy; axis tight; colormap(analysisMap); view(0,90);
+xlabel('Time (s)');
+ylabel('Frequency (Hz)');
+
+
+
+function [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs)
+
+dlgParam.prompt={'Custom Function must output variables ''analysisSignal'' and ''analysisTime'''};
+dlgParam.defaultanswer={'[analysisSignal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
+dlgParam.name='Evaluate Command:';
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+h = waitbar(0,'Executing code on signal. Please wait...');
+try
+    eval([answer{1} ';']);
+    analysisSignal=filtfilt(b,a,analysisSignal);
+catch
+    errordlg(['Unable to execute code!! Error: ' lasterr])
+end
 close(h)
-   
+
+
+function [analysisSignal,analysisTime,analysisYAxis]=wfdbSpect(analysisSignal,analysisTime,Fs)
+
+dlgParam.prompt={'window size','overlap size'};
+window=2^10;
+noverlap=round(window/2);
+
+dlgParam.defaultanswer={num2str(window),num2str(noverlap)};
+dlgParam.name='Spectogram Parameters';
+dlgParam.numlines=1;
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+h = waitbar(0,'Calculating spectogram. Please wait...');
+window= str2num(answer{1});
+noverlap= str2num(answer{2});
+[~,F,analysisTime,analysisSignal] = spectrogram(analysisSignal,window,noverlap,window,Fs,'yaxis');
+
+analysisSignal=10*log10(abs(analysisSignal));
+analysisYAxis.values=F;
+analysisYAxis.map='jet';
+analysisYAxis.legend='Frequency (Hz)';
+
+figure
+surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
+axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
+xlabel('Time (s)');
+ylabel(analysisYAxis.legend);
