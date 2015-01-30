@@ -234,7 +234,7 @@ set(handles.Ann2Menu,'String',annotations)
 
 
 function wfdbplot(handles)
-global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal analysisTime analysisUnits
+global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal analysisTime analysisUnits analysisYAxis
 axes(handles.axes1);
 cla;
 
@@ -321,8 +321,16 @@ end
 %Plot custom signal in the analysis window
 if(~isempty(analysisSignal))
     axes(handles.AnalysisAxes);
-    plot(analysisTime,analysisSignal,'k')
-    grid on;
+    if(isempty(analysisYAxis))
+        %Standard 2D Plot
+        plot(analysisTime,analysisSignal,'k')
+        grid on;
+    else
+        %3D Plot with colormap
+        surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
+        axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
+        ylim([analysisYAxis.minY analysisYAxis.maxY])
+    end
     xlim([tm(ind_start) tm(ind_end)])
     if(~isempty(analysisUnits))
         ylabel(analysisUnits)
@@ -576,7 +584,7 @@ function SignalMenu_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns SignalMenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from SignalMenu
 
-global tm signal info analysisSignal analysisTime analysisUnits
+global tm signal info analysisSignal analysisTime analysisUnits analysisYAxis
 contents = cellstr(get(hObject,'String'));
 ind=get(handles.signalList,'Value');
 str= contents{get(hObject,'Value')};
@@ -591,7 +599,7 @@ else
     analysisUnits=[];
 end
 Fs=double(info(ind).SamplingFrequency);
-
+analysisYAxis=[];
 switch str
     
     case 'Plot Raw Signal'
@@ -614,8 +622,8 @@ switch str
         wfdbplot(handles);
         
     case 'Spectogram Analysis'
-        [analysisSignal,analysisTime]=wfdbSpect(analysisSignal,analysisTime,Fs);
-        
+        [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs);
+        wfdbplot(handles);
         
 end
 
@@ -736,12 +744,7 @@ try
 catch
     errordlg(['Unable to filter data! Error: ' lasterr])
 end
-close(h)figure
-surf(analysisTime,analysisYAxis,analysisSignal,'EdgeColor','none');
-axis xy; axis tight; colormap(analysisMap); view(0,90);
-xlabel('Time (s)');
-ylabel('Frequency (Hz)');
-
+close(h)
 
 
 function [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs)
@@ -761,13 +764,16 @@ end
 close(h)
 
 
-function [analysisSignal,analysisTime,analysisYAxis]=wfdbSpect(analysisSignal,analysisTime,Fs)
+function [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs)
 
-dlgParam.prompt={'window size','overlap size'};
+dlgParam.prompt={'window size','overlap size','Min Frequency (Hz)','Max Frequency (Hz)','colormap'};
 window=2^10;
+minY= 0;
+maxY= floor(Fs/2);
 noverlap=round(window/2);
 
-dlgParam.defaultanswer={num2str(window),num2str(noverlap)};
+dlgParam.defaultanswer={num2str(window),num2str(noverlap),...
+    num2str(minY),num2str(maxY),'jet'};
 dlgParam.name='Spectogram Parameters';
 dlgParam.numlines=1;
 
@@ -775,15 +781,11 @@ answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.default
 h = waitbar(0,'Calculating spectogram. Please wait...');
 window= str2num(answer{1});
 noverlap= str2num(answer{2});
+analysisYAxis.minY= str2num(answer{3});
+analysisYAxis.maxY= str2num(answer{4});
+analysisYAxis.map=answer{5};
 [~,F,analysisTime,analysisSignal] = spectrogram(analysisSignal,window,noverlap,window,Fs,'yaxis');
 
 analysisSignal=10*log10(abs(analysisSignal));
 analysisYAxis.values=F;
-analysisYAxis.map='jet';
-analysisYAxis.legend='Frequency (Hz)';
-
-figure
-surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
-axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
-xlabel('Time (s)');
-ylabel(analysisYAxis.legend);
+analysisUnits='Frequency (Hz)';
