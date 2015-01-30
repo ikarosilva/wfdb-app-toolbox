@@ -815,21 +815,23 @@ function [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSigna
 
 persistent dlgParam
 if(isempty(dlgParam))
-    dlgParam.prompt={'wavelet','scales','colormap'};
+    dlgParam.prompt={'wavelet','scales','colormap','logScale'};
     dlgParam.wavelet='coif2';    
     dlgParam.scales='1:28';    
     dlgParam.map='jet';    
+    dlgParam.log='false';
     dlgParam.name='Wavelet Parameters';
     dlgParam.numlines=1;
 end
 
-dlgParam.defaultanswer={num2str(dlgParam.wavelet),num2str(dlgParam.scales),dlgParam.map};  
+dlgParam.defaultanswer={num2str(dlgParam.wavelet),num2str(dlgParam.scales),dlgParam.map,dlgParam.log};  
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
 h = waitbar(0,'Calculating wavelets. Please wait...');
 dlgParam.wavelet= answer{1};
 dlgParam.scales = str2num(answer{2});
 dlgParam.map= answer{3};
+dlgParam.log= answer{4};
 analysisYAxis.minY= dlgParam.scales(1);
 analysisYAxis.maxY= dlgParam.scales(end);
 analysisYAxis.map=dlgParam.map;
@@ -837,6 +839,9 @@ analysisYAxis.isImage=1;
 
 coefs = cwt(analysisSignal,dlgParam.scales,dlgParam.wavelet);
 analysisSignal = wscalogram('',coefs);
+if(strcmp(dlgParam.log,'true'))
+    analysisSignal=log(analysisSignal);
+end
 analysisYAxis.values=dlgParam.scales;
 analysisUnits='Scale';
 close(h)

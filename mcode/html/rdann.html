@@ -40,10 +40,11 @@ function varargout=rdann(varargin)
        To convert this vector to a string of time stamps see WFDBTIME.
 
  type
-       Nx1 vector of the chars describing annotation type.
+       NxT vector of the chars describing annotation type. Usually
+       (but not always) T is 1.
 
  subtype
-       Nx1 vector of the chars describing annotation subtype. 
+       Nx1 vector of the chars describing annotation subtype.
        For a list of standard annotation codes used by PhyioNet, please see:
              http://www.physionet.org/physiobank/annotations.shtml
 
@@ -96,8 +97,8 @@ function varargout=rdann(varargin)
 
 
  Written by Ikaro Silva, 2013
- Last Modified: November 4, 2014
- Version 1.4
+ Last Modified: December 4, 2014
+ Version 2
  Since 0.0.1
 
  %Example 1- Read a signal and annotation from PhysioNet's Remote server:

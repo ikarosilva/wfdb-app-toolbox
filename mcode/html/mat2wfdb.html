@@ -40,8 +40,8 @@ function [varargout]=mat2wfdb(varargin)
           Options are: 8,  16, and 32 ( all are signed types). 16 is the default.
  adu     -(Optional)  Cell array of strings describing the physical units (default is 'V').
           If only one string is entered all signals will have the same physical units.
-          If muliplte physical units, the total units entered has to equal M (number of
-          channels).
+          If multiple physical units, the total units entered has to equal M (number of
+          channels). Units are delimited by '/'. See examples below.
  info    -(Optional)  String that will be added to the comment section of the header file.
  gain    -(Optional) Scalar, if provided, no automatic scaling will be applied before the
           quantitzation of the signal. If a gain is passed,  in will be the same one set
