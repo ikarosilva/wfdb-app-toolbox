@@ -22,7 +22,7 @@ function varargout = wfdbRecordViewer(varargin)
 
 % Edit the above text to modify the response to help wfdbRecordViewer
 
-% Last Modified by GUIDE v2.5 29-Jan-2015 15:29:20
+% Last Modified by GUIDE v2.5 30-Jan-2015 12:05:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -781,7 +781,7 @@ if(isempty(dlgParam))
     dlgParam.window=2^10;
     dlgParam.minY= 0;
     dlgParam.maxY= floor(Fs/2);
-    dlgParam.noverlap=round(window/2);
+    dlgParam.noverlap=round(dlgParam.window/2);
     dlgParam.map='jet';    
     dlgParam.name='Spectogram Parameters';
     dlgParam.numlines=1;
