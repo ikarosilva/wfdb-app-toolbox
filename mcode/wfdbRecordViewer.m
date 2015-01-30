@@ -296,7 +296,7 @@ for ch=1:CH;
         end
     end
     if(~isempty(info(ch).Description))
-        text(tm(ind_start),ch*offset+0.8*offset,info(ch).Description,'FontWeight','bold','FontSize',12)
+        text(tm(ind_start),ch*offset+0.85*offset,info(ch).Description,'FontWeight','bold','FontSize',12)
     end
     
 end
