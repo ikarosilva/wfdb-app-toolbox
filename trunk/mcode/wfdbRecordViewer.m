@@ -326,9 +326,14 @@ if(~isempty(analysisSignal))
         plot(analysisTime,analysisSignal,'k')
         grid on;
     else
+        if(isfield(analysisYAxis,'isImage') && analysisYAxis.isImage)
+            %Plot scaled image
+            imagesc(analysisSignal)
+        else
         %3D Plot with colormap
         surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
         axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
+        end
         ylim([analysisYAxis.minY analysisYAxis.maxY])
     end
     xlim([tm(ind_start) tm(ind_end)])
@@ -625,6 +630,10 @@ switch str
         [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs);
         wfdbplot(handles);
         
+    case 'Wavelets Analysis'
+        [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
+        wfdbplot(handles);
+        
 end
 
 
@@ -766,26 +775,71 @@ close(h)
 
 function [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs)
 
-dlgParam.prompt={'window size','overlap size','Min Frequency (Hz)','Max Frequency (Hz)','colormap'};
-window=2^10;
-minY= 0;
-maxY= floor(Fs/2);
-noverlap=round(window/2);
+persistent dlgParam
+if(isempty(dlgParam))
+    dlgParam.prompt={'window size','overlap size','Min Frequency (Hz)','Max Frequency (Hz)','colormap'};
+    dlgParam.window=2^10;
+    dlgParam.minY= 0;
+    dlgParam.maxY= floor(Fs/2);
+    dlgParam.noverlap=round(window/2);
+    dlgParam.map='jet';    
+    dlgParam.name='Spectogram Parameters';
+    dlgParam.numlines=1;
+end
 
-dlgParam.defaultanswer={num2str(window),num2str(noverlap),...
-    num2str(minY),num2str(maxY),'jet'};
-dlgParam.name='Spectogram Parameters';
-dlgParam.numlines=1;
+dlgParam.defaultanswer={num2str(dlgParam.window),num2str(dlgParam.noverlap),...
+    num2str(dlgParam.minY),num2str(dlgParam.maxY),dlgParam.map};  
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
 h = waitbar(0,'Calculating spectogram. Please wait...');
-window= str2num(answer{1});
-noverlap= str2num(answer{2});
+dlgParam.window= str2num(answer{1});
+dlgParam.noverlap= str2num(answer{2});
 analysisYAxis.minY= str2num(answer{3});
 analysisYAxis.maxY= str2num(answer{4});
 analysisYAxis.map=answer{5};
-[~,F,analysisTime,analysisSignal] = spectrogram(analysisSignal,window,noverlap,window,Fs,'yaxis');
+
+dlgParam.minY=analysisYAxis.minY;
+dlgParam.maxY=analysisYAxis.maxY;
+dlgParam.map=analysisYAxis.map;
+
+[~,F,analysisTime,analysisSignal] = spectrogram(analysisSignal,dlgParam.window,...
+    dlgParam.noverlap,dlgParam.window,Fs,'yaxis');
 
 analysisSignal=10*log10(abs(analysisSignal));
 analysisYAxis.values=F;
 analysisUnits='Frequency (Hz)';
+close(h)
+
+
+function [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs)
+
+persistent dlgParam
+if(isempty(dlgParam))
+    dlgParam.prompt={'wavelet','scales','colormap'};
+    dlgParam.wavelet='coif2';    
+    dlgParam.scales='1:28';    
+    dlgParam.map='jet';    
+    dlgParam.name='Wavelet Parameters';
+    dlgParam.numlines=1;
+end
+
+dlgParam.defaultanswer={num2str(dlgParam.wavelet),num2str(dlgParam.scales),dlgParam.map};  
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+h = waitbar(0,'Calculating wavelets. Please wait...');
+dlgParam.wavelet= answer{1};
+dlgParam.scales = str2num(answer{2});
+dlgParam.map= answer{3};
+analysisYAxis.minY= dlgParam.scales(1);
+analysisYAxis.maxY= dlgParam.scales(end);
+analysisYAxis.map=dlgParam.map;
+analysisYAxis.isImage=1;
+
+coefs = cwt(analysisSignal,dlgParam.scales,dlgParam.wavelet);
+analysisSignal = wscalogram('',coefs);
+analysisYAxis.values=dlgParam.scales;
+analysisUnits='Scale';
+close(h)
+
+
+      
