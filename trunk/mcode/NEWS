@@ -1,7 +1,7 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
-0.9.9 (TBA)
+0.9.9 (February 1, 2015)
        Added a GUI for viewing and processing WFDB records and annotation:
        WFDBRECORDVIEWER. Several bug fixes.
 0.9.8 (December 1, 2014)
