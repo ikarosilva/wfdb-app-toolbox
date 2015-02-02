@@ -1,0 +1,49 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: wfdbloadlib</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: wfdbloadlib</td>
+            <td class="subheader-left"><a href="wfdbloadlib.m">View code for wfdbloadlib</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">wfdbloadlib</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function [varargout]=wfdbloadlib(varargin)
+
+ [isloaded,config]=wfdbloadlib(debugLevel,networkWaitTime)
+
+ Loads the WDFDB libarary if it has not been loaded already into the
+ MATLAB classpath. And optionally prints configuration environment and debug information
+ regarding the settings used by the classes in the JAR file.
+
+ Inputs:
+
+ debugLevel
+       (Optional) 1x1 integer between 0 and 5 represeting the level of debug information to output from
+       Java class when output configuration information. Level 0 (no debug information),
+       level =5 is maximum level of information output by the class (logger set to finest). Default is level 0.
+
+ networkWaitTime
+       (Optional) 1x1 integer representing the longest time in
+       milliseconds  for which the JVM should wait for a data stream from
+       PhysioNet (default is =1000  , ie one second). If you need to change this time to a
+       longer value across the entire toolbox, it is better modify to default value in the source
+       code below and restart MATLAB.
+
+
+ Written by Ikaro Silva, 2013
+         Last Modified: December 3, 2014
+ Since 0.0.1
+</pre></div><!--after help -->
+   </body>
+</html>

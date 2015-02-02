@@ -1,0 +1,104 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: rdsamp</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: rdsamp</td>
+            <td class="subheader-left"><a href="rdsamp.m">View code for rdsamp</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">rdsamp</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=rdsamp(varargin)
+
+ [tm,signal,Fs]=rdsamp(recordName,signaList,N,N0,rawUnits,highResolution)
+
+    Wrapper to WFDB RDSAMP:
+         http://www.physionet.org/physiotools/wag/rdsamp-1.htm
+
+ Reads a WFDB record and returns:
+
+
+ signal
+       NxM matrix (doubles) of M signals with each signal being N samples long.
+       Signal data type will be either in double int16 format
+       depending on the flag passed to the function (according to
+       the boolean flags below).
+
+ tm
+       Nx1 vector of doubles representing the sampling intervals.
+       Depending on input flags (see below), this vector can either be a
+       vector of integers (sampling number), or a vector of elapsed time
+       in seconds  ( with up to millisecond precision only).
+
+ Fs    (Optional)
+       1xM Double, sampling frequency in Hz of all the signals in the
+       record.
+
+ Required Parameters:
+
+ recorName
+       String specifying the name of the record in the WFDB path or
+       in the current directory.
+
+
+ Optional Parameters are:
+
+ signalList
+       A Mx1 array of integers. Read only the signals (columns)
+       named in the signalList (default: read all signals).
+ N
+       A 1x1 integer specifying the sample number at which to stop reading the
+       record file (default read all the samples = N).
+ N0
+       A 1x1 integer specifying the sample number at which to start reading the
+       record file (default 1 = first sample).
+
+
+ rawUnits
+       A 1x1 integer (default: 1). Returns tm and signal as vectors
+       according to the following values:
+               rawUnits=1 -returns tm ( millisecond precision only! ) and signal in physical units with 64 bit (double) floating point precision
+               rawUnits=2 -returns tm ( millisecond precision only! ) and signal in physical units with 32 bit (single) floating point  precision
+               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
+               rawUnits=4 -returns both tm and signal as 64 bit integers (long). Use Fs to convert tm to seconds.
+
+ highResolution
+      A 1x1 boolean (default =0). If true, reads the record in high
+      resolution mode.
+
+
+ Written by Ikaro Silva, 2013
+ Last Modified: December 4, 2014
+ Version 1.5
+
+ Since 0.0.1
+
+ %Example 1- Read a signal from PhysioNet's Remote server:
+[tm, signal]=rdsamp('mitdb/100',[],1000);
+plot(tm,signal(:,1))
+
+%Example 2-Read 1000 samples from 3 signals
+[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000);
+
+%%Example 3- Read 1000 samples from 3 signlas in single precision format
+[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
+
+
+%%Example 4- Read a multiresolution signal with 32 samples per frame
+ [tm,sig] = rdsamp('drivedb/drive02',[1],[],[],[],1);
+
+
+ See also WFDBDESC, PHYSIONETDB
+</pre></div><!--after help -->
+   </body>
+</html>

@@ -1,0 +1,78 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: wfdbdesc</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: wfdbdesc</td>
+            <td class="subheader-left"><a href="wfdbdesc.m">View code for wfdbdesc</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">wfdbdesc</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=wfdbdesc(varargin)
+
+ [siginfo,Fs]=wfdbdesc(recordName)
+
+    Wrapper to WFDB WFDBDESC:
+         http://www.physionet.org/physiotools/wag/wfdbde-1.htm
+
+ Reads a WFDB record metadata and returns:
+
+
+ signal
+       Nx1 vector of siginfo structures with the following fields:
+
+       LengthSamples           : Number of samples in record (integer)
+       LengthTime              : Duration of record  (String WFDB Time)
+       RecordName              : Record name (String)
+       RecordIndex             : Record Index (Integer)
+       Description             : Signal Description (String)
+       SamplingFrequency       : Sampling Frequency w/ Units (String)
+       File                    : File name (String)
+       SignalIndex             : Zero Based Signal Index (Integer)
+       StartTime               : Start Time (String WFDB Time)
+       Group                   : Group (Integer)
+       AdcResolution           : Bit resolution of the singal (String)
+       AdcZero                 : Physical value for 0 ADC (double)
+       Baseline                : Physical zero level of signal (Integer)
+       CheckSum                : 16-bit checksum of all samples (Integer)
+       Format                  : WFDB's Format of the samples (String)
+       Gain                    : ADC units per physical unit (String)
+       InitialValue            : Value of sample 1 in the signal (Integer)
+       IO                      : IO Type  (String)
+
+ Fs   (Optional)
+       Nx1 vector of doubles representing the sampling frequency of each
+       signal in Hz (if the 'SamplingFrequency' string is parsable).
+
+ Required Parameters:
+
+ recorName
+       String specifying the name of the record in the WFDB path or
+       in the current directory.
+
+
+ %Example
+ siginfo=wfdbdesc('challenge/2013/set-a/a01')
+
+
+ Written by Ikaro Silva, 2013
+
+ Modified by Ikaro Silva, December 3, 2014
+
+ Version 2.0
+
+ Since 0.0.1
+ See also RDSAMP
+</pre></div><!--after help -->
+   </body>
+</html>

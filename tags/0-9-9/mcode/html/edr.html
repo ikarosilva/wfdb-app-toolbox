@@ -1,0 +1,109 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: edr</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: edr</td>
+            <td class="subheader-left"><a href="edr.m">View code for edr</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">edr</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function y=edr(varargin)
+
+ y = edr(data_type,signal,r_peaks,fs,pqoff, jpoff, gain_ecg, channel, show)
+
+ ECG-derived Respiratory (EDR) signal computation from given
+ single-lead ECG signal based on the signed area under the QRS complex.
+
+ Required Parameters:
+
+ data_type
+       A 1x1 integer specifying the file data_type
+       0 --> if Matlab file
+       1 --> if record in MIT format
+
+ signal
+       A Nx1 integer array containing the ECG signal in mV (if data_type=0)
+       OR a char string containing record name (if data_type=1)
+
+ fs
+       A 1x1 integer specifying the sampling frequency in hz (for Matlab variables only)
+
+ r_peaks
+
+       A Mx1 integer array containing locations of r peaks on signal in s
+       OR a char string containing the extension of the annotation file
+       with r peaks in samples (e.g. "qrs") (if data_type=1)
+
+ optional parameters:
+
+ gain_ecg
+       A 1x1 integer specifying dig_max/phy_max (default=1)
+
+ channel
+       A 1x1 integer>1 (default=1) indicating ECG channel (if data_type=1)
+
+ pqoff
+       A 1x1 integer>0 specifying average distance between PQ junction and
+       R peak, in samples
+
+ jpoff
+       A 1x1 integer>0 specifying average distance between R peak and
+       J point, in samples
+
+ show
+       A 1x1 boolean if true, generates a plot of the estimated
+       respiration signal (default = 0).
+
+
+ output:
+
+ y
+       A Mx2 integer matrix containing time in seconds and edr
+
+ This code was written by Sara Mariani at the Wyss Institute at Harvard
+ based on the open-source PhysioNet code edr.c
+ (http://www.physionet.org/physiotools/edr/)
+ by George Moody
+
+ Author: Sara Mariani, 2014
+ Last Modified: November 17, 2014
+
+ please report bugs/questions at sara.mariani@wyss.harvard.edu
+
+ Example - Extract EDR signal from ECG in PhysioNet's Remote server:
+ signal='fantasia/f1o02';
+ r_peaks='ecg';
+ data_type=1;
+ channel=2;
+ show=1;
+ y=edr(data_type,signal,r_peaks,[],[],[],channel,show);
+ wfdb2mat('f1o02')
+ [~,signal,Fs,~]=rdmat('f1o02m');
+ resp=signal(:,1);
+ resp=resp-mean(resp);
+ resp=resp*200;
+ sec=length(resp)/Fs;
+ xax=[.25:.25:sec];
+ r=interp1(y(:,1), y(:,2), xax, 'spline');
+ figure
+ plot(xax,r)
+ hold on
+ plot([1:length(resp)]/Fs,resp,'r')
+ legend('edr','respiratory signal')
+ xlabel('time (s)')
+
+ see also: ecgpuwave, gqrs
+</pre></div><!--after help -->
+   </body>
+</html>

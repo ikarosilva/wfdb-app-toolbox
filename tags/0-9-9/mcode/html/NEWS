@@ -1,0 +1,79 @@
+For a detailed list of changes see the repository Log at:
+   http://code.google.com/p/wfdb-app-toolbox/source/list
+
+0.9.9 (TBA)
+       Added a GUI for viewing and processing WFDB records and annotation:
+       WFDBRECORDVIEWER. Several bug fixes.
+0.9.8 (December 1, 2014)
+	   Several features added and bug fixes. New implementation of the EDR function
+	   by Sara Mariani. Removed WFDBUPDATE and SCORE2013. Added the following new functions : 
+	   CORRINT, DFA, PBSEARCH, SURROGATE, VISGRAPH, and WFDBTOOL.
+	   
+0.9.7 (October 8, 2014)
+       Updated WFDB library to 10.5.24. Added method to change the Toolbox binary path at runtime.
+       Added data integrity check in RDSAMP and added extra data type options. 
+       Improved performance in WRANN, and WFDBTIME. Changed API in PHYSIONETDB.
+       Fixed issues with ECPUWAVE reading annotations passed through signalList. Removed 
+       STDERR from input stream when parsing system calls. Fixed issue with RDANN 
+       returning channels in with 0 indexing. WFDBTEST now also checks if user is running 
+       on supported version of MATLAB or Mac OS X. 
+
+0.9.6.1 (February 10, 2014):
+	Minor bug fixes with JAR files loading libraries.
+
+0.9.6 (February 6, 2014):
+	Added support to GNU Octave version 3.6.4 (requires Octave Java package). 
+	Added single, and fixed point, and higher precision options to RDSAMP. 
+	Added a system wide WFDB path configuration to WFDBLOADLIB. The default 
+	search is now the current directory, {WFDB_HOME}/database, and http:physionet/physiobank/database. 
+	So databases can be stored in a single centralized location on the user's machine
+	({WFDB_HOME}/database). Added the function WOODY (average with alignment), and HTML
+	help files.
+
+0.9.5 (December 6, 2013):
+	Updated native libs to WFDB 10.5.22. Added WFDBEXEC 
+	(runs WFDB native commands in their native API and by a system call through the JVM), 
+    EDR, GQRS, MSENTROPY. Added framework for users who want to run their own custom version
+    of the WFDB native binaries. Any user who can successfully compile and run WFDB executables 
+    on their system should be able to use most functionality of this toolbox provided that 
+    they install the binaries in the '/mcode/nativelibs/custom' directory (see README for details).
+    Added WDFB and WFDBCAL environment variables and ability to set and change them. Added 
+    system wide debugging information and variable to allow configuration of maximum network
+    waiting time (default = 1 second).
+	
+0.9.4.3 (06 November 2013):
+	Fixed libcurl and path issue.
+
+0.9.4.2 (05 November 2013):
+	Added more diagnostic information and fixed some issues with using spaces in Windows directories.
+	
+0.9.4.1 (04 November 2013):
+	Fixed library path issues with Windows systems.
+	
+0.9.4 (01 November 2013):
+	Updated native libs to WFDB 10.5.20. Added a LightWave interface: WFDBTOOL.
+	Fixed bugs in WRANN, RDANN, RDSAMP. Included libcurl with native libs.
+  
+0.9.3 (22 August 2013):
+	Fixed bias issues with SCORE2013.
+	
+0.9.2 (15 August 2013):
+	Fixed issues with WFDBUPDATE and SCORE2013.
+
+0.9.1 (12 July 2013):
+	Added: MAPRECORD. Fixed parsing issues with RDANN and added option
+	to load specific annotation types only.
+
+0.9.0 (24 June 2013):
+	Added: WFDBUPDATE, BXB, MXM, SUMANN, SORTANN, WABP, LOMB, and 
+	RDMIMIC2WAVE. Fixed bug and performance issues with RDANN and
+	RDSAMP.
+	
+0.0.2 (13 June 2013):
+	Added score2013 to score PhysioNet2013 challenge entries.
+	Fixed MATLAB/WDDB indexing issues with RDANN and WRANN.
+	Allowed scalar parameters into WRANN.
+	Added external logging capabilities to the Java wrappers.
+	
+0.0.1 (11 June 2013):
+	Initial beta release. 

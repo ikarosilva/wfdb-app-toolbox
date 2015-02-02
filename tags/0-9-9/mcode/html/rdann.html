@@ -1,0 +1,121 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: rdann</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: rdann</td>
+            <td class="subheader-left"><a href="rdann.m">View code for rdann</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">rdann</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=rdann(varargin)
+
+ [ann,type,subtype,chan,num,comments]=rdann(recordName,annotator,C,N,N0,type)
+
+    Wrapper to WFDB RDANN:
+         http://www.physionet.org/physiotools/wag/rdann-1.htm
+
+ NOTE: The WFDB Toolbox uses 0 based index, and MATLAB uses 1 based index.
+       Due to this difference annotation values ('ann') are shifted inside
+       this function in order to be compatible with the WFDB native
+       library. The MATLAB user should leave the indexing conversion to
+       the WFDB Toolbox.
+
+ Reads a WFDB annotation and returns:
+
+
+ ann
+       Nx1 vector of the ints. The time of the annotation in samples
+       with respect to the fist sample in the signals in recordName.
+       To convert this vector to a string of time stamps see WFDBTIME.
+
+ type
+       NxT vector of the chars describing annotation type. Usually
+       (but not always) T is 1.
+
+ subtype
+       Nx1 vector of the chars describing annotation subtype.
+       For a list of standard annotation codes used by PhyioNet, please see:
+             http://www.physionet.org/physiobank/annotations.shtml
+
+ chan
+       Nx1 vector of the ints describing annotation subtype.
+
+ num
+       Nx1 vector of the ints describing annotation NUM.
+
+ comments
+       Nx1 vector of the cells describing annotation comments.
+
+
+ Required Parameters:
+
+ recorName
+       String specifying the name of the record in the WFDB path or
+       in the current directory.
+
+ annotator
+       String specifying the name of the annotation file in the WFDB path or
+       in the current directory.
+
+ Optional Parameters are:
+
+ C
+       A 1x1 integer. Read only the annotations for signal C.
+ N
+       A 1x1 integer specifying the sample number at which to stop reading the
+       record file (default read all = N).
+ N0
+       A 1x1 integer specifying the sample number at which to start reading the
+       annotion file (default 1 = begining of the record).
+
+ type
+       A 1x1 String specifying the type of annotation to output (default is
+       empty, which gets all annotations).
+
+
+
+ **OPTIMIZATION NOTE: This function has been optimized for cases in which
+ only the annotation sample vector is required, ie for function calls of
+ the type:
+
+  ann=rdann(recordName,annotator,C,N,N0,type);
+
+  For these cases, no string parsing is required and the formatting is
+  done at the Java level, increasing substantially the processing speed.
+
+
+
+ Written by Ikaro Silva, 2013
+ Last Modified: December 4, 2014
+ Version 2
+ Since 0.0.1
+
+ %Example 1- Read a signal and annotation from PhysioNet's Remote server:
+[tm, signal]=rdsamp('challenge/2013/set-a/a01');
+[ann]=rdann('challenge/2013/set-a/a01','fqrs');
+plot(tm,signal(:,1));hold on;grid on
+plot(tm(ann),signal(ann,1),'ro','MarkerSize',4)
+
+%Example 2- Read annotation from the first 500 samples only
+ ann=rdann('mitdb/100','atr',[],500);
+
+
+%Example 3- Read only a certain type of annotation
+ annV=rdann('mitdb/100', 'atr', [],[],[],'V');
+
+
+ See also wfdbtime, wrann
+</pre></div><!--after help -->
+   </body>
+</html>

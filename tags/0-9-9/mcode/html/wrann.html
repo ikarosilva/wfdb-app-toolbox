@@ -1,0 +1,103 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: wrann</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: wrann</td>
+            <td class="subheader-left"><a href="wrann.m">View code for wrann</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">wrann</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function varargout=wrann(varargin)
+
+ wrann(recordName,annotator,ann,annType,subType,chan,num,comments)
+
+    Wrapper to WFDB WRANN:
+         http://www.physionet.org/physiotools/wag/wrann-1.htm
+
+ Writes data into a WFDB annotation file. The file will be saved at the
+ current directory (if the record is in the current directory) or, if a using
+ a PhysioNet web record , a subdirectory in the current directory, with
+ the relative path determined by recordName. The files will have the same
+ name is the recordName but with a 'annotator' extension. You can use RDANN to
+ verify that the write was completed sucessfully (see example below).
+
+
+
+ NOTE: The WFDB Toolbox uses 0 based index, and MATLAB uses 1 based index.
+       Due to this difference annotation values ('ann') are shifted inside
+       this function in order to be compatible with the WFDB native
+       library. The MATLAB user should leave the indexing conversion to
+       the WFDB Toolbox.
+
+ Required Parameters:
+
+ recorName
+       String specifying the name of the record in the WFDB path or
+       in the current directory.
+
+ annotator
+       String specifying the name of the annotation file in the WFDB path or
+       in the current directory.
+
+ ann
+       Nx1 vector of the integers. The time of the annotation, in samples,
+       with respect to the signals in recordName. The values of ann are
+       sample numbers (indices) with respect to the begining of the
+       record.
+
+ annType
+       Nx1 vector of the chars or scalar describing annotation type. Default is 'N'.
+       For a list of standard annotation codes used by PhyioNet, please see:
+             http://www.physionet.org/physiobank/annotations.shtml
+
+ subType
+       Nx1 vector of the chars or scalar describing annotation subtype.
+       Default is '0'.
+
+ chan
+       Nx1 vector of the ints or scalar describing annotation CHAN. Default is 0.
+
+ num
+       Nx1 vector of the ints or scalar describing annotation NUM. Default is 0.
+
+ comments
+       Nx1 vector of the chars or scalar describing annotation comments. Default is ''.
+
+
+%Example- Creates a *.test file in your current directory
+[ann,type,subtype,chan,num]=rdann('challenge/2013/set-a/a01','fqrs');
+ wrann('challenge/2013/set-a/a01','test',ann,type,subtype,chan,num)
+
+
+ %Reading the file again should give the same results
+[ann,type,subtype,chan,num]=rdann('challenge/2013/set-a/a01','fqrs');
+wrann('challenge/2013/set-a/a01','test',ann,type,subtype,chan,num);
+[ann2,type2,subtype2,chan2,num2]=rdann('challenge/2013/set-a/a01','test',[],[],1);
+err=sum(ann ~= ann2)
+
+
+
+ %Example 2
+[ann,type,subtype,chan,num]=rdann('mitdb/100','atr');
+wrann('mitdb/100','test',ann,type,subtype,chan,num);
+
+ Written by Ikaro Silva, 2013
+ Last Modified: November 4, 2014
+ Version 1.4
+ Since 0.0.1
+
+ See also RDANN, RDSAMP, WFDBDESC
+</pre></div><!--after help -->
+   </body>
+</html>

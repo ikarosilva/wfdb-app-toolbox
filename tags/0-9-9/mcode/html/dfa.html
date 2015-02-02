@@ -1,0 +1,88 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: dfa</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: dfa</td>
+            <td class="subheader-left"><a href="dfa.m">View code for dfa</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">dfa</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function [ln,lf]=dfa(varargin)
+
+ [ln,lf]=dfa(x,p,integrateFlag,minBoxSize,maxBoxSize,slideWindowFlag)
+
+
+ Wrapper to the DFA Algorithm in:
+    http://www.physionet.org/physiotools/dfa/
+
+ References: 
+ Peng C-K, Buldyrev SV, Havlin S, Simons M, Stanley HE, Goldberger AL. Mosaic organization of DNA nucleotides. Phys Rev E 1994;49:1685-1689.
+ Peng C-K, Havlin S, Stanley HE, Goldberger AL. Quantification of scaling exponents and crossover phenomena in nonstationary heartbeat time series. Chaos 1995;5:82-87.
+
+ Please cite at least one of the above publications when referencing this
+ material.
+
+ Required Input Options are:
+
+ x
+       A Nx1 vector of doubles. 
+
+ Optional Input Options are:
+
+ p
+       Detrend using a polynomial of degree p (default: p=1, linear
+       detrending).
+
+ integrateFlag
+       Input series is already integrated ( default= false ).
+
+ minBoxSize
+       Smallest box width (default: 2p+2)
+
+ maxBoxSize
+       Largest box width (default: N/4)
+
+ slideWindowFlag
+       Sliding window DFA (default =false);
+
+
+ The Output variables are:
+
+ ln
+       A (MaxBoxSize -MinBoxSize) x 1 vector of log(boxsize)
+
+ lf
+       A (MaxBoxSize -MinBoxSize) x 1 vector of the log of the root
+       mean square fluctuation for the given boxsize. 
+
+
+ Written by Ikaro Silva, 2014
+ Last Modified: November 21, 2014
+ Version 1.0
+
+ Since 0.9.8
+
+ %Example:
+
+  gqrs('mitdb/117');
+  [rr]=ann2rr('mitdb/117','qrs');
+  [ln,lf]=dfa(rr);
+  plot(ln,lf)
+
+
+
+ See also MSENTROPY, SURROGATE
+</pre></div><!--after help -->
+   </body>
+</html>
