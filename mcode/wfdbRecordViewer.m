@@ -22,7 +22,7 @@ function varargout = wfdbRecordViewer(varargin)
 
 % Edit the above text to modify the response to help wfdbRecordViewer
 
-% Last Modified by GUIDE v2.5 30-Jan-2015 12:05:48
+% Last Modified by GUIDE v2.5 05-Feb-2015 15:38:57
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -330,9 +330,9 @@ if(~isempty(analysisSignal))
             %Plot scaled image
             imagesc(analysisSignal)
         else
-        %3D Plot with colormap
-        surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
-        axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
+            %3D Plot with colormap
+            surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
+            axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
         end
         ylim([analysisYAxis.minY analysisYAxis.maxY])
     end
@@ -634,6 +634,9 @@ switch str
         [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
         wfdbplot(handles);
         
+    case 'Track Fundamental'
+        [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs);
+        wfdbplot(handles);
 end
 
 
@@ -758,15 +761,19 @@ close(h)
 
 function [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs)
 
-dlgParam.prompt={'Custom Function must output variables ''analysisSignal'' and ''analysisTime'''};
-dlgParam.defaultanswer={'[analysisSignal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
-dlgParam.name='Evaluate Command:';
+persistent dlgParam
 
-answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+if(isempty(dlgParam))
+dlgParam.prompt={'Custom Function must output variables ''analysisSignal'' and ''analysisTime'''};
+dlgParam.answer={'[analysisSignal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
+dlgParam.name='Evaluate Command:';
+end
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.answer);
+dlgParam.answer=answer{1};
 h = waitbar(0,'Executing code on signal. Please wait...');
 try
-    eval([answer{1} ';']);
-    analysisSignal=filtfilt(b,a,analysisSignal);
+    eval([dlgParam.answer ';']);
 catch
     errordlg(['Unable to execute code!! Error: ' lasterr])
 end
@@ -782,13 +789,13 @@ if(isempty(dlgParam))
     dlgParam.minY= 0;
     dlgParam.maxY= floor(Fs/2);
     dlgParam.noverlap=round(dlgParam.window/2);
-    dlgParam.map='jet';    
+    dlgParam.map='jet';
     dlgParam.name='Spectogram Parameters';
     dlgParam.numlines=1;
 end
 
 dlgParam.defaultanswer={num2str(dlgParam.window),num2str(dlgParam.noverlap),...
-    num2str(dlgParam.minY),num2str(dlgParam.maxY),dlgParam.map};  
+    num2str(dlgParam.minY),num2str(dlgParam.maxY),dlgParam.map};
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
 h = waitbar(0,'Calculating spectogram. Please wait...');
@@ -816,15 +823,15 @@ function [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSigna
 persistent dlgParam
 if(isempty(dlgParam))
     dlgParam.prompt={'wavelet','scales','colormap','logScale'};
-    dlgParam.wavelet='coif2';    
-    dlgParam.scales='1:28';    
-    dlgParam.map='jet';    
+    dlgParam.wavelet='coif2';
+    dlgParam.scales='1:28';
+    dlgParam.map='jet';
     dlgParam.log='false';
     dlgParam.name='Wavelet Parameters';
     dlgParam.numlines=1;
 end
 
-dlgParam.defaultanswer={num2str(dlgParam.wavelet),num2str(dlgParam.scales),dlgParam.map,dlgParam.log};  
+dlgParam.defaultanswer={num2str(dlgParam.wavelet),num2str(dlgParam.scales),dlgParam.map,dlgParam.log};
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
 h = waitbar(0,'Calculating wavelets. Please wait...');
@@ -847,4 +854,179 @@ analysisUnits='Scale';
 close(h)
 
 
-      
+
+function [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs)
+
+persistent dlgParam
+
+if(isempty(dlgParam))
+dlgParam.prompt={'Order of how many harmonics to track:',...
+    'Initial guess of the fundamental frequency (Hz)', 'Step size of the LMS algorithm',...
+    'Magnitude of the pole for the harmonic comb filter'};
+dlgParam.P='3';
+dlgParam.theta='[]';
+dlgParam.mu='10^-3';
+dlgParam.r='0.85';
+dlgParam.answer={'[analysisSigal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
+dlgParam.name='Parameters for tracking fundamental frequency';
+dlgParam.numlines=1;
+end
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines, {dlgParam.P, ...
+    dlgParam.theta,dlgParam.mu,dlgParam.r});
+dlgParam.P=answer{1};
+dlgParam.theta=answer{2};
+dlgParam.mu=answer{3};
+dlgParam.r=answer{4};
+
+if(strcmp(dlgParam.theta,'[]'))
+    %use peak on low range of FFT as an estimate
+    [Pxx,F] = pwelch(analysisSignal,[],[],[],Fs);
+    FUP=100;
+    [~,maxInd]=min(abs(F-FUP));
+    [~,maxP]=max(Pxx(1:maxInd));
+    dlgParam.theta=num2str(F(maxP));
+end
+    
+h = waitbar(0,'Estimating fundamental frequency. Please wait...');
+analysisSignal=harmonic_est(analysisSignal,str2num(dlgParam.P),Fs,...
+    str2num(dlgParam.theta),str2num(dlgParam.mu),str2num(dlgParam.r));
+analysisUnits='Hz';
+close(h)
+
+
+function theta_curve=harmonic_est(x,varargin)
+%
+%[theta_curve]=harmonic_est(x,P,Fs,theta,mu,r)
+% Implements harmonic frequency tracking algorithm as described in
+% IEEE Signal Processing Magazine (189) 11/09 by Tan and Jiang.
+% Parameters are:
+%
+% Input:
+%     x     - (Nx1, required) Signal to be tracked
+%     P     - (1x1, required) Order of how many harmonics (including fundamental)
+%              to be estimated.
+%     Fs    - (1x1, optional) Sampling frequency (Hz). If present output is returned
+%             in Hertz, if absent output is returned in radians.
+%     theta - (1x1, optional) Initial guess of the fundamental frequency capture range.
+%     mu    - (1x1, optional) Step size of the LMS algorithm.
+%     r     - (1x1, optinoal) Magnitude of the pole for the harmonic comb filter
+%             (0<r<1).
+%
+% Output:
+%     theta -       (1x1,required) Final estimate of the fundamental frequency.
+%     theta_curve - (Nx1,optional) Tracking curve of the instantenous fundamental
+%                                  frequency.
+%     b-            (1xP,optional) b coefficients of the comb filter.
+%     a-            (1xP,optional) a coefficients fo the comb filter.
+%
+%
+% %Example
+% clear all;close all;clc
+% N=1200;
+% Fs=8000;
+% tm=[0:1/Fs:(N-1)/Fs]';
+% t=[0:400:N]+1;
+% snr=10^(-18/20);
+% F=[1000 1075 975];
+% x=[];
+% true=[];
+% for i=1:3
+%     T=2*pi*F(i).*tm(t(i):t(i+1)-1);
+%     sig=sin(T)+0.5*cos(T*2)+0.25*cos(T*3)+randn(N/3,1).*snr;
+%     x=[x;sig];
+%     true=[true;ones(N/3,1)*F(i)];
+% end
+%
+% [theta,theta_curve,b,a]=harmonic_est(x,3,Fs);
+% subplot(211)
+% plot(tm,theta_curve)
+% hold on
+% plot(tm,true,'r--','LineWidth',3)
+% grid on
+% xlabel('Time')
+% ylabel('Fundamental Frequency Estimate')
+% legend('Tracking','True')
+% subplot(212)
+% [H,F]=freqz(b,a,N,Fs);
+% plot(F,log10(abs(H)))
+% title('Final Comb Filter')
+% xlabel('Frequency')
+% ylabel('Magnitude')
+%%%  Written by Ikaro Silva, 2010
+
+
+[N,M]=size(x);
+step=500;
+r= 0.85;
+Fs=[];
+theta=[];
+mu=10^-3;
+
+
+P=varargin{1}; %required
+if(nargin>2 && ~isempty(varargin{2}) )
+    Fs=varargin{2};
+end
+if(nargin>3 && ~isempty(varargin{3}) )
+    theta=varargin{3};
+end
+if(nargin>4 && ~isempty(varargin{4}) )
+    mu=varargin{4};
+end
+if(nargin>5 && ~isempty(varargin{5}) )
+    r=varargin{5};
+end
+
+THETA=linspace(0,pi/P,step);
+F=THETA;
+Ntheta=length(THETA);
+MSE=zeros(Ntheta,1);
+MSE1=zeros(Ntheta,1);
+
+if(isempty(theta))
+    %Default guess to a frequency on the low range
+   theta=60; 
+end
+
+%Step 1- Convert theta to radians
+theta=theta*2*pi/Fs;
+
+%Step 2 - Apply LMS to optimize Theta
+beta=zeros(P+1,1);
+ym=zeros(P+1,1);
+theta_curve=zeros(N,1)+NaN;
+ym_old=zeros(P+1,2);
+beta_old=zeros(P+1,2);
+ym_const=zeros(P+1,2);
+ym_old(1,:)=[0 0];
+
+for n=1:N
+    
+    ym=rec_step(ym_old,ym_const,x(n),theta,P+1,r);
+    beta=rec_step(beta_old,ym_old(:,1),0,theta,P+1,r);
+    
+    ym_old=[ym ym_old(:,1)];
+    beta_old=[beta beta_old(:,1)];
+    
+    theta_curve(n)=theta;
+    theta= theta - 2*mu*ym(end)*beta(end);
+end
+
+theta_curve=theta_curve*Fs/(2*pi);
+
+
+
+function out = rec_step(out_old,const,init,theta,P,r)
+
+out=zeros(P,1);
+out(1)=init;
+
+for p=2:P
+    
+    w=(p-1)*theta;
+    out(p)= out(p-1) - 2*cos(w)*out_old(p-1,1) + ...
+        2*(p-1)*sin(w)*const(p-1) + out_old(p-1,2) + ...
+        2*r*cos(w)*out_old(p,1) - (r^2)*out_old(p,2) - ...
+        2*r*(p-1)*sin(w)*const(p);
+end

@@ -1,9 +1,12 @@
 For a detailed list of changes see the repository Log at:
    http://code.google.com/p/wfdb-app-toolbox/source/list
 
-0.9.9 (TBA)
+1.0.0 (TBA)
+
+0.9.9 (February 1, 2015)
        Added a GUI for viewing and processing WFDB records and annotation:
        WFDBRECORDVIEWER. Several bug fixes.
+       
 0.9.8 (December 1, 2014)
 	   Several features added and bug fixes. New implementation of the EDR function
 	   by Sara Mariani. Removed WFDBUPDATE and SCORE2013. Added the following new functions : 
