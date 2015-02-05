@@ -606,39 +606,28 @@ end
 Fs=double(info(ind).SamplingFrequency);
 analysisYAxis=[];
 switch str
-    
     case 'Plot Raw Signal'
-        wfdbplot(handles);
-        
+        %default to plot after switch
     case 'Apply General Filter'
         [analysisSignal]=wfdbFilter(analysisSignal);
-        wfdbplot(handles);
-        
     case '60/50 Hz Notch Filter'
         [analysisSignal]=wfdbNotch(analysisSignal,Fs);
-        wfdbplot(handles);
-        
     case 'Resonator Filter'
         [analysisSignal]=wfdbResonator(analysisSignal,Fs);
-        wfdbplot(handles);
-        
     case 'Custom Function'
         [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs);
-        wfdbplot(handles);
-        
     case 'Spectogram Analysis'
         [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs);
-        wfdbplot(handles);
-        
     case 'Wavelets Analysis'
         [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
-        wfdbplot(handles);
-        
     case 'Track Fundamental'
         [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs);
-        wfdbplot(handles);
 end
-
+if(~isempty(analysisSignal))
+    %If analysisSignal is empty, command has been cancelled, else go ahead
+    %and plot
+    wfdbplot(handles);
+end
 
 % --- Executes during object creation, after setting all properties.
 function SignalMenu_CreateFcn(hObject, eventdata, handles)
@@ -680,15 +669,25 @@ end
 function [analysisSignal]=wfdbFilter(analysisSignal)
 
 %Set Low-pass default values
+persistent dlgParam
+
+if(isempty(dlgParam)) 
 dlgParam.prompt={'Filter Design Function (should return "a" and "b", for use by FILTFILT ):'};
-dlgParam.defaultanswer={'b=fir1(48,[0.1 0.5]);a=1;'};
+dlgParam.answer={'b=fir1(48,[0.1 0.5]);a=1;'};
 dlgParam.name='Filter Design Command';
 dlgParam.numlines=1;
+end
 
-answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.answer);
+
+if(isempty(answer))
+    analysisSignal=[];
+    return;
+end
 h = waitbar(0,'Filtering Data. Please wait...');
+dlgParam.answer=answer{1};
 try
-    eval([answer{1} ';']);
+    eval([dlgParam.answer ';']);
     analysisSignal=filtfilt(b,a,analysisSignal);
 catch
     errordlg(['Unable to filter data! Error: ' lasterr])
@@ -702,15 +701,30 @@ function [analysisSignal]=wfdbNotch(analysisSignal,Fs)
 %
 % *Hayes (1999), "Digital Signal Processing", Schaum's Outline
 %Set Low-pass default values
+
+persistent dlgParam
+
+if(isempty(dlgParam)) 
 dlgParam.prompt={'Control Paramter (0 < r < 1 ):','Notch Frequency (Hz):'};
-dlgParam.defaultanswer={'0.995','60'};
+dlgParam.r='0.995';
+dlgParam.fn='60';
 dlgParam.name='Notch Filter Design';
 dlgParam.numlines=1;
+end
 
-answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,...
+    {dlgParam.r, dlgParam.fn});
+if(isempty(answer))
+    analysisSignal=[];
+    return;
+end
+
 h = waitbar(0,'Filtering Data. Please wait...');
-r = str2num(answer{1});   % Control parameter. 0 < r < 1.
-fn= str2num(answer{2});
+dlgParam.r = answer{1};   % Control parameter. 0 < r < 1.
+dlgParam.fn= answer{2};
+
+r = str2num(dlgParam.r);   % Control parameter. 0 < r < 1.
+fn= str2num(dlgParam.fn);
 
 cW = cos(2*pi*fn/Fs);
 b=[1 -2*cW 1];
@@ -730,18 +744,33 @@ function [analysisSignal]=wfdbResonator(analysisSignal,Fs)
 %
 % *Hayes (1999), "Digital Signal Processing", Schaum's Outline
 %Set Low-pass default values
+
+persistent dlgParam
+
+if(isempty(dlgParam))
 dlgParam.prompt={'Resonating Frequency (Hz):','Q factor:'};
-dlgParam.defaultanswer={num2str(Fs/5),'50'};
+dlgParam.fn=num2str(Fs/5);
+dlgParam.K='50';
 dlgParam.name='Resonator Filter Design';
 dlgParam.numlines=1;
+end
 
-answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,...
+    {dlgParam.fn,dlgParam.fn});
+if(isempty(answer))
+    analysisSignal=[];
+    return;
+end
+
+
 h = waitbar(0,'Filtering Data. Please wait...');
-fn= str2num(answer{1});
-K= str2num(answer{2});
+dlgParam.fn= answer{1};
+dlgParam.K= answer{2};
 
 %Similar  to 'Q1' but more accurate
 %For details see IEEE SP 2008 (5), pg 113
+K=str2num(dlgParam.K);
+fn=str2num(dlgParam.fn);
 beta=1+K;
 f=pi*fn/Fs;
 numA=tan(pi/4 - f);
@@ -770,6 +799,12 @@ dlgParam.name='Evaluate Command:';
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.answer);
+if(isempty(answer))
+    analysisSignal=[];
+    analysisTime=[];
+    return;
+end
+
 dlgParam.answer=answer{1};
 h = waitbar(0,'Executing code on signal. Please wait...');
 try
@@ -798,6 +833,14 @@ dlgParam.defaultanswer={num2str(dlgParam.window),num2str(dlgParam.noverlap),...
     num2str(dlgParam.minY),num2str(dlgParam.maxY),dlgParam.map};
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+if(isempty(answer))
+    analysisSignal=[];
+    analysisUnits=[];
+    analysisYAxis=[];
+    analysisTime=[];
+    return;
+end
+
 h = waitbar(0,'Calculating spectogram. Please wait...');
 dlgParam.window= str2num(answer{1});
 dlgParam.noverlap= str2num(answer{2});
@@ -834,6 +877,13 @@ end
 dlgParam.defaultanswer={num2str(dlgParam.wavelet),num2str(dlgParam.scales),dlgParam.map,dlgParam.log};
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.defaultanswer);
+if(isempty(answer))
+    analysisSignal=[];
+    analysisUnits=[];
+    analysisYAxis=[];
+    return;
+end
+
 h = waitbar(0,'Calculating wavelets. Please wait...');
 dlgParam.wavelet= answer{1};
 dlgParam.scales = str2num(answer{2});
@@ -874,6 +924,13 @@ end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines, {dlgParam.P, ...
     dlgParam.theta,dlgParam.mu,dlgParam.r});
+
+if(isempty(answer))
+    analysisSignal=[];
+    analysisUnits=[];
+    return;
+end
+
 dlgParam.P=answer{1};
 dlgParam.theta=answer{2};
 dlgParam.mu=answer{3};
