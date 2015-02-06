@@ -620,6 +620,8 @@ switch str
         [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs);
     case 'Wavelets Analysis'
         [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
+    case 'Spatial PCA'
+        [analysisSignal,analysisUnits]=wfdbPCA(signal);
     case 'Track Fundamental'
         [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs);
 end
@@ -673,12 +675,12 @@ persistent dlgParam
 
 if(isempty(dlgParam)) 
 dlgParam.prompt={'Filter Design Function (should return "a" and "b", for use by FILTFILT ):'};
-dlgParam.answer={'b=fir1(48,[0.1 0.5]);a=1;'};
+dlgParam.answer='b=fir1(48,[0.1 0.5]);a=1;';
 dlgParam.name='Filter Design Command';
 dlgParam.numlines=1;
 end
 
-answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.answer);
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,{dlgParam.answer});
 
 if(isempty(answer))
     analysisSignal=[];
@@ -902,6 +904,48 @@ end
 analysisYAxis.values=dlgParam.scales;
 analysisUnits='Scale';
 close(h)
+
+function [analysisSignal,analysisUnits]=wfdbPCA(signal)
+
+persistent dlgParam
+
+if(isempty(dlgParam))
+dlgParam.M=['1:' num2str(size(signal,2))];
+dlgParam.P='1';
+dlgParam.prompt={'Indices of signals to include in PCA:',...
+    'Selecta a Principal Component (equal or less than the number of indices above):'};
+dlgParam.name='Parameters for plotinng principal component';
+dlgParam.numlines=1;
+end
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines, {dlgParam.M, ...
+    dlgParam.P});
+if(isempty(answer))
+    analysisSignal=[];
+    analysisUnits=[];
+    return;
+end
+
+dlgParam.M=answer{1};
+dlgParam.P=answer{2};   
+h = waitbar(0,'Estimating fundamental frequency. Please wait...');
+analysisUnits='Amplitude';
+
+signal=signal(:,str2num(dlgParam.M));
+[u,s,v]=svd(signal,0);
+ind=str2num(dlgParam.P);
+%pow=s(ind,ind);
+%s=s.*0;
+%s(ind,ind)=pow;
+analysisSignal=u(:,ind);
+%analysisSignal=analysisSignal(:,ind);
+close(h)
+
+
+
+
+
+
 
 
 
