@@ -932,13 +932,9 @@ h = waitbar(0,'Estimating fundamental frequency. Please wait...');
 analysisUnits='Amplitude';
 
 signal=signal(:,str2num(dlgParam.M));
-[u,s,v]=svd(signal,0);
+[u,~,~]=svd(signal,0);
 ind=str2num(dlgParam.P);
-%pow=s(ind,ind);
-%s=s.*0;
-%s(ind,ind)=pow;
 analysisSignal=u(:,ind);
-%analysisSignal=analysisSignal(:,ind);
 close(h)
 
 
