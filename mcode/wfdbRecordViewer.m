@@ -622,6 +622,8 @@ switch str
         [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
     case 'Spatial PCA'
         [analysisSignal,analysisUnits]=wfdbPCA(signal);
+    case 'Karhunen-Loeve Expansion'
+        [analysisSignal,analysisUnits]=wfdbKL(analysisSignal);
     case 'Track Fundamental'
         [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs);
 end
@@ -914,7 +916,7 @@ dlgParam.M=['1:' num2str(size(signal,2))];
 dlgParam.P='1';
 dlgParam.prompt={'Indices of signals to include in PCA:',...
     'Selecta a Principal Component (equal or less than the number of indices above):'};
-dlgParam.name='Parameters for plotinng principal component';
+dlgParam.name='Parameters for ploting principal component';
 dlgParam.numlines=1;
 end
 
@@ -928,7 +930,7 @@ end
 
 dlgParam.M=answer{1};
 dlgParam.P=answer{2};   
-h = waitbar(0,'Estimating fundamental frequency. Please wait...');
+h = waitbar(0,'Estimating K-L Basis. Please wait...');
 analysisUnits='Amplitude';
 
 signal=signal(:,str2num(dlgParam.M));
@@ -938,9 +940,36 @@ analysisSignal=u(:,ind);
 close(h)
 
 
+function [analysisSignal,analysisUnits]=wfdbKL(signal)
 
+persistent dlgParam
+maxM=11;
+if(isempty(dlgParam))
+dlgParam.P='1';
+dlgParam.prompt={['Select index of desired Principal Component (<= ' num2str(maxM) ') :']};
+dlgParam.numlines=1;
+dlgParam.name='Parameters for K-L Expansion';
+end
 
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines, {dlgParam.P});
+if(isempty(answer))
+    analysisSignal=[];
+    analysisUnits=[];
+    return;
+end
 
+dlgParam.P=answer{1};   
+h = waitbar(0,'Estimating fundamental frequency. Please wait...');
+analysisUnits='Amplitude';
+
+signal=signal-mean(signal);
+ind=num2str(dlgParam.P);
+R=corrmtx(signal,maxM);
+[u,s,v]=svd(R,0);
+N=length(signal);
+ind=str2num(dlgParam.P);
+analysisSignal=u(1:N,ind);
+close(h)
 
 
 
