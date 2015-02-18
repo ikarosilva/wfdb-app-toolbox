@@ -84,6 +84,7 @@ StartTime =[];
 LengthSamples=[];
 LengthTime=[];
 SamplingFrequency =[];
+Notes=[];
 
 %index for each signal
 ind=0;
