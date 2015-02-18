@@ -43,6 +43,7 @@ else
 end
 % End initialization code - DO NOT EDIT
 
+
 % --- Executes just before wfdbRecordViewer is made visible.
 function wfdbRecordViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
@@ -51,7 +52,7 @@ function wfdbRecordViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm tm_step signalDescription
+global current_record records tm tm_step 
 
 % Choose default command line output for wfdbRecordViewer
 handles.output = hObject;
@@ -74,8 +75,7 @@ for n=1:N
 end
 set(handles.RecorListMenu,'String',records)
 set(handles.RecorListMenu,'Value',current_record)
-loadRecord(records{current_record})
-set(handles.signalList,'String',signalDescription)
+loadRecord(records{current_record},handles);
 loadAnnotationList(records{current_record},handles);
 set(handles.slider1,'Max',tm(end))
 set(handles.slider1,'Min',tm(1))
@@ -166,8 +166,8 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-function loadRecord(fname)
-global tm signal info tm_step signalDescription analysisSignal analysisTime
+function loadRecord(fname,handles)
+global tm signal info analysisSignal analysisTime
 h = waitbar(0,'Loading Data. Please wait...');
 try
     [tm,signal]=rdmat(fname);
@@ -182,7 +182,10 @@ signalDescription=cell(R,1);
 for r=1:R
     signalDescription(r)={info(r).Description};
 end
+set(handles.signalList,'String',signalDescription)
 close(h)
+return
+
 
 function loadAnn1(fname,annName)
 global ann1
@@ -572,13 +575,13 @@ end
 
 
 function Refresh(hObject, eventdata, handles)
-global records current_record
-
-loadRecord(records{current_record})
+global records current_record 
+loadRecord(records{current_record},handles);
 loadAnnotationList(records{current_record},handles)
 Ann1Menu_Callback(hObject, eventdata, handles)
 Ann2Menu_Callback(hObject, eventdata, handles)
 %AnalysisMenu_Callback(hObject, eventdata, handles)
+
 
 % --- Executes on selection change in SignalMenu.
 function SignalMenu_Callback(hObject, eventdata, handles)
