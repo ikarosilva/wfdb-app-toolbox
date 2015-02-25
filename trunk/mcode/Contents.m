@@ -34,6 +34,7 @@
 %   rdmimic2wave    - Searches MIMIC II matched waveform records within a clinical time range
 %   rdsamp          - Read signal files of WFDB records
 %   sortann         - Rearrange annotations in canonical order
+%   snip            - Copy an excerpt of a WFDB record
 %   sqrs            - Finds the QRS complexes of a WFDB ECG record signal
 %   surrogate       - Generates amplitude adjusted phase shuffled surrogate time series
 %   sumann	        - Summarize the contents of a WFDB annotation file
