@@ -5,25 +5,25 @@ function varargout=snip(varargin)
 %    Wrapper to WFDB SNIP:
 %         http://www.physionet.org/physiotools/wag/snip-1.htm
 %
-% Copy an excerpt of a WFDB record  
+% Copy an excerpt of a WFDB record
 %
 %
 %Input Parameters:
-% inputRecord    
+% inputRecord
 %       String specifying the input WFDB record file.
 %
-% outputRecord    
+% outputRecord
 %       String specifying the output WFDB record file name that will be generated.
 %
 % beginTime (Optional)
 %       Integer specifying start time of the output WFDB record. Default is
 %       the beginning of the input record.
-% 
+%
 % stopTime (Optional)
 %       Integer specifying end time of the output WFDB record. Defaut is
 %       end of input record.
 %
-% inputAnn (Optional)    
+% inputAnn (Optional)
 %       String specifying the annotation files to convert along with the
 %       given record. Defaults i none (empty).
 %
@@ -69,23 +69,27 @@ end
 wfdb_argument={'-i',inputRecord,'-n',outputRecord,'-m'};
 
 if(~isempty(beginTime))
-     wfdb_argument{end+1}='-f';
+    wfdb_argument{end+1}='-f';
     wfdb_argument{end+1}=['s ' num2str(beginTime-1)];
 end
 if(~isempty(stopTime))
-     wfdb_argument{end+1}='-t';
+    wfdb_argument{end+1}='-t';
     wfdb_argument{end+1}=['s ' num2str(stopTime)];
 end
 if(~isempty(inputAnn))
-     wfdb_argument{end+1}='-a';
+    wfdb_argument{end+1}='-a';
     wfdb_argument{end+1}=inputAnn;
 end
 if(~isempty(outFormat))
-     wfdb_argument{end+1}='-O';
+    wfdb_argument{end+1}='-O';
     wfdb_argument{end+1}=outFormat;
 end
 
 err=javaWfdbExec.execToStringList(wfdb_argument);
-
-
-varargout{1}=err.toString;
+if(nargout>0)
+    err=char(err.toString);
+    if(strcmp(err,'[]'))
+        err=[];
+    end
+    varargout{1}=err;
+end
