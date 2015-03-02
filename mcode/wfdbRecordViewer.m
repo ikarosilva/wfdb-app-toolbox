@@ -345,7 +345,7 @@ if(~isempty(analysisSignal))
     end
 else
     %Plot RR series in analysis window
-    if(~isempty(ann1RR) & (get(handles.AnnotationMenu,'Value')==3))
+    if(~isempty(ann1RR) && (get(handles.AnnotationMenu,'Value')==2))
         Nann=length(ann1);
         axes(handles.AnalysisAxes);
         ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
@@ -365,7 +365,7 @@ else
             tm_ind(del_ind)=[];
         end
         plot(tm(tm_ind),ann1RR(ind),'k*-')
-        text(tm(tm_ind(1)),max(df),'RR Series','FontWeight','bold','FontSize',12)
+        text(tm(tm_ind(1)),max(ann1RR(ind)),'RR Series','FontWeight','bold','FontSize',12)
         grid on
         ylabel('Interval (seconds)')
         if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
