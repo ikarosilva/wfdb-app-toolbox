@@ -52,27 +52,71 @@ function wfdbRecordViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm tm_step 
+global current_record records tm tm_step
 
 % Choose default command line output for wfdbRecordViewer
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
-[filename,directoryname] = uigetfile('*.hea','Select signal header file:');
-cd(directoryname)
-tmp=dir('*.hea');
-
-N=length(tmp);
-records=cell(N,1);
 current_record=1;
-for n=1:N
-    fname=tmp(n).name;
-    records(n)={fname(1:end-4)};
-    if(strcmp(fname,filename))
-        current_record=n;
-    end
-end
+ButtonName = questdlg('Select Database Location', 'Database Location',...
+    'Local Directory','PhysioNet','Local Directory');
+switch ButtonName,
+    case 'Local Directory',
+        [filename,directoryname] = uigetfile('*.hea','Select signal header file:');
+        cd(directoryname)
+        tmp=dir('*.hea');
+        N=length(tmp);
+        records=cell(N,1);
+        for n=1:N
+            fname=tmp(n).name;
+            records(n)={fname(1:end-4)};
+            if(strcmp(fname,filename))
+                current_record=n;
+            end
+        end
+    case 'PhysioNet',
+        %To implement
+        %Select Database name
+        h = waitbar(0,'Getting List of Databases from PhysioNet. Please wait...');
+        dbs=physionetdb;
+        D=length(dbs);
+        IND=zeros(D,1);
+        for n=1:D
+            str=char(dbs{n});
+            ind=strfind(str,'Description:');
+            IND(n)=ind;
+            pad=30-ind(1);
+            str=regexprep(str,'Description:',blanks(pad));
+            dbs{n}=str;
+        end
+        close(h)
+        [db_ind,ok] = listdlg('PromptString','Select a database:',...
+            'SelectionMode','single',...
+            'ListString',dbs,'ListSize',[550 600]);
+        if(~ok)
+            return
+        end
+        h = waitbar(0,'Loading list of records. Please wait...');
+        dbname=dbs{db_ind};
+        dbname=dbname(1:IND(db_ind));
+        dbname=regexprep(dbname,' ','');
+        dbname=regexprep(dbname,'\n','');
+        dbname=regexprep(dbname,'\t','');
+        tmp=urlread(['http://physionet.org/physiobank/database/' dbname '/RECORDS']);
+        records=regexp(tmp,'\n','split');
+        if(isempty(records{end}(:)))
+            records(end)=[];
+        end
+        for n=1:length(records)
+           records{n}=['/' dbname '/' records{n}]; 
+        end
+        close(h)
+        
+end % switch
+
+
 set(handles.RecorListMenu,'String',records)
 set(handles.RecorListMenu,'Value',current_record)
 loadRecord(records{current_record},handles);
@@ -575,7 +619,7 @@ end
 
 
 function Refresh(hObject, eventdata, handles)
-global records current_record 
+global records current_record
 loadRecord(records{current_record},handles);
 loadAnnotationList(records{current_record},handles)
 Ann1Menu_Callback(hObject, eventdata, handles)
@@ -678,11 +722,11 @@ function [analysisSignal]=wfdbFilter(analysisSignal)
 %Set Low-pass default values
 persistent dlgParam
 
-if(isempty(dlgParam)) 
-dlgParam.prompt={'Filter Design Function (should return "a" and "b", for use by FILTFILT ):'};
-dlgParam.answer='b=fir1(48,[0.1 0.5]);a=1;';
-dlgParam.name='Filter Design Command';
-dlgParam.numlines=1;
+if(isempty(dlgParam))
+    dlgParam.prompt={'Filter Design Function (should return "a" and "b", for use by FILTFILT ):'};
+    dlgParam.answer='b=fir1(48,[0.1 0.5]);a=1;';
+    dlgParam.name='Filter Design Command';
+    dlgParam.numlines=1;
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,{dlgParam.answer});
@@ -711,12 +755,12 @@ function [analysisSignal]=wfdbNotch(analysisSignal,Fs)
 
 persistent dlgParam
 
-if(isempty(dlgParam)) 
-dlgParam.prompt={'Control Paramter (0 < r < 1 ):','Notch Frequency (Hz):'};
-dlgParam.r='0.995';
-dlgParam.fn='60';
-dlgParam.name='Notch Filter Design';
-dlgParam.numlines=1;
+if(isempty(dlgParam))
+    dlgParam.prompt={'Control Paramter (0 < r < 1 ):','Notch Frequency (Hz):'};
+    dlgParam.r='0.995';
+    dlgParam.fn='60';
+    dlgParam.name='Notch Filter Design';
+    dlgParam.numlines=1;
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,...
@@ -755,11 +799,11 @@ function [analysisSignal]=wfdbResonator(analysisSignal,Fs)
 persistent dlgParam
 
 if(isempty(dlgParam))
-dlgParam.prompt={'Resonating Frequency (Hz):','Q factor:'};
-dlgParam.fn=num2str(Fs/5);
-dlgParam.K='50';
-dlgParam.name='Resonator Filter Design';
-dlgParam.numlines=1;
+    dlgParam.prompt={'Resonating Frequency (Hz):','Q factor:'};
+    dlgParam.fn=num2str(Fs/5);
+    dlgParam.K='50';
+    dlgParam.name='Resonator Filter Design';
+    dlgParam.numlines=1;
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,...
@@ -800,9 +844,9 @@ function [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,
 persistent dlgParam
 
 if(isempty(dlgParam))
-dlgParam.prompt={'Custom Function must output variables ''analysisSignal'' and ''analysisTime'''};
-dlgParam.answer={'[analysisSignal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
-dlgParam.name='Evaluate Command:';
+    dlgParam.prompt={'Custom Function must output variables ''analysisSignal'' and ''analysisTime'''};
+    dlgParam.answer={'[analysisSignal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
+    dlgParam.name='Evaluate Command:';
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.answer);
@@ -915,12 +959,12 @@ function [analysisSignal,analysisUnits]=wfdbPCA(signal)
 persistent dlgParam
 
 if(isempty(dlgParam))
-dlgParam.M=['1:' num2str(size(signal,2))];
-dlgParam.P='1';
-dlgParam.prompt={'Indices of signals to include in PCA:',...
-    'Selecta a Principal Component (equal or less than the number of indices above):'};
-dlgParam.name='Parameters for ploting principal component';
-dlgParam.numlines=1;
+    dlgParam.M=['1:' num2str(size(signal,2))];
+    dlgParam.P='1';
+    dlgParam.prompt={'Indices of signals to include in PCA:',...
+        'Selecta a Principal Component (equal or less than the number of indices above):'};
+    dlgParam.name='Parameters for ploting principal component';
+    dlgParam.numlines=1;
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines, {dlgParam.M, ...
@@ -932,7 +976,7 @@ if(isempty(answer))
 end
 
 dlgParam.M=answer{1};
-dlgParam.P=answer{2};   
+dlgParam.P=answer{2};
 h = waitbar(0,'Estimating K-L Basis. Please wait...');
 analysisUnits='Amplitude';
 
@@ -948,10 +992,10 @@ function [analysisSignal,analysisUnits]=wfdbKL(signal)
 persistent dlgParam
 maxM=11;
 if(isempty(dlgParam))
-dlgParam.P='1';
-dlgParam.prompt={['Select index of desired Principal Component (<= ' num2str(maxM) ') :']};
-dlgParam.numlines=1;
-dlgParam.name='Parameters for K-L Expansion';
+    dlgParam.P='1';
+    dlgParam.prompt={['Select index of desired Principal Component (<= ' num2str(maxM) ') :']};
+    dlgParam.numlines=1;
+    dlgParam.name='Parameters for K-L Expansion';
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines, {dlgParam.P});
@@ -961,7 +1005,7 @@ if(isempty(answer))
     return;
 end
 
-dlgParam.P=answer{1};   
+dlgParam.P=answer{1};
 h = waitbar(0,'Estimating fundamental frequency. Please wait...');
 analysisUnits='Amplitude';
 
@@ -982,16 +1026,16 @@ function [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs)
 persistent dlgParam
 
 if(isempty(dlgParam))
-dlgParam.prompt={'Order of how many harmonics to track:',...
-    'Initial guess of the fundamental frequency (Hz)', 'Step size of the LMS algorithm',...
-    'Magnitude of the pole for the harmonic comb filter'};
-dlgParam.P='3';
-dlgParam.theta='[]';
-dlgParam.mu='10^-3';
-dlgParam.r='0.85';
-dlgParam.answer={'[analysisSigal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
-dlgParam.name='Parameters for tracking fundamental frequency';
-dlgParam.numlines=1;
+    dlgParam.prompt={'Order of how many harmonics to track:',...
+        'Initial guess of the fundamental frequency (Hz)', 'Step size of the LMS algorithm',...
+        'Magnitude of the pole for the harmonic comb filter'};
+    dlgParam.P='3';
+    dlgParam.theta='[]';
+    dlgParam.mu='10^-3';
+    dlgParam.r='0.85';
+    dlgParam.answer={'[analysisSigal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
+    dlgParam.name='Parameters for tracking fundamental frequency';
+    dlgParam.numlines=1;
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines, {dlgParam.P, ...
@@ -1016,7 +1060,7 @@ if(strcmp(dlgParam.theta,'[]'))
     [~,maxP]=max(Pxx(1:maxInd));
     dlgParam.theta=num2str(F(maxP));
 end
-    
+
 h = waitbar(0,'Estimating fundamental frequency. Please wait...');
 analysisSignal=harmonic_est(analysisSignal,str2num(dlgParam.P),Fs,...
     str2num(dlgParam.theta),str2num(dlgParam.mu),str2num(dlgParam.r));
@@ -1115,7 +1159,7 @@ MSE1=zeros(Ntheta,1);
 
 if(isempty(theta))
     %Default guess to a frequency on the low range
-   theta=60; 
+    theta=60;
 end
 
 %Step 1- Convert theta to radians
