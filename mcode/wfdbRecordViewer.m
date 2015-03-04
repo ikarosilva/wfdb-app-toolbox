@@ -59,7 +59,7 @@ handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
-current_record=1;
+current_tmp=1;
 ButtonName = questdlg('Select Database Location', 'Database Location',...
     'Local Directory','PhysioNet','Local Directory');
 switch ButtonName,
@@ -73,7 +73,7 @@ switch ButtonName,
             fname=tmp(n).name;
             records(n)={fname(1:end-4)};
             if(strcmp(fname,filename))
-                current_record=n;
+                current_tmp=n;
             end
         end
     case 'PhysioNet',
@@ -118,6 +118,7 @@ end % switch
 
 
 set(handles.RecorListMenu,'String',records)
+current_record=current_tmp;
 set(handles.RecorListMenu,'Value',current_record)
 loadRecord(records{current_record},handles);
 loadAnnotationList(records{current_record},handles);
@@ -281,7 +282,8 @@ set(handles.Ann2Menu,'String',annotations)
 
 
 function wfdbplot(handles)
-global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal analysisTime analysisUnits analysisYAxis
+global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal 
+global specEstimation analysisTime analysisUnits analysisYAxis 
 axes(handles.axes1);
 cla;
 
@@ -365,60 +367,80 @@ if(~isempty(annDiff) & (get(handles.AnnotationMenu,'Value')==2))
     xlim([tm(ind_start) tm(ind_end)])
 end
 
-%Plot custom signal in the analysis window
-if(~isempty(analysisSignal))
+if(~isempty(specEstimation))
+    %Plot Spectral estimate in the analysis window
     axes(handles.AnalysisAxes);
-    if(isempty(analysisYAxis))
-        %Standard 2D Plot
-        plot(analysisTime,analysisSignal,'k')
-        grid on;
-    else
-        if(isfield(analysisYAxis,'isImage') && analysisYAxis.isImage)
-            %Plot scaled image
-            imagesc(analysisSignal)
-        else
-            %3D Plot with colormap
-            surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
-            axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
-        end
-        ylim([analysisYAxis.minY analysisYAxis.maxY])
+    [Pxx,F]=pwelch(sig(ind_start:ind_end,specEstimation.sigInd),...
+        specEstimation.WINDOW,specEstimation.NOVERLAP,...
+        specEstimation.NFFT,specEstimation.Fs,'power');
+    
+    switch specEstimation.scale
+        case 'linear'
+            plot(F,Pxx,'k')
+        case 'semilogx'
+            semilogx(F,Pxx,'k')
+        case 'semilogy'
+            semilogy(F,Pxx,'k')
+        case 'loglog'
+            loglog(F,Pxx,'k')
     end
-    xlim([tm(ind_start) tm(ind_end)])
-    if(~isempty(analysisUnits))
-        ylabel(analysisUnits)
-    end
+    xlabel('Frequency (Hz)')
+    ylabel('Power')
 else
-    %Plot RR series in analysis window
-    if(~isempty(ann1RR) && (get(handles.AnnotationMenu,'Value')==2))
-        Nann=length(ann1);
+    %Plot custom signal in the analysis window
+    if(~isempty(analysisSignal))
         axes(handles.AnalysisAxes);
-        ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
-        ind=find(ind==1)+1;
-        if(~isempty(ind) && ind(end)> Nann)
-            ind(end)=[];
+        if(isempty(analysisYAxis))
+            %Standard 2D Plot
+            plot(analysisTime,analysisSignal,'k')
+            grid on;
+        else
+            if(isfield(analysisYAxis,'isImage') && analysisYAxis.isImage)
+                %Plot scaled image
+                imagesc(analysisSignal)
+            else
+                %3D Plot with colormap
+                surf(analysisTime,analysisYAxis.values,analysisSignal,'EdgeColor','none');
+                axis xy; axis tight; colormap(analysisYAxis.map); view(0,90);
+            end
+            ylim([analysisYAxis.minY analysisYAxis.maxY])
         end
-        tm_ind=ann1(ind);
-        del_ind=find(tm_ind>N);
-        if(~isempty(del_ind))
-            ind(ann1(ind)==tm_ind(del_ind))=[];
-            tm_ind(del_ind)=[];
+        xlim([tm(ind_start) tm(ind_end)])
+        if(~isempty(analysisUnits))
+            ylabel(analysisUnits)
         end
-        if(~isempty(ind) && ind(end)>length(ann1RR))
-            del_ind=find(ind>length(ann1RR));
-            ind(del_ind)=[];
-            tm_ind(del_ind)=[];
+    else
+        %Plot RR series in analysis window
+        if(~isempty(ann1RR) && (get(handles.AnnotationMenu,'Value')==2))
+            Nann=length(ann1);
+            axes(handles.AnalysisAxes);
+            ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
+            ind=find(ind==1)+1;
+            if(~isempty(ind) && ind(end)> Nann)
+                ind(end)=[];
+            end
+            tm_ind=ann1(ind);
+            del_ind=find(tm_ind>N);
+            if(~isempty(del_ind))
+                ind(ann1(ind)==tm_ind(del_ind))=[];
+                tm_ind(del_ind)=[];
+            end
+            if(~isempty(ind) && ind(end)>length(ann1RR))
+                del_ind=find(ind>length(ann1RR));
+                ind(del_ind)=[];
+                tm_ind(del_ind)=[];
+            end
+            plot(tm(tm_ind),ann1RR(ind),'k*-')
+            text(tm(tm_ind(1)),max(ann1RR(ind)),'RR Series','FontWeight','bold','FontSize',12)
+            grid on
+            ylabel('Interval (seconds)')
+            if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
+                xlim([tm(ind_start) tm(ind_end)])
+            end
+            
         end
-        plot(tm(tm_ind),ann1RR(ind),'k*-')
-        text(tm(tm_ind(1)),max(ann1RR(ind)),'RR Series','FontWeight','bold','FontSize',12)
-        grid on
-        ylabel('Interval (seconds)')
-        if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
-            xlim([tm(ind_start) tm(ind_end)])
-        end
-        
     end
 end
-
 
 % --- Executes on selection change in TimeScaleSelection.
 function TimeScaleSelection_Callback(hObject, eventdata, handles)
@@ -493,7 +515,7 @@ end
 
 function AnnotationMenu_Callback(hObject, eventdata, handles)
 
-global ann1 ann1RR info tm ann2
+global ann1 ann1RR info tm ann2 specEstimation
 
 tips=0;
 Fs=double(info(1).SamplingFrequency);
@@ -510,6 +532,7 @@ switch(annStr{index})
             annDiff=min(abs(A1-A2))./Fs;
         end
         close(h)
+        specEstimation=[];
         wfdbplot(handles)
         
     case 'Plot RR Series Ann1'
@@ -517,6 +540,7 @@ switch(annStr{index})
         %Compare annotation with ann1menu being the reference
         ann1RR=diff(ann1)./double(info(1).SamplingFrequency);
         close(h)
+        specEstimation=[];
         wfdbplot(handles)
         
     case 'Add annotations to Ann1'
@@ -636,7 +660,7 @@ function SignalMenu_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns SignalMenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from SignalMenu
 
-global tm signal info analysisSignal analysisTime analysisUnits analysisYAxis
+global tm signal info analysisSignal analysisTime analysisUnits analysisYAxis specEstimation
 contents = cellstr(get(hObject,'String'));
 ind=get(handles.signalList,'Value');
 str= contents{get(hObject,'Value')};
@@ -652,6 +676,7 @@ else
 end
 Fs=double(info(ind).SamplingFrequency);
 analysisYAxis=[];
+specEstimation=[];
 switch str
     case 'Plot Raw Signal'
         %default to plot after switch
@@ -673,8 +698,12 @@ switch str
         [analysisSignal,analysisUnits]=wfdbKL(analysisSignal);
     case 'Track Fundamental'
         [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs);
+    case 'Spectral Estimation'
+        specEstimation=wfdbPwelch();
+        specEstimation.sigInd=ind;
+        specEstimation.Fs=Fs;
 end
-if(~isempty(analysisSignal))
+if(~isempty(analysisSignal) || ~isempty(specEstimation))
     %If analysisSignal is empty, command has been cancelled, else go ahead
     %and plot
     wfdbplot(handles);
@@ -744,6 +773,33 @@ catch
     errordlg(['Unable to filter data! Error: ' lasterr])
 end
 close(h)
+
+function x=wfdbPwelch() 
+
+persistent specEstimation
+if(isempty(specEstimation))
+    specEstimation.prompt={'Window Size','Samples that Overlap','FFT Size'...
+        'Plot scale (linear, semilogx, semilogy, loglog)'};
+    specEstimation.WINDOW='[]';
+    specEstimation.NOVERLAP='[]';
+    specEstimation.NFFT='[]';
+    specEstimation.scale='linear';
+    specEstimation.name='PWLECH Spectral Estimation Parameters';
+    specEstimation.numlines=1;
+end
+
+answer=inputdlg(specEstimation.prompt,specEstimation.name,specEstimation.numlines,...
+    {specEstimation.WINDOW, specEstimation.NOVERLAP,specEstimation.NFFT, specEstimation.scale});
+specEstimation.WINDOW = answer{1};
+specEstimation.NOVERLAP= answer{2};
+specEstimation.NFFT= answer{3};
+specEstimation.scale= answer{4};
+
+x.WINDOW =str2num(answer{1});
+x.NOVERLAP=str2num(answer{2});
+x.NFFT= str2num(answer{3});
+x.scale= answer{4};
+
 
 
 function [analysisSignal]=wfdbNotch(analysisSignal,Fs)
