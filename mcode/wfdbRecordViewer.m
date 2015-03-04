@@ -85,6 +85,7 @@ switch ButtonName,
         IND=zeros(D,1);
         for n=1:D
             str=char(dbs{n});
+            str=regexprep(str,'\n',' ');
             ind=strfind(str,'Description:');
             IND(n)=ind;
             pad=30-ind(1);
