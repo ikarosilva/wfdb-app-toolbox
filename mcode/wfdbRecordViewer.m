@@ -371,10 +371,15 @@ end
 if(~isempty(specEstimation))
     %Plot Spectral estimate in the analysis window
     axes(handles.AnalysisAxes);
+    if(specEstimation.isCohere==0)
     [Pxx,F]=pwelch(sig(ind_start:ind_end,specEstimation.sigInd),...
         specEstimation.WINDOW,specEstimation.NOVERLAP,...
         specEstimation.NFFT,specEstimation.Fs,'power');
-    
+    else
+        [Pxx,F]=mscohere(sig(ind_start:ind_end,specEstimation.sigInd),...
+        sig(ind_start:ind_end,specEstimation.ind2),specEstimation.WINDOW,...
+        specEstimation.NOVERLAP,specEstimation.NFFT,specEstimation.Fs);
+    end
     switch specEstimation.scale
         case 'linear'
             plot(F,Pxx,'k')
@@ -715,6 +720,10 @@ else
             specEstimation=wfdbPwelch();
             specEstimation.sigInd=ind;
             specEstimation.Fs=Fs;
+        case 'Spectral Coherence'
+            specEstimation=wfdbCohere();
+            specEstimation.sigInd=ind;
+            specEstimation.Fs=Fs;
     end
 end
 if(~isempty(analysisSignal) || ~isempty(specEstimation))
@@ -813,6 +822,38 @@ x.WINDOW =str2num(answer{1});
 x.NOVERLAP=str2num(answer{2});
 x.NFFT= str2num(answer{3});
 x.scale= answer{4};
+x.isCohere=0;
+
+function x=wfdbCohere() 
+
+persistent specEstimation
+if(isempty(specEstimation))
+    specEstimation.prompt={'Window Size','Samples that Overlap','FFT Size'...
+        'Plot scale (linear, semilogx, semilogy, loglog)','Index of Second Signal:'};
+    specEstimation.WINDOW='[]';
+    specEstimation.NOVERLAP='[]';
+    specEstimation.NFFT='[]';
+    specEstimation.scale='linear';
+    specEstimation.ind2='1';
+    specEstimation.name='PWLECH Spectral Estimation Parameters';
+    specEstimation.numlines=1;
+end
+
+answer=inputdlg(specEstimation.prompt,specEstimation.name,specEstimation.numlines,...
+    {specEstimation.WINDOW, specEstimation.NOVERLAP,specEstimation.NFFT,...
+    specEstimation.scale,specEstimation.ind2});
+specEstimation.WINDOW = answer{1};
+specEstimation.NOVERLAP= answer{2};
+specEstimation.NFFT= answer{3};
+specEstimation.scale= answer{4};
+specEstimation.ind2= answer{5};
+
+x.WINDOW =str2num(answer{1});
+x.NOVERLAP=str2num(answer{2});
+x.NFFT= str2num(answer{3});
+x.scale= answer{4};
+x.ind2= str2num(answer{5});
+x.isCohere=1;
 
 
 
