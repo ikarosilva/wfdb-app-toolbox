@@ -387,6 +387,7 @@ if(~isempty(specEstimation))
     end
     xlabel('Frequency (Hz)')
     ylabel('Power')
+    grid on
 else
     %Plot custom signal in the analysis window
     if(~isempty(analysisSignal))
@@ -666,43 +667,55 @@ contents = cellstr(get(hObject,'String'));
 ind=get(handles.signalList,'Value');
 str= contents{get(hObject,'Value')};
 
-%Get Raw Signal
-analysisTime=tm;
-analysisSignal=signal(:,ind);
-analysisUnits=strsplit(info(ind).Gain,'/');
-if(length(analysisUnits)>1)
-    analysisUnits=analysisUnits{2};
+if(strcmp(str,'Overwrite Signal'))
+    if(length(analysisTime) == length(tm))
+        signal(:,ind)=analysisSignal;
+    else
+        errordlg(['Analysis signal must be same size as original signal to be overwritten.'])
+    end
 else
-    analysisUnits=[];
-end
-Fs=double(info(ind).SamplingFrequency);
-analysisYAxis=[];
-specEstimation=[];
-switch str
-    case 'Plot Raw Signal'
-        %default to plot after switch
-    case 'Apply General Filter'
-        [analysisSignal]=wfdbFilter(analysisSignal);
-    case '60/50 Hz Notch Filter'
-        [analysisSignal]=wfdbNotch(analysisSignal,Fs);
-    case 'Resonator Filter'
-        [analysisSignal]=wfdbResonator(analysisSignal,Fs);
-    case 'Custom Function'
-        [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs);
-    case 'Spectogram Analysis'
-        [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs);
-    case 'Wavelets Analysis'
-        [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
-    case 'Spatial PCA'
-        [analysisSignal,analysisUnits]=wfdbPCA(signal);
-    case 'Karhunen-Loeve Expansion'
-        [analysisSignal,analysisUnits]=wfdbKL(analysisSignal);
-    case 'Track Fundamental'
-        [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs);
-    case 'Spectral Estimation'
-        specEstimation=wfdbPwelch();
-        specEstimation.sigInd=ind;
-        specEstimation.Fs=Fs;
+    %Get Raw Signal
+    analysisTime=tm;
+    analysisSignal=signal(:,ind);
+    analysisUnits=strsplit(info(ind).Gain,'/');
+    if(length(analysisUnits)>1)
+        analysisUnits=analysisUnits{2};
+    else
+        analysisUnits=[];
+    end
+    Fs=double(info(ind).SamplingFrequency);
+    analysisYAxis=[];
+    specEstimation=[];
+    switch str
+        case 'Plot Raw Signal'
+            %default to plot after switch
+        case 'Apply General Filter'
+            [analysisSignal]=wfdbFilter(analysisSignal,Fs);
+        case '60/50 Hz Notch Filter'
+            [analysisSignal]=wfdbNotch(analysisSignal,Fs);
+        case 'Resonator Filter'
+            [analysisSignal]=wfdbResonator(analysisSignal,Fs);
+        case 'Custom Function'
+            try
+                [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs);
+            catch
+                errordlg(lasterr)
+            end
+        case 'Spectogram Analysis'
+            [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs);
+        case 'Wavelets Analysis'
+            [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
+        case 'Spatial PCA'
+            [analysisSignal,analysisUnits]=wfdbPCA(signal);
+        case 'Karhunen-Loeve Expansion'
+            [analysisSignal,analysisUnits]=wfdbKL(analysisSignal);
+        case 'Track Fundamental'
+            [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs);
+        case 'Spectral Estimation'
+            specEstimation=wfdbPwelch();
+            specEstimation.sigInd=ind;
+            specEstimation.Fs=Fs;
+    end
 end
 if(~isempty(analysisSignal) || ~isempty(specEstimation))
     %If analysisSignal is empty, command has been cancelled, else go ahead
@@ -747,14 +760,14 @@ end
 
 
 
-function [analysisSignal]=wfdbFilter(analysisSignal)
+function [analysisSignal]=wfdbFilter(analysisSignal,Fs)
 
 %Set Low-pass default values
 persistent dlgParam
 
 if(isempty(dlgParam))
     dlgParam.prompt={'Filter Design Function (should return "a" and "b", for use by FILTFILT ):'};
-    dlgParam.answer='b=fir1(48,[0.1 0.5]);a=1;';
+    dlgParam.answer=['Fs= ' num2str(Fs) ';b=fir1(48,[10 40]./(0.5*Fs));a=1;'];
     dlgParam.name='Filter Design Command';
     dlgParam.numlines=1;
 end
@@ -784,7 +797,7 @@ if(isempty(specEstimation))
     specEstimation.WINDOW='[]';
     specEstimation.NOVERLAP='[]';
     specEstimation.NFFT='[]';
-    specEstimation.scale='linear';
+    specEstimation.scale='semilogy';
     specEstimation.name='PWLECH Spectral Estimation Parameters';
     specEstimation.numlines=1;
 end
@@ -904,6 +917,7 @@ if(isempty(dlgParam))
     dlgParam.prompt={'Custom Function must output variables ''analysisSignal'' and ''analysisTime'''};
     dlgParam.answer={'[analysisSignal,analysisTime]=foo(analysisSignal,analysisTime,Fs)'};
     dlgParam.name='Evaluate Command:';
+    dlgParam.numlines=1;
 end
 
 answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,dlgParam.answer);
@@ -913,12 +927,12 @@ if(isempty(answer))
     return;
 end
 
-dlgParam.answer=answer{1};
+dlgParam.answer=answer(1);
 h = waitbar(0,'Executing code on signal. Please wait...');
 try
-    eval([dlgParam.answer ';']);
+    eval([dlgParam.answer{1} ';']);
 catch
-    errordlg(['Unable to execute code!! Error: ' lasterr])
+    errordlg(['Error: ' lasterr])
 end
 close(h)
 
