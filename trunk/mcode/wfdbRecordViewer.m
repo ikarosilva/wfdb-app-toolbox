@@ -234,13 +234,17 @@ return
 
 
 function loadAnn1(fname,annName)
-global ann1
+global ann1 ann1Labels
 h = waitbar(0,'Loading Annotations. Please wait...');
 if(strcmp(fname,'none'))
     ann1=[];
 else
-    [ann1,type,subtype,chan,num,comments]=rdann(fname,annName);
+    [ann1,type,subtype,chan,num,comment]=rdann(fname,annName);
 end
+ann1Labels.type=type;
+ann1Labels.comment=comment;
+ann1Labels.chan=chan;
+
 close(h)
 
 function loadAnn2(fname,annName)
@@ -284,7 +288,7 @@ set(handles.Ann2Menu,'String',annotations)
 
 function wfdbplot(handles)
 global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal 
-global specEstimation analysisTime analysisUnits analysisYAxis 
+global specEstimation analysisTime analysisUnits analysisYAxis ann1Labels
 axes(handles.axes1);
 cla;
 
@@ -332,6 +336,26 @@ for ch=1:CH;
                 msize=5;
             end
             plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
+            %Plot labels if selected
+            if(length(tmp_ann1)<50 && ~strcmp(ann1Labels.showType,'-1'))
+                tmpType=ann1Labels.type((ann1>ind_start) & (ann1<ind_end));
+                tmpChan=ann1Labels.chan((ann1>ind_start) & (ann1<ind_end));
+                K=length(tmpType);
+                if(strcmp(ann1Labels.showComment,'false'))
+                    tmpComment=cell(K,1);
+                else
+                    tmpComment=ann1Labels.comment((ann1>ind_start) & (ann1<ind_end));
+                end
+                if(~strcmp(ann1Labels,'[]'))
+                    %Filter according to beat type
+                end
+                for k=1:K
+                   if(strcmp(ann1Labels.channelSpecific,'false') || tmpChan(k)==ch) 
+                        str=[tmpType(k,:) ' ' tmpComment{k}];
+                        text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
+                   end
+                end
+            end
         end
     end
     if(~isempty(ann2))
@@ -563,6 +587,9 @@ switch(annStr{index})
         ann1=sort([ann1;x]);
         %Refresh annotation plot
         wfdbplot(handles)
+        
+    case 'Show Ann1 Labels'
+        wfdbShowAnn1Labels();
         
     case 'Delete annotations from Ann1'
         
@@ -814,7 +841,7 @@ end
 answer=inputdlg(specEstimation.prompt,specEstimation.name,specEstimation.numlines,...
     {specEstimation.WINDOW, specEstimation.NOVERLAP,specEstimation.NFFT, specEstimation.scale});
 specEstimation.WINDOW = answer{1};
-specEstimation.NOVERLAP= answer{2};
+specEstimation.NOVERLAP= answer{2};f
 specEstimation.NFFT= answer{3};
 specEstimation.scale= answer{4};
 
@@ -1178,6 +1205,27 @@ analysisSignal=harmonic_est(analysisSignal,str2num(dlgParam.P),Fs,...
     str2num(dlgParam.theta),str2num(dlgParam.mu),str2num(dlgParam.r));
 analysisUnits='Hz';
 close(h)
+
+function wfdbShowAnn1Labels()
+
+global ann1Labels
+
+if(~isfield(ann1Labels,'prompt'))
+    ann1Labels.prompt={'Ann1 Types (if empty, show all types, if -1 don''t display):',...
+        'Show Comments (true/false):','Display label on original channel only (true/false):'};
+    ann1Labels.showType='-1';
+    ann1Labels.showComment='true';
+    ann1Labels.channelSpecific='false';
+    ann1Labels.name='Displays Ann1 Type and Comments when there is 50 annotation or less.';
+    ann1Labels.numlines=1;
+end
+
+answer=inputdlg(ann1Labels.prompt,ann1Labels.name,ann1Labels.numlines,...
+    {ann1Labels.showType,ann1Labels.showComment, ann1Labels.channelSpecific});
+ann1Labels.showType= answer{1};
+ann1Labels.showComment= answer{2};
+ann1Labels.channelSpecific=answer{3};
+
 
 
 function theta_curve=harmonic_est(x,varargin)
