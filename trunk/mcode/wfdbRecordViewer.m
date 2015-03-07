@@ -841,7 +841,7 @@ end
 answer=inputdlg(specEstimation.prompt,specEstimation.name,specEstimation.numlines,...
     {specEstimation.WINDOW, specEstimation.NOVERLAP,specEstimation.NFFT, specEstimation.scale});
 specEstimation.WINDOW = answer{1};
-specEstimation.NOVERLAP= answer{2};f
+specEstimation.NOVERLAP= answer{2};
 specEstimation.NFFT= answer{3};
 specEstimation.scale= answer{4};
 
