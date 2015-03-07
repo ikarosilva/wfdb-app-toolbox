@@ -337,7 +337,7 @@ for ch=1:CH;
             end
             plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
             %Plot labels if selected
-            if(length(tmp_ann1)<50 && ~strcmp(ann1Labels.showType,'-1'))
+            if(length(tmp_ann1)<ann1Labels.threshold && ~strcmp(ann1Labels.showType,'-1'))
                 tmpType=ann1Labels.type((ann1>ind_start) & (ann1<ind_end));
                 tmpChan=ann1Labels.chan((ann1>ind_start) & (ann1<ind_end));
                 K=length(tmpType);
@@ -1212,14 +1212,14 @@ close(h)
 function wfdbShowAnn1Labels()
 
 global ann1Labels
-
+ann1Labels.threshold=100;
 if(~isfield(ann1Labels,'prompt'))
     ann1Labels.prompt={'Ann1 Types (if empty, show all types, if -1 don''t display):',...
         'Show Comments (true/false):','Display label on original channel only (true/false):'};
-    ann1Labels.showType='-1';
+    ann1Labels.showType='[]';
     ann1Labels.showComment='true';
     ann1Labels.channelSpecific='false';
-    ann1Labels.name='Displays Ann1 Type and Comments when there is 50 annotation or less.';
+    ann1Labels.name='Displays Ann1 Type and Comments when there are 100 annotation or less.';
     ann1Labels.numlines=1;
 end
 
