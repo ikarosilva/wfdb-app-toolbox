@@ -111,7 +111,7 @@ switch ButtonName,
             records(end)=[];
         end
         for n=1:length(records)
-           records{n}=['/' dbname '/' records{n}]; 
+            records{n}=['/' dbname '/' records{n}];
         end
         close(h)
         
@@ -244,6 +244,8 @@ end
 ann1Labels.type=type;
 ann1Labels.comment=comment;
 ann1Labels.chan=chan;
+%Load other parameters for the ann1Labels structure
+wfdbShowAnn1Labels(0);
 
 close(h)
 
@@ -287,7 +289,7 @@ set(handles.Ann2Menu,'String',annotations)
 
 
 function wfdbplot(handles)
-global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal 
+global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal
 global specEstimation analysisTime analysisUnits analysisYAxis ann1Labels
 axes(handles.axes1);
 cla;
@@ -323,6 +325,9 @@ SCALE(SCALE==0)=1;
 sig=offset.*sig./repmat(SCALE,[N 1]);
 OFFSET=offset.*[1:CH];
 sig=sig + repmat(OFFSET,[N 1]);
+if(~isempty(ann1))
+    showThreshold=str2num(ann1Labels.threshold);
+end
 
 for ch=1:CH;
     plot(tm(ind_start:ind_end),sig(ind_start:ind_end,ch))
@@ -337,7 +342,7 @@ for ch=1:CH;
             end
             plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
             %Plot labels if selected
-            if(length(tmp_ann1)<ann1Labels.threshold && ~strcmp(ann1Labels.showType,'-1'))
+            if(length(tmp_ann1)<showThreshold && ~strcmp(ann1Labels.showType,'-1'))
                 tmpType=ann1Labels.type((ann1>ind_start) & (ann1<ind_end));
                 tmpChan=ann1Labels.chan((ann1>ind_start) & (ann1<ind_end));
                 K=length(tmpType);
@@ -350,10 +355,17 @@ for ch=1:CH;
                     %Filter according to beat type
                 end
                 for k=1:K
-                   if(strcmp(ann1Labels.channelSpecific,'false') || tmpChan(k)==ch) 
-                        str=[tmpType(k,:) ' ' tmpComment{k}];
-                        text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
-                   end
+                    if(strcmp(ann1Labels.channelSpecific,'false') || tmpChan(k)==ch)
+                        if(strcmp(ann1Labels.abnormalOnly,'false'))
+                            str=[tmpType(k,:) ' ' tmpComment{k}];
+                            text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
+                        else
+                            if(~strcmp(tmpType(k,:),'N'))
+                                str=[tmpType(k,:) ' ' tmpComment{k}];
+                                text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
+                            end
+                        end
+                    end
                 end
             end
         end
@@ -396,13 +408,13 @@ if(~isempty(specEstimation))
     %Plot Spectral estimate in the analysis window
     axes(handles.AnalysisAxes);
     if(specEstimation.isCohere==0)
-    [Pxx,F]=pwelch(sig(ind_start:ind_end,specEstimation.sigInd),...
-        specEstimation.WINDOW,specEstimation.NOVERLAP,...
-        specEstimation.NFFT,specEstimation.Fs,'power');
+        [Pxx,F]=pwelch(sig(ind_start:ind_end,specEstimation.sigInd),...
+            specEstimation.WINDOW,specEstimation.NOVERLAP,...
+            specEstimation.NFFT,specEstimation.Fs,'power');
     else
         [Pxx,F]=mscohere(sig(ind_start:ind_end,specEstimation.sigInd),...
-        sig(ind_start:ind_end,specEstimation.ind2),specEstimation.WINDOW,...
-        specEstimation.NOVERLAP,specEstimation.NFFT,specEstimation.Fs);
+            sig(ind_start:ind_end,specEstimation.ind2),specEstimation.WINDOW,...
+            specEstimation.NOVERLAP,specEstimation.NFFT,specEstimation.Fs);
     end
     switch specEstimation.scale
         case 'linear'
@@ -589,7 +601,7 @@ switch(annStr{index})
         wfdbplot(handles)
         
     case 'Show Ann1 Labels'
-        wfdbShowAnn1Labels();
+        wfdbShowAnn1Labels(1);
         
     case 'Delete annotations from Ann1'
         
@@ -669,7 +681,7 @@ switch(annStr{index})
         
     case 'Launch PhysioNet Label Definitions'
         web('http://www.physionet.org/physiobank/annotations.shtml');
-  
+        
 end
 
 
@@ -827,7 +839,7 @@ catch
 end
 close(h)
 
-function x=wfdbPwelch() 
+function x=wfdbPwelch()
 
 persistent specEstimation
 if(isempty(specEstimation))
@@ -854,7 +866,7 @@ x.NFFT= str2num(answer{3});
 x.scale= answer{4};
 x.isCohere=0;
 
-function x=wfdbCohere() 
+function x=wfdbCohere()
 
 persistent specEstimation
 if(isempty(specEstimation))
@@ -1209,26 +1221,31 @@ analysisSignal=harmonic_est(analysisSignal,str2num(dlgParam.P),Fs,...
 analysisUnits='Hz';
 close(h)
 
-function wfdbShowAnn1Labels()
-
+function wfdbShowAnn1Labels(promptMe)
 global ann1Labels
-ann1Labels.threshold=100;
 if(~isfield(ann1Labels,'prompt'))
     ann1Labels.prompt={'Ann1 Types (if empty, show all types, if -1 don''t display):',...
-        'Show Comments (true/false):','Display label on original channel only (true/false):'};
+        'Show Comments (true/false):','Display label on original channel only (true/false):',...
+        'Display Label Types & Comments when there are at most N labels:', ...
+        'Display abnormal labels only (true/false):'};
     ann1Labels.showType='[]';
     ann1Labels.showComment='true';
     ann1Labels.channelSpecific='false';
-    ann1Labels.name='Displays Ann1 Type and Comments when there are 100 annotation or less.';
+    ann1Labels.threshold='100';
+    ann1Labels.abnormalOnly='false';
+    ann1Labels.name='Displays Ann1 Type and Comments';
     ann1Labels.numlines=1;
 end
-
-answer=inputdlg(ann1Labels.prompt,ann1Labels.name,ann1Labels.numlines,...
-    {ann1Labels.showType,ann1Labels.showComment, ann1Labels.channelSpecific});
-ann1Labels.showType= answer{1};
-ann1Labels.showComment= answer{2};
-ann1Labels.channelSpecific=answer{3};
-
+if(promptMe)
+    answer=inputdlg(ann1Labels.prompt,ann1Labels.name,ann1Labels.numlines,...
+        {ann1Labels.showType,ann1Labels.showComment, ann1Labels.channelSpecific,...
+        ann1Labels.threshold,ann1Labels.abnormalOnly});
+    ann1Labels.showType= answer{1};
+    ann1Labels.showComment= answer{2};
+    ann1Labels.channelSpecific=answer{3};
+    ann1Labels.threshold=answer{4};
+    ann1Labels.abnormalOnly=answer{5};
+end
 
 
 function theta_curve=harmonic_est(x,varargin)
