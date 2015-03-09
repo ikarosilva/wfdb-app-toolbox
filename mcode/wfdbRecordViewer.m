@@ -225,7 +225,7 @@ R=length(info);
 analysisSignal=[];
 analysisTime=[];
 signalDescription=cell(R,1);
-for r=1:R
+for r=R:-1:1
     signalDescription(r)={info(r).Description};
 end
 set(handles.signalList,'String',signalDescription)
@@ -454,7 +454,7 @@ else
         end
     else
         %Plot RR series in analysis window
-        if(~isempty(ann1RR) && (get(handles.AnnotationMenu,'Value')==2))
+        if(~isempty(ann1RR) && strcmp(handles.AnnotationMenu.String{handles.AnnotationMenu.Value},'Plot RR Series Ann1'))
             Nann=length(ann1);
             axes(handles.AnalysisAxes);
             ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
@@ -558,7 +558,7 @@ end
 
 function AnnotationMenu_Callback(hObject, eventdata, handles)
 
-global ann1 ann1RR info tm ann2 specEstimation
+global ann1 ann1RR info tm ann2 specEstimation analysisSignal
 
 tips=0;
 Fs=double(info(1).SamplingFrequency);
@@ -584,6 +584,7 @@ switch(annStr{index})
         ann1RR=diff(ann1)./double(info(1).SamplingFrequency);
         close(h)
         specEstimation=[];
+        analysisSignal=[];
         wfdbplot(handles)
         
     case 'Add annotations to Ann1'
