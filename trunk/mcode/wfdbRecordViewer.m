@@ -52,8 +52,8 @@ function wfdbRecordViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm tm_step
-
+global current_record records tm tm_step exportFigure
+exportFigure=0;
 % Choose default command line output for wfdbRecordViewer
 handles.output = hObject;
 
@@ -291,8 +291,15 @@ set(handles.Ann2Menu,'String',annotations)
 function wfdbplot(handles)
 global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal
 global specEstimation analysisTime analysisUnits analysisYAxis ann1Labels
-axes(handles.axes1);
-cla;
+global exportFigure
+
+if(exportFigure)
+    figure
+    subplot(211)
+else
+    axes(handles.axes1);
+    cla;
+end
 
 %Normalize each signal and plot them with an offset
 [N,CH]=size(signal);
@@ -395,7 +402,12 @@ xlim([tm(ind_start) tm(ind_end)])
 
 %Plot annotations in analysis window
 if(~isempty(annDiff) & (get(handles.AnnotationMenu,'Value')==2))
-    axes(handles.AnalysisAxes);
+    if(exportFigure)
+        gcf
+        subplot(212)
+    else
+        axes(handles.AnalysisAxes);
+    end
     df=annDiff((ann1>ind_start) & (ann1<ind_end));
     plot(tm(tmp_ann1),df,'k*-')
     text(tm(tmp_ann1(1)),max(df),'Ann Diff','FontWeight','bold','FontSize',12)
@@ -406,7 +418,12 @@ end
 
 if(~isempty(specEstimation))
     %Plot Spectral estimate in the analysis window
-    axes(handles.AnalysisAxes);
+    if(exportFigure)
+        gcf
+        subplot(212)
+    else
+        axes(handles.AnalysisAxes);
+    end
     if(specEstimation.isCohere==0)
         [Pxx,F]=pwelch(sig(ind_start:ind_end,specEstimation.sigInd),...
             specEstimation.WINDOW,specEstimation.NOVERLAP,...
@@ -432,7 +449,12 @@ if(~isempty(specEstimation))
 else
     %Plot custom signal in the analysis window
     if(~isempty(analysisSignal))
-        axes(handles.AnalysisAxes);
+        if(exportFigure)
+            gcf
+            subplot(212)
+        else
+            axes(handles.AnalysisAxes);
+        end
         if(isempty(analysisYAxis))
             %Standard 2D Plot
             plot(analysisTime,analysisSignal,'k')
@@ -456,7 +478,12 @@ else
         %Plot RR series in analysis window
         if(~isempty(ann1RR) && strcmp(handles.AnnotationMenu.String{handles.AnnotationMenu.Value},'Plot RR Series Ann1'))
             Nann=length(ann1);
-            axes(handles.AnalysisAxes);
+            if(exportFigure)
+                gcf
+                subplot(212)
+            else
+                axes(handles.AnalysisAxes);
+            end
             ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
             ind=find(ind==1)+1;
             if(~isempty(ind) && ind(end)> Nann)
@@ -483,6 +510,7 @@ else
             
         end
     end
+    exportFigure=0;
 end
 
 % --- Executes on selection change in TimeScaleSelection.
@@ -558,7 +586,8 @@ end
 
 function AnnotationMenu_Callback(hObject, eventdata, handles)
 
-global ann1 ann1RR info tm ann2 specEstimation analysisSignal
+global ann1 ann1RR info tm ann2 specEstimation analysisSignal exportFigure
+exportFigure=0;
 
 tips=0;
 Fs=double(info(1).SamplingFrequency);
@@ -711,11 +740,13 @@ function SignalMenu_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from SignalMenu
 
 global tm signal info analysisSignal analysisTime analysisUnits analysisYAxis specEstimation
+global exportFigure
 contents = cellstr(get(hObject,'String'));
 ind=get(handles.signalList,'Value');
 str= contents{get(hObject,'Value')};
+exportFigure=0;
 
-if(strcmp(str,'Overwrite Signal'))
+if(strcmp(str,'Overwrite with Analyzed Signal'))
     if(length(analysisTime) == length(tm))
         signal(:,ind)=analysisSignal;
     else
@@ -767,6 +798,29 @@ else
             specEstimation=wfdbCohere();
             specEstimation.sigInd=ind;
             specEstimation.Fs=Fs;
+        case 'Export as Separate Figure'
+            exportFigure=1;
+        case 'Add Analyzed Signal'
+            try
+                signal(:,end+1)=analysisSignal;
+            catch
+                errordlg(lasterr);
+            end
+            info(end+1).Description='Analyzed Signal';
+            signalDescription=cell(R,1);
+            for r=R:-1:1
+                signalDescription(r)={info(r).Description};
+            end
+            set(handles.signalList,'String',signalDescription)
+        case 'Delete Selected Signal'
+            info(ind)=[];
+            signal(:,ind)=[];
+            signalDescription=cell(R,1);
+            for r=R:-1:1
+                signalDescription(r)={info(r).Description};
+            end
+            set(handles.signalList,'String',signalDescription)
+            wfdbplot(handles);
     end
 end
 if(~isempty(analysisSignal) || ~isempty(specEstimation))
