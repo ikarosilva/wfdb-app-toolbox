@@ -99,6 +99,14 @@ if(isempty(isloaded))
     end
     javaaddpath(wfdb_path)
     isloaded=1;
+    
+    %Check if there are any empty space on the path directory, and 
+    %issue a warning if there is
+    warnMe=strfind(wfdb_path,' ');
+    if(~isempty(warnMe))
+       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
+       warning(['The installation path is set to: ' wfdb_path])
+    end
 end
 
 outputs={'isloaded','config'};
@@ -144,6 +152,10 @@ for n=1:nargout
         config.WFDB_PATH=WFDB_PATH;
         config.WFDBCAL=WFDBCAL;
         config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
+    end
+    warnMe=strfind(wfdb_path,' ');
+    if(~isempty(warnMe))
+       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
     end
     eval(['varargout{n}=' outputs{n} ';'])
 end
