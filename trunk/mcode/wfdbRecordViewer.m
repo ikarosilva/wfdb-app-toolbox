@@ -52,8 +52,9 @@ function wfdbRecordViewer_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm tm_step exportFigure
+global current_record records tm tm_step exportFigure physionetAnn
 exportFigure=0;
+physionetAnn={};
 % Choose default command line output for wfdbRecordViewer
 handles.output = hObject;
 
@@ -112,6 +113,15 @@ switch ButtonName,
         end
         for n=1:length(records)
             records{n}=['/' dbname '/' records{n}];
+        end
+        close(h)
+        
+        h = waitbar(0,'Loading list of annotations. Please wait...');
+        tmp=urlread(['http://physionet.org/physiobank/database/' dbname '/ANNOTATORS']);
+        ann=regexp(tmp,'\n','split');
+        for n=1:length(ann(:,1))
+            tmpInd=regexp(ann{1},'\s');
+            physionetAnn(end+1)={ann{1}(1:tmpInd-1)};
         end
         close(h)
         
@@ -260,28 +270,33 @@ end
 close(h)
 
 function loadAnnotationList(fname,handles)
-global ann1 ann2 annDiff
+global ann1 ann2 annDiff physionetAnn
+
 ann1=[];
 ann2=[];
 annDiff=[];
 tmp=dir([fname '*']);
 annotations={'none'};
-exclude={'dat','hea','edf','mat'};
-for i=1:length(tmp)
-    name=tmp(i).name;
-    st=strfind(name,'.');
-    if(~isempty(st))
-        tmp_ann=name(st+1:end);
-        enter=1;
-        for k=1:length(exclude)
-            if(strcmp(tmp_ann,exclude{k}))
-                enter=0;
+if(isempty(physionetAnn))
+    exclude={'dat','hea','edf','mat'};
+    for i=1:length(tmp)
+        name=tmp(i).name;
+        st=strfind(name,'.');
+        if(~isempty(st))
+            tmp_ann=name(st+1:end);
+            enter=1;
+            for k=1:length(exclude)
+                if(strcmp(tmp_ann,exclude{k}))
+                    enter=0;
+                end
+            end
+            if(enter)
+                annotations(end+1)={tmp_ann};
             end
         end
-        if(enter)
-            annotations(end+1)={tmp_ann};
-        end
     end
+else
+    annotations=[annotations;physionetAnn];
 end
 
 set(handles.Ann1Menu,'String',annotations)
@@ -476,38 +491,41 @@ else
         end
     else
         %Plot RR series in analysis window
-        if(~isempty(ann1RR) && strcmp(handles.AnnotationMenu.String{handles.AnnotationMenu.Value},'Plot RR Series Ann1'))
-            Nann=length(ann1);
-            if(exportFigure)
-                gcf
-                subplot(212)
-            else
-                axes(handles.AnalysisAxes);
+        if(~isempty(ann1RR))
+            annStr=get(handles.AnnotationMenu,'String');
+            valInd=get(handles.AnnotationMenu,'Value');
+            if(strcmp(annStr{valInd},'Plot RR Series Ann1'))
+                Nann=length(ann1);
+                if(exportFigure)
+                    gcf
+                    subplot(212)
+                else
+                    axes(handles.AnalysisAxes);
+                end
+                ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
+                ind=find(ind==1)+1;
+                if(~isempty(ind) && ind(end)> Nann)
+                    ind(end)=[];
+                end
+                tm_ind=ann1(ind);
+                del_ind=find(tm_ind>N);
+                if(~isempty(del_ind))
+                    ind(ann1(ind)==tm_ind(del_ind))=[];
+                    tm_ind(del_ind)=[];
+                end
+                if(~isempty(ind) && ind(end)>length(ann1RR))
+                    del_ind=find(ind>length(ann1RR));
+                    ind(del_ind)=[];
+                    tm_ind(del_ind)=[];
+                end
+                plot(tm(tm_ind),ann1RR(ind),'k*-')
+                text(tm(tm_ind(1)),max(ann1RR(ind)),'RR Series','FontWeight','bold','FontSize',12)
+                grid on
+                ylabel('Interval (seconds)')
+                if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
+                    xlim([tm(ind_start) tm(ind_end)])
+                end
             end
-            ind=(ann1(1:end)>ind_start) & (ann1(1:end)<ind_end);
-            ind=find(ind==1)+1;
-            if(~isempty(ind) && ind(end)> Nann)
-                ind(end)=[];
-            end
-            tm_ind=ann1(ind);
-            del_ind=find(tm_ind>N);
-            if(~isempty(del_ind))
-                ind(ann1(ind)==tm_ind(del_ind))=[];
-                tm_ind(del_ind)=[];
-            end
-            if(~isempty(ind) && ind(end)>length(ann1RR))
-                del_ind=find(ind>length(ann1RR));
-                ind(del_ind)=[];
-                tm_ind(del_ind)=[];
-            end
-            plot(tm(tm_ind),ann1RR(ind),'k*-')
-            text(tm(tm_ind(1)),max(ann1RR(ind)),'RR Series','FontWeight','bold','FontSize',12)
-            grid on
-            ylabel('Interval (seconds)')
-            if(~isnan(ind_start) && ~isnan(ind_end) && ~(ind_start==ind_end))
-                xlim([tm(ind_start) tm(ind_end)])
-            end
-            
         end
     end
     exportFigure=0;
