@@ -39,7 +39,7 @@ function varargout=snip(varargin)
 % Written by Ikaro Silva, 2015
 % Last Modified: -
 % Version 1.0
-% Since 1.0
+% Since 0.9.10
 %
 %
 % %Example- Generate a record from the first minute of mitdb/100
