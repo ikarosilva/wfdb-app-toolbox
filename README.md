@@ -23,7 +23,7 @@ or remotely in PhysioNet's [databases](http://physionet.org/physiobank/database/
 
 ## Forum
 
-A community discussion group forum is available at:
+A community discussion group is available at:
 http://groups.google.com/forum/#!forum/wfdb-app-toolbox
 
 ## Available Databases
