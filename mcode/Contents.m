@@ -24,7 +24,6 @@
 %   gqrs            - Estimation of QRS from ECG signals
 %   lomb	        - Estimates power spectrum using the Lomb periodogram method	
 %   mat2wfdb        - Writes a MATLAB variable into a WDFB record file
-%   maprecord       - Performs multithreaded concurent annotation or processing of WFDB records 
 %   mrgann          - Merge annotation files
 %   msentropy       - Multi scale entropy estimation
 %   physionetdb     - Get information about all of PhysioNet's available databases and signals
