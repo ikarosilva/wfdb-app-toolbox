@@ -33,7 +33,7 @@ For a list of available databases accessible through the WFDB Toolbox, see:
 http://physionet.org/physiobank/database/DBS
 
 
-## References
+## Reference & Toolbox Technical Overview
 
 [An Open-source Toolbox for Analysing and Processing PhysioNet Databases in MATLAB and Octave.
 I Silva, GB Moody, Journal of Open Research Software 2 (1), e27](http://openresearchsoftware.metajnl.com/article/view/jors.bi/77)
