@@ -5,7 +5,7 @@
 
 The WFDB Toolbox for MATLAB and Octave is a set of Java, GUI, and m-code wrapper functions,
 which make system calls to WFDB Software Package and other PhysioToolkit applications. The
-website for the toolbox can be found at:
+website for the toolbox (along with the installation instructions) can be found at:
 
 http://physionet.org/physiotools/matlab/wfdb-app-matlab/
 
@@ -22,7 +22,6 @@ The Toolbox is open-source (distributed under the GPL). The toolbox includes a G
 for facilitating the browsing, exploration, and analysis of WFBD records stored locally on the users machine, 
 or remotely in PhysioNet's databases.
 
+A community discussion group forum is available at:
 
-To simplify installation, the toolbox is distributed with precompiled native executables used 
-by some of its functions. Sources for all of the native executables used in this toolbox can be
-obtained from PhysioNet (see the individual help files).
+http://groups.google.com/forum/#!forum/wfdb-app-toolbox
