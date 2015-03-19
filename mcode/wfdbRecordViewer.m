@@ -117,11 +117,13 @@ switch ButtonName,
         close(h)
         
         h = waitbar(0,'Loading list of annotations. Please wait...');
-        tmp=urlread(['http://physionet.org/physiobank/database/' dbname '/ANNOTATORS']);
-        ann=regexp(tmp,'\n','split');
-        for n=1:length(ann(:,1))
-            tmpInd=regexp(ann{1},'\s');
-            physionetAnn(end+1)={ann{1}(1:tmpInd-1)};
+        [tmp,status]=urlread(['http://physionet.org/physiobank/database/' dbname '/ANNOTATORS']);
+        if(status==1)
+            ann=regexp(tmp,'\n','split');
+            for n=1:length(ann(:,1))
+                tmpInd=regexp(ann{1},'\s');
+                physionetAnn(end+1)={ann{1}(1:tmpInd-1)};
+            end
         end
         close(h)
         
@@ -792,6 +794,8 @@ else
             [analysisSignal]=wfdbNotch(analysisSignal,Fs);
         case 'Resonator Filter'
             [analysisSignal]=wfdbResonator(analysisSignal,Fs);
+        case 'Savitzky-Golay Filter'
+            [analysisSignal]=wfdbSgolayfilt(analysisSignal);
         case 'Custom Function'
             try
                 [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs);
@@ -1064,6 +1068,39 @@ catch
 end
 close(h)
 
+
+function [analysisSignal]=wfdbSgolayfilt(analysisSignal)
+persistent dlgParam
+if(isempty(dlgParam))
+    dlgParam.prompt={'Polynomial Order (K)','Window Size in samples (F):'};
+    dlgParam.K='3';
+    dlgParam.F='21';
+    dlgParam.name='Savitzky-Golay Filtering Options';
+    dlgParam.numlines=1;
+end
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,...
+    {dlgParam.K,dlgParam.F});
+if(isempty(answer))
+    analysisSignal=[];
+    return;
+end
+
+
+h = waitbar(0,'Filtering Data. Please wait...');
+dlgParam.K= answer{1};
+dlgParam.F= answer{2};
+
+%Similar  to 'Q1' but more accurate
+%For details see IEEE SP 2008 (5), pg 113
+K=str2num(dlgParam.K);
+F=str2num(dlgParam.F);
+try
+    analysisSignal=sgolayfilt(analysisSignal,K,F);
+catch
+    errordlg(['Unable to filter data! Error: ' lasterr])
+end
+close(h)
 
 function [analysisSignal,analysisTime]=wfdbFunction(analysisSignal,analysisTime,Fs)
 
