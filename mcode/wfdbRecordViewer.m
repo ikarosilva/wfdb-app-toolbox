@@ -106,26 +106,31 @@ switch ButtonName,
         dbname=regexprep(dbname,' ','');
         dbname=regexprep(dbname,'\n','');
         dbname=regexprep(dbname,'\t','');
-        tmp=urlread(['http://physionet.org/physiobank/database/' dbname '/RECORDS']);
-        records=regexp(tmp,'\n','split');
-        if(isempty(records{end}(:)))
-            records(end)=[];
-        end
-        for n=1:length(records)
-            records{n}=['/' dbname '/' records{n}];
-        end
-        close(h)
-        
-        h = waitbar(0,'Loading list of annotations. Please wait...');
-        [tmp,status]=urlread(['http://physionet.org/physiobank/database/' dbname '/ANNOTATORS']);
-        if(status==1)
-            ann=regexp(tmp,'\n','split');
-            for n=1:length(ann(:,1))
-                tmpInd=regexp(ann{1},'\s');
-                physionetAnn(end+1)={ann{1}(1:tmpInd-1)};
-            end
-        end
-        close(h)
+        [tmp,status]=urlread(['http://physionet.org/physiobank/database/' dbname '/RECORDS']);
+	if(status==1)
+        	records=regexp(tmp,'\n','split');
+        	if(isempty(records{end}(:)))
+        	    records(end)=[];
+        	end
+        	for n=1:length(records)
+        	    records{n}=['/' dbname '/' records{n}];
+        	end
+        	close(h)
+        	
+        	h = waitbar(0,'Loading list of annotations. Please wait...');
+        	[tmp,status]=urlread(['http://physionet.org/physiobank/database/' dbname '/ANNOTATORS']);
+        	if(status==1)
+        	    ann=regexp(tmp,'\n','split');
+        	    for n=1:length(ann(:,1))
+        	        tmpInd=regexp(ann{1},'\s');
+        	        physionetAnn(end+1)={ann{1}(1:tmpInd-1)};
+        	    end
+        	end
+        	close(h)
+	else
+	   errordlg(['Could not connect to PhysioNet server. Exiting!'])
+           return
+	end
         
 end % switch
 
