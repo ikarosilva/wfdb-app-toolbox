@@ -29,13 +29,13 @@ function varargout=rdann(varargin)
 %             http://www.physionet.org/physiobank/annotations.shtml
 %
 % chan
-%       Nx1 vector of the ints describing annotation subtype.
+%       Nx1 vector of ints describing annotation subtype.
 %
 % num
-%       Nx1 vector of the ints describing annotation NUM.
+%       Nx1 vector of ints describing annotation NUM.
 %
 % comments
-%       Nx1 vector of the cells describing annotation comments.
+%       Nx1 vector of cells describing annotation comments.
 %
 %
 % Required Parameters:
@@ -77,8 +77,8 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: December 4, 2014
-% Version 2
+% Last Modified: March 23, 2015
+% Version 2.1
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -232,7 +232,7 @@ else
                     num(n)=C{5};
                 end
                 if(~isempty(C{6}))
-                    comments(n)=C(6);
+                    comments(n)=C{6};
                 end
             end
         end
@@ -276,7 +276,7 @@ else
                     num(n)=C{6};
                 end
                 if(~isempty(C{7}))
-                    comments(n)=C(7);
+                    comments(n)=C{7};
                 end
             end
         end
