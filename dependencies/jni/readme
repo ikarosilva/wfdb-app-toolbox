@@ -1,0 +1,13 @@
+
+
+Implementation of some of the WFDB Applications via the Java Native Interface for
+improvements in speed and memory allocation.
+
+ Some useful links to guide through development:
+ 
+ http://www.lithiumhead.com/notes/windows_jni
+ https://www3.ntu.edu.sg/home/ehchua/programming/java/JavaNativeInterface.html#zz-2.1
+ 
+ 
+ The Eclipse project space need to be configured properly to that these libraries are visible when building 
+ the respective Java classes. 
