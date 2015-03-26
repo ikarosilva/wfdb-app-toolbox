@@ -15,11 +15,21 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject obj)
+long nSamples=0;
+
+JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
+	jfieldID NfieldID;
+
+	if((NfieldID = (*env)->GetFieldID(env,
+			(*env)->GetObjectClass(env,this),"nSamples","I"))==NULL ){
+		fprintf(stderr,"GetFieldID for nSamples failed");
+		return;
+	}
 
 	getData();
 	wfdbquit();
+	(*env)->SetLongField(env,this,NfieldID,nSamples);
 	return;
 }
 
@@ -38,7 +48,6 @@ void getData(){
 	WFDB_Siginfo *info;
 	long from = 0L, to = 0L;
 	int* data;
-	long nSamples=0;
 	long maxl = 0L;
 	long maxSamples =10000;
 	long reallocIncrement= 1000000;   // For records with no specified lenght
