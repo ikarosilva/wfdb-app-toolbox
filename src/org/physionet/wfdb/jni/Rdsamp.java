@@ -2,7 +2,7 @@ package org.physionet.wfdb.jni;
 
 public class Rdsamp {
 	long nSamples;
-	int baseline;
+	int[] baseline;
 	double gain;
 	double fs;
 	
@@ -27,7 +27,7 @@ public class Rdsamp {
 		return gain;
 	}
 	
-	public int getBaseline(){
+	public int[] getBaseline(){
 		return baseline;
 	}
 	

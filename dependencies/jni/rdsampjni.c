@@ -9,6 +9,7 @@
  *
  *
  */
+
 #include <jni.h>
 #include <stdio.h>
 #include <wfdb/wfdb.h>
@@ -17,15 +18,16 @@
 
 long nSamples=0;
 double fs;
-int baseline=0;
+int[] baseline;
 double gain=0;
 int nsig=0;
+jintArray data;
 
 JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
 	jfieldID NFieldID, baselineFieldID, gainFieldID, fsFieldID;
-
-	//TO get field signatures, run
+	jintArray result;
+	//To get field signatures, run
 	// javap -classpath ../../bin/ -s -p org.physionet.wfdb.jni.Rdsamp
 
 	if((NFieldID = (*env)->GetFieldID(env,
@@ -35,7 +37,7 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	}
 
 	if((baselineFieldID = (*env)->GetFieldID(env,
-				(*env)->GetObjectClass(env,this),"baseline","I"))==NULL ){
+				(*env)->GetObjectClass(env,this),"baseline","[I"))==NULL ){
 			fprintf(stderr,"GetFieldID for baseline failed");
 			return;
 	}
@@ -53,11 +55,18 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	}
 
 	getData();
-	wfdbquit();
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
-	(*env)->SetLongField(env,this,baselineFieldID,baseline);
 	(*env)->SetDoubleField(env,this,gainFieldID,gain);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
+
+	result = (jintArray)env->GetObjectField(this,baselineFieldID);
+	(*env)->SetIntArrayField(env,this,baselineFieldID,baseline);
+
+	//Clean up
+	free(baseline);
+	baseline=NULL;
+	wfdbquit();
+
 	return;
 }
 
@@ -226,9 +235,15 @@ void getData(){
 		exit(2);
 	}
 
-	baseline=info[sig[0]].baseline;
-	gain=info[sig[0]].gain;
-	fs = sampfreq(NULL);
+	fs = sampfreq(NULL); //Get sampling frequency  in Hz
+
+	//Get information from all signals
+	baseline=new int[nsig];
+	for (i = 0; i < nsig; i++){
+		baseline[i]=info[sig[i]].baseline;
+		//gain=info[sig[i]].gain;
+	}
+
 	while (( (nSamples<maxl) || (dynamicData==1) ) && getvec(datum) >= 0) {
 		fprintf(stdout,"\n%u:\t",nSamples);
 		for (i = 0; i < nsig; i++){
