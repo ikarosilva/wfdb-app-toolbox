@@ -16,20 +16,48 @@
 #include <stdlib.h>
 
 long nSamples=0;
+double fs;
+int baseline=0;
+double gain=0;
+int nsig=0;
 
 JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
-	jfieldID NfieldID;
+	jfieldID NFieldID, baselineFieldID, gainFieldID, fsFieldID;
 
-	if((NfieldID = (*env)->GetFieldID(env,
-			(*env)->GetObjectClass(env,this),"nSamples","I"))==NULL ){
+	//TO get field signatures, run
+	// javap -classpath ../../bin/ -s -p org.physionet.wfdb.jni.Rdsamp
+
+	if((NFieldID = (*env)->GetFieldID(env,
+			(*env)->GetObjectClass(env,this),"nSamples","J"))==NULL ){
 		fprintf(stderr,"GetFieldID for nSamples failed");
 		return;
 	}
 
+	if((baselineFieldID = (*env)->GetFieldID(env,
+				(*env)->GetObjectClass(env,this),"baseline","I"))==NULL ){
+			fprintf(stderr,"GetFieldID for baseline failed");
+			return;
+	}
+
+	if((gainFieldID = (*env)->GetFieldID(env,
+				(*env)->GetObjectClass(env,this),"gain","D"))==NULL ){
+			fprintf(stderr,"GetFieldID for gain failed");
+			return;
+	}
+
+	if((fsFieldID = (*env)->GetFieldID(env,
+					(*env)->GetObjectClass(env,this),"fs","D"))==NULL ){
+				fprintf(stderr,"GetFieldID for fs failed");
+				return;
+	}
+
 	getData();
 	wfdbquit();
-	(*env)->SetLongField(env,this,NfieldID,nSamples);
+	(*env)->SetLongField(env,this,NFieldID,nSamples);
+	(*env)->SetLongField(env,this,baselineFieldID,baseline);
+	(*env)->SetDoubleField(env,this,gainFieldID,gain);
+	(*env)->SetDoubleField(env,this,fsFieldID,fs);
 	return;
 }
 
@@ -42,8 +70,6 @@ void getData(){
 	char *invalid, speriod[16], tustr[16];
 	int  highres = 0, i, isiglist, nosig = 0, s,
 	*sig = NULL;
-	long nsig;
-	WFDB_Frequency freq;
 	WFDB_Sample *datum;
 	WFDB_Siginfo *info;
 	long from = 0L, to = 0L;
@@ -140,7 +166,7 @@ void getData(){
 		if (info[i].gain == 0.0) info[i].gain = WFDB_DEFGAIN;
 	if (highres)
 		setgvmode(WFDB_HIGHRES);
-	freq = sampfreq(NULL);
+	fs = sampfreq(NULL);
 	if (isigsettime(from) < 0)
 		exit(2);
 	if (nosig) {	/* print samples only from specified signals */
@@ -200,6 +226,9 @@ void getData(){
 		exit(2);
 	}
 
+	baseline=info[sig[0]].baseline;
+	gain=info[sig[0]].gain;
+	fs = sampfreq(NULL);
 	while (( (nSamples<maxl) || (dynamicData==1) ) && getvec(datum) >= 0) {
 		fprintf(stdout,"\n%u:\t",nSamples);
 		for (i = 0; i < nsig; i++){
