@@ -1,15 +1,16 @@
 package org.physionet.wfdb.jni;
 
+import java.util.ArrayList;
+
 public class Rdsamp {
 	long nSamples;
-	int[] baseline;
+	ArrayList<Integer> baseline;
 	double gain;
-	double fs;
-	
-	public native void getData();
+	double fs;	
 	static {
 		System.loadLibrary("rdsampjni");
 	}
+	
 	public static void main(String[] args) {
 		Rdsamp myRdsamp = new Rdsamp();
 		myRdsamp.getData();
@@ -19,6 +20,8 @@ public class Rdsamp {
 		System.out.println("gain: " + myRdsamp.gain);
 	}
 	
+	public native void getData();
+	
 	public long getnSamples(){
 		return nSamples;
 	}
@@ -27,7 +30,7 @@ public class Rdsamp {
 		return gain;
 	}
 	
-	public int[] getBaseline(){
+	public ArrayList<Integer> getBaseline(){
 		return baseline;
 	}
 	

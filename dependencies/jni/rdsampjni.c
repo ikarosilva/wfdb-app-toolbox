@@ -18,28 +18,53 @@
 
 long nSamples=0;
 double fs;
-int[] baseline;
+int* baseline;
 double gain=0;
 int nsig=0;
 jintArray data;
 
+//To get field signatures, run
+// javap -classpath ../../bin/ -s -p org.physionet.wfdb.jni.Rdsamp
+
 JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
-	jfieldID NFieldID, baselineFieldID, gainFieldID, fsFieldID;
-	jintArray result;
-	//To get field signatures, run
-	// javap -classpath ../../bin/ -s -p org.physionet.wfdb.jni.Rdsamp
+	jfieldID NFieldID, gainFieldID, fsFieldID;
+	jmethodID mid_init, mid_add, IntMethodID;
+	jclass arrayClass;
+	jintArray intArr;
+	jboolean jbool;
+	int n;
+	jclass clsInteger = (*env)->FindClass(env,"Ljava/lang/Integer;");
+	IntMethodID = (*env)->GetMethodID(env,clsInteger, "<init>", "(Ljava/lang/Integer)V");
+
+	arrayClass = (*env)->FindClass(env, "Ljava/util/ArrayList;");
+	  if (arrayClass == NULL){
+		  fprintf(stderr,"Could not get arrayClass\n");
+		  exit(2);
+	 }
+
+	mid_init =  (*env)->GetMethodID(env, arrayClass, "<init>", "()V");
+	  if (mid_init == NULL){
+		  fprintf(stderr,"Could not get mid_init\n");
+		  exit(2);
+	  }
+
+	intArr = (*env)->NewObject(env, arrayClass, mid_init);
+	  if (intArr == NULL) {
+		  fprintf(stderr,"Could not get intArr\n");
+		  exit(2);
+	  }
+
+	mid_add = (*env)->GetMethodID(env, arrayClass, "add", "(Ljava/lang/Object;)Z");
+	  if (mid_add == NULL) {
+		  fprintf(stderr,"Could not get mid_add\n");
+		  exit(2);
+	  }
 
 	if((NFieldID = (*env)->GetFieldID(env,
 			(*env)->GetObjectClass(env,this),"nSamples","J"))==NULL ){
 		fprintf(stderr,"GetFieldID for nSamples failed");
 		return;
-	}
-
-	if((baselineFieldID = (*env)->GetFieldID(env,
-				(*env)->GetObjectClass(env,this),"baseline","[I"))==NULL ){
-			fprintf(stderr,"GetFieldID for baseline failed");
-			return;
 	}
 
 	if((gainFieldID = (*env)->GetFieldID(env,
@@ -58,9 +83,31 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
 	(*env)->SetDoubleField(env,this,gainFieldID,gain);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
+	jint foo=1;
 
-	result = (jintArray)env->GetObjectField(this,baselineFieldID);
+	for(n=0;n<nsig;n++){
+		fprintf(stderr,"Writing: baseline[%u]=%u\n\n",n,baseline[n]);
+		jbool= (*env)->CallObjectMethod(*env, intArr, mid_add,
+				(*env)->NewObject(*env,clsInteger,IntMethodID,3));
+		if (jbool == NULL) exit(2);
+	}
+
+	/* To consider:
+	 * result = (jintArray)env->GetObjectField(this,baselineFieldID);
 	(*env)->SetIntArrayField(env,this,baselineFieldID,baseline);
+	 *
+	 *   jint len = (*env)->GetArrayLength(env, arr1);
+  	  jbyte *a1 = (*env)->GetPrimitiveArrayCritical(env, arr1, 0);
+  	  jbyte *a2 = (*env)->GetPrimitiveArrayCritical(env, arr2, 0);
+  	  if (a1 == NULL || a2 == NULL) {
+  	     fprintf(stderr,"Cannot allocate memory for Java array");
+     	 exit(2);
+  	  }
+  memcpy(a1, a2, len);
+  (*env)->ReleasePrimitiveArrayCritical(env, arr2, a2, 0);
+  (*env)->ReleasePrimitiveArrayCritical(env, arr1, a1, 0);
+
+	 */
 
 	//Clean up
 	free(baseline);
@@ -238,7 +285,11 @@ void getData(){
 	fs = sampfreq(NULL); //Get sampling frequency  in Hz
 
 	//Get information from all signals
-	baseline=new int[nsig];
+	if ( (baseline= malloc(nsig * sizeof(int)) ) == NULL) {
+			fprintf(stderr,"Unable to allocate enough memory for signal information!");
+			exit(2);
+	}
+
 	for (i = 0; i < nsig; i++){
 		baseline[i]=info[sig[i]].baseline;
 		//gain=info[sig[i]].gain;
