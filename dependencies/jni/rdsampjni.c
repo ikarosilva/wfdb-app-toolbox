@@ -23,91 +23,74 @@ double gain=0;
 int nsig=0;
 jintArray data;
 
+void getData(void);
 //To get field signatures, run
 // javap -classpath ../../bin/ -s -p org.physionet.wfdb.jni.Rdsamp
 
 JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
 	jfieldID NFieldID, gainFieldID, fsFieldID;
-	jmethodID mid_init, mid_add, IntMethodID;
-	jclass arrayClass;
+	jmethodID setBaseline;
 	jintArray intArr;
-	jboolean jbool;
-	int n;
-	jclass clsInteger = (*env)->FindClass(env,"Ljava/lang/Integer;");
-	IntMethodID = (*env)->GetMethodID(env,clsInteger, "<init>", "(Ljava/lang/Integer)V");
-
-	arrayClass = (*env)->FindClass(env, "Ljava/util/ArrayList;");
-	  if (arrayClass == NULL){
-		  fprintf(stderr,"Could not get arrayClass\n");
-		  exit(2);
-	 }
-
-	mid_init =  (*env)->GetMethodID(env, arrayClass, "<init>", "()V");
-	  if (mid_init == NULL){
-		  fprintf(stderr,"Could not get mid_init\n");
-		  exit(2);
-	  }
-
-	intArr = (*env)->NewObject(env, arrayClass, mid_init);
-	  if (intArr == NULL) {
-		  fprintf(stderr,"Could not get intArr\n");
-		  exit(2);
-	  }
-
-	mid_add = (*env)->GetMethodID(env, arrayClass, "add", "(Ljava/lang/Object;)Z");
-	  if (mid_add == NULL) {
-		  fprintf(stderr,"Could not get mid_add\n");
-		  exit(2);
-	  }
+	jclass baselineClass;
+	int n, size=2;
 
 	if((NFieldID = (*env)->GetFieldID(env,
 			(*env)->GetObjectClass(env,this),"nSamples","J"))==NULL ){
 		fprintf(stderr,"GetFieldID for nSamples failed");
-		return;
+		exit(2);
 	}
 
 	if((gainFieldID = (*env)->GetFieldID(env,
 				(*env)->GetObjectClass(env,this),"gain","D"))==NULL ){
 			fprintf(stderr,"GetFieldID for gain failed");
-			return;
+			exit(2);
 	}
 
 	if((fsFieldID = (*env)->GetFieldID(env,
 					(*env)->GetObjectClass(env,this),"fs","D"))==NULL ){
 				fprintf(stderr,"GetFieldID for fs failed");
-				return;
+				exit(2);
 	}
 
+	//Call function linked to WFDB Library to fetch data
 	getData();
+
+	//Allocate space for info array
+	intArr = (*env)->NewIntArray(env,2);
+	if (intArr == NULL) {
+		fprintf(stderr,"Failed to allocate intArr.");
+		exit(2); /* out of memory error thrown */
+	}
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
 	(*env)->SetDoubleField(env,this,gainFieldID,gain);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
-	jint foo=1;
 
 	for(n=0;n<nsig;n++){
-		fprintf(stderr,"Writing: baseline[%u]=%u\n\n",n,baseline[n]);
-		jbool= (*env)->CallObjectMethod(*env, intArr, mid_add,
-				(*env)->NewObject(*env,clsInteger,IntMethodID,3));
-		if (jbool == NULL) exit(2);
+		fprintf(stderr,"Writing: baseline[%u]=%u\n",n,baseline[n]);
 	}
 
-	/* To consider:
-	 * result = (jintArray)env->GetObjectField(this,baselineFieldID);
-	(*env)->SetIntArrayField(env,this,baselineFieldID,baseline);
-	 *
-	 *   jint len = (*env)->GetArrayLength(env, arr1);
-  	  jbyte *a1 = (*env)->GetPrimitiveArrayCritical(env, arr1, 0);
-  	  jbyte *a2 = (*env)->GetPrimitiveArrayCritical(env, arr2, 0);
-  	  if (a1 == NULL || a2 == NULL) {
-  	     fprintf(stderr,"Cannot allocate memory for Java array");
-     	 exit(2);
-  	  }
-  memcpy(a1, a2, len);
-  (*env)->ReleasePrimitiveArrayCritical(env, arr2, a2, 0);
-  (*env)->ReleasePrimitiveArrayCritical(env, arr1, a1, 0);
+	 // fill a temp structure to use to populate the java int array
+	jintArray fill[2];
+	 for (n = 0; n < size; n++) {
+	     fill[n] = 0; // put whatever logic you want to populate the values here.
+	 }
 
-	 */
+	 setBaseline =  (*env)->GetMethodID(env, (*env)->GetObjectClass(env,this)
+			 	 	 	 	 	 	 	 	 	 	 , "setBaseline", "()V");
+	 if(setBaseline ==NULL ){
+	 		 fprintf(stderr,"GetMethodID for setBaseline failed! \n");
+	 		 exit(2);
+	 }
+
+	 // move from the temp structure to the java structure
+	 fprintf(stderr,"Copying data...\n");
+	 (*env)->CallVoidMethod(env,this,setBaseline,fill);
+	 //(*env)->CallVoidMethod(env,this,setBaseline);
+	 //(*env)->SetIntArrayRegion(env,intArr, 0, size, test);
+
+	 fprintf(stderr,"Cleaning up...\n");
+	//(*env)->ReleaseIntArrayElements(env,intArr,fill, 0);
 
 	//Clean up
 	free(baseline);
@@ -274,7 +257,7 @@ void getData(){
 
 	/* Read in the data in raw units */
 	maxl=to-from+1;
-	fprintf(stderr,"creating output matrix for %u signals and %u samples\n",
+	fprintf(stderr,"creating output matrix for %u signals and %ld samples\n",
 			nsig,maxl);
 
 	if ( (data= malloc(maxl * nsig * sizeof(int)) ) == NULL) {
@@ -296,12 +279,12 @@ void getData(){
 	}
 
 	while (( (nSamples<maxl) || (dynamicData==1) ) && getvec(datum) >= 0) {
-		fprintf(stdout,"\n%u:\t",nSamples);
+		fprintf(stdout,"\n%lu:\t",nSamples);
 		for (i = 0; i < nsig; i++){
 			if (nSamples >= maxl) {
 				/*Reallocate memory for records that did not specify number of samples*/
 				maxl +=reallocIncrement;
-				fprintf(stderr,"Reallocating memory for rdsampjni to %u samples\n", to);
+				fprintf(stderr,"Reallocating memory for rdsampjni to %lu samples\n", to);
 				if ((data = realloc(data, maxl * nsig * sizeof(int))) == NULL) {
 					fprintf(stderr,"Unable to allocate enough memory to read record!");
 					free(data);

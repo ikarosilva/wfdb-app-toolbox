@@ -28,7 +28,7 @@ test: librdsampjni.so
 	LD_LIBRARY_PATH=".:$(WFDB_LIB)" java -classpath $(CLASS_PATH) org.physionet.wfdb.jni.Rdsamp
 
 librdsampjni.so : rdsampjni.o
-	gcc -W -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
+	gcc -W -Wignored-qualifiers -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
 	-I"$(WFDB_INCLUDE)" "-L$(WFDB_LIB)" -shared -o librdsampjni.so rdsampjni.c -lwfdb
 
 rdsampjni.o : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
