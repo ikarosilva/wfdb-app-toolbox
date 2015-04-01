@@ -36,8 +36,13 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	jdoubleArray tmpGain;
 	int n;
 
+	//// ******* Create data array parameters that will be used to exchange data*****////
+
+
+
 	//// ******* Call WFDB Library to get Data and signal info   *****////
 	getData();
+
 	if(sig == NULL || info==NULL){
 		fprintf(stderr,"Could not get signal information...aborting!");
 		exit(2);
@@ -296,8 +301,6 @@ void getData(){
 					exit(2);
 				}
 			}
-			//data[nSamples] =( (double) datum[sig[i]] - info[sig[i]].baseline )
-			// 		  / info[sig[i]].gain;
 			fprintf(stdout,"%u\t",datum[sig[i]]);
 		}/* End of Channel loop */
 		nSamples++;
