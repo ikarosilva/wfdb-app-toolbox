@@ -3,8 +3,9 @@ package org.physionet.wfdb.jni;
 public class Rdsamp {
 	long nSamples;
 	int[] baseline;
-	double gain;
+	double[] gain;
 	double fs;
+	int nsig;
 	
 	static {
 		System.loadLibrary("rdsampjni");
@@ -15,14 +16,20 @@ public class Rdsamp {
 		myRdsamp.getData();
 		System.out.println("Samples Read: " + myRdsamp.nSamples);
 		System.out.println("Fs: " + myRdsamp.fs);
-		System.out.println("gain: " + myRdsamp.gain);
-		for(int i=0;i< myRdsamp.baseline.length;i++)
-			System.out.println("baseline[" +i +"] =" + myRdsamp.baseline[i]);
+		System.out.println("nsig: " + myRdsamp.nsig);
+		for(int i=0;i< myRdsamp.nsig;i++){
+			System.out.print("baseline[" +i +"] =" + myRdsamp.baseline[i]);
+			System.out.println("\tgain[" +i +"] =" + myRdsamp.gain[i]);
+		}
 		System.out.println("");
 	}
 	
 	public void setBaseline(int[] newBaseline){
 		baseline=newBaseline;
+	}
+	
+	public void setGain(double[] newGain){
+		gain=newGain;
 	}
 	
 	public native void getData();
@@ -31,7 +38,7 @@ public class Rdsamp {
 		return nSamples;
 	}
 	
-	public double getGain(){
+	public double[] getGain(){
 		return gain;
 	}
 	

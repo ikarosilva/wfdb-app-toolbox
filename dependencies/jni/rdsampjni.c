@@ -18,9 +18,9 @@
 
 long nSamples=0;
 double fs;
-int* baseline;
-double gain=0;
-int nsig=0;
+int nsig;
+WFDB_Siginfo *info;
+int *sig = NULL;
 jintArray data;
 
 void getData(void);
@@ -29,59 +29,94 @@ void getData(void);
 
 JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
-	jfieldID NFieldID, gainFieldID, fsFieldID;
-	jmethodID setBaseline;
 	jobject myRdsamp=(*env)->GetObjectClass(env,this);
+	jfieldID NFieldID, fsFieldID, nsigFieldID; //Single element fields
+	jmethodID setBaseline, setGain;
+	jintArray tmpBaseline;
+	jdoubleArray tmpGain;
 	int n;
 
+	//// ******* Call WFDB Library to get Data and signal info   *****////
+	getData();
+	if(sig == NULL || info==NULL){
+		fprintf(stderr,"Could not get signal information...aborting!");
+		exit(2);
+	}
+
+	//// ******* Set Single Element fields in Java Class   *****////
 	if((NFieldID = (*env)->GetFieldID(env,myRdsamp,"nSamples","J"))==NULL ){
 		fprintf(stderr,"GetFieldID for nSamples failed");
 		exit(2);
 	}
-	if((gainFieldID = (*env)->GetFieldID(env,myRdsamp,"gain","D"))==NULL ){
-			fprintf(stderr,"GetFieldID for gain failed");
+	if((fsFieldID = (*env)->GetFieldID(env,myRdsamp,"fs","D"))==NULL ){
+		fprintf(stderr,"GetFieldID for fs failed");
+		exit(2);
+	}
+	if((nsigFieldID = (*env)->GetFieldID(env,myRdsamp,"nsig","I"))==NULL ){
+			fprintf(stderr,"GetFieldID for nsig failed");
 			exit(2);
 	}
-	if((fsFieldID = (*env)->GetFieldID(env,myRdsamp,"fs","D"))==NULL ){
-				fprintf(stderr,"GetFieldID for fs failed");
-				exit(2);
-	}
-
-	//Call function linked to WFDB Library to fetch data
-	getData();
-
-	//Set single element native fields for the class
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
-	(*env)->SetDoubleField(env,this,gainFieldID,gain);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
+	(*env)->SetIntField(env,this,nsigFieldID,nsig);
 
-	//Set native arrays for the class (using method call approach for now...)
-    setBaseline =  (*env)->GetMethodID(env,myRdsamp, "setBaseline", "([I)V");
-	 if(setBaseline ==NULL ){
-	 		 fprintf(stderr,"GetMethodID for setBaseline failed! \n");
-	 		 exit(2);
-	 }
-	 jintArray tmpBaseline = (*env)->NewIntArray(env,nsig);
-	 if(tmpBaseline ==NULL ){
-		 fprintf(stderr,"Could not allocate space for baseline array! \n");
-		 exit(2);
-	 }
-	 //Copy array contents
-	 jint *baselineArr = (*env)->GetIntArrayElements(env,tmpBaseline,NULL);
-	 for (n = 0; n < nsig; n++) {
-		 baselineArr[n] = baseline[n];
-	 }
-	 //Release array and call method to
-	 (*env)->ReleaseIntArrayElements(env,tmpBaseline,baselineArr,0);
-	 (*env)->CallVoidMethod(env,this,setBaseline,tmpBaseline);
 
-	//Clean up
-	free(baseline);
-	baseline=NULL;
+	//// ******* Set Baseline Array   *****////
+	setBaseline =  (*env)->GetMethodID(env,myRdsamp, "setBaseline", "([I)V");
+	if(setBaseline ==NULL ){
+		fprintf(stderr,"GetMethodID for setBaseline failed! \n");
+		exit(2);
+	}
+	tmpBaseline = (*env)->NewIntArray(env,nsig);
+	if(tmpBaseline ==NULL ){
+		fprintf(stderr,"Could not allocate space for baseline array! \n");
+		exit(2);
+	}
+	//Copy array contents
+	jint *baselineArr = (*env)->GetIntArrayElements(env,tmpBaseline,NULL);
+	for (n = 0; n < nsig; n++) {
+		baselineArr[n] = info[sig[n]].baseline;
+	}
+	//Release array and call method to
+	(*env)->ReleaseIntArrayElements(env,tmpBaseline,baselineArr,0);
+	(*env)->CallVoidMethod(env,this,setBaseline,tmpBaseline);
+
+
+	//// ******* Set Gain Array   *****////
+	setGain =  (*env)->GetMethodID(env,myRdsamp, "setGain", "([D)V");
+	if(setGain ==NULL ){
+		fprintf(stderr,"GetMethodID for setGain failed! \n");
+		exit(2);
+	}
+	tmpGain = (*env)->NewDoubleArray(env,nsig);
+	if(tmpGain ==NULL ){
+		fprintf(stderr,"Could not allocate space for gain array! \n");
+		exit(2);
+	}
+	//Copy array contents
+	jdouble *gainArr = (*env)->GetDoubleArrayElements(env,tmpGain,NULL);
+	for (n = 0; n < nsig; n++) {
+		gainArr[n] = info[sig[n]].gain;
+	}
+	//Release array and call method to
+	(*env)->ReleaseDoubleArrayElements(env,tmpGain,gainArr,0);
+	(*env)->CallVoidMethod(env,this,setGain,tmpGain);
+
+
+
+	//// ******* Clean Up!   *****////
+	free(info);
+	info=NULL;
 	wfdbquit();
 	fprintf(stderr,"Exiting!!\n");
 	return;
+
 }
+
+
+
+
+
 
 //void getData()(int argc, char *argv[]){
 void getData(){
@@ -90,10 +125,8 @@ void getData(){
 	char* pname ="rdsampjni";
 	char *record = NULL, *search = NULL;
 	char *invalid, speriod[16], tustr[16];
-	int  highres = 0, i, isiglist, nosig = 0, s,
-	*sig = NULL;
+	int  highres = 0, i, isiglist, nosig = 0, s;
 	WFDB_Sample *datum;
-	WFDB_Siginfo *info;
 	long from = 0L, to = 0L;
 	int* data;
 	long maxl = 0L;
@@ -230,9 +263,9 @@ void getData(){
 	if( to == 0L){
 		to=strtim("e");
 		if(to == 0){
-		 /* In this case the record has no signal length defined, so we need
-		  * an expandable array
-		  */
+			/* In this case the record has no signal length defined, so we need
+			 * an expandable array
+			 */
 			to=maxSamples;
 			dynamicData=1;
 		}
@@ -249,17 +282,6 @@ void getData(){
 	}
 
 	fs = sampfreq(NULL); //Get sampling frequency  in Hz
-
-	//Get information from all signals
-	if ( (baseline= malloc(nsig * sizeof(int)) ) == NULL) {
-			fprintf(stderr,"Unable to allocate enough memory for signal information!");
-			exit(2);
-	}
-
-	for (i = 0; i < nsig; i++){
-		baseline[i]=info[sig[i]].baseline;
-		//gain=info[sig[i]].gain;
-	}
 
 	while (( (nSamples<maxl) || (dynamicData==1) ) && getvec(datum) >= 0) {
 		fprintf(stdout,"\n%lu:\t",nSamples);
