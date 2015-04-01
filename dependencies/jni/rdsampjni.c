@@ -31,11 +31,9 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 {
 	jfieldID NFieldID, gainFieldID, fsFieldID;
 	jmethodID setBaseline;
-	jintArray intArr;
-	jclass baselineClass;
 	jobject myRdsamp=(*env)->GetObjectClass(env,this);
+	int n;
 
-	int n, size=2;
 	if((NFieldID = (*env)->GetFieldID(env,myRdsamp,"nSamples","J"))==NULL ){
 		fprintf(stderr,"GetFieldID for nSamples failed");
 		exit(2);
@@ -52,35 +50,30 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	//Call function linked to WFDB Library to fetch data
 	getData();
 
-	//Allocate space for info array
-	intArr = (*env)->NewIntArray(env,2);
-	if (intArr == NULL) {
-		fprintf(stderr,"Failed to allocate intArr.");
-		exit(2); /* out of memory error thrown */
-	}
+	//Set single element native fields for the class
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
 	(*env)->SetDoubleField(env,this,gainFieldID,gain);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
+
+	//Set native arrays for the class (using method call approach for now...)
     setBaseline =  (*env)->GetMethodID(env,myRdsamp, "setBaseline", "([I)V");
 	 if(setBaseline ==NULL ){
 	 		 fprintf(stderr,"GetMethodID for setBaseline failed! \n");
 	 		 exit(2);
 	 }
-
-	 jintArray fill = (*env)->NewIntArray(env,size);
-	 if(fill ==NULL ){
-		 fprintf(stderr,"Could not allocate space for fill array! \n");
+	 jintArray tmpBaseline = (*env)->NewIntArray(env,nsig);
+	 if(tmpBaseline ==NULL ){
+		 fprintf(stderr,"Could not allocate space for baseline array! \n");
 		 exit(2);
 	 }
-
 	 //Copy array contents
-	 jint *narr = (*env)->GetIntArrayElements(env,fill,NULL);
-	 for (n = 0; n < size; n++) {
-		 narr[n] = baseline[n];
+	 jint *baselineArr = (*env)->GetIntArrayElements(env,tmpBaseline,NULL);
+	 for (n = 0; n < nsig; n++) {
+		 baselineArr[n] = baseline[n];
 	 }
 	 //Release array and call method to
-	 (*env)->ReleaseIntArrayElements(env,fill,narr,0);
-	 (*env)->CallVoidMethod(env,this,setBaseline,fill);
+	 (*env)->ReleaseIntArrayElements(env,tmpBaseline,baselineArr,0);
+	 (*env)->CallVoidMethod(env,this,setBaseline,tmpBaseline);
 
 	//Clean up
 	free(baseline);
