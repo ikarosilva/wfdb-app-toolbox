@@ -30,25 +30,21 @@ void getData(void);
 JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
 	jfieldID NFieldID, gainFieldID, fsFieldID;
-	jmethodID setBaseline, getFoo;
+	jmethodID setBaseline;
 	jintArray intArr;
 	jclass baselineClass;
-	int n, size=2;
+	jobject myRdsamp=(*env)->GetObjectClass(env,this);
 
-	if((NFieldID = (*env)->GetFieldID(env,
-			(*env)->GetObjectClass(env,this),"nSamples","J"))==NULL ){
+	int n, size=2;
+	if((NFieldID = (*env)->GetFieldID(env,myRdsamp,"nSamples","J"))==NULL ){
 		fprintf(stderr,"GetFieldID for nSamples failed");
 		exit(2);
 	}
-
-	if((gainFieldID = (*env)->GetFieldID(env,
-				(*env)->GetObjectClass(env,this),"gain","D"))==NULL ){
+	if((gainFieldID = (*env)->GetFieldID(env,myRdsamp,"gain","D"))==NULL ){
 			fprintf(stderr,"GetFieldID for gain failed");
 			exit(2);
 	}
-
-	if((fsFieldID = (*env)->GetFieldID(env,
-					(*env)->GetObjectClass(env,this),"fs","D"))==NULL ){
+	if((fsFieldID = (*env)->GetFieldID(env,myRdsamp,"fs","D"))==NULL ){
 				fprintf(stderr,"GetFieldID for fs failed");
 				exit(2);
 	}
@@ -65,59 +61,47 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
 	(*env)->SetDoubleField(env,this,gainFieldID,gain);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
-
-	for(n=0;n<nsig;n++){
-		fprintf(stderr,"Writing: baseline[%u]=%u\n",n,baseline[n]);
-	}
-
-	 // fill a temp structure to use to populate the java int array
-	//jintArray fill;
-	/*
-	for (n = 0; n < size; n++) {
-	     fill[n] = 3; // put whatever logic you want to populate the values here.
-	 }
-	 */
-
-	 setBaseline =  (*env)->GetMethodID(env, (*env)->GetObjectClass(env,this)
-			 	 	 	 	 	 	 	 	 	 	 , "setBaseline", "([I)V");
+    setBaseline =  (*env)->GetMethodID(env,myRdsamp, "setBaseline", "([I)V");
 	 if(setBaseline ==NULL ){
 	 		 fprintf(stderr,"GetMethodID for setBaseline failed! \n");
 	 		 exit(2);
 	 }
 
-	 getFoo =  (*env)->GetMethodID(env, (*env)->GetObjectClass(env,this)
-			 , "getFoo", "()[I");
-	 if(setBaseline ==NULL ){
-		 fprintf(stderr,"GetMethodID for getFoo failed! \n");
+	 fprintf(stderr,"creating new array \n");
+	 jintArray fill;
+	 jfieldID arrg=(*env)->GetFieldID(env,myRdsamp,"foo","[I");
+	 if(arrg ==NULL ){
+	 		 fprintf(stderr,"Could not allocate arrg! \n");
+	 		 exit(2);
+	 	 }
+	 fill=(*env)->GetObjectField(env,this,arrg);
+	 //fill = (*env)->NewIntArray(env,size);
+	 if(fill ==NULL ){
+		 fprintf(stderr,"Could not allocate space for fill array! \n");
 		 exit(2);
 	 }
-
-	 jintArray retval = (jintArray) (*env)->CallObjectMethod(env,this,getFoo);
-	 if(retval == NULL){
-		 fprintf(stderr,"Execution of getFoo failed! \n");
-		 exit(2);
+	 /*
+	 fprintf(stderr,"getting new array pointer \n");
+	 jint *narr = (*env)->GetIntArrayElements(env,fill,NULL);
+	 fprintf(stderr,"filling array \n");
+	 for (n = 0; n < size; n++) {
+		 fprintf(stderr,"Writing: narr[%u]=%u\n",n,baseline[n]);
+		 //narr[n] = baseline[n];
 	 }
-	 jint *ptr = (*env)->GetIntArrayElements(env,retval, 0);
-	 fprintf(stderr,"Got array pointer \n");
-	 for (n = 0; n < 2; n++) {
-		 fprintf(stderr,"C: ret[%d]=%d\n",n,*(ptr + n));
-	 }
-	 (*env)->ReleaseIntArrayElements(env,retval,ptr,NULL);
+	 (*env)->ReleaseIntArrayElements(env,fill,narr,0);
+	 */
 
-	 // move from the temp structure to the java structure
-	 fprintf(stderr,"Calling setBaseline method from C \n");
-	 (*env)->CallVoidMethod(env,(*env)->GetObjectClass(env,this),setBaseline,retval);
-	 //(*env)->CallVoidMethod(env,this,setBaseline);
-	 //(*env)->SetIntArrayRegion(env,intArr, 0, size, test);
+	 fprintf(stderr,"done filling array \n");
+	 (*env)->CallVoidMethod(env,this,setBaseline,fill);
 
 	 fprintf(stderr,"Cleaning up...\n");
-	//(*env)->ReleaseIntArrayElements(env,intArr,fill, 0);
+
 
 	//Clean up
 	free(baseline);
 	baseline=NULL;
 	wfdbquit();
-
+	fprintf(stderr,"Exiting!!\n");
 	return;
 }
 
