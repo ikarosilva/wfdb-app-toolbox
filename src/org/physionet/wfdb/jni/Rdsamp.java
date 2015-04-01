@@ -16,15 +16,18 @@ public class Rdsamp {
 		System.out.println("Samples Read: " + myRdsamp.nSamples);
 		System.out.println("Fs: " + myRdsamp.fs);
 		System.out.println("gain: " + myRdsamp.gain);
-		System.out.println("updated length baseline is: " + myRdsamp.baseline.length);
 		for(int i=0;i< myRdsamp.baseline.length;i++)
 			System.out.println("baseline[" +i +"] =" + myRdsamp.baseline[i]);
+		System.out.println("");
 	}
 	
-	public void setBaseline(){
-		int[] newBaseline={1, 3};
-		System.out.println("Setting baseline.");
-		System.out.println("Baseline length="  + newBaseline.length);
+	public int[] getFoo(){
+		int[] foo={1,3};
+		return foo;
+	}
+	
+	public void setBaseline(int[] newBaseline){
+		System.out.println("new baseline length="  + newBaseline.length);
 		baseline=newBaseline;
 		System.out.println("New baseline is: " + baseline.length);
 	}

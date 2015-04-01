@@ -30,7 +30,7 @@ void getData(void);
 JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
 {
 	jfieldID NFieldID, gainFieldID, fsFieldID;
-	jmethodID setBaseline;
+	jmethodID setBaseline, getFoo;
 	jintArray intArr;
 	jclass baselineClass;
 	int n, size=2;
@@ -71,21 +71,42 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	}
 
 	 // fill a temp structure to use to populate the java int array
-	jintArray fill[2];
-	 for (n = 0; n < size; n++) {
-	     fill[n] = 0; // put whatever logic you want to populate the values here.
+	//jintArray fill;
+	/*
+	for (n = 0; n < size; n++) {
+	     fill[n] = 3; // put whatever logic you want to populate the values here.
 	 }
+	 */
 
 	 setBaseline =  (*env)->GetMethodID(env, (*env)->GetObjectClass(env,this)
-			 	 	 	 	 	 	 	 	 	 	 , "setBaseline", "()V");
+			 	 	 	 	 	 	 	 	 	 	 , "setBaseline", "([I)V");
 	 if(setBaseline ==NULL ){
 	 		 fprintf(stderr,"GetMethodID for setBaseline failed! \n");
 	 		 exit(2);
 	 }
 
+	 getFoo =  (*env)->GetMethodID(env, (*env)->GetObjectClass(env,this)
+			 , "getFoo", "()[I");
+	 if(setBaseline ==NULL ){
+		 fprintf(stderr,"GetMethodID for getFoo failed! \n");
+		 exit(2);
+	 }
+
+	 jintArray retval = (jintArray) (*env)->CallObjectMethod(env,this,getFoo);
+	 if(retval == NULL){
+		 fprintf(stderr,"Execution of getFoo failed! \n");
+		 exit(2);
+	 }
+	 jint *ptr = (*env)->GetIntArrayElements(env,retval, 0);
+	 fprintf(stderr,"Got array pointer \n");
+	 for (n = 0; n < 2; n++) {
+		 fprintf(stderr,"C: ret[%d]=%d\n",n,*(ptr + n));
+	 }
+	 (*env)->ReleaseIntArrayElements(env,retval,ptr,NULL);
+
 	 // move from the temp structure to the java structure
-	 fprintf(stderr,"Copying data...\n");
-	 (*env)->CallVoidMethod(env,this,setBaseline,fill);
+	 fprintf(stderr,"Calling setBaseline method from C \n");
+	 (*env)->CallVoidMethod(env,(*env)->GetObjectClass(env,this),setBaseline,retval);
 	 //(*env)->CallVoidMethod(env,this,setBaseline);
 	 //(*env)->SetIntArrayRegion(env,intArr, 0, size, test);
 
@@ -296,5 +317,6 @@ void getData(){
 			fprintf(stdout,"%u\t",datum[sig[i]]);
 		}/* End of Channel loop */
 		nSamples++;
-	}
+	}/* End of data array loop */
+	fprintf(stdout,"\n");
 }
