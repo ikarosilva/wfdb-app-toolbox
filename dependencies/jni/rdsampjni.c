@@ -67,35 +67,20 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	 		 exit(2);
 	 }
 
-	 fprintf(stderr,"creating new array \n");
-	 jintArray fill;
-	 jfieldID arrg=(*env)->GetFieldID(env,myRdsamp,"foo","[I");
-	 if(arrg ==NULL ){
-	 		 fprintf(stderr,"Could not allocate arrg! \n");
-	 		 exit(2);
-	 	 }
-	 fill=(*env)->GetObjectField(env,this,arrg);
-	 //fill = (*env)->NewIntArray(env,size);
+	 jintArray fill = (*env)->NewIntArray(env,size);
 	 if(fill ==NULL ){
 		 fprintf(stderr,"Could not allocate space for fill array! \n");
 		 exit(2);
 	 }
-	 /*
-	 fprintf(stderr,"getting new array pointer \n");
+
+	 //Copy array contents
 	 jint *narr = (*env)->GetIntArrayElements(env,fill,NULL);
-	 fprintf(stderr,"filling array \n");
 	 for (n = 0; n < size; n++) {
-		 fprintf(stderr,"Writing: narr[%u]=%u\n",n,baseline[n]);
-		 //narr[n] = baseline[n];
+		 narr[n] = baseline[n];
 	 }
+	 //Release array and call method to
 	 (*env)->ReleaseIntArrayElements(env,fill,narr,0);
-	 */
-
-	 fprintf(stderr,"done filling array \n");
 	 (*env)->CallVoidMethod(env,this,setBaseline,fill);
-
-	 fprintf(stderr,"Cleaning up...\n");
-
 
 	//Clean up
 	free(baseline);

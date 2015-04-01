@@ -5,7 +5,6 @@ public class Rdsamp {
 	int[] baseline;
 	double gain;
 	double fs;
-	int[] foo={1,3};
 	
 	static {
 		System.loadLibrary("rdsampjni");
@@ -23,10 +22,7 @@ public class Rdsamp {
 	}
 	
 	public void setBaseline(int[] newBaseline){
-		System.out.println("In Java:setBaseline");
-		System.out.println("new baseline length="  + newBaseline.length);
 		baseline=newBaseline;
-		System.out.println("New baseline is: " + baseline.length);
 	}
 	
 	public native void getData();
