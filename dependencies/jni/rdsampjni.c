@@ -21,7 +21,7 @@ double fs;
 int nsig;
 WFDB_Siginfo *info;
 int *sig = NULL;
-jintArray data;
+int* data;
 
 void getData(void);
 //To get field signatures, run
@@ -31,17 +31,39 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 {
 	jobject myRdsamp=(*env)->GetObjectClass(env,this);
 	jfieldID NFieldID, fsFieldID, nsigFieldID; //Single element fields
-	jmethodID setBaseline, setGain;
-	jintArray tmpBaseline;
+	jmethodID setBaseline, setGain, setData;
+	jintArray tmpBaseline, tmpData;
 	jdoubleArray tmpGain;
 	int n;
 
-	//// ******* Create data array parameters that will be used to exchange data*****////
-
-
-
 	//// ******* Call WFDB Library to get Data and signal info   *****////
 	getData();
+
+	//// ******* Create data array parameters that will be used to exchange data*****////
+	/// Assumptions: Multichannel data is interleaved !!
+	setData =  (*env)->GetMethodID(env,myRdsamp, "setRawData", "([I)V");
+	if(setData ==NULL ){
+		fprintf(stderr,"GetMethodID for setRawData failed! \n");
+		exit(2);
+	}
+	int N=nsig*nSamples; //interleaved data -> N= nsig*nSamples
+	tmpData = (*env)->NewIntArray(env,N);
+	if(tmpData ==NULL ){
+		fprintf(stderr,"Could not allocate space for Java data array! \n");
+		exit(2);
+	}
+	//Copy array contents
+	jint *dataArr = (*env)->GetIntArrayElements(env,tmpData,NULL);
+	for (n = 0; n < N; n++) {
+		dataArr[n] = data[n];
+	}
+	//Release array and call method to
+	(*env)->ReleaseIntArrayElements(env,tmpData,dataArr,0);
+	(*env)->CallVoidMethod(env,this,setData,tmpData);
+	//Release WFDB data
+	free(data);
+	data=NULL;
+
 
 	if(sig == NULL || info==NULL){
 		fprintf(stderr,"Could not get signal information...aborting!");
@@ -66,6 +88,7 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	(*env)->SetIntField(env,this,nsigFieldID,nsig);
 
 
+
 	//// ******* Set Baseline Array   *****////
 	setBaseline =  (*env)->GetMethodID(env,myRdsamp, "setBaseline", "([I)V");
 	if(setBaseline ==NULL ){
@@ -85,6 +108,7 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	//Release array and call method to
 	(*env)->ReleaseIntArrayElements(env,tmpBaseline,baselineArr,0);
 	(*env)->CallVoidMethod(env,this,setBaseline,tmpBaseline);
+
 
 
 	//// ******* Set Gain Array   *****////
@@ -121,8 +145,6 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 
 
 
-
-
 //void getData()(int argc, char *argv[]){
 void getData(){
 	char *argv[]={"-r","mitdb/100","-t","20"};
@@ -133,7 +155,6 @@ void getData(){
 	int  highres = 0, i, isiglist, nosig = 0, s;
 	WFDB_Sample *datum;
 	long from = 0L, to = 0L;
-	int* data;
 	long maxl = 0L;
 	long maxSamples =10000;
 	long reallocIncrement= 1000000;   // For records with no specified lenght
@@ -301,7 +322,9 @@ void getData(){
 					exit(2);
 				}
 			}
-			fprintf(stdout,"%u\t",datum[sig[i]]);
+			//Get interleaved data
+			data[(nSamples*nsig)+i]=datum[sig[i]];
+			fprintf(stdout,"%lu\ti=%u\t",data[(nSamples/nsig)+i],(nSamples*nsig)+i);
 		}/* End of Channel loop */
 		nSamples++;
 	}/* End of data array loop */

@@ -40,6 +40,9 @@ public class Rdsamp {
 			System.out.println("\tgain[" +i +"] =" + gain[i]);
 		}
 		System.out.println("");
+		for(int i=0;i< rawData.length;i++){
+			System.out.println("data[" +i +"] =" + rawData[i]);
+		}
 	}
 	
 	public int[] getRawData(){
