@@ -171,8 +171,8 @@ void getData(int argc, char *argv[]){
 	WFDB_Sample *datum;
 	long from = 0L, to = 0L;
 	long maxl = 0L;
-	long maxSamples =10000;
-	long reallocIncrement= 1000000;   // For records with no specified lenght
+	long maxSamples =325000;
+	long reallocIncrement=2*325000;   // For records with no specified length
 	int dynamicData=0;              // allow the input buffer to grow (the increment is arbitrary)
 
 	for(i = 0 ; i < argc; i++){

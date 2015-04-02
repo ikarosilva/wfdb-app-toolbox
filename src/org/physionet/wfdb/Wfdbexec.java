@@ -54,6 +54,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.physionet.wfdb.jni.Rdsamp;
+
 public class Wfdbexec {
 
 	private String commandName;
@@ -1088,7 +1090,7 @@ public class Wfdbexec {
 
 		Logger.getLogger("org.physionet").setLevel(debugLevel);
 	}
-
+	
 	public static void main(String[] args) throws Exception {
 
 		Level debugLevel = Level.FINEST;//use for debugging Level.FINEST;

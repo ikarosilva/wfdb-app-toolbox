@@ -32,8 +32,8 @@ public class SystemSettings {
 			//Do nothing for now
 		}else{
 			//Default to Linux
-			System.loadLibrary(SystemSettings.getWFDB_NATIVE_BIN(false) 
-					+ "\\lib64\\" + "rdsampjni");
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+					+ "/lib64/lib" + libName + ".so");
 		}
 	}
 

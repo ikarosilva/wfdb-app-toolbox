@@ -18,17 +18,26 @@ public class Rdsamp {
 	double fs;
 	int nsig;
 	int[] rawData;
+	String recordName;
 	
+	//Initialize enviroment
 	static {
-		System.loadLibrary("rdsampjni");
+		org.physionet.wfdb.SystemSettings.loadLib("wfdb");
+		org.physionet.wfdb.SystemSettings.loadLib("rdsampjni");
 	}
 	
-	public static void main(String[] args) {
-		String[] newArgs={"-r","mitdb/100","-t","20"};
+	public static void main(String[] args){
 		Rdsamp myRdsamp=new Rdsamp();
-		myRdsamp.readData(newArgs);
-		//Done with the class, release memory for the GC
-		myRdsamp=null; 
+		myRdsamp.readData(args);
+		for(int i=0;i<myRdsamp.rawData.length;i++)
+			System.out.println(myRdsamp.rawData[i]);
+		myRdsamp=null;
+	}
+	
+	public static int[] exec(String[] args) {
+		Rdsamp myRdsamp=new Rdsamp();
+		myRdsamp.readData(args);
+		return myRdsamp.rawData;
 	}
 
 	//Utility functions, not be be used by other classes
@@ -43,27 +52,14 @@ public class Rdsamp {
 	private void setRawData(int[] newRawData){
 		rawData=newRawData;
 	}
-	
-	//Public interface
-	public void readData(String[] newArgs){
-		getData(newArgs);
-		System.out.println("Samples Read: " + nSamples);
-		System.out.println("Fs: " + fs);
-		System.out.println("nsig: " + nsig);
-		for(int i=0;i< nsig;i++){
-			System.out.print("baseline[" +i +"] =" + baseline[i]);
-			System.out.println("\tgain[" +i +"] =" + gain[i]);
-		}
-		System.out.println("");
-		/*
-		for(int i=0;i< rawData.length;i++){
-			System.out.println("data[" +i +"] =" + rawData[i]);
-		}
-		*/
+	private void setRecordName(String recName){
+		recordName=recName;
 	}
 	
-	public int[] getRawData(){
-		return rawData;
+	//Public interface
+	public void readData(String[] args){
+		setRecordName(args[1]);
+		getData(args);
 	}
 	
 	public int[] getBaseline(){
@@ -82,5 +78,19 @@ public class Rdsamp {
 		return gain;
 	}
 	
+	public String getRecordName(){
+		return recordName;
+	}
+	
+	public void reset(){
+		
+		nSamples=-1;
+		fs=-1;
+		baseline=null;
+		nsig=-1;
+		gain=null;
+		rawData=null;
+		recordName=null;
+	}
 	
 }
