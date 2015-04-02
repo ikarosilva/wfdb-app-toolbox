@@ -3,28 +3,9 @@ package org.physionet.wfdb;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.security.CodeSource;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public class SystemSettings {
-
-	private final static Logger logger = Logger.getLogger(Wfdbexec.class.getName());
-	public final static boolean inJar= detectJar();
-
-	private static boolean detectJar(){
-		boolean isJar=true;
-		try
-		{
-			CodeSource cs = SystemSettings.class.getProtectionDomain().getCodeSource();
-			isJar = cs.getLocation().toURI().getPath().endsWith(".jar");
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return isJar;
-	}
 
 	public static void loadCurl(Boolean customArch){
 
@@ -38,15 +19,25 @@ public class SystemSettings {
 			SecurityManager security = System.getSecurityManager();
 			if(security != null){
 				security.checkLink(libCurlName);
-				logger.finest("security manager is null! ");
 			}
-			logger.finest("\n\t***Loading Curl from: " + libCurlName);
 			System.load(libCurlName);
-			//System.loadLibrary("curl.4");
 		}
 
 	}
+	
+	public static void loadLib(String libName){
+		if(getOsName().contains("windows")){
+			//Do nothing for now
+		}else if(getOsName().contains("mac")){
+			//Do nothing for now
+		}else{
+			//Default to Linux
+			System.loadLibrary(SystemSettings.getWFDB_NATIVE_BIN(false) 
+					+ "\\lib64\\" + "rdsampjni");
+		}
+	}
 
+	
 	public static String getPhysioNetDBURL(){
 		return "http://physionet.org/physiobank/database";
 	}
@@ -113,7 +104,6 @@ public class SystemSettings {
 			//Only add if path is not present already
 			LD_PATH=tmp+pathSep+LD_PATH;
 		}
-		logger.finest("\n\t***Default Library " + OsPathName +" is: " + LD_PATH);
 		return LD_PATH;
 	}
 
@@ -144,20 +134,10 @@ public class SystemSettings {
 		if(customArchFlag){
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + "custom"+ getFileSeparator();
 		}else{
-			if(inJar){
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
 			getOsName().toLowerCase()+ getFileSeparator() ;
-			}else{
-				//In case we are running from Eclipse or another IDE without compiling the JAR
-				WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "mcode" + getFileSeparator()+ 
-				"nativelibs" + getFileSeparator() + getOsName().toLowerCase()+ getFileSeparator() ;
-			}
 		}
 		return WFDB_NATIVE_BIN;
-	}
-
-	public static void main(String[] args) throws Exception {
-		System.out.println(getWFDB_NATIVE_BIN(false));
 	}
 
 }
