@@ -5,9 +5,13 @@
  *The modification are done in order to make it compatible and
  *efficient when called through JNI.
  *
- *Create by Ikaro Silva 2015
+ *Created by Ikaro Silva 2015
  *
  *
+
+To get field signatures for the JNI API, run
+ javap -classpath ../../bin/ -s -p org.physionet.wfdb.jni.Rdsamp
+
  */
 
 #include <jni.h>
@@ -20,24 +24,38 @@ long nSamples=0;
 double fs;
 int nsig;
 WFDB_Siginfo *info;
-int *sig = NULL;
+int* sig = NULL;
 int* data;
 
-void getData(void);
-//To get field signatures, run
-// javap -classpath ../../bin/ -s -p org.physionet.wfdb.jni.Rdsamp
+void getData(int argc, char *argv[]);
 
-JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this)
+JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, jobject this, jobjectArray Args)
 {
 	jobject myRdsamp=(*env)->GetObjectClass(env,this);
-	jfieldID NFieldID, fsFieldID, nsigFieldID; //Single element fields
+	jfieldID NFieldID, fsFieldID, nsigFieldID, argsField; //Single element fields
 	jmethodID setBaseline, setGain, setData;
 	jintArray tmpBaseline, tmpData;
 	jdoubleArray tmpGain;
-	int n;
+	int n; // temporary Loop counter variable
+
+	//// ******* Parse arguments   *****////
+	int argc = (*env)->GetArrayLength(env,Args);
+	jstring str[argc];
+	char* argv[argc];
+	for (n=0; n<argc; n++) {
+		str[n] = (jstring) (*env)->GetObjectArrayElement(env, Args, n);
+		argv[n] = (*env)->GetStringUTFChars(env, str[n], 0);
+		// Don't forget to call `ReleaseStringUTFChars` when you're done.
+	}
 
 	//// ******* Call WFDB Library to get Data and signal info   *****////
-	getData();
+	getData(argc, argv);
+
+	//Release argument strings
+	for (n=0; n<argc; n++) {
+		(*env)->ReleaseStringUTFChars(env,str[n],argv[n]);
+	}
+
 
 	//// ******* Create data array parameters that will be used to exchange data*****////
 	/// Assumptions: Multichannel data is interleaved !!
@@ -80,8 +98,8 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 		exit(2);
 	}
 	if((nsigFieldID = (*env)->GetFieldID(env,myRdsamp,"nsig","I"))==NULL ){
-			fprintf(stderr,"GetFieldID for nsig failed");
-			exit(2);
+		fprintf(stderr,"GetFieldID for nsig failed");
+		exit(2);
 	}
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
@@ -136,19 +154,16 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	//// ******* Clean Up!   *****////
 	free(info);
 	info=NULL;
+	free(sig);
+	sig=NULL;
 	wfdbquit();
-	fprintf(stderr,"Exiting!!\n");
 	return;
 
 }
 
 
 
-
-//void getData()(int argc, char *argv[]){
-void getData(){
-	char *argv[]={"-r","mitdb/100","-t","20"};
-	int argc=4;
+void getData(int argc, char *argv[]){
 	char* pname ="rdsampjni";
 	char *record = NULL, *search = NULL;
 	char *invalid, speriod[16], tustr[16];
@@ -297,20 +312,13 @@ void getData(){
 		}
 	}
 
-	/* Read in the data in raw units */
+	/* Read in the data in raw ( digital ) units */
 	maxl=to-from+1;
-	fprintf(stderr,"creating output matrix for %u signals and %ld samples\n",
-			nsig,maxl);
-
 	if ( (data= malloc(maxl * nsig * sizeof(int)) ) == NULL) {
 		fprintf(stderr,"Unable to allocate enough memory to read record!");
 		exit(2);
 	}
-
-	fs = sampfreq(NULL); //Get sampling frequency  in Hz
-
 	while (( (nSamples<maxl) || (dynamicData==1) ) && getvec(datum) >= 0) {
-		fprintf(stdout,"\n%lu:\t",nSamples);
 		for (i = 0; i < nsig; i++){
 			if (nSamples >= maxl) {
 				/*Reallocate memory for records that did not specify number of samples*/
@@ -324,9 +332,7 @@ void getData(){
 			}
 			//Get interleaved data
 			data[(nSamples*nsig)+i]=datum[sig[i]];
-			fprintf(stdout,"%lu\ti=%u\t",data[(nSamples/nsig)+i],(nSamples*nsig)+i);
 		}/* End of Channel loop */
 		nSamples++;
 	}/* End of data array loop */
-	fprintf(stdout,"\n");
 }

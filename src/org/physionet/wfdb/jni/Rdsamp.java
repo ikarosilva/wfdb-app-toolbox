@@ -1,3 +1,14 @@
+/* Wrapper to Java Native Interface implementation of rdsamp.c :
+ *
+ *http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
+ *
+ *The modification are done in order to make it compatible and
+ *efficient when called through JNI.
+ *
+ *Created by Ikaro Silva 2015
+ *
+ *
+ */
 package org.physionet.wfdb.jni;
 
 public class Rdsamp {
@@ -13,12 +24,16 @@ public class Rdsamp {
 	}
 	
 	public static void main(String[] args) {
-		Rdsamp myRdsamp = new Rdsamp();
-		myRdsamp.readData();
+		String[] newArgs={"-r","mitdb/100","-t","20"};
+		Rdsamp myRdsamp=new Rdsamp();
+		myRdsamp.readData(newArgs);
+		//Done with the class, release memory for the GC
+		myRdsamp=null; 
 	}
 
 	//Utility functions, not be be used by other classes
-	private native void getData();
+	private native void getData(String[] args);
+	
 	private void setBaseline(int[] newBaseline){
 		baseline=newBaseline;
 	}
@@ -30,8 +45,8 @@ public class Rdsamp {
 	}
 	
 	//Public interface
-	public void readData(){
-		getData();
+	public void readData(String[] newArgs){
+		getData(newArgs);
 		System.out.println("Samples Read: " + nSamples);
 		System.out.println("Fs: " + fs);
 		System.out.println("nsig: " + nsig);
@@ -40,9 +55,11 @@ public class Rdsamp {
 			System.out.println("\tgain[" +i +"] =" + gain[i]);
 		}
 		System.out.println("");
+		/*
 		for(int i=0;i< rawData.length;i++){
 			System.out.println("data[" +i +"] =" + rawData[i]);
 		}
+		*/
 	}
 	
 	public int[] getRawData(){
