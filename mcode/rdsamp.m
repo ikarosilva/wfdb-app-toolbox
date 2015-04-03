@@ -194,6 +194,7 @@ switch rawUnits
             data=double(javaWfdbRdsamp.exec(wfdb_argument));
         catch
             javaWfdbRdsamp.reset();%Free JNI resources    
+            error(['Could not find record: ' recordName '. Search path is set to: ''' config.WFDB_PATH '''']); 
         end
         if(isempty(data))
            error(['Could not find record: ' recordName '. Search path is set to: ''' config.WFDB_PATH '''']); 

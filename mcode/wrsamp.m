@@ -48,12 +48,12 @@ function varargout=wrsamp(varargin)
 %
 %%Example- 
 %%Read signal in raw units
-%[tm, signal]=rdsamp('challenge/2013/set-a/a01',[],[],[],1);
+%[signal,Fs,tm]=rdsamp('challenge/2013/set-a/a01',[],[],[],1);
 %[siginfo,Fs]=wfdbdesc('challenge/2013/set-a/a01');
 %%Write a copy to file
 %wrsamp(tm,signal(:,1),'a01Copy',Fs(1),200,siginfo(1).Format)
 %%Check that the signals match
-%[tm, signalCopy]=rdsamp('a01Copy',[],[],[],1);
+%[signalCopy,Fs,tm]=rdsamp('a01Copy',[],[],[],1);
 %err=sum(signalCopy ~= signal(:,1))
 %
 %

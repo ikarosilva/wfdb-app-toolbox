@@ -45,8 +45,8 @@ function varargout=snip(varargin)
 % %Example- Generate a record from the first minute of mitdb/100
 %  Fs=360;
 %  err=snip('mitdb/100','100cut',[],Fs*60);
-%  [tm1,sig1]=rdsamp('mitdb/100');
-%  [tm2,sig2]=rdsamp('100cut');
+%  [sig2,Fs,tm1]=rdsamp('mitdb/100');
+%  [sig2,Fs,tm2]=rdsamp('100cut');
 %  plot(tm1,sig1(:,1));hold on;grid on
 %  plot(tm2,sig2(:,1),'r')
 %

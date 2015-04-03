@@ -59,7 +59,7 @@ function varargout=lomb(varargin)
 %
 %
 % %Example: Heart Rate Spectral Analysis:
-% [tm, signal]=rdsamp('mitdb/100',1);
+% [signal,Fs,tm]=rdsamp('mitdb/100',1);
 % [ann]=rdann('mitdb/100','atr');
 % [Pxx,F]=lomb([tm(ann) signal(ann)]);
 % plot(F,Pxx);grid on;hold on

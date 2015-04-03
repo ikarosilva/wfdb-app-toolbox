@@ -9,7 +9,7 @@ function wfdbdemo()
 echo on
 display('Reading samples ECG signal from MIT-BIH Arrhythmia Database')
 N=10000;
-[tm,ecg]=rdsamp('mitdb/100',1,N);
+[ecg,Fs,tm]=rdsamp('mitdb/100',1,N);
 
 display('Reading and plotting annotations (human labels) of QRS complexes performend on the signals')
 %by cardiologists.

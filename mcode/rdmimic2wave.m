@@ -215,7 +215,7 @@ if(~isempty(matched_pid))
             if(end_offset <= waveLengthSamples)
                 %Found a match. Get the waveform and exit the the search
                 %Get signal and exit
-                [tm,signal]=rdsamp(recList,[],end_offset,start_offset);
+                [signal,Fs,tm]=rdsamp(recList,[],end_offset,start_offset);
                 break;
             end
         end %of thisDateNum< beginTime

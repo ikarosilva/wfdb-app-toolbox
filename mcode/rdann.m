@@ -82,7 +82,7 @@ function varargout=rdann(varargin)
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
-%[tm, signal]=rdsamp('challenge/2013/set-a/a01');
+%[signal,Fs,tm]=rdsamp('challenge/2013/set-a/a01');
 %[ann]=rdann('challenge/2013/set-a/a01','fqrs');
 %plot(tm,signal(:,1));hold on;grid on
 %plot(tm(ann),signal(ann,1),'ro','MarkerSize',4)

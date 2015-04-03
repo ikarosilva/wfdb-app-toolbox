@@ -54,7 +54,7 @@ function varargout=rdmat(varargin)
 % %Example:
 % wfdb2mat('mitdb/200')
 %tic;[tm,signal,Fs,siginfo]=rdmat('200m');toc
-%tic;[tm2,signal2]=rdsamp('200m');toc
+%tic;[signal2]=rdsamp('200m');toc
 % sum(abs(signal-signal2))
 %
 %

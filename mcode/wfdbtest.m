@@ -107,7 +107,7 @@ fname='a01';
 
 try
     cd(data_dir)
-    [tm, signal]=rdsamp(fname,[],sampleLength);
+    [signal,Fs,tm]=rdsamp(fname,[],sampleLength);
     if(length(tm) ~= sampleLength)
         warning( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
     end
@@ -119,7 +119,7 @@ catch
             display(['addpath(''' cur_dir ''')']);
         end
     end
-    str=['cd(' data_dir ');[tm, signal]=rdsamp(' fname ',[],' num2str(sampleLength) ');'];
+    str=['cd(' data_dir ');[signal,Fs,tm]=rdsamp(' fname ',[],' num2str(sampleLength) ');'];
     if(verbose)
         warning(['Failed running: ' str]);
     end
@@ -177,9 +177,9 @@ try
     if(~isempty(recExist))
         warning('Cannot test because record already exists in current directory. Delete record and repeat.')
     end
-    [tm, ~]=rdsamp('mghdb/mgh001', [1],sampleLength);
-    if(length(tm) ~= sampleLength)
-        warning( ['Incomplete data! tm is ' num2str(length(tm))  ', expected: ' num2str(sampleLength)]);
+    [signal]=rdsamp('mghdb/mgh001',[1],sampleLength);
+    if(length(signal) ~= sampleLength)
+        warning( ['Incomplete data! tm is ' num2str(length(signal))  ', expected: ' num2str(sampleLength)]);
     end
 catch
     if(verbose)
