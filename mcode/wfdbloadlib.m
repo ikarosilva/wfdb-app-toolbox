@@ -143,8 +143,7 @@ if(isempty(config))
         
         %Define WFDB Environment variables
         if(isempty(WFDB_PATH))
-            %WFDB_PATH=['. ' 'file:// ' config.MATLAB_PATH 'database http://physionet.org/physiobank/database/'];
-            WFDB_PATH=['.'];
+            WFDB_PATH=['. ' 'http://physionet.org/physiobank/database/'];
         end
         if(isempty(WFDBCAL))
             WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];

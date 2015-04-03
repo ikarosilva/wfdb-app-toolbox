@@ -189,11 +189,13 @@ switch rawUnits
     case 0
         %Use Java Native Interface wrapper
         try
-            signal=javaWfdbRdsamp.exec(wfdb_argument);
+            %Channeles are returned in interleaved fashion, in a single
+            %array
+            data=double(javaWfdbRdsamp.exec(wfdb_argument));
         catch
             javaWfdbRdsamp.reset();%Free JNI resources    
         end
-        if(isempty(signal))
+        if(isempty(data))
            error(['Could not find record: ' recordName '. Search path is set to: ''' config.WFDB_PATH '''']); 
         end
         baseline=double(javaWfdbRdsamp.getBaseline);
@@ -202,10 +204,10 @@ switch rawUnits
         N=javaWfdbRdsamp.getNSamples;
         javaWfdbRdsamp.reset();%Free JNI resources
         M=length(baseline);
-        signal=double(reshape(signal,[N M]));
+        signal=zeros(N,M);
         %Convert to Physical units
         for m=1:M
-           signal(:,m)= (signal(:,m)-baseline(m))./gain(m); 
+           signal(:,m)= (data(m:M:end)-baseline(m))./gain(m); 
         end
         if(nargout>2)
             %generate time in seconds
