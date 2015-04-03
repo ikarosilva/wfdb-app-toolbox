@@ -34,8 +34,8 @@ end
 javaWfdbExec=javaObject('org.physionet.wfdb.Wfdbexec',commandName,config.WFDB_CUSTOMLIB);
 javaWfdbExec.setInitialWaitTime(config.NETWORK_WAIT_TIME);
 javaWfdbExec.setLogLevel(config.DEBUG_LEVEL);
-javaWfdbExec.setWFDB_PATH(config.WFDB_PATH);
-javaWfdbExec.setWFDBCAL(config.WFDBCAL);
+%javaWfdbExec.setWFDB_PATH(config.WFDB_PATH);
+%javaWfdbExec.setWFDBCAL(config.WFDBCAL);
 
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])

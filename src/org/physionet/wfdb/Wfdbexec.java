@@ -59,12 +59,12 @@ import org.physionet.wfdb.jni.Rdsamp;
 public class Wfdbexec {
 
 	private String commandName;
-	private static final String fileSeparator=SystemSettings.getFileSeparator();
+	private static final String fsep=SystemSettings.fsep;
 	private static final String osArch= SystemSettings.getosArch();
 	private static final String osName=SystemSettings.getOsName();
 	protected static final String WFDB_JAVA_HOME=SystemSettings.getWFDB_JAVA_HOME();
-	private String WFDB_PATH;
-	private String WFDBCAL;
+	private String WFDB_PATH=null;
+	private String WFDBCAL=null;
 	private List<String> commandInput;
 	protected static Map<String,String> env;
 	protected static File EXECUTING_DIR=null;
@@ -88,12 +88,10 @@ public class Wfdbexec {
 		Wfdbexec.customArchFlag=customArchFlag;
 		setWFDB_NATIVE_BIN(SystemSettings.getWFDB_NATIVE_BIN(customArchFlag));
 		LD_PATH=SystemSettings.getLD_PATH(customArchFlag);
-		WFDB_PATH=SystemSettings.getDefaultWFDBPath(); 
-		WFDBCAL=SystemSettings.getDefaultWFDBCal();
 	}
 
 	public Wfdbexec(String commandName,boolean customArchFlag){
-		this(commandName,SystemSettings.getWFDB_NATIVE_BIN(customArchFlag)+"bin" + fileSeparator,customArchFlag);
+		this(commandName,SystemSettings.getWFDB_NATIVE_BIN(customArchFlag)+"bin" + fsep,customArchFlag);
 	}
 
 	public void setArguments(String[] args){

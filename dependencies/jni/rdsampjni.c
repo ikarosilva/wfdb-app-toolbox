@@ -291,9 +291,6 @@ void getData(int argc, char *argv[]){
 		fprintf(stderr,"Unable to allocate enough memory to read record!");
 		return;
 	}
-	fprintf(stderr,"from: %lu samples", from);
-	fprintf(stderr,"from: %lu samples", to);
-	fprintf(stderr,"Reading: %lu samples", nSamples);
 	while (( (nSamples<maxl) || (dynamicData==1) ) && getvec(datum) >= 0) {
 		for (i = 0; i < nsig; i++){
 			if (nSamples >= maxl) {

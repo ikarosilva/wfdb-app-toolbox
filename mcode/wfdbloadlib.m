@@ -22,14 +22,14 @@ function [varargout]=wfdbloadlib(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-%         Last Modified: December 3, 2014
+%         Last Modified: April 3, 2015
 % Since 0.0.1
 %
 %
 
 %endOfHelp
 mlock
-persistent isloaded wfdb_path wfdb_native_path
+persistent isloaded wfdb_path wfdb_native_path config
 
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
 %%% Change these values for system wide configuration of the WFDB binaries
@@ -109,9 +109,8 @@ if(isempty(isloaded))
     end
 end
 
-outputs={'isloaded','config'};
-for n=1:nargout
-    if(n>1)
+%set configuration
+if(isempty(config))
         config.MATLAB_VERSION=version;
         config.inOctave=inOctave;
         if(inOctave)
@@ -144,7 +143,8 @@ for n=1:nargout
         
         %Define WFDB Environment variables
         if(isempty(WFDB_PATH))
-            WFDB_PATH=['. ' 'file:// ' config.MATLAB_PATH 'database http://physionet.org/physiobank/database'];
+            %WFDB_PATH=['. ' 'file:// ' config.MATLAB_PATH 'database http://physionet.org/physiobank/database/'];
+            WFDB_PATH=['.'];
         end
         if(isempty(WFDBCAL))
             WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];
@@ -152,11 +152,19 @@ for n=1:nargout
         config.WFDB_PATH=WFDB_PATH;
         config.WFDBCAL=WFDBCAL;
         config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
-    end
-    warnMe=strfind(wfdb_path,' ');
+            warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
        warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
     end
+    
+    %Set enviroment variables used by WFBD
+    setenv('WFDB',config.WFDB_PATH);
+    setenv('WFDBCAL',config.WFDBCAL);
+end
+
+
+outputs={'isloaded','config'};
+for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end
 

@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class SystemSettings {
 
+	static String fsep= System.getProperty("file.separator");
+	
 	public static void loadCurl(Boolean customArch){
 
 		if(getOsName().contains("windows")){
@@ -37,26 +39,7 @@ public class SystemSettings {
 		}
 	}
 
-	
-	public static String getPhysioNetDBURL(){
-		return "http://physionet.org/physiobank/database";
-	}
 
-	public static String getDefaultWFDBPath(){
-		//Acording to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
-		//use white space as best option for all the operating systems
-		return ". " + " " + SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
-		"database "+ getPhysioNetDBURL();
-	}
-
-	public static String getDefaultWFDBCal() {
-		return SystemSettings.getWFDB_JAVA_HOME() + getFileSeparator() +
-		"database" + getFileSeparator() + "wfdbcal";
-	}
-
-	public static String getFileSeparator(){
-		return System.getProperty("file.separator");		
-	}
 	public static String getosArch(){
 		//Returns the JVM type
 		return System.getProperty("os.arch");
@@ -121,7 +104,7 @@ public class SystemSettings {
 			System.err.println("Could not get path location of WFDB JAR file.");
 			e.printStackTrace();
 		}
-		int tmp = packageDir.lastIndexOf(getFileSeparator());
+		int tmp = packageDir.lastIndexOf(fsep);
 		packageDir=packageDir.substring(0,tmp+1);
 		packageDir=packageDir.replace("file:","");
 		return packageDir.toString();
@@ -132,10 +115,10 @@ public class SystemSettings {
 		String WFDB_JAVA_HOME=getWFDB_JAVA_HOME();
 		//Set path to executables based on system/arch and customArchFlga
 		if(customArchFlag){
-			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + "custom"+ getFileSeparator();
+			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + fsep + "custom"+ fsep;
 		}else{
-			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + getFileSeparator() + 
-			getOsName().toLowerCase()+ getFileSeparator() ;
+			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + fsep + 
+			getOsName().toLowerCase()+ fsep ;
 		}
 		return WFDB_NATIVE_BIN;
 	}

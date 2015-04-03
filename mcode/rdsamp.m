@@ -188,7 +188,14 @@ end
 switch rawUnits
     case 0
         %Use Java Native Interface wrapper
-        signal=javaWfdbRdsamp.exec(wfdb_argument);
+        try
+            signal=javaWfdbRdsamp.exec(wfdb_argument);
+        catch
+            javaWfdbRdsamp.reset();%Free JNI resources    
+        end
+        if(isempty(signal))
+           error(['Could not find record: ' recordName '. Search path is set to: ''' config.WFDB_PATH '''']); 
+        end
         baseline=double(javaWfdbRdsamp.getBaseline);
         gain=javaWfdbRdsamp.getGain;
         Fs=double(javaWfdbRdsamp.getFs);
@@ -236,20 +243,28 @@ if(config.inOctave)
     data=java2mat(data);
 end
 
+if(rawUnits ~=0)
+    %Remap variables to output variables (if not using JNI interface)
+    signal=data(:,2:end);
+    if(nargout>2)
+        tm=data(:,1);
+        Fstest=1/(tm(2)-tm(1)); %Not exatly accurate because tm is accurate only the millisecond
+    else
+        Fstest=Fs;
+    end
+    data=[];
+    [N,M]=size(signal);
+end
+
 %When reading one signal only check if Fs is correct,
 %because it may not be for multiresolution signals
 if(length(signalList)==1 && rawUnits<3 && (rawUnits ~= 0) )
-    Fstest=1/(data(2,1)-data(1,1));
     err=abs(Fs-Fstest);
-    if(err>1)
+    if(err>1)siginfo
         warning([ 'Sampling frequency maybe incorrect! ' ...
             'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)])
         Fs=Fstest;
     end
-    tm=data(:,1);
-    signal=data(:,2:end);
-    data=[];
-    [N,M]=size(signal);
 end
 
 for n=1:nargout
