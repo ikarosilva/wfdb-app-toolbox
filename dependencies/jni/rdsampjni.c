@@ -62,13 +62,13 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	setData =  (*env)->GetMethodID(env,myRdsamp, "setRawData", "([I)V");
 	if(setData ==NULL ){
 		fprintf(stderr,"GetMethodID for setRawData failed! \n");
-		exit(2);
+		return;
 	}
 	int N=nsig*nSamples; //interleaved data -> N= nsig*nSamples
 	tmpData = (*env)->NewIntArray(env,N);
 	if(tmpData ==NULL ){
 		fprintf(stderr,"Could not allocate space for Java data array! \n");
-		exit(2);
+		return;
 	}
 	//Copy array contents
 	jint *dataArr = (*env)->GetIntArrayElements(env,tmpData,NULL);
@@ -85,21 +85,21 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 
 	if(sig == NULL || info==NULL){
 		fprintf(stderr,"Could not get signal information...aborting!");
-		exit(2);
+		return;
 	}
 
 	//// ******* Set Single Element fields in Java Class   *****////
 	if((NFieldID = (*env)->GetFieldID(env,myRdsamp,"nSamples","J"))==NULL ){
 		fprintf(stderr,"GetFieldID for nSamples failed");
-		exit(2);
+		return;
 	}
 	if((fsFieldID = (*env)->GetFieldID(env,myRdsamp,"fs","D"))==NULL ){
 		fprintf(stderr,"GetFieldID for fs failed");
-		exit(2);
+		return;
 	}
 	if((nsigFieldID = (*env)->GetFieldID(env,myRdsamp,"nsig","I"))==NULL ){
 		fprintf(stderr,"GetFieldID for nsig failed");
-		exit(2);
+		return;
 	}
 	(*env)->SetLongField(env,this,NFieldID,nSamples);
 	(*env)->SetDoubleField(env,this,fsFieldID,fs);
@@ -111,12 +111,12 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	setBaseline =  (*env)->GetMethodID(env,myRdsamp, "setBaseline", "([I)V");
 	if(setBaseline ==NULL ){
 		fprintf(stderr,"GetMethodID for setBaseline failed! \n");
-		exit(2);
+		return;
 	}
 	tmpBaseline = (*env)->NewIntArray(env,nsig);
 	if(tmpBaseline ==NULL ){
 		fprintf(stderr,"Could not allocate space for baseline array! \n");
-		exit(2);
+		return;
 	}
 	//Copy array contents
 	jint *baselineArr = (*env)->GetIntArrayElements(env,tmpBaseline,NULL);
@@ -133,12 +133,12 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 	setGain =  (*env)->GetMethodID(env,myRdsamp, "setGain", "([D)V");
 	if(setGain ==NULL ){
 		fprintf(stderr,"GetMethodID for setGain failed! \n");
-		exit(2);
+		return;
 	}
 	tmpGain = (*env)->NewDoubleArray(env,nsig);
 	if(tmpGain ==NULL ){
 		fprintf(stderr,"Could not allocate space for gain array! \n");
-		exit(2);
+		return;
 	}
 	//Copy array contents
 	jdouble *gainArr = (*env)->GetDoubleArrayElements(env,tmpGain,NULL);
@@ -165,9 +165,9 @@ JNIEXPORT void JNICALL Java_org_physionet_wfdb_jni_Rdsamp_getData(JNIEnv *env, j
 
 void getData(int argc, char *argv[]){
 	char* pname ="rdsampjni";
-	char *record = NULL, *search = NULL;
+	char *record = NULL;
 	char *invalid, speriod[16], tustr[16];
-	int  highres = 0, i, isiglist, nosig = 0, s;
+	int  highres = 1, i, isiglist, nosig = 0, s;
 	WFDB_Sample *datum;
 	long from = 0L, to = 0L;
 	long maxl = 0L;
@@ -180,26 +180,15 @@ void getData(int argc, char *argv[]){
 		case 'f':	/* starting time */
 			if (++i >= argc) {
 				fprintf(stderr, "%s: time must follow -f\n", pname);
-				exit(2);
+				return;
 			}
 			from = i;
-			break;
-		case 'H':	/* select high-resolution mode */
-			highres = 1;
-			break;
-		case 'l':	/* maximum length of output follows */
-			if (++i >= argc) {
-				fprintf(stderr, "%s: max output length must follow -l\n",
-						pname);
-				exit(2);
-			}
-			maxl = i;
 			break;
 		case 'r':	/* record name */
 			if (++i >= argc) {
 				fprintf(stderr, "%s: record name must follow -r\n",
 						pname);
-				exit(2);
+				return;
 			}
 			record = argv[i];
 			break;
@@ -212,69 +201,64 @@ void getData(int argc, char *argv[]){
 			if (nosig == 0) {
 				fprintf(stderr, "%s: signal list must follow -s\n",
 						pname);
-				exit(2);
+				return;
 			}
-			break;
-		case 'S':	/* search for valid sample of specified signal */
-			if (++i >= argc) {
-				fprintf(stderr,
-						"%s: signal name or number must follow -S\n",
-						pname);
-				exit(2);
-			}
-			search = argv[i];
 			break;
 		case 't':	/* end time */
 			if (++i >= argc) {
 				fprintf(stderr, "%s: time must follow -t\n",pname);
-				exit(2);
+				return;
 			}
-			to = atoi(argv[i]);
+			to = i;
 			break;
 		default:
 			fprintf(stderr, "%s: unrecognized option %s\n", pname,
 					argv[i]);
-			exit(2);
+			return;
 		}
 		else {
 			fprintf(stderr, "%s: unrecognized argument %s\n", pname,
 					argv[i]);
-			exit(2);
+			return;
 		}
 	}
 
 	if (record == NULL) {
 		fprintf(stderr,"No record name\n");
-		exit(2);
+		return;
 	}
 
-	if ((nsig = isigopen(record, NULL, 0)) <= 0) exit(2);
+	if ((nsig = isigopen(record, NULL, 0)) <= 0) return;
 
 	if ((datum = malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
 			(info = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
 		fprintf(stderr, "%s: insufficient memory\n", pname);
-		exit(2);
+		return;
 	}
 
 	if ((nsig = isigopen(record, info, nsig)) <= 0)
-		exit(2);
+		return;
 	for (i = 0; i < nsig; i++)
 		if (info[i].gain == 0.0) info[i].gain = WFDB_DEFGAIN;
 	if (highres)
 		setgvmode(WFDB_HIGHRES);
 	fs = sampfreq(NULL);
+	if (from > 0L && (from = strtim(argv[from])) < 0L)
+		from = -from;
 	if (isigsettime(from) < 0)
-		exit(2);
+		return;
+	if (to > 0L && (to = strtim(argv[to])) < 0L)
+		to = -to;
 	if (nosig) {	/* print samples only from specified signals */
 		if ((sig = (int *)malloc((unsigned)nosig*sizeof(int))) == NULL) {
 			fprintf(stderr, "%s: insufficient memory\n", pname);
-			exit(2);
+			return;
 		}
 		for (i = 0; i < nosig; i++) {
 			if ((s = findsig(argv[isiglist+i])) < 0) {
 				fprintf(stderr, "%s: can't read signal '%s'\n", pname,
 						argv[isiglist+i]);
-				exit(2);
+				return;
 			}
 			sig[i] = s;
 		}
@@ -283,22 +267,11 @@ void getData(int argc, char *argv[]){
 	else {	/* print samples from all signals */
 		if ((sig = (int *) malloc( (unsigned) nsig*sizeof(int) ) ) == NULL) {
 			fprintf(stderr, "%s: insufficient memory\n", pname);
-			exit(2);
+			return;
 		}
 		for (i = 0; i < nsig; i++)
 			sig[i] = i;
 	}
-
-	/* Reset 'from' if a search was requested. */
-	if (search &&
-			((s = findsig(search)) < 0 || (from = tnextvec(s, from)) < 0)) {
-		fprintf(stderr, "%s: can't read signal '%s'\n", pname, search);
-		exit(2);
-	}
-
-	/* Reset 'to' if a duration limit was specified. */
-	if (maxl && (to == 0L || to > from + maxl))
-		to = from + maxl;
 
 	/* Reset to end of record if 'to' is zero (ie, undefined) */
 	if( to == 0L){
@@ -313,11 +286,14 @@ void getData(int argc, char *argv[]){
 	}
 
 	/* Read in the data in raw ( digital ) units */
-	maxl=to-from+1;
+	maxl=to-from;
 	if ( (data= malloc(maxl * nsig * sizeof(int)) ) == NULL) {
 		fprintf(stderr,"Unable to allocate enough memory to read record!");
-		exit(2);
+		return;
 	}
+	fprintf(stderr,"from: %lu samples", from);
+	fprintf(stderr,"from: %lu samples", to);
+	fprintf(stderr,"Reading: %lu samples", nSamples);
 	while (( (nSamples<maxl) || (dynamicData==1) ) && getvec(datum) >= 0) {
 		for (i = 0; i < nsig; i++){
 			if (nSamples >= maxl) {
@@ -327,7 +303,7 @@ void getData(int argc, char *argv[]){
 				if ((data = realloc(data, maxl * nsig * sizeof(int))) == NULL) {
 					fprintf(stderr,"Unable to allocate enough memory to read record!");
 					free(data);
-					exit(2);
+					return;
 				}
 			}
 			//Get interleaved data

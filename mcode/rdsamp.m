@@ -1,6 +1,6 @@
 function varargout=rdsamp(varargin)
 %
-% [tm,signal,Fs]=rdsamp(recordName,signaList,N,N0,rawUnits,highResolution)
+% [signal,Fs,tm]=rdsamp(recordName,signaList,N,N0,rawUnits,highResolution)
 %
 %    Wrapper to WFDB RDSAMP:
 %         http://www.physionet.org/physiotools/wag/rdsamp-1.htm
@@ -14,15 +14,15 @@ function varargout=rdsamp(varargin)
 %       depending on the flag passed to the function (according to
 %       the boolean flags below).
 %
-% tm
+% Fs    (Optional)
+%       1xM Double, sampling frequency in Hz of all the signals in the
+%       record.
+%
+%% tm   (Optional)
 %       Nx1 vector of doubles representing the sampling intervals.
 %       Depending on input flags (see below), this vector can either be a
 %       vector of integers (sampling number), or a vector of elapsed time
 %       in seconds  ( with up to millisecond precision only).
-%
-% Fs    (Optional)
-%       1xM Double, sampling frequency in Hz of all the signals in the
-%       record.
 %
 % Required Parameters:
 %
@@ -45,8 +45,9 @@ function varargout=rdsamp(varargin)
 %
 %
 % rawUnits
-%       A 1x1 integer (default: 1). Returns tm and signal as vectors
+%       A 1x1 integer (default: 0). Returns tm and signal as vectors
 %       according to the following values:
+%               rawUnits=0 - Uses Java Native Interface to directly fetch  data, returning signal in physical units with double precision.
 %               rawUnits=1 -returns tm ( millisecond precision only! ) and signal in physical units with 64 bit (double) floating point precision
 %               rawUnits=2 -returns tm ( millisecond precision only! ) and signal in physical units with 32 bit (single) floating point  precision
 %               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
@@ -54,49 +55,51 @@ function varargout=rdsamp(varargin)
 %
 % highResolution
 %      A 1x1 boolean (default =0). If true, reads the record in high
-%      resolution mode.
+%      resolution mode. Ignored if rawUnits == 0. 
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: December 4, 2014
-% Version 1.5
+% Last Modified: April 3, 2015
+% Version 2.0
 %
 % Since 0.0.1
 %
 % %Example 1- Read a signal from PhysioNet's Remote server:
-%[tm, signal]=rdsamp('mitdb/100',[],1000);
+%[signal,Fs,tm]=rdsamp('mitdb/100',[],1000);
 %plot(tm,signal(:,1))
 %
 %%Example 2-Read 1000 samples from 3 signals
-%[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000);
+%[signal,Fs,tm]=rdsamp('mghdb/mgh001', [1 3 5],1000);
 %
 %%%Example 3- Read 1000 samples from 3 signlas in single precision format
-%[tm,signal,Fs]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
+%[signal,Fs,tm]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
 %
 %
 %%%Example 4- Read a multiresolution signal with 32 samples per frame
-% [tm,sig] = rdsamp('drivedb/drive02',[1],[],[],[],1);
+% [sig,Fs,tm] = rdsamp('drivedb/drive02',[1],[],[],[],1);
 %
 %
 % See also WFDBDESC, PHYSIONETDB
 
 %endOfHelp
 
-persistent javaWfdbExec config
+persistent javaWfdbExec javaWfdbRdsamp config
 if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('rdsamp');
 end
 
 %Set default pararamter values
 inputs={'recordName','signalList','N','N0','rawUnits','highResolution'};
-outputs={'data(:,1)','data(:,2:end)','Fs'};
+outputs={'signal','Fs','tm'};
 signalList=[];
 N=[];
-N0=1;
+N0=0;
 ListCapacity=[]; %Use to pre-allocate space for reading
 siginfo=[];
-rawUnits=1;
+rawUnits=0;
 Fs=[];
+tm=[];
+signal=[];
 highResolution=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
@@ -104,20 +107,33 @@ for n=1:nargin
     end
 end
 
+if(isempty(javaWfdbRdsamp) && (rawUnits ==0))
+    javaWfdbRdsamp=javaObject('org.physionet.wfdb.jni.Rdsamp');
+end
+
+
 %Remove file extension if present
 if(length(recordName)>4 && strcmp(recordName(end-3:end),'.dat'))
     recordName=recordName(1:end-4);
 end
-if(rawUnits <3)
-    %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument={'-r',recordName,'-Ps','-f',['s' num2str(N0-1)]};
+
+%Initialize wfdb_argument
+if((rawUnits >=3) || (rawUnits ==0) )
+    %Reads raw data as integer (JNI converts to double later on)
+    wfdb_argument={'-r',recordName};
 else
-    wfdb_argument={'-r',recordName,'-f',['s' num2str(N0-1)]};
+    wfdb_argument={'-r',recordName,'-Ps'};
+end
+
+if(N0 ~=0)
+   %Set start sample 
+   wfdb_argument{end+1}='-f';
+   wfdb_argument{end+1}=['s' num2str(N0-1)];
 end
 
 %If N is empty, it is the entire dataset. We should ensure capacity
 %so that the fetching will be more efficient.
-if(isempty(N))
+if(isempty(N) && (rawUnits ~=0))
     [siginfo,~]=wfdbdesc(recordName);
     if(~isempty(siginfo))
         N=siginfo(1).LengthSamples;
@@ -134,7 +150,7 @@ if(~isempty(signalList))
     end
 end
 
-if(highResolution)
+if(highResolution && (rawUnits ~=0))
     wfdb_argument{end+1}=['-H'];
     %In this case overwrite N, multiply by the maximum number of samples
     %per frame
@@ -142,13 +158,13 @@ if(highResolution)
     for i=1:length(siginfo)
         ind=strfind(siginfo(1).Format,'samples per frame');
         if(~isempty(ind))
-           str= siginfo(1).Format(1:ind-1);
-           ind2=strfind(siginfo(1).Format,'(');
-           str=str(ind2+1:end);
-           frm=str2num(str);
-           if(frm>maxFrame)
-               maxFrame=frm;
-           end
+            str= siginfo(1).Format(1:ind-1);
+            ind2=strfind(siginfo(1).Format,'(');
+            str=str(ind2+1:end);
+            frm=str2num(str);
+            if(frm>maxFrame)
+                maxFrame=frm;
+            end
         end
     end
     N=N*maxFrame;
@@ -163,13 +179,31 @@ if(~isempty(N))
 end
 
 
-if(nargout>2)
+if(nargout>2 && (rawUnits ~=0))
     if(isempty(siginfo))
         [siginfo,Fs]=wfdbdesc(recordName);
     end
 end
 
 switch rawUnits
+    case 0
+        %Use Java Native Interface wrapper
+        signal=javaWfdbRdsamp.exec(wfdb_argument);
+        baseline=double(javaWfdbRdsamp.getBaseline);
+        gain=javaWfdbRdsamp.getGain;
+        Fs=double(javaWfdbRdsamp.getFs);
+        N=javaWfdbRdsamp.getNSamples;
+        javaWfdbRdsamp.reset();%Free JNI resources
+        M=length(baseline);
+        signal=double(reshape(signal,[N M]));
+        %Convert to Physical units
+        for m=1:M
+           signal(:,m)= (signal(:,m)-baseline(m))./gain(m); 
+        end
+        if(nargout>2)
+            %generate time in seconds
+             tm=linspace(0,N,1/Fs);
+        end
     case 1
         if(~isempty(ListCapacity))
             %Ensure list capacity if information is available
@@ -204,7 +238,7 @@ end
 
 %When reading one signal only check if Fs is correct,
 %because it may not be for multiresolution signals
-if(length(signalList)==1 && rawUnits<3 )
+if(length(signalList)==1 && rawUnits<3 && (rawUnits ~= 0) )
     Fstest=1/(data(2,1)-data(1,1));
     err=abs(Fs-Fstest);
     if(err>1)
@@ -212,6 +246,10 @@ if(length(signalList)==1 && rawUnits<3 )
             'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)])
         Fs=Fstest;
     end
+    tm=data(:,1);
+    signal=data(:,2:end);
+    data=[];
+    [N,M]=size(signal);
 end
 
 for n=1:nargout
@@ -219,16 +257,15 @@ for n=1:nargout
     
     %Perform minor data integrity check by validating with the expected
     %sizes
-    [N,M]=size(data);
     if(~isempty(signalList) )
         sList=length(signalList);
-        if(sList ~= (M-1))
-            error(['Received: ' num2str(M-1) ' signals, expected: '  num2str(length(signalList))])
+        if(sList ~= (M))
+            error(['Received: ' num2str(M) ' signals, expected: '  num2str(length(signalList))])
         end
     end
     if(~isempty(ListCapacity) && ~isnan(ListCapacity) )
-        if((ListCapacity+1) ~= N )
-            error(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity+1)])
+        if((ListCapacity) ~= N )
+            warning(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity)])
         end
     end
 end

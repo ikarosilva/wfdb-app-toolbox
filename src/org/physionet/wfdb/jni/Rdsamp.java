@@ -34,10 +34,9 @@ public class Rdsamp {
 		myRdsamp=null;
 	}
 	
-	public static int[] exec(String[] args) {
-		Rdsamp myRdsamp=new Rdsamp();
-		myRdsamp.readData(args);
-		return myRdsamp.rawData;
+	public int[] exec(String[] args) {
+		readData(args);
+		return rawData;
 	}
 
 	//Utility functions, not be be used by other classes
@@ -70,8 +69,12 @@ public class Rdsamp {
 		return fs;
 	}
 	
-	public long getnSamples(){
+	public long getNSamples(){
 		return nSamples;
+	}
+	
+	public int getNsig(){
+		return nsig;
 	}
 	
 	public double[] getGain(){
