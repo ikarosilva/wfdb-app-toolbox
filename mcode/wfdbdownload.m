@@ -79,7 +79,7 @@ else
     end
     if(isdir(db_dir))
         %File extensions to download
-        wfdb_extensions={'.dat','.atr','.edf','.rec','.hea','.hea-','.trigger'};
+        wfdb_extensions={'.dat','.atr','.edf','.rec','.hea','.hea-','.trigger','.mat'};
         M=length(wfdb_extensions);
         timeout=600; %timeout in seconds
         
