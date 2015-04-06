@@ -55,6 +55,17 @@ WFDB_PATH=[];
 %See http://www.physionet.org/physiotools/wag/wfdbca-5.htm for more details.
 WFDBCAL=[];
 
+%CACHE: If CACHE==1, the toolbox will attemp to download data from 
+%CACHE_SOURCE to CACHE_DEST if the record is not found no the standard 
+%WFDB PATH. Change CACHE_DEST path to a PhysioNet mirror, if you wish to
+%use a server closer to your geographical location. It is safe to delete files on
+%CACHE_SOURCE, as they can be re-downloaded if need me.
+
+CACHE=1; %Default is to use the cache system
+CACHE_SOURCE=[]; %If empty, defaults to last element of WFDB_PATH
+CACHE_DEST=[]; %If empty, defaults to WFDB_JAVA_HOME/../database
+
+
 %debugLevel: Ouput JVM information while running commands
 debugLevel=0;
 
@@ -131,7 +142,6 @@ if(isempty(config))
             eval(['config.' varname '=''' tmpstr{2} ''';'])
         end
         config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
-        config.SUPPORT_EMAIL='wfdb-matlab-support@physionet.org';
         wver=regexp(wfdb_path,fsep,'split');
         config.WFDB_JAVA_VERSION=wver{end};
         config.DEBUG_LEVEL=debugLevel;
@@ -143,7 +153,8 @@ if(isempty(config))
         
         %Define WFDB Environment variables
         if(isempty(WFDB_PATH))
-            WFDB_PATH=['. ' 'http://physionet.org/physiobank/database/'];
+            tmpCache=[config.MATLAB_PATH '..' filesep 'database' filesep];
+            WFDB_PATH=['. ' tmpCache ' http://physionet.org/physiobank/database/'];
         end
         if(isempty(WFDBCAL))
             WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];
@@ -155,6 +166,31 @@ if(isempty(config))
     if(~isempty(warnMe))
        warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
     end
+    
+    %Set CACHE configurations
+    if(isempty(CACHE_SOURCE) && CACHE)
+        ind=strfind(config.WFDB_PATH,'http');
+        if(~isempty(ind))
+            CACHE_SOURCE=config.WFDB_PATH(ind:end);
+        else
+            warning(['Could not set CACHE, CACHE_SOURCE invalid'])
+            CACHE=0;   
+        end
+    end
+    config.CACHE_SOURCE=CACHE_SOURCE;
+    
+    if(isempty(CACHE_DEST) && CACHE)
+        CACHE_DEST=[config.MATLAB_PATH '..' filesep 'database' filesep];
+        if(~isdir(CACHE_DEST))
+            mkdir(CACHE_DEST);
+        end
+        if(~isdir(CACHE_DEST))
+            warning(['Could not set CACHE, CACHE_DEST directory does not exist: ' CACHE_DEST])
+            CACHE=0;   
+        end
+    end
+    config.CACHE_DEST=CACHE_DEST;   
+    config.CACHE=CACHE; 
     
     %Set enviroment variables used by WFBD
     setenv('WFDB',config.WFDB_PATH);

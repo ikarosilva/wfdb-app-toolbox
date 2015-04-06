@@ -79,7 +79,7 @@ function varargout=rdsamp(varargin)
 % [sig,Fs,tm] = rdsamp('drivedb/drive02',[1],[],[],[],1);
 %
 %
-% See also WFDBDESC, PHYSIONETDB
+% See also WFDBDESC, PHYSIONETDB, WFDBDOWNLOAD
 
 %endOfHelp
 
@@ -106,6 +106,9 @@ for n=1:nargin
         eval([inputs{n} '=varargin{n};'])
     end
 end
+
+%Cache record
+wfdbdownload(recordName);
 
 if(isempty(javaWfdbRdsamp) && (rawUnits ==0))
     javaWfdbRdsamp=javaObject('org.physionet.wfdb.jni.Rdsamp');
