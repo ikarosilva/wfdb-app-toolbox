@@ -58,7 +58,7 @@ for n=1:nargin
     end
 end
 
-persistent config DBS
+persistent config 
 
 if(isempty(config))
     [~,config]=wfdbloadlib;

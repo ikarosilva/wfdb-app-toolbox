@@ -20,6 +20,7 @@ CLASS_PATH = ../../bin
 #Denife location of wfdb/wfdb.h
 WFDB_INCLUDE=/home/ikaro/Downloads/
 WFDB_LIB =../../mcode/nativelibs/linux/lib64/
+WIN_WFDB_LIB =../../mcode/nativelibs/windows/bin/
 # Define a virtual path for .class in the bin directory
 vpath %.class $(CLASS_PATH)
 
@@ -41,7 +42,7 @@ rdsampjni.o : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
 #
 librdsampjni.dll : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
 	x86_64-w64-mingw32-gcc -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
-	-I"$(WFDB_INCLUDE)" "-L$(WFDB_LIB)" -shared rdsampjni.c -o librdsampjni.dll -lwfdb
+	-I"$(WFDB_INCLUDE)" "-L$(WIN_WFDB_LIB)" -shared rdsampjni.c -o librdsampjni.dll -Xlinker libwfdb.dll.a
 
 org_physionet_wfdb_jni_Rdsamp.h : 
 	javah -classpath $(CLASS_PATH) org.physionet.wfdb.jni.Rdsamp 

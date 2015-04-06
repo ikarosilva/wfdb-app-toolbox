@@ -215,7 +215,7 @@ switch rawUnits
         end
         if(nargout>2)
             %generate time in seconds
-             tm=linspace(0,N,1/Fs);
+             tm=linspace(0,(N-1)/Fs,N)';
         end
     case 1
         if(~isempty(ListCapacity))
