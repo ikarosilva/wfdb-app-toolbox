@@ -18,9 +18,10 @@
 # Define a variable for class path
 CLASS_PATH = ../../bin
 #Denife location of wfdb/wfdb.h
-WFDB_INCLUDE=/home/ikaro/Downloads/
+WFDB_INCLUDE=.
 WFDB_LIB =../../mcode/nativelibs/linux/lib64/
 WIN_WFDB_LIB =../../mcode/nativelibs/windows/bin/
+MAC_WFDB_LIB =../../mcode/nativelibs/macosx/bin/
 # Define a virtual path for .class in the bin directory
 vpath %.class $(CLASS_PATH)
 
@@ -33,6 +34,10 @@ librdsampjni.so : rdsampjni.o
 	gcc -W -Wignored-qualifiers -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
 	-I"$(WFDB_INCLUDE)" "-L$(WFDB_LIB)" -shared -o librdsampjni.so rdsampjni.c -lwfdb
 
+librdsampjni.dylib : rdsampjni.o
+	gcc -W -Wignored-qualifiers -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
+	-I"$(WFDB_INCLUDE)" "-L$(MAC_WFDB_LIB)" -shared -o librdsampjni.dylib rdsampjni.c -lwfdb
+	
 rdsampjni.o : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
 	gcc -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" \
 	-I"$(WFDB_INCLUDE)" -c $< -o $@
@@ -47,5 +52,7 @@ librdsampjni.dll : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
 org_physionet_wfdb_jni_Rdsamp.h : 
 	javah -classpath $(CLASS_PATH) org.physionet.wfdb.jni.Rdsamp 
 
+wfdb.h:
+	curl http://physionet.org/physiotools/wfdb/lib/wfdb.h > wfdb.h
 clean :
 	rm -vf org_physionet_wfdb_jni_Rdsamp.h *.o *.so *.dll
