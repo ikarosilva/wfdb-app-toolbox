@@ -4,13 +4,13 @@ function varargout=physionetdb(varargin)
 %
 %
 % Lists all the available databases at PhysioNet
-% (http://physionet.org/physiobank/) or list all available signal in a database.
+% (http://physionet.org/physiobank/) or list all available records in a database.
 % Users can read the signals (waveforms) or annotations (labels) using the WFDB
 % App Toolbox's functions such as RDSAMP. Options are
 %
 % Optional Input Parameters:
 % db_name
-%          String specifying the datbase to query for available signals.
+%          String specifying the datbase to query for available records.
 %          If left empty (default) a list of available database names is
 %          returned. NOTE: Some databases (such as 'mimic2db') have a huge
 %          number of records so that querying the records in the database
@@ -34,13 +34,13 @@ function varargout=physionetdb(varargin)
 % db_list -(Optional) Cell array list of elements. If an output
 %          is not provided, results are displayed to the screen.
 %          The returned valued are either a list of database names to query
-%          (if db_name is empty), or a list of available signals that can
+%          (if db_name is empty), or a list of available records that can
 %          be read via RDSAMP (if db_name is a name of a valid database as
 %          given by the return list when db_name is empty).
 %
 % Author: Ikaro Silva, 2013
 % Since: 0.0.1
-% Last Modified: November 13, 2014
+% Last Modified: April 8, 2015
 %
 %
 % %Example 1 - List all available databases from PhysioNet into the screen
@@ -49,7 +49,7 @@ function varargout=physionetdb(varargin)
 % %Example 2 - List all available databases from PhysioNet in web browser
 % physionetdb([],[],1)
 %
-% %Example 3- List all available signals in the ucddb database.
+% %Example 3- List all available records in the ucddb database.
 % db_list=physionetdb('ucddb')
 %
 % %Example 4- Download all records for database MITDB
@@ -67,7 +67,8 @@ if(isempty(isloaded) || ~isloaded)
     %Add classes to path
     [isloaded,config]=wfdbloadlib;
 end
-
+%URL to PhysioBank database in PhysioNet
+PHYSIONET_URL=config.CACHE_SOURCE;
 inputs={'db_name','DoBatchDownload','webBrowser'};
 db_name=[];
 DoBatchDownload=0;
@@ -91,7 +92,7 @@ if(isempty(db_name))
         varargout(1)={db_list};
     else
         if(webBrowser)
-            web('http://physionet.org/physiobank/database/DBS')
+            web([PHYSIONET_URL 'DBS'])
         else
             for i=0:double(list.size)-1
                 fprintf(char(list.get(i).getDBInfo))
@@ -100,40 +101,26 @@ if(isempty(db_name))
         end
     end
 else
-    J=javaObject('org.physionet.wfdb.physiobank.PhysioNetDB',db_name);
     if(DoBatchDownload)
         display(['Making directory: ' db_name ' to store record files'])
         mkdir(db_name)
-        wfdb_url='http://physionet.org/physiobank/database/';
     end
-    db_list={};
+    rec_list={};
     if(webBrowser)
-        web(['http://physionet.org/physiobank/database/pbi/' db_name])
+        web([PHYSIONET_URL 'pbi/' db_name])
     else
-        rec_list=J.getDBRecordList;
-        Nstr=num2str(double(rec_list.size));
-        for i=0:double(rec_list.size)-1
-            sig_list=rec_list.get(i).getSignalList;
-            for j=0:double(sig_list.size)-1
-                if(config.inOctave)
-                    db_list(end+1)=sig_list.get(j).getRecordName;
-                else
-                    db_list(end+1)=cell(sig_list.get(j).getRecordName);
-                end
-            end
+        rec_list=deblank(urlread([PHYSIONET_URL db_name '/RECORDS']));
+        rec_list=regexp(rec_list,'\s','split');
+        Nstr=length(rec_list);
+        for i=1:Nstr
             if(DoBatchDownload)
-                recName=cell(rec_list.get(i).getRecordName);
-                recName=recName{:};
+                recName=rec_list{i};
                 display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
-                [filestr1] = urlwrite([wfdb_url recName '.dat'],[recName '.dat']);
-                [filestr2] = urlwrite([wfdb_url recName '.hea'],[recName '.hea']);
-                if(i==(double(rec_list.size)-1))
-                    display(['**Finished downloading records.'])
-                end
+                [success,files_saved]=wfdbdownload([db_name '/' recName]);
             end
         end
     end
     if(nargout>0)
-        varargout(1)={db_list};
+        varargout(1)={rec_list};
     end
 end
