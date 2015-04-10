@@ -24,7 +24,7 @@ function varargout=physionetdb(varargin)
 %          write permission to the current directory.
 %
 %          NOTE: This function currently does not perform any checksum in order
-%          to verify that the files were downloaded properly.
+%          to verify that the files were dwnloaded properly.
 %
 % webBrowserFlag
 %          Boolean. If true, displays database information in MATLAB's
