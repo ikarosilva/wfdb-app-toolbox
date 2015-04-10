@@ -14,6 +14,14 @@ function varargout=wrsamp(varargin)
 % http://www.physionet.org/physiotools/wag/header-5.htm
 % 
 %
+%
+% LIMITATIONS: 
+%        The input variables 'tm' and 'data' should be integer values.
+%		 Currently the MATLAB/Octave wrappers do take into account Baseline values. 
+%        Signals that have baseline values will not be converted properly to physical units.
+%        You will have to edit the generated header files manually to include baseline variables and update the checksums.
+%
+%
 % Required Parameters:
 %
 % tm  
@@ -48,21 +56,21 @@ function varargout=wrsamp(varargin)
 %
 %%Example- 
 %%Read signal in raw units
-%[signal,Fs,tm]=rdsamp('challenge/2013/set-a/a01',[],[],[],1);
+%[signal,Fs,tm]=rdsamp('challenge/2013/set-a/a01',[],[],[],4);
 %[siginfo,Fs]=wfdbdesc('challenge/2013/set-a/a01');
 %%Write a copy to file
 %wrsamp(tm,signal(:,1),'a01Copy',Fs(1),200,siginfo(1).Format)
 %%Check that the signals match
-%[signalCopy,Fs,tm]=rdsamp('a01Copy',[],[],[],1);
+%[signalCopy,Fs,tm]=rdsamp('a01Copy',[],[],[],4);
 %err=sum(signalCopy ~= signal(:,1))
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: April 18, 2014
+% Last Modified: April 10, 2015
 % Since 0.0.1
 %
 %
-% See also rdsamp, wfdbdesc
+% See also rdsamp, wfdbdesc, mat2wfdb
 %
 
 %endOfHelp
