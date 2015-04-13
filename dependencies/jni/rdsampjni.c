@@ -174,6 +174,7 @@ void getData(int argc, char *argv[]){
 	long maxSamples =325000;
 	long reallocIncrement=2*325000;   // For records with no specified length
 	int dynamicData=0;              // allow the input buffer to grow (the increment is arbitrary)
+	nSamples=0;
 
 	for(i = 0 ; i < argc; i++){
 		if (*argv[i] == '-') switch (*(argv[i]+1)) {

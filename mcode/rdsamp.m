@@ -83,7 +83,7 @@ function varargout=rdsamp(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec javaWfdbRdsamp config
+persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('rdsamp');
 end
@@ -109,7 +109,7 @@ end
 
 %Cache record
 wfdbdownload(recordName);
-
+javaWfdbRdsamp=[];
 if(isempty(javaWfdbRdsamp) && (rawUnits ==0))
     javaWfdbRdsamp=javaObject('org.physionet.wfdb.jni.Rdsamp');
 end
@@ -215,7 +215,7 @@ switch rawUnits
         end
         if(nargout>2)
             %generate time in seconds
-             tm=linspace(0,N,1/Fs);
+             tm=linspace(0,(N-1)/Fs,N)';
         end
     case 1
         if(~isempty(ListCapacity))
