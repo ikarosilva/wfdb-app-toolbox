@@ -25,7 +25,7 @@ WIN_WFDB_LIB =.
 # Define a virtual path for .class in the bin directory
 vpath %.class $(CLASS_PATH)
 
-all : librdsampjni.so librdsampjni.dll
+all : librdsampjni.so librdsampjni.exe
 
 test: librdsampjni.so
 	LD_LIBRARY_PATH=".:$(WFDB_LIB)" java -classpath $(CLASS_PATH) org.physionet.wfdb.jni.Rdsamp
@@ -41,15 +41,15 @@ rdsampjni.o : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
 #For cross compilation (Linux to Windows), need to install MinGW tools:
 # sudo apt-get install mingw-w64
 #
-librdsampjni.dll : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
+librdsampjni.exe : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
 	x86_64-w64-mingw32-gcc -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
-	-I"$(WFDB_INCLUDE)" "-L$(WIN_WFDB_LIB)" -shared rdsampjni.c -o librdsampjni.dll \
+	-I"$(WFDB_INCLUDE)" "-L$(WIN_WFDB_LIB)" -shared rdsampjni.c -o librdsampjni.exe \
 	-Xlinker --out-implib -Xlinker libwfdb.dll.a
 
 org_physionet_wfdb_jni_Rdsamp.h : 
 	javah -classpath $(CLASS_PATH) org.physionet.wfdb.jni.Rdsamp 
 
 clean :
-	rm -vf org_physionet_wfdb_jni_Rdsamp.h *.o *.so *.dll
+	rm -vf org_physionet_wfdb_jni_Rdsamp.h *.o *.so *.exe
 	
 	
