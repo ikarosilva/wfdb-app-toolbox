@@ -20,11 +20,8 @@ CLASS_PATH = ../../bin
 #Denife location of wfdb/wfdb.h
 WFDB_INCLUDE=.
 WFDB_LIB =../../mcode/nativelibs/linux/lib64/
-WIN_WFDB_LIB =../../mcode/nativelibs/windows/bin/
-MAC_WFDB_LIB =../../mcode/nativelibs/macosx/bin/
-#Use this for Macs only
-JAVA_HOME=`/usr/libexec/java_home`
-
+WIN_WFDB_LIB =. 
+#../../mcode/nativelibs/windows/bin/
 # Define a virtual path for .class in the bin directory
 vpath %.class $(CLASS_PATH)
 
@@ -36,28 +33,23 @@ test: librdsampjni.so
 librdsampjni.so : rdsampjni.o
 	gcc -W -Wignored-qualifiers -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
 	-I"$(WFDB_INCLUDE)" "-L$(WFDB_LIB)" -shared -o librdsampjni.so rdsampjni.c -lwfdb
-	
+
 rdsampjni.o : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
-	gcc -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin/" \
+	gcc -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/linux" \
 	-I"$(WFDB_INCLUDE)" -c $< -o $@
-
-#Compiling in Macs
-librdsampjni.dylib : rdsampjni.o
-	gcc -W -Wignored-qualifiers -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/darwin/" \
-	-I"$(WFDB_INCLUDE)" "-L$(MAC_WFDB_LIB)" -shared -o librdsampjni.dylib rdsampjni.c -lwfdb
-
 
 #For cross compilation (Linux to Windows), need to install MinGW tools:
 # sudo apt-get install mingw-w64
 #
 librdsampjni.dll : rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
 	x86_64-w64-mingw32-gcc -fPIC -I"$(JAVA_HOME)/include/" -I"$(JAVA_HOME)/include/linux" \
-	-I"$(WFDB_INCLUDE)" "-L$(WIN_WFDB_LIB)" -shared rdsampjni.c -o librdsampjni.dll -Xlinker libwfdb.dll.a
+	-I"$(WFDB_INCLUDE)" "-L$(WIN_WFDB_LIB)" -shared rdsampjni.c -o librdsampjni.dll \
+	-Xlinker --out-implib -Xlinker libwfdb.dll.a
 
 org_physionet_wfdb_jni_Rdsamp.h : 
 	javah -classpath $(CLASS_PATH) org.physionet.wfdb.jni.Rdsamp 
 
-wfdb.h:
-	curl http://physionet.org/physiotools/wfdb/lib/wfdb.h > wfdb.h
 clean :
 	rm -vf org_physionet_wfdb_jni_Rdsamp.h *.o *.so *.dll
+	
+	
