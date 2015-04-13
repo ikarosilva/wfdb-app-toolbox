@@ -31,7 +31,8 @@ public class SystemSettings {
 		if(getOsName().contains("windows")){
 			//Do nothing for now
 		}else if(getOsName().contains("mac")){
-			//Do nothing for now
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+					+ "/bin/lib" + libName + ".dylib");
 		}else{
 			//Default to Linux
 			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
