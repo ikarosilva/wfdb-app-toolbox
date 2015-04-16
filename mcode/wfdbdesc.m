@@ -206,7 +206,7 @@ persistent class_def
 
 if(isempty(class_def))
     %Get signal class information from PhysioNet's servers
-    %and stor information locally ( persistent )
+    %and store information locally ( persistent )
     class_def=urlread([config.CACHE_SOURCE '../signals.shtml']);
     st_ind=findstr(class_def,'<td><b>Description</b></td><td></td></tr>');
     class_def(1:st_ind+1)=[];
@@ -217,13 +217,11 @@ end
 M=length(siginfo);
 sigClass=cell(M,1);
 for m=1:M
-    label=siginfo(m).Description;
-    ind=strmatch(['<td>' label '</td>'],class_def);
+    ind=strmatch(['<td>' siginfo(m).Description '</td>'],class_def);
     if(isempty(ind))
         continue
     end
-    str=class_def{ind};
-    str=regexp(str,'</td>','split');
+    str=regexp(class_def{ind},'</td>','split');
     str=regexprep(str{2},'<td>','');
     sigClass(m)={str};
 end
