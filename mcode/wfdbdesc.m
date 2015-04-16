@@ -8,8 +8,8 @@ function varargout=wfdbdesc(varargin)
 % Reads a WFDB record metadata and returns:
 %
 %
-% signal
-%       Nx1 vector of siginfo structures with the following fields:
+% siginfo
+%       Nx1 vector of structures with the following fields:
 %
 %       LengthSamples           : Number of samples in record (integer)
 %       LengthTime              : Duration of record  (String WFDB Time)
@@ -21,7 +21,7 @@ function varargout=wfdbdesc(varargin)
 %       SignalIndex             : Zero Based Signal Index (Integer)
 %       StartTime               : Start Time (String WFDB Time)
 %       Group                   : Group (Integer)
-%       AdcResolution           : Bit resolution of the singal (String)
+%       AdcResolution           : Bit resolution of the signal (String)
 %       AdcZero                 : Physical value for 0 ADC (double)
 %       Baseline                : Physical zero level of signal (Integer)
 %       CheckSum                : 16-bit checksum of all samples (Integer)
@@ -35,8 +35,8 @@ function varargout=wfdbdesc(varargin)
 %       signal in Hz (if the 'SamplingFrequency' string is parsable).
 %
 % sigClass (Optional)
-%       Nx1 cell array of strings for the corresponding signal class base on
-%       information from PhysioNet (www.physionet.org/physiobank/signals.shtml).
+%       Nx1 cell array of strings for the corresponding signal class based on
+%       information from PhysioNet: www.physionet.org/physiobank/signals.shtml.
 %       The signal class will be one of the following:
 %                    BP         blood pressure
 %                    CO         cardiac output
@@ -206,7 +206,7 @@ persistent class_def
 
 if(isempty(class_def))
     %Get signal class information from PhysioNet's servers
-    %and stored in locally (persistent mode)
+    %and stor information locally ( persistent )
     class_def=urlread([config.CACHE_SOURCE '../signals.shtml']);
     st_ind=findstr(class_def,'<td><b>Description</b></td><td></td></tr>');
     class_def(1:st_ind+1)=[];
