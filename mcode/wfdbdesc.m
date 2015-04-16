@@ -1,6 +1,6 @@
 function varargout=wfdbdesc(varargin)
 %
-% [siginfo,Fs]=wfdbdesc(recordName)
+% [siginfo,Fs,sigClass]=wfdbdesc(recordName)
 %
 %    Wrapper to WFDB WFDBDESC:
 %         http://www.physionet.org/physiotools/wag/wfdbde-1.htm
@@ -34,6 +34,32 @@ function varargout=wfdbdesc(varargin)
 %       Nx1 vector of doubles representing the sampling frequency of each
 %       signal in Hz (if the 'SamplingFrequency' string is parsable).
 %
+% sigClass (Optional)
+%       Nx1 cell array of strings for the corresponding signal class base on
+%       information from PhysioNet (www.physionet.org/physiobank/signals.shtml).
+%       The signal class will be one of the following:
+%                    BP         blood pressure
+%                    CO         cardiac output
+%                    CO2        carbon dioxide
+%                    ECG        electrocardiogram
+%                    EEG        electroencephalogram
+%                    EMG        electromyogram
+%                    EOG        electrooculogram
+%                    Flow       air flow
+%                    HR         heart rate
+%                    Noise      for stress testing
+%                    O2         oxygen
+%                    PLETH      plethysmogram
+%                    Pos        body position
+%                    Resp       respiration
+%                    Sound      sound
+%                    ST         ECG ST segment level
+%                    Status     status of patient or monitor
+%                    SV         stroke volume
+%                    Temp       temperature 
+%                    []         unkown class
+%
+%
 % Required Parameters:
 %
 % recorName
@@ -45,11 +71,14 @@ function varargout=wfdbdesc(varargin)
 % siginfo=wfdbdesc('challenge/2013/set-a/a01')
 %
 %
+% %Example 2 -Get signal Classes
+% [siginfo,Fs,sigClass]=wfdbdesc('mitdb/100')
+%
+%
 % Written by Ikaro Silva, 2013
+% Last Modified by Ikaro Silva, April 16, 2015
 %
-% Modified by Ikaro Silva, December 3, 2014
-%
-% Version 2.0
+% Version 3.0
 %
 % Since 0.0.1
 % See also RDSAMP
@@ -63,7 +92,7 @@ end
 
 %Set default pararamter values
 inputs={'recordName'};
-outputs={'siginfo','Fs'};
+outputs={'siginfo','Fs','sigClass'};
 
 for n=1:nargin
     if(~isempty(varargin{n}))
@@ -76,6 +105,7 @@ data=char(javaWfdbExec.execToStringList(wfdb_argument));
 lines=[1 strfind(data,',')];
 siginfo=[];
 Fs=[];
+sigClass={};
 L=length(lines);
 
 %Define record Wide parameters
@@ -158,8 +188,46 @@ for n=1:L-1
     
 end
 
+if(nargout>2)
+    %Get signal class
+    sigClass=getSignalClass(siginfo,config);
+end
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end
+
+
+
+%%%%%% Help function to return signal class information %%%%%
+
+function sigClass=getSignalClass(siginfo,config)
+
+persistent class_def
+
+if(isempty(class_def))
+    %Get signal class information from PhysioNet's servers
+    %and stored in locally (persistent mode)
+    class_def=urlread([config.CACHE_SOURCE '../signals.shtml']);
+    st_ind=findstr(class_def,'<td><b>Description</b></td><td></td></tr>');
+    class_def(1:st_ind+1)=[];
+    end_ind=findstr(class_def,'</table></center>');
+    class_def(end_ind:end)=[];
+    class_def=regexp(class_def,'<tr>','split');
+end
+M=length(siginfo);
+sigClass=cell(M,1);
+for m=1:M
+    label=siginfo(m).Description;
+    ind=strmatch(['<td>' label '</td>'],class_def);
+    if(isempty(ind))
+        continue
+    end
+    str=class_def{ind};
+    str=regexp(str,'</td>','split');
+    str=regexprep(str{2},'<td>','');
+    sigClass(m)={str};
+end
+
+
 
 
