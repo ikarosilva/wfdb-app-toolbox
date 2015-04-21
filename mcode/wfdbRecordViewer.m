@@ -45,14 +45,14 @@ end
 
 
 % --- Executes just before wfdbRecordViewer is made visible.
-function wfdbRecordViewer_OpeningFcn(hObject, eventdata, handles, varargin)
+function wfdbRecordViewer_OpeningFcn(hObject, ~, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm tm_step exportFigure physionetAnn
+global current_record records tm signal info tm_step exportFigure physionetAnn
 exportFigure=0;
 physionetAnn={};
 % Choose default command line output for wfdbRecordViewer
@@ -61,8 +61,9 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 current_tmp=1;
+isWorkspace=0;
 ButtonName = questdlg('Select Database Location', 'Database Location',...
-    'Local Directory','PhysioNet','Local Directory');
+    'Local Directory','PhysioNet','MATLAB Workspace','Local Directory');
 switch ButtonName,
     case 'Local Directory',
         [filename,directoryname] = uigetfile('*.hea','Select signal header file:');
@@ -77,6 +78,10 @@ switch ButtonName,
                 current_tmp=n;
             end
         end
+    case 'MATLAB Workspace',
+        records={'MALTAB Workspace'};
+        [tm,signal,info]=loadWorkspaceRecord(handles);
+        isWorkspace=1;
     case 'PhysioNet',
         %To implement
         %Select Database name
@@ -138,8 +143,10 @@ end % switch
 set(handles.RecorListMenu,'String',records)
 current_record=current_tmp;
 set(handles.RecorListMenu,'Value',current_record)
-loadRecord(records{current_record},handles);
-loadAnnotationList(records{current_record},handles);
+if(isWorkspace==0)
+    loadRecord(records{current_record},handles);
+    loadAnnotationList(records{current_record},handles);
+end
 set(handles.slider1,'Max',tm(end))
 set(handles.slider1,'Min',tm(1))
 set(handles.slider1,'SliderStep',[1 1]);
@@ -1287,8 +1294,36 @@ ind=str2num(dlgParam.P);
 analysisSignal=u(1:N,ind);
 close(h)
 
+function [tm,signal,info]=loadWorkspaceRecord(handles)
 
+dlgParam.prompt={'Enter List of variable names (ie: x,y,z )', ...
+    'Sampling Frequency in Hz (ie: 250)',...
+    'Enter list of label names (ie: ECG,BP,EEG} )'};
 
+dlgParam.name='Select signals to load from workspace:';
+dlgParam.numlines=1;
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines);
+
+%Convert variables to format expected by the GUI
+varnames=regexp(answer{1},',','split');
+Fs=str2num(answer{2});
+tags=regexp(answer{3},',','split');
+M=length(varnames);
+signal=[];
+info=[];
+signalDescription=cell(M,1);
+for m=1:M
+    signal(:,m)=evalin('base',varnames{m});
+    info(m).Description=tags{m};
+    info(m).SamplingFrequency=Fs;
+    info(m).Gain='1';
+    info(m).Baseline=0;
+    signalDescription(m)={info(m).Description};
+end
+N=length(signal);
+tm=[0:N-1]'./Fs;
+set(handles.signalList,'String',signalDescription)
 
 function [analysisSignal,analysisUnits]=wfdbF1Track(analysisSignal,Fs)
 
