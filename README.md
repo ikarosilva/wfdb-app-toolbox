@@ -37,7 +37,7 @@ To check out and install from the trunk using MATLAB, run the following commands
 
 ```
 [old_path]=which('rdsamp');if(~isempty(old_path)) rmpath(old_path(1:end-8)); end
-wfdb_url='https://github.com/ikarosilva/wfdb-app-toolbox.git/wfdb-app-toolbox-0-9-10.zip';
+wfdb_url='http://github.com/ikarosilva/wfdb-app-toolbox.git/wfdb-app-toolbox-0-9-10.zip';
 [filestr,status] = urlwrite(wfdb_url,'wfdb-app-toolbox-0-9-10.zip');%Octave users may have to download manually
 unzip('wfdb-app-toolbox-0-9-10.zip');
 cd wfdb-app-toolbox-0-9-10;cd mcode
