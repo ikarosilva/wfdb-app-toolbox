@@ -31,6 +31,19 @@ For a list of available databases accessible through the WFDB Toolbox, see:
 
 http://physionet.org/physiobank/database/DBS
 
+## Checking out and installing from the trunk 
+
+To check out and install from the trunk using MATLAB, run the following commands:
+
+```
+[old_path]=which('rdsamp');if(~isempty(old_path)) rmpath(old_path(1:end-8)); end
+wfdb_url='https://github.com/ikarosilva/wfdb-app-toolbox.git/wfdb-app-toolbox-0-9-10.zip';
+[filestr,status] = urlwrite(wfdb_url,'wfdb-app-toolbox-0-9-10.zip');%Octave users may have to download manually
+unzip('wfdb-app-toolbox-0-9-10.zip');
+cd wfdb-app-toolbox-0-9-10;cd mcode
+addpath(pwd);savepath
+
+```
 
 ## Reference & Toolbox Technical Overview
 
@@ -39,3 +52,4 @@ I Silva, GB Moody, Journal of Open Research Software 2 (1), e27](http://openrese
 
 
 [WFDB Software Package](http://physionet.org/physiotools/wfdb.shtml) 
+
