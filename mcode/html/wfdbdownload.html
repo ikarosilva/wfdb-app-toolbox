@@ -1,0 +1,68 @@
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+      <link rel="stylesheet" href="helpwin.css">
+      <title>MATLAB File Help: wfdbdownload</title>
+   </head>
+   <body>
+      <!--Single-page help-->
+      <table border="0" cellspacing="0" width="100%">
+         <tr class="subheader">
+            <td class="headertitle">MATLAB File Help: wfdbdownload</td>
+            <td class="subheader-left"><a href="wfdbdownload.m">View code for wfdbdownload</a></td>
+            <td class="subheader-right"><a href="Contents.html">WFDB Contents</a></td>
+         </tr>
+      </table>
+      <div class="title">wfdbdownload</div>
+      <div class="helptext"><pre><!--helptext -->
+
+
+function  varargout=wfdbdownload(varargin)
+
+ [success,files_saved]=wfdbdownload(recordName)
+
+ Downloads a WFDB record with recordName 
+ and associated files from PhysioNet server and store is on the WFB Toolbox
+ cache directory.
+
+ The toolbox cache directory is determined by the foolowing toolbox
+ configuation parameters obtained by running:
+  
+  [~,config]=wfdbloadlib;
+  
+  config.CACHE     -Boolean. If true this wfdbdownlaod will attempt to
+                   download record
+
+  config.CACHE_DEST -Destion of the cached files on the user's system.
+                     It shoudl be safe to delete the cached files, they
+                     can be re-obtained when CACHE==1.
+ 
+  config.CACHE_SOURCE -Source of the cached files (default is PhysioNet's 
+                       server at physionet.org/physiobank/database/
+
+
+ Optional output parameters:
+
+ success 
+       Integer. If 0, could not download files, if -1, file already
+       exists of CACHE==0. If success>0, an integer representing the number of files
+       downloaded.
+
+ files_saved
+       A cell array of string specifying the saved files full path.
+
+
+   Written by Ikaro Silva, April 6, 2015
+   Last Modified: -
+   Version 0.1
+
+ Since 0.0.1
+ %Example:
+[success,files_saved]=wfdbdownload('mitdb/102')
+
+
+ See also WFDBLOADLIB, RDSAMP
+</pre></div><!--after help -->
+   </body>
+</html>

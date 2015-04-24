@@ -51,8 +51,7 @@ function varargout=wfdb2mat(varargin)
  
  NOTE: 
        You can use the WFDB2MAT command in order to convert the record data into a *.mat file, 
-       which can then be loaded into MATLAB/Octave's workspace using the LOAD command. 
-       This sequence of procedures is quicker (by several orders of magnitude) than calling RDSAMP.       
+       which can then be loaded into MATLAB/Octave's workspace using the LOAD command.        
        This will load the signal data in raw units (use RDMAT to load the signal in physical units). 
 
 
@@ -64,7 +63,7 @@ function varargout=wfdb2mat(varargin)
 
  %Example:
  wfdb2mat('mitdb/200')
- [tm,signal,Fs,labels]=rdmat('200m.mat');
+ [tm,signal,Fs,labels]=rdmat('200m');
  
 
  See also RDSAMP, RDMAT

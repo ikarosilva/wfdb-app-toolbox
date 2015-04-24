@@ -110,7 +110,7 @@ function ecgpuwave(varargin)
 curdir=pwd;
 [~,config]=wfdbloadlib;eval(['cd ' config.WFDB_JAVA_HOME filesep 'example'])
 ecgpuwave('100s','test');
-[tm,signal]=rdsamp('100s');
+[signal,Fs,tm]=rdsamp('100s');
 pwaves=rdann('100s','test',[],[],[],'p');
 plot(tm,signal(:,1));hold on;grid on
 plot(tm(pwaves),signal(pwaves),'or')

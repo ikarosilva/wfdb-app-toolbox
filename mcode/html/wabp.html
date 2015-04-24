@@ -90,7 +90,7 @@ Required Parameters:
  %Example - Note this will create the file: ./slpdb/slp60.wabp in you
  %directory
  N=2000;
- [tm,x]=rdsamp('slpdb/slp60',2,N);
+ [signal,Fs,tm]=rdsamp('slpdb/slp60',2,N);
  [endTime,dateStamp]=wfdbtime('slpdb/slp60',N);
  wabp('slpdb/slp60',[],endTime{1},[],2);
  [ann]=rdann('slpdb/slp60','wabp')
