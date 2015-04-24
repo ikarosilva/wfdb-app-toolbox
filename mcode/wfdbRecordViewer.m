@@ -1093,7 +1093,7 @@ function [analysisSignal]=wfdbHarmonicFilter(analysisSignal,Fs)
 persistent dlgParam
 
 if(isempty(dlgParam))
-    dlgParam.prompt={'Fundamental Frequency (Hz):','Stop Frequency (Hz)','Q factor:'};
+    dlgParam.prompt={'Fundamental Frequency (Hz). If empty, will be estimated:','Stop Frequency (Hz)','Q factor:'};
     dlgParam.fn='';
     dlgParam.stop=num2str(Fs);
     dlgParam.K='50';
@@ -1112,6 +1112,22 @@ h = waitbar(0,'Filtering Data. Please wait...');
 dlgParam.fn= answer{1};
 dlgParam.stop=answer{2};
 dlgParam.K= answer{3};
+
+if(isempty(dlgParam.fn))
+    %Estimate fundamental from spectrum
+    N=length(analysisSignal);
+    [Pxx,F] = pwelch(analysisSignal,N,0,[],Fs);
+    L=length(Pxx);
+    [acor,lag] = xcorr(Pxx-mean(Pxx));
+    acor(1:L-1)=[];
+    lag(1:L-1)=[];
+    %Find where first peak stops
+    ind=find(sign(diff(acor))>0);
+    acor(1:ind)=0;
+    [~,offset]=max(acor);
+    fn=F(lag(offset));
+    dlgParam.fn=num2str(fn); %Store in dialog box
+end
 
 %Similar  to 'Q1' but more accurate
 %For details see IEEE SP 2008 (5), pg 113
