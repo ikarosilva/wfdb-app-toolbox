@@ -1117,15 +1117,15 @@ if(isempty(dlgParam.fn))
     %Estimate fundamental from spectrum
     N=length(analysisSignal);
     [Pxx,F] = pwelch(analysisSignal,N,0,[],Fs);
+    [~,minInd]=min(abs(F-1));% Kill all frequencies below 1 Hz
     L=length(Pxx);
-    [acor,lag] = xcorr(Pxx-mean(Pxx));
+    [acor] = xcorr(Pxx-mean(Pxx));
     acor(1:L-1)=[];
-    lag(1:L-1)=[];
     %Find where first peak stops
     ind=find(sign(diff(acor))>0);
-    acor(1:ind)=0;
+    acor(1:max(ind,minInd))=0;
     [~,offset]=max(acor);
-    fn=F(lag(offset));
+    fn=F(offset);
     dlgParam.fn=num2str(fn); %Store in dialog box
 end
 
