@@ -112,30 +112,30 @@ switch ButtonName,
         dbname=regexprep(dbname,'\n','');
         dbname=regexprep(dbname,'\t','');
         [tmp,status]=urlread(['http://physionet.org/physiobank/database/' dbname '/RECORDS']);
-	if(status==1)
-        	records=regexp(tmp,'\n','split');
-        	if(isempty(records{end}(:)))
-        	    records(end)=[];
-        	end
-        	for n=1:length(records)
-        	    records{n}=['/' dbname '/' records{n}];
-        	end
-        	close(h)
-        	
-        	h = waitbar(0,'Loading list of annotations. Please wait...');
-        	[tmp,status]=urlread(['http://physionet.org/physiobank/database/' dbname '/ANNOTATORS']);
-        	if(status==1)
-        	    ann=regexp(tmp,'\n','split');
-        	    for n=1:length(ann(:,1))
-        	        tmpInd=regexp(ann{1},'\s');
-        	        physionetAnn(end+1)={ann{1}(1:tmpInd-1)};
-        	    end
-        	end
-        	close(h)
-	else
-	   errordlg(['Could not connect to PhysioNet server. Exiting!'])
-           return
-	end
+        if(status==1)
+            records=regexp(tmp,'\n','split');
+            if(isempty(records{end}(:)))
+                records(end)=[];
+            end
+            for n=1:length(records)
+                records{n}=['/' dbname '/' records{n}];
+            end
+            close(h)
+            
+            h = waitbar(0,'Loading list of annotations. Please wait...');
+            [tmp,status]=urlread(['http://physionet.org/physiobank/database/' dbname '/ANNOTATORS']);
+            if(status==1)
+                ann=regexp(tmp,'\n','split');
+                for n=1:length(ann(:,1))
+                    tmpInd=regexp(ann{1},'\s');
+                    physionetAnn(end+1)={ann{1}(1:tmpInd-1)};
+                end
+            end
+            close(h)
+        else
+            errordlg(['Could not connect to PhysioNet server. Exiting!'])
+            return
+        end
         
 end % switch
 
@@ -820,6 +820,8 @@ else
             [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
         case 'Spatial PCA'
             [analysisSignal,analysisUnits]=wfdbPCA(signal);
+        case 'Harmonic Filter'
+            [analysisSignal]=wfdbHarmonicFilter(analysisSignal,Fs);
         case 'Karhunen-Loeve Expansion'
             [analysisSignal,analysisUnits]=wfdbKL(analysisSignal);
         case 'Track Fundamental'
@@ -1079,6 +1081,81 @@ catch
     errordlg(['Unable to filter data! Error: ' lasterr])
 end
 close(h)
+
+
+function [analysisSignal]=wfdbHarmonicFilter(analysisSignal,Fs)
+% References:
+% *Rangayyan (2002), "Biomedical Signal Analysis", IEEE Press Series in BME
+%
+% *Hayes (1999), "Digital Signal Processing", Schaum's Outline
+%Set Low-pass default values
+
+persistent dlgParam
+
+if(isempty(dlgParam))
+    dlgParam.prompt={'Fundamental Frequency (Hz). If empty, will be estimated:','Stop Frequency (Hz)','Q factor:'};
+    dlgParam.fn='';
+    dlgParam.stop=num2str(Fs);
+    dlgParam.K='50';
+    dlgParam.name='Harmonic Filter Design';
+    dlgParam.numlines=1;
+end
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,...
+    {dlgParam.fn,dlgParam.stop,dlgParam.K});
+if(isempty(answer))
+    analysisSignal=[];
+    return;
+end
+
+
+h = waitbar(0,'Filtering Data. Please wait...');
+dlgParam.fn= answer{1};
+dlgParam.stop=answer{2};
+dlgParam.K= answer{3};
+
+if(isempty(dlgParam.fn))
+    %Estimate fundamental from spectrum
+    N=length(analysisSignal);
+    [Pxx,F] = pwelch(analysisSignal,N,0,[],Fs);
+    [~,minInd]=min(abs(F-1));% Kill all frequencies below 1 Hz
+    L=length(Pxx);
+    [acor] = xcorr(Pxx-mean(Pxx));
+    acor(1:L-1)=[];
+    %Find where first peak stops
+    ind=find(sign(diff(acor))>0);
+    acor(1:max(ind,minInd))=0;
+    [~,offset]=max(acor);
+    fn=F(offset);
+    dlgParam.fn=num2str(fn); %Store in dialog box
+end
+
+%Similar  to 'Q1' but more accurate
+%For details see IEEE SP 2008 (5), pg 113
+K=str2num(dlgParam.K);
+fn=str2num(dlgParam.fn);
+stop=str2num(dlgParam.stop);
+beta=1+K;
+M=floor(stop/fn);
+A=[];
+B=[];
+for i=1:M
+    f=pi*fn/Fs;
+    numA=tan(pi/4 - f);
+    denA=sin(2*f)+cos(2*f)*numA;
+    c=numA/denA;
+    b=[1 -2*c c.^2];
+    a=[ (beta + K*(c^2)) -2*c*(beta+K) ((c^2)*beta + K)];
+    B=[B b];
+    A=[A a];
+end
+
+try
+    analysisSignal=filtfilt(B,A,analysisSignal);
+catch
+    errordlg(['Unable to filter data! Error: ' lasterr])
+end
+close(h)
+
 
 
 function [analysisSignal]=wfdbSgolayfilt(analysisSignal)
