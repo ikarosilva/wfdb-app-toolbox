@@ -18,7 +18,7 @@
 CLASS_PATH = ../../bin
 #Define location of wfdb/wfdb.h
 WFDB_INCLUDE=.
-WFDB_LIB =../../mcode/nativelibs/windows/bin/
+WFDB_LIB =.
 # Define a virtual path for .class in the bin directory
 vpath %.class $(CLASS_PATH)
 JAVA_HOME=/c/Program\ Files/Java/jdk1.8.0_40/
