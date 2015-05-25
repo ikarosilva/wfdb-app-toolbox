@@ -8,7 +8,7 @@ import java.util.Map;
 public class SystemSettings {
 
 	static String fsep= System.getProperty("file.separator");
-	
+
 	public static void loadCurl(Boolean customArch){
 
 		if(getOsName().contains("windows")){
@@ -17,7 +17,7 @@ public class SystemSettings {
 					+ "\\bin\\libcurl-4.dll" );
 		}else if(getOsName().contains("mac")){
 			String libCurlName= SystemSettings.getWFDB_NATIVE_BIN(customArch) 
-			+ "bin/libcurl.4.dylib";
+					+ "bin/libcurl.4.dylib";
 			SecurityManager security = System.getSecurityManager();
 			if(security != null){
 				security.checkLink(libCurlName);
@@ -26,10 +26,24 @@ public class SystemSettings {
 		}
 
 	}
-	
+
 	public static void loadLib(String libName){
 		if(getOsName().contains("windows")){
-			//Do nothing for now
+			try {
+				//Windows is messy, so I am hard-coding this here ....
+				//This is only valid when called from Rdsamp.java. No other class should call
+				//this (if it does, input arg is ignored)
+				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+						 + "\\bin\\"  +"libcurl-4.dll");
+				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+						 + "\\bin\\"  +"wfdb-10.5.dll");
+				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+						 + "\\bin\\"  + "librdsampjni.exe.exe" );
+			} catch (UnsatisfiedLinkError e) {
+				System.err.println("Native code library failed to load.\n" + e);
+				System.exit(1);
+			}
+			
 		}else if(getOsName().contains("mac")){
 			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
 					+ "/bin/lib" + libName + ".dylib");
@@ -72,14 +86,14 @@ public class SystemSettings {
 			LD_PATH=env.get("DYLD_LIBRARY_PATH");pathSep=":";
 			OsPathName="DYLD_LIBRARY_PATH";
 			tmp=WFDB_NATIVE_BIN + "bin" + pathSep 
-			+ WFDB_NATIVE_BIN + "lib64" + pathSep 
-			+ WFDB_NATIVE_BIN + "lib";
+					+ WFDB_NATIVE_BIN + "lib64" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib";
 		}else{
 			LD_PATH=env.get("LD_LIBRARY_PATH");pathSep=":";
 			OsPathName="LD_LIBRARY_PATH";
 			tmp=WFDB_NATIVE_BIN + "bin" + pathSep 
-			+ WFDB_NATIVE_BIN + "lib64" + pathSep 
-			+ WFDB_NATIVE_BIN + "lib";
+					+ WFDB_NATIVE_BIN + "lib64" + pathSep 
+					+ WFDB_NATIVE_BIN + "lib";
 		}
 
 		if(LD_PATH == null){
@@ -119,7 +133,7 @@ public class SystemSettings {
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + fsep + "custom"+ fsep;
 		}else{
 			WFDB_NATIVE_BIN= WFDB_JAVA_HOME+ "nativelibs" + fsep + 
-			getOsName().toLowerCase()+ fsep ;
+					getOsName().toLowerCase()+ fsep ;
 		}
 		return WFDB_NATIVE_BIN;
 	}
