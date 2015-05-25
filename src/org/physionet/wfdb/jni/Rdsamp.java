@@ -22,7 +22,7 @@ public class Rdsamp {
 	
 	//Initialize enviroment
 	static {
-		org.physionet.wfdb.SystemSettings.loadLib("wfdb");
+		org.physionet.wfdb.SystemSettings.loadLib("libwfdb");
 		org.physionet.wfdb.SystemSettings.loadLib("rdsampjni");
 	}
 	
