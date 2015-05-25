@@ -262,20 +262,27 @@ else
     [ann1,type,subtype,chan,num,comment]=rdann(fname,annName);
 end
 ann1Labels.type=type;
-ann1Labels.comment=comment;
+ann1Labels.subtype=subtype;
 ann1Labels.chan=chan;
+ann1Labels.num=num;
+ann1Labels.comment=comment;
 %Load other parameters for the ann1Labels structure
 wfdbShowAnn1Labels(0);
 
 close(h)
 
 function loadAnn2(fname,annName)
-global ann2
+global ann2 ann2Labels
 h = waitbar(0,'Loading Annotations. Please wait...');
 if(strcmp(fname,'none'))
     ann1=[];
 else
-    [ann2,type,subtype,chan,num,comments]=rdann(fname,annName);
+    [ann2,type,subtype,chan,num,comment]=rdann(fname,annName);
+    ann2Labels.type=type;
+    ann2Labels.subtype=subtype;
+    ann2Labels.chan=chan;
+    ann2Labels.num=num;
+    ann2Labels.comment=comment;
 end
 close(h)
 
@@ -614,7 +621,7 @@ end
 
 function AnnotationMenu_Callback(hObject, eventdata, handles)
 
-global ann1 ann1RR info tm ann2 specEstimation analysisSignal exportFigure
+global ann1 ann1Labels ann1RR info ann2 ann2Labels tm specEstimation analysisSignal exportFigure
 exportFigure=0;
 
 tips=0;
@@ -654,7 +661,25 @@ switch(annStr{index})
         
         %Convert to samples ann to ann1
         x=round(x*Fs);
-        ann1=sort([ann1;x]);
+        x=sort(x);
+        N=length(x);
+        
+        %Get annotation info (which will be the same for multiple
+        %annotations
+        [annType,annSubtype,annChan,annNum,annComments]=getAnnFields();
+        for n=1:N
+            tmp.ann=x(n);
+            ann1(end+1)=n;
+            ann1Labels(end+1).type=type;
+            ann1Labels(end).subtype=subtype;
+            ann1Labels(end).chan=chan;
+            ann1Labels(end).num=num;
+            ann1Labels(end).comment=comment;
+        end
+        if(~isfield(ann1Labels.threshold))
+            %Define/set display parameters if this is the first annotation
+            wfdbShowAnn1Labels(1);
+        end
         %Refresh annotation plot
         wfdbplot(handles)
         
@@ -715,15 +740,20 @@ switch(annStr{index})
         wfdbplot(handles)
         
     case 'Add annotations in a range from Ann2 to Ann2'
-        global ann2
+        
         if(tips)
             helpdlg('Left click on waveform to select start and end of region to add from Ann2 to Ann1. Hit Enter when done.','Adding Annotations');
         end
         axes(handles.axes1);
         [x,~]= ginput;
+        ind=[1:length(x)]';
+        X=sortrows([ind x(:)],2);
+        x=X(:,2);
+        ann2Labels=ann2Labels(X(:,1));
         [~,start_ind]=min(abs(x(1)-tm(ann2)));
         [~,end_ind]=min(abs(x(2)-tm(ann2)));
         ann1=sort([ann1;ann2(start_ind:end_ind)]);
+        ann1Labels=[ann1Labels;ann2Labels];
         %Refresh annotation plot
         wfdbplot(handles)
         
@@ -896,6 +926,37 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+
+function [annType,annSubtype,annChan,annNum,annComments]=getAnnFields()
+%Set Low-pass default values
+persistent dlgParam
+
+if(isempty(dlgParam))
+    dlgParam.prompt={'Annotation Type:', 'Annotation Subtype:','Annotation Channel:','Annotation Number:'...
+        'Annotation Commentes:'};
+    dlgParam.annType='N';
+    dlgParam.annSubtype='';
+    dlgParam.annChan='1';
+    dlgParam.annNum='';
+    dlgParam.annComments='';
+    dlgParam.name='Enter Optional Annotation Info';
+    dlgParam.numlines=1;
+end
+
+answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines,{dlgParam.annType,...
+    dlgParam.annSubtype,dlgParam.annChan,dlgParam.annNum,dlgParam.annComments});
+
+dlgParam.annType=answer{1};
+dlgParam.annSubtype=answer{2};
+dlgParam.annChan=answer{3};
+dlgParam.annNum=answer{4};
+dlgParam.annComments=answer{5};
+
+annType=answer{1};
+annSubtype=answer{2};
+annChan=answer{3};
+annNum=answer{4};
+annComments=answer{5};
 
 
 function [analysisSignal]=wfdbFilter(analysisSignal,Fs)
