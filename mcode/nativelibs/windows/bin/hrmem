@@ -51,14 +51,14 @@ do
 done
 
 if [ x$PLOT = x ]; then
-  if [ -x /home/ikaro/wfdb-app-toolbox/mcode/nativelibs/windows/build/bin/plt ]; then
-    PLOT=/home/ikaro/wfdb-app-toolbox/mcode/nativelibs/windows/build/bin/plt
+  if [ -x /home/benjamin/wfdb-bin-mingw/x86_64/bin/plt ]; then
+    PLOT=/home/benjamin/wfdb-bin-mingw/x86_64/bin/plt
   elif [ -x /usr/local/bin/plt ]; then
     PLOT=/usr/local/bin/plt
   elif [ -x /usr/bin/plt ]; then
     PLOT=/usr/bin/plt
-  elif [ -x /home/ikaro/wfdb-app-toolbox/mcode/nativelibs/windows/build/bin/plot2d ]; then
-    PLOT=/home/ikaro/wfdb-app-toolbox/mcode/nativelibs/windows/build/bin/plot2d
+  elif [ -x /home/benjamin/wfdb-bin-mingw/x86_64/bin/plot2d ]; then
+    PLOT=/home/benjamin/wfdb-bin-mingw/x86_64/bin/plot2d
   elif [ -x /usr/local/bin/plot2d ]; then
     PLOT=/usr/local/bin/plot2d
   elif [ -x /usr/bin/plot2d ]; then
