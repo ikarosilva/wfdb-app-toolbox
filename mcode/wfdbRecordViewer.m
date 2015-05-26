@@ -670,13 +670,13 @@ switch(annStr{index})
         for n=1:N
             tmp.ann=x(n);
             ann1(end+1)=n;
-            ann1Labels(end+1).type=type;
-            ann1Labels(end).subtype=subtype;
-            ann1Labels(end).chan=chan;
-            ann1Labels(end).num=num;
-            ann1Labels(end).comment=comment;
+            ann1Labels(end+1).type=annType;
+            ann1Labels(end).subtype=annSubtype;
+            ann1Labels(end).chan=annChan;
+            ann1Labels(end).num=annNum;
+            ann1Labels(end).comment=annComments;
         end
-        if(~isfield(ann1Labels.threshold))
+        if(~isfield(ann1Labels,'threshold'))
             %Define/set display parameters if this is the first annotation
             wfdbShowAnn1Labels(1);
         end
