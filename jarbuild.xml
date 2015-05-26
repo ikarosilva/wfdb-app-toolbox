@@ -5,6 +5,8 @@
   	<property name="classes.dir" value="${build.dir}/classes"/>
   	<property name="jar.dir"     value="mcode"/>
   	<property name="jar7name"     value="wfdb-app-JVM7-0-9-10.jar"/>
+	<property name="jar8name"    value="wfdb-app-JVM8-0-9-10.jar"/>
+	
 	<target name="compile7">
 		<delete dir="${build.dir}"/>
 		<mkdir dir="${build.dir}"/>
@@ -13,9 +15,25 @@
 	    	includeantruntime="yes"	target="1.7" 
 	    	source="1.7" />
 	</target>
+	<target name="compile8">
+	 	 	<delete dir="${build.dir}"/>
+	 	 	<mkdir dir="${build.dir}"/>
+	    	<mkdir dir="${classes.dir}"/>
+	    	<javac srcdir="${src.dir}" destdir="${classes.dir}"	
+	    		includeantruntime="yes"	target="1.8" 
+	    		source="1.8" />
+	</target>
  	<target name="jar7" depends="compile7">
 	 		<delete file="${jar.dir}/${jar7name}"/>
 	    	<jar destfile="${jar.dir}/${jar7name}" basedir="${classes.dir}">
+	      	<manifest>
+	        	<attribute name="Main-Class" value="org.physionet.wfdb.Wfdbexec"/>
+	      	</manifest>
+	    	</jar>
+	</target>
+	<target name="jar8" depends="compile8">
+	 		<delete file="${jar.dir}/${jar8name}"/>
+	    	<jar destfile="${jar.dir}/${jar8name}" basedir="${classes.dir}">
 	      	<manifest>
 	        	<attribute name="Main-Class" value="org.physionet.wfdb.Wfdbexec"/>
 	      	</manifest>
