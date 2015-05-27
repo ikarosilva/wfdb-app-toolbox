@@ -323,7 +323,7 @@ set(handles.Ann2Menu,'String',annotations)
 function wfdbplot(handles)
 global tm signal info tm_step ann1 ann2 annDiff ann1RR analysisSignal
 global specEstimation analysisTime analysisUnits analysisYAxis ann1Labels
-global exportFigure
+global exportFigure ann1LabelsDisplaySetting
 
 if(exportFigure)
     figure
@@ -365,7 +365,7 @@ sig=offset.*sig./repmat(SCALE,[N 1]);
 OFFSET=offset.*[1:CH];
 sig=sig + repmat(OFFSET,[N 1]);
 if(~isempty(ann1))
-    showThreshold=str2num(ann1Labels.threshold);
+    showThreshold=str2num(ann1LabelsDisplaySetting.threshold);
 end
 
 for ch=1:CH;
@@ -381,26 +381,20 @@ for ch=1:CH;
             end
             plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
             %Plot labels if selected
-            if(length(tmp_ann1)<showThreshold && ~strcmp(ann1Labels.showType,'-1'))
-                tmpType=ann1Labels.type((ann1>ind_start) & (ann1<ind_end));
-                tmpChan=ann1Labels.chan((ann1>ind_start) & (ann1<ind_end));
-                K=length(tmpType);
-                if(strcmp(ann1Labels.showComment,'false'))
-                    tmpComment=cell(K,1);
-                else
-                    tmpComment=ann1Labels.comment((ann1>ind_start) & (ann1<ind_end));
-                end
-                if(~strcmp(ann1Labels,'[]'))
-                    %Filter according to beat type
-                end
+            if(length(tmp_ann1)<showThreshold && ~strcmp(ann1LabelsDisplaySetting.showType,'-1'))
+                ann_ind=(ann1>ind_start) & (ann1<ind_end);
+                tmpLabel=ann1Labels(ann_ind);
+                K=length(tmpLabel);
                 for k=1:K
-                    if(strcmp(ann1Labels.channelSpecific,'false') || tmpChan(k)==ch)
-                        if(strcmp(ann1Labels.abnormalOnly,'false'))
-                            str=[tmpType(k,:) ' ' tmpComment{k}];
+                    str=tmpLabel(k).type;
+                    if(strcmp(ann1LabelsDisplaySetting.showComment,'true'))
+                        str=[ str(:) ' ' tmpLabel(k).comment(:)];
+                    end
+                    if(strcmp(ann1LabelsDisplaySetting.channelSpecific,'false') || tmpChan(k)==ch)
+                        if(strcmp(ann1LabelsDisplaySetting.abnormalOnly,'false'))
                             text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
                         else
-                            if(~strcmp(tmpType(k,:),'N'))
-                                str=[tmpType(k,:) ' ' tmpComment{k}];
+                            if(~strcmp(tmpLabel(k).type,'N'))
                                 text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
                             end
                         end
@@ -1506,29 +1500,29 @@ analysisUnits='Hz';
 close(h)
 
 function wfdbShowAnn1Labels(promptMe)
-global ann1Labels
-if(~isfield(ann1Labels,'prompt'))
-    ann1Labels.prompt={'Ann1 Types (if empty, show all types, if -1 don''t display):',...
+global ann1LabelsDisplaySetting
+if(~isfield(ann1LabelsDisplaySetting,'prompt'))
+    ann1LabelsDisplaySetting.prompt={'Ann1 Types (if empty, show all types, if -1 don''t display):',...
         'Show Comments (true/false):','Display label on original channel only (true/false):',...
         'Display Label Types & Comments when there are at most N labels:', ...
         'Display abnormal labels only (true/false):'};
-    ann1Labels.showType='[]';
-    ann1Labels.showComment='true';
-    ann1Labels.channelSpecific='false';
-    ann1Labels.threshold='100';
-    ann1Labels.abnormalOnly='false';
-    ann1Labels.name='Displays Ann1 Type and Comments';
-    ann1Labels.numlines=1;
+    ann1LabelsDisplaySetting.showType='[]';
+    ann1LabelsDisplaySetting.showComment='true';
+    ann1LabelsDisplaySetting.channelSpecific='false';
+    ann1LabelsDisplaySetting.threshold='100';
+    ann1LabelsDisplaySetting.abnormalOnly='false';
+    ann1LabelsDisplaySetting.name='Displays Ann1 Type and Comments';
+    ann1LabelsDisplaySetting.numlines=1;
 end
 if(promptMe)
-    answer=inputdlg(ann1Labels.prompt,ann1Labels.name,ann1Labels.numlines,...
-        {ann1Labels.showType,ann1Labels.showComment, ann1Labels.channelSpecific,...
-        ann1Labels.threshold,ann1Labels.abnormalOnly});
-    ann1Labels.showType= answer{1};
-    ann1Labels.showComment= answer{2};
-    ann1Labels.channelSpecific=answer{3};
-    ann1Labels.threshold=answer{4};
-    ann1Labels.abnormalOnly=answer{5};
+    answer=inputdlg(ann1LabelsDisplaySetting.prompt,ann1LabelsDisplaySetting.name,ann1LabelsDisplaySetting.numlines,...
+        {ann1LabelsDisplaySetting.showType,ann1LabelsDisplaySetting.showComment, ann1LabelsDisplaySetting.channelSpecific,...
+        ann1LabelsDisplaySetting.threshold,ann1LabelsDisplaySetting.abnormalOnly});
+    ann1LabelsDisplaySetting.showType= answer{1};
+    ann1LabelsDisplaySetting.showComment= answer{2};
+    ann1LabelsDisplaySetting.channelSpecific=answer{3};
+    ann1LabelsDisplaySetting.threshold=answer{4};
+    ann1LabelsDisplaySetting.abnormalOnly=answer{5};
 end
 
 
