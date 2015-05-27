@@ -615,7 +615,7 @@ end
 
 function AnnotationMenu_Callback(hObject, eventdata, handles)
 
-global ann1 ann1Labels ann1RR info ann2 ann2Labels tm specEstimation analysisSignal exportFigure
+global ann1 ann1Labels ann1RR info ann2 ann2Labels tm specEstimation analysisSignal exportFigure ann1LabelsDisplaySetting
 exportFigure=0;
 
 tips=0;
@@ -661,16 +661,17 @@ switch(annStr{index})
         %Get annotation info (which will be the same for multiple
         %annotations
         [annType,annSubtype,annChan,annNum,annComments]=getAnnFields();
+        %samp=round(tm*Fs);
         for n=1:N
-            tmp.ann=x(n);
-            ann1(end+1)=n;
+            %[~,tmp_ind]=min(abs(x(n)-samp));
+            ann1(end+1)=x(n);
             ann1Labels(end+1).type=annType;
             ann1Labels(end).subtype=annSubtype;
             ann1Labels(end).chan=annChan;
             ann1Labels(end).num=annNum;
             ann1Labels(end).comment=annComments;
         end
-        if(~isfield(ann1Labels,'threshold'))
+        if(isempty(ann1LabelsDisplaySetting))
             %Define/set display parameters if this is the first annotation
             wfdbShowAnn1Labels(1);
         end

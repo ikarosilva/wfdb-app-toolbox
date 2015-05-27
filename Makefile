@@ -30,7 +30,7 @@ JARFLAGS := -jar		\
 #version numbers, as they are really modular...But for now we keep them at the same
 #versioning level in order to avoid (or increase?) confusion.
 APP_NAME="wfdb-app-toolbox-0-9-10.zip"
-JAR6_NAME="wfdb-app-JVM6-0-9-10.jar" 
+JAR8_NAME="wfdb-app-JVM8-0-9-10.jar" 
 JAR7_NAME="wfdb-app-JVM7-0-9-10.jar"
 
 #TODO: There are two directories for linux. we need to remove one!	
@@ -47,7 +47,7 @@ package: clean doc jartest unit-test.zip
 	rm $(APP_NAME) ;\
 	zip -r $(APP_NAME) mcode -x@zipexclude.lst  
 %.java:
-	java $(JARFLAGS) jar6; \
+	java $(JARFLAGS) jar8; \
 	java $(JARFLAGS) jar7
 
 $(JAR6_NAME): %.java
