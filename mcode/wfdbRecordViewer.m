@@ -52,7 +52,7 @@ function wfdbRecordViewer_OpeningFcn(hObject, ~, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm signal info tm_step exportFigure physionetAnn
+global current_record records tm signal info tm_step exportFigure physionetAnn fext
 exportFigure=0;
 physionetAnn={};
 % Choose default command line output for wfdbRecordViewer
@@ -66,14 +66,19 @@ ButtonName = questdlg('Select Database Location', 'Database Location',...
     'Local Directory','PhysioNet','MATLAB Workspace','Local Directory');
 switch ButtonName,
     case 'Local Directory',
-        [filename,directoryname] = uigetfile('*.hea','Select signal header file:');
+        [filename,directoryname] = uigetfile('*.hea;*.edf;*.mat','Select signal header file:');
         cd(directoryname)
-        tmp=dir('*.hea');
+        fext=filename(end-3:end);
+        tmp=dir(['*' fext]);
         N=length(tmp);
         records=cell(N,1);
         for n=1:N
             fname=tmp(n).name;
-            records(n)={fname(1:end-4)};
+            if(strcmp(fext,'.edf'))
+                records(n)={fname};
+            else
+                records(n)={fname(1:end-4)};
+            end
             if(strcmp(fname,filename))
                 current_tmp=n;
             end
