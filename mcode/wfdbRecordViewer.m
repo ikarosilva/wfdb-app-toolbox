@@ -245,6 +245,7 @@ function loadRecord(fname,handles)
 global tm signal info analysisSignal analysisTime
 h = waitbar(0,'Loading Data. Please wait...');
 [signal,Fs,tm]=rdsamp(fname);
+signal=single(signal);
 info=wfdbdesc(fname);
 R=length(info);
 analysisSignal=[];
