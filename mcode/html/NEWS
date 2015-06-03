@@ -2,7 +2,8 @@ For a detailed list of changes see the repository Log at:
    http://github.com/ikarosilva/wfdb-app-toolbox.git
 
 0.9.10 (March 13, 2015)
-	   Added the function SNIP to the library.
+	   Added the function SNIP to the library. Added local caching of PhysioNet files to the {wfdbroot}/databases directory.
+	   Updated native libraries to WFDB 10.5.24. Implement RSDSAMP via the JNI for improvement in memory and speed.
 	   Several bug fixes. WFDBLOADLIB now issues a warning if installation directory has an empty space in the path.
 	   Added feature to WFDBRECORDVIEWER that allows user to remotely view any record or annotation in PhysioNet
 	   through WFDBRECORDVIEWER's interface. Added following features to WFDBRECORDVIEWER:

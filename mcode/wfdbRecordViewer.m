@@ -388,19 +388,18 @@ for ch=1:CH;
             plot(tm(tmp_ann1),OFFSET(ch),'go','MarkerSize',msize,'MarkerFaceColor','g')
             %Plot labels if selected
             if(length(tmp_ann1)<showThreshold && ~strcmp(ann1LabelsDisplaySetting.showType,'-1'))
-                ann_ind=(ann1>ind_start) & (ann1<ind_end);
-                tmpLabel=ann1Labels(ann_ind);
-                K=length(tmpLabel);
+                ann_ind=find(((ann1>ind_start) & (ann1<ind_end)) ==1);
+                K=length(ann_ind);
                 for k=1:K
-                    str=tmpLabel(k).type;
+                    str=ann1Labels.type(k);
                     if(strcmp(ann1LabelsDisplaySetting.showComment,'true'))
-                        str=[ str(:) ' ' tmpLabel(k).comment(:)];
+                        str=[ str(:) ' ' ann1Labels.comment(k)];
                     end
                     if(strcmp(ann1LabelsDisplaySetting.channelSpecific,'false') || tmpChan(k)==ch)
                         if(strcmp(ann1LabelsDisplaySetting.abnormalOnly,'false'))
                             text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
                         else
-                            if(~strcmp(tmpLabel(k).type,'N'))
+                            if(~strcmp(ann1Labels.type(k),'N'))
                                 text(tm(tmp_ann1(k)),OFFSET(ch)+0.15,str)
                             end
                         end
@@ -671,11 +670,11 @@ switch(annStr{index})
         for n=1:N
             %[~,tmp_ind]=min(abs(x(n)-samp));
             ann1(end+1)=x(n);
-            ann1Labels(end+1).type=annType;
-            ann1Labels(end).subtype=annSubtype;
-            ann1Labels(end).chan=annChan;
-            ann1Labels(end).num=annNum;
-            ann1Labels(end).comment=annComments;
+            ann1Labels.type(end+1)=annType;
+            ann1Labels.subtype(end+1)=annSubtype;
+            ann1Labels.chan(end+1)=annChan;
+            ann1Labels.num(end+1)=annNum;
+            ann1Labels.comment(end+1)=annComments;
         end
         if(isempty(ann1LabelsDisplaySetting))
             %Define/set display parameters if this is the first annotation
@@ -936,9 +935,9 @@ if(isempty(dlgParam))
     dlgParam.prompt={'Annotation Type:', 'Annotation Subtype:','Annotation Channel:','Annotation Number:'...
         'Annotation Commentes:'};
     dlgParam.annType='N';
-    dlgParam.annSubtype='';
+    dlgParam.annSubtype='0';
     dlgParam.annChan='1';
-    dlgParam.annNum='';
+    dlgParam.annNum='0';
     dlgParam.annComments='';
     dlgParam.name='Enter Optional Annotation Info';
     dlgParam.numlines=1;
@@ -954,10 +953,10 @@ dlgParam.annNum=answer{4};
 dlgParam.annComments=answer{5};
 
 annType=answer{1};
-annSubtype=answer{2};
-annChan=answer{3};
-annNum=answer{4};
-annComments=answer{5};
+annSubtype=num2str(answer{2});
+annChan=num2str(answer{3});
+annNum=num2str(answer{4});
+annComments=answer(5);
 
 
 function [analysisSignal]=wfdbFilter(analysisSignal,Fs)
