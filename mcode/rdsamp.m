@@ -178,7 +178,7 @@ if(~isempty(N))
     %there is no signal length information on the header file
     wfdb_argument{end+1}='-t';
     wfdb_argument{end+1}=['s' num2str(N)];
-    ListCapacity=N-N0;
+    ListCapacity=N-N0+min(1, N0);
 end
 
 
