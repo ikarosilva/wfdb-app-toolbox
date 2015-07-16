@@ -52,7 +52,7 @@ function wfdbRecordViewer_OpeningFcn(hObject, ~, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to wfdbRecordViewer (see VARARGIN)
 
-global current_record records tm signal info tm_step exportFigure physionetAnn fext
+global current_record records tm signal info tm_step exportFigure physionetAnn fext ann1 ann1Type ann1LabelsDisplaySetting
 exportFigure=0;
 physionetAnn={};
 % Choose default command line output for wfdbRecordViewer
@@ -85,7 +85,7 @@ switch ButtonName,
         end
     case 'MATLAB Workspace',
         records={'MALTAB Workspace'};
-        [tm,signal,info]=loadWorkspaceRecord(handles);
+        [tm,signal,info,ann1,ann1Type]=loadWorkspaceRecord(handles);
         isWorkspace=1;
     case 'PhysioNet',
         %To implement
@@ -666,15 +666,14 @@ switch(annStr{index})
         %Get annotation info (which will be the same for multiple
         %annotations
         [annType,annSubtype,annChan,annNum,annComments]=getAnnFields();
-        %samp=round(tm*Fs);
         for n=1:N
             %[~,tmp_ind]=min(abs(x(n)-samp));
             ann1(end+1)=x(n);
-            ann1Labels.type(end+1)=annType;
-            ann1Labels.subtype(end+1)=annSubtype;
-            ann1Labels.chan(end+1)=annChan;
-            ann1Labels.num(end+1)=annNum;
-            ann1Labels.comment(end+1)=annComments;
+            ann1Labels(end+1).type=annType;
+            ann1Labels(end).subtype=annSubtype;
+            ann1Labels(end).chan=annChan;
+            ann1Labels(end).num=annNum;
+            ann1Labels(end).comment=annComments;
         end
         if(isempty(ann1LabelsDisplaySetting))
             %Define/set display parameters if this is the first annotation
@@ -765,6 +764,13 @@ switch(annStr{index})
         newAnn=inputdlg('Enter new annotation name:','Save Annotation',1,defName);
         h=waitbar(0,['Saving annotation file: ' records{current_record} '.' newAnn{1}]);
         wrann(records{current_record},newAnn{1},ann1);
+        close(h)
+        
+    case 'Save Ann1 to matfile'
+        defName={'new_label.mat'};
+        newAnn=inputdlg('Enter new MAT file name:','Save to mat file: ',1,defName);
+        h=waitbar(0,['Saving annotation file: ' newAnn]);
+        save(newAnn,'ann1','ann1Labels')
         close(h)
         
     case 'Launch PhysioNet Label Definitions'
@@ -1428,11 +1434,12 @@ ind=str2num(dlgParam.P);
 analysisSignal=u(1:N,ind);
 close(h)
 
-function [tm,signal,info]=loadWorkspaceRecord(handles)
+function [tm,signal,info,ann, annLabels]=loadWorkspaceRecord(handles)
 
 dlgParam.prompt={'Enter List of variable names (ie: x,y,z )', ...
     'Sampling Frequency in Hz (ie: 250)',...
-    'Enter list of label names (ie: ECG,BP,EEG} )'};
+    'Enter list of label names (ie: ECG,BP,EEG} )',...
+    'Enter Annotation name: '};
 
 dlgParam.name='Select signals to load from workspace:';
 dlgParam.numlines=1;
@@ -1441,11 +1448,36 @@ answer=inputdlg(dlgParam.prompt,dlgParam.name,dlgParam.numlines);
 
 %Convert variables to format expected by the GUI
 varnames=regexp(answer{1},',','split');
-Fs=str2num(answer{2});
+tentative_Fs=answer{2};
+Fs=[];
+try
+    Fs=str2num(tentative_Fs);
+catch
+    %Maybe it is a variable, evaluate it! 
+    Fs=evalin('base',tentative_Fs);
+end
+
 tags=regexp(answer{3},',','split');
 M=length(varnames);
 signal=[];
 info=[];
+ann=[];
+if(length(answer{4})>1)
+    ann=evalin('base',answer{4});
+    if(~isempty(ann))
+        wfdbShowAnn1Labels(1)
+        [annType,annSubtype,annChan,annNum,annComments]=getAnnFields();
+        annLabels=struct([]);
+        for n=1:length(ann)
+            annLabels(end+1).type=annType;
+            annLabels(end).subtype=annSubtype;
+            annLabels(end).chan=annChan;
+            annLabels(end).num=annNum;
+            annLabels(end).comment=annComments;
+        end
+        
+    end
+end
 signalDescription=cell(M,1);
 for m=1:M
     signal(:,m)=evalin('base',varnames{m});
