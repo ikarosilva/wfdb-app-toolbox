@@ -987,7 +987,7 @@ h = waitbar(0,'Filtering Data. Please wait...');
 dlgParam.answer=answer{1};
 try
     eval([dlgParam.answer ';']);
-    analysisSignal=filtfilt(b,a,analysisSignal);
+    analysisSignal=filtfilt(b,a,double(analysisSignal));
 catch
     errordlg(['Unable to filter data! Error: ' lasterr])
 end
@@ -1089,7 +1089,7 @@ b=[1 -2*cW 1];
 a=[1 -2*r*cW r^2];
 try
     eval([answer{1} ';']);
-    analysisSignal=filtfilt(b,a,analysisSignal);
+    analysisSignal=filtfilt(b,a,double(analysisSignal));
 catch
     errordlg(['Unable to filter data! Error: ' lasterr])
 end
@@ -1139,7 +1139,7 @@ a=[ (beta + K*(A^2)) -2*A*(beta+K) ((A^2)*beta + K)];
 
 try
     eval([answer{1} ';']);
-    analysisSignal=filtfilt(b,a,analysisSignal);
+    analysisSignal=filtfilt(b,a,double(analysisSignal));
 catch
     errordlg(['Unable to filter data! Error: ' lasterr])
 end
