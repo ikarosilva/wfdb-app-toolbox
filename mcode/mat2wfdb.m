@@ -107,7 +107,7 @@ skip=0;
 %Set default parameters
 params={'x','fname','Fs','bit_res','adu','info','gain','sg_name','baseline','isint'};
 Fs=1;
-adu=[];
+adu={};
 info=[];
 isint=0;
 %Use cell array for baseline and gain in case of empty conditions
@@ -202,7 +202,7 @@ for m=1:M+1
 end
 
 if(~isempty(info))
-    count=fprintf(fid,'#%s',info);
+    count=cellfun(@(x) fprintf(fid,'#%s\n',x),info);
 end
 
 if(nargout==1)
