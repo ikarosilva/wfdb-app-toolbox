@@ -141,6 +141,9 @@ if(isempty(sg_name))
 end
 if(isempty(adu))
     adu=repmat({'V'},[M 1]);
+elseif length(adu)<M
+    adu=repmat(adu{:},[M 1]);
+end
 end
 if ~isempty(setdiff(bit_res,bit_res_suport))
     error(['Bit res should be any of: ' num2str(bit_res_suport)]);
