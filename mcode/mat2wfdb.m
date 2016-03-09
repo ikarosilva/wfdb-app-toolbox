@@ -29,11 +29,11 @@ function [varargout]=mat2wfdb(varargin)
 %          process. Use this options if you want to have a standard gain and quantization
 %          process for all signals in a dataset (the function will not attempt to quantitized
 %          individual waveforms based on their individual range and baseline).
-%baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
-%           value) that would be observed if the analog signal present at the ADC inputs had a
-%           level that fell exactly in the middle of the input range of the ADC.
 % sg_name -(Optional) Cell array of strings describing signal names.
 %
+% baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
+%           value) that would be observed if the analog signal present at the ADC inputs had a
+%           level that fell exactly in the middle of the input range of the ADC.
 % isint  -(Optional) Logical value (default=0). Use this option if you know
 %           the signal is already quantitized, and you want to remove round-off
 %           error by setting the original values to integers prior to fixed
