@@ -29,11 +29,11 @@ function [varargout]=mat2wfdb(varargin)
 %          process. Use this options if you want to have a standard gain and quantization
 %          process for all signals in a dataset (the function will not attempt to quantitized
 %          individual waveforms based on their individual range and baseline).
-%baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
-%           value) that would be observed if the analog signal present at the ADC inputs had a
-%           level that fell exactly in the middle of the input range of the ADC.
 % sg_name -(Optional) Cell array of strings describing signal names.
 %
+% baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
+%           value) that would be observed if the analog signal present at the ADC inputs had a
+%           level that fell exactly in the middle of the input range of the ADC.
 % isint  -(Optional) Logical value (default=0). Use this option if you know
 %           the signal is already quantitized, and you want to remove round-off
 %           error by setting the original values to integers prior to fixed
@@ -107,7 +107,7 @@ skip=0;
 %Set default parameters
 params={'x','fname','Fs','bit_res','adu','info','gain','sg_name','baseline','isint'};
 Fs=1;
-adu=[];
+adu={};
 info=[];
 isint=0;
 %Use cell array for baseline and gain in case of empty conditions
@@ -141,6 +141,9 @@ if(isempty(sg_name))
 end
 if(isempty(adu))
     adu=repmat({'V'},[M 1]);
+elseif length(adu)<M
+    adu=repmat(adu{:},[M 1]);
+end
 end
 if ~isempty(setdiff(bit_res,bit_res_suport))
     error(['Bit res should be any of: ' num2str(bit_res_suport)]);
@@ -202,7 +205,7 @@ for m=1:M+1
 end
 
 if(~isempty(info))
-    count=fprintf(fid,'#%s',info);
+    count=cellfun(@(x) fprintf(fid,'#%s\n',x),info);
 end
 
 if(nargout==1)
