@@ -173,7 +173,7 @@ for m=1:M
     
     y(:,m)=tmp_bit1;
     head_str(m+1)={[fname '.dat ' num2str(bit_res) ' ' num2str(bit_gain) '(' ...
-        num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 0 ' num2str(ck_sum) ' 0 ' sg_name{m}]};
+        num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 ' num2str(tmp_bit1(1)) ' ' num2str(ck_sum) ' 0 ' sg_name{m}]};
 end
 if(length(y)<1)
     error(['Converted data is empty. Exiting without saving file...'])
