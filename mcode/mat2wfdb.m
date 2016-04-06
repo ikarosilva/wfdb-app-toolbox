@@ -132,10 +132,14 @@ if(isempty(gain))
     gain=cell(M,1); %Generate empty cells as default
 elseif(length(gain)==1)
     gain=repmat(gain,[M 1]);
-    gain=num2cell(gain);
 else
     gain=gain;
 end
+% ensure gain is a cell array
+if isnumeric(gain)
+    gain=num2cell(gain);
+end
+
 if(isempty(sg_name))
     sg_name=repmat({''},[M 1]);
 end
@@ -149,6 +153,9 @@ if(isempty(baseline))
     baseline=cell(M,1); %Generate empty cells as default
 elseif(length(baseline)==1)
     baseline=repmat(baseline,[M 1]);
+end
+% ensure baseline is a cell array
+if isnumeric(baseline)
     baseline=num2cell(baseline);
 end
 
