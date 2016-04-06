@@ -27,6 +27,9 @@ function [varargout]=mat2wfdb(varargin)
 %            - Cell array of strings, where the total units entered has to equal M 
 %            (number of channels).
 % info    -(Optional)  String that will be added to the comment section of the header file.
+%           For multi-lined comments, use a cell array of strings. Each
+%           cell will be output on a new line. Note that comments in the
+%           header file are automatically prefixed with a pound symbol (#)
 % gain    -(Optional) Scalar, if provided, no automatic scaling will be applied before the
 %          quantitzation of the signal. If a gain is passed,  in will be the same one set
 %          on the header file. The signal will be scaled by this gain prior to the quantization
@@ -226,7 +229,13 @@ for m=1:M+1
 end
 
 if(~isempty(info))
-    count=fprintf(fid,'#%s',info);
+    if ischar(info)
+        fprintf(fid,'#%s',info);
+    elseif iscell(info)
+        for m=1:numel(info)
+            fprintf(fid,'#%s',info{m});
+        end
+    end
 end
 
 if(nargout==1)
