@@ -18,10 +18,14 @@ function [varargout]=mat2wfdb(varargin)
 %                      each signal.
 %                      1x1 : If all the signals should have the same bit depth
 %          Options are: 8,  16, and 32 ( all are signed types). 16 is the default.
-% adu     -(Optional)  Cell array of strings describing the physical units (default is 'V').
-%          If only one string is entered all signals will have the same physical units.
-%          If multiple physical units, the total units entered has to equal M (number of
-%          channels). Units are delimited by '/'. See examples below.
+% adu     -(Optional) Describes the physical units (default is 'V').
+%          Three input options:
+%            - String delimited by forward slashes (e.g. 'V/mV/mmHg'), with
+%            M-1 slash characters
+%            - Single string (e.g. 'V'), in which case all signals will 
+%            have the same physical units.
+%            - Cell array of strings, where the total units entered has to equal M 
+%            (number of channels).
 % info    -(Optional)  String that will be added to the comment section of the header file.
 % gain    -(Optional) Scalar, if provided, no automatic scaling will be applied before the
 %          quantitzation of the signal. If a gain is passed,  in will be the same one set
@@ -126,7 +130,23 @@ for i=1:nargin
     end
 end
 [N,M]=size(x);
-adu=regexp(adu,'/','split');
+
+if isempty(adu) % default unit: 'V'
+    adu=repmat({'V'},[M 1]);
+elseif iscell(adu) 
+    % adu directly input as a cell array of strings
+elseif ischar(adu)
+    if ~isempty(strfind(adu,'/'))
+        adu=regexp(adu,'/','split');
+    else
+        adu = repmat({adu},[M,1]);
+    end
+end
+
+% ensure we have the right number of units
+if numel(adu) ~= M
+    error('adu:wrongNumberOfElements','adu cell array has incorrect number of elements');
+end
 
 if(isempty(gain))
     gain=cell(M,1); %Generate empty cells as default
@@ -142,9 +162,6 @@ end
 
 if(isempty(sg_name))
     sg_name=repmat({''},[M 1]);
-end
-if(isempty(adu))
-    adu=repmat({'V'},[M 1]);
 end
 if ~isempty(setdiff(bit_res,bit_res_suport))
     error(['Bit res should be any of: ' num2str(bit_res_suport)]);
