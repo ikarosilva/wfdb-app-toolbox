@@ -90,7 +90,7 @@ while(strcmp(str(1),'#'))
 end
 
 %Process Record Line Info
-info=textscan(str,'%s %u %f %u %s %s');
+info=textscan(str,'%s %d %f %d %s %s');
 M=info{2}; %Number of signals present
 Fs=info{3};
 
@@ -98,7 +98,8 @@ Fs=info{3};
 siginfo=[];
 for m = 1:M
     str=fgetl(fid);
-    info=textscan(str,'%s %s %s %u %u %f %u %u %s');
+    info=textscan(str,'%s %s %s %d %d %f %d %d %s');
+    fmt=info{2}{:};
     gain=info{3}{:};
     
     %Get Signal Units if present
@@ -123,7 +124,13 @@ for m = 1:M
             error('Could not obtain signal baseline');
         end
     end
-    
+
+    % Adjust baseline for format 80 (unsigned bytes
+    % representing signed values -128 to 127)
+    if(~isempty(strfind(fmt,'80+')))
+        siginfo(m).Baseline=siginfo(m).Baseline+128;
+    end
+
     %Get Signal Gain
     gain=str2num(gain);
     if(gain==0)

@@ -1,4 +1,4 @@
-function varargout=wfdb2mat(varargin)
+function wfdb2mat(varargin)
 %
 % wfdm2mat(recordName,signaList,N,N0)
 %

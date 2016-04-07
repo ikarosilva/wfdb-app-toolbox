@@ -17,3 +17,4 @@ mcode/nativelibs/windows/build/*
 mcode/nativelibs/macosx/tmp/*
 mcode/nativelibs/macosx/build/*
 mcode/nativelibs/linux/build32/*
+mcode/*.wav
