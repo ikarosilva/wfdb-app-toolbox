@@ -1462,6 +1462,7 @@ M=length(varnames);
 signal=[];
 info=[];
 ann=[];
+annLabels=[];
 if(length(answer{4})>1)
     ann=evalin('base',answer{4});
     if(~isempty(ann))
