@@ -18,22 +18,29 @@ function [varargout]=mat2wfdb(varargin)
 %                      each signal.
 %                      1x1 : If all the signals should have the same bit depth
 %          Options are: 8,  16, and 32 ( all are signed types). 16 is the default.
-% adu     -(Optional)  Cell array of strings describing the physical units (default is 'V').
-%          If only one string is entered all signals will have the same physical units.
-%          If multiple physical units, the total units entered has to equal M (number of
-%          channels). Units are delimited by '/'. See examples below.
+% adu     -(Optional) Describes the physical units (default is 'V').
+%          Three input options:
+%            - String delimited by forward slashes (e.g. 'V/mV/mmHg'), with
+%            M-1 slash characters
+%            - Single string (e.g. 'V'), in which case all signals will 
+%            have the same physical units.
+%            - Cell array of strings, where the total units entered has to equal M 
+%            (number of channels).
 % info    -(Optional)  String that will be added to the comment section of the header file.
+%           For multi-lined comments, use a cell array of strings. Each
+%           cell will be output on a new line. Note that comments in the
+%           header file are automatically prefixed with a pound symbol (#)
 % gain    -(Optional) Scalar, if provided, no automatic scaling will be applied before the
 %          quantitzation of the signal. If a gain is passed,  in will be the same one set
 %          on the header file. The signal will be scaled by this gain prior to the quantization
 %          process. Use this options if you want to have a standard gain and quantization
 %          process for all signals in a dataset (the function will not attempt to quantitized
 %          individual waveforms based on their individual range and baseline).
-% sg_name -(Optional) Cell array of strings describing signal names.
-%
-% baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
+%baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
 %           value) that would be observed if the analog signal present at the ADC inputs had a
 %           level that fell exactly in the middle of the input range of the ADC.
+% sg_name -(Optional) Cell array of strings describing signal names.
+%
 % isint  -(Optional) Logical value (default=0). Use this option if you know
 %           the signal is already quantitized, and you want to remove round-off
 %           error by setting the original values to integers prior to fixed
@@ -51,7 +58,7 @@ function [varargout]=mat2wfdb(varargin)
 %  a reference gain, with the scaling factor saved in the *.hea file.
 %
 %Written by Ikaro Silva 2010
-%Modified by Louis Mayaud 2011
+%Modified by Louis Mayaud 2011, Alistair Johson 2016
 % Version 1.0
 %
 % Since 0.0.1
@@ -107,7 +114,7 @@ skip=0;
 %Set default parameters
 params={'x','fname','Fs','bit_res','adu','info','gain','sg_name','baseline','isint'};
 Fs=1;
-adu={};
+adu=[];
 info=[];
 isint=0;
 %Use cell array for baseline and gain in case of empty conditions
@@ -126,24 +133,38 @@ for i=1:nargin
     end
 end
 [N,M]=size(x);
-adu=regexp(adu,'/','split');
+
+if isempty(adu) % default unit: 'V'
+    adu=repmat({'V'},[M 1]);
+elseif iscell(adu) 
+    % adu directly input as a cell array of strings
+elseif ischar(adu)
+    if ~isempty(strfind(adu,'/'))
+        adu=regexp(adu,'/','split');
+    else
+        adu = repmat({adu},[M,1]);
+    end
+end
+
+% ensure we have the right number of units
+if numel(adu) ~= M
+    error('adu:wrongNumberOfElements','adu cell array has incorrect number of elements');
+end
 
 if(isempty(gain))
     gain=cell(M,1); %Generate empty cells as default
 elseif(length(gain)==1)
     gain=repmat(gain,[M 1]);
-    gain=num2cell(gain);
 else
     gain=gain;
 end
+% ensure gain is a cell array
+if isnumeric(gain)
+    gain=num2cell(gain);
+end
+
 if(isempty(sg_name))
     sg_name=repmat({''},[M 1]);
-end
-if(isempty(adu))
-    adu=repmat({'V'},[M 1]);
-elseif length(adu)<M
-    adu=repmat(adu{:},[M 1]);
-end
 end
 if ~isempty(setdiff(bit_res,bit_res_suport))
     error(['Bit res should be any of: ' num2str(bit_res_suport)]);
@@ -152,6 +173,9 @@ if(isempty(baseline))
     baseline=cell(M,1); %Generate empty cells as default
 elseif(length(baseline)==1)
     baseline=repmat(baseline,[M 1]);
+end
+% ensure baseline is a cell array
+if isnumeric(baseline)
     baseline=num2cell(baseline);
 end
 
@@ -173,7 +197,7 @@ for m=1:M
     
     y(:,m)=tmp_bit1;
     head_str(m+1)={[fname '.dat ' num2str(bit_res) ' ' num2str(bit_gain) '(' ...
-        num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 ' num2str(tmp_bit1(1)) ' ' num2str(ck_sum) ' 0 ' sg_name{m}]};
+        num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 0 ' num2str(ck_sum) ' 0 ' sg_name{m}]};
 end
 if(length(y)<1)
     error(['Converted data is empty. Exiting without saving file...'])
@@ -205,7 +229,13 @@ for m=1:M+1
 end
 
 if(~isempty(info))
-    count=cellfun(@(x) fprintf(fid,'#%s\n',x),info);
+    if ischar(info)
+        fprintf(fid,'#%s',info);
+    elseif iscell(info)
+        for m=1:numel(info)
+            fprintf(fid,'#%s',info{m});
+        end
+    end
 end
 
 if(nargout==1)
@@ -316,6 +346,7 @@ for i=1:length(ind)
     y(end+1)={str(old:ind(i)-1)};
     old=ind(i)+1;
 end
+
 
 
 
