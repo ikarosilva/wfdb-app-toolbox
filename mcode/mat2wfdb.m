@@ -233,7 +233,7 @@ if(~isempty(info))
         fprintf(fid,'#%s',info);
     elseif iscell(info)
         for m=1:numel(info)
-            fprintf(fid,'#%s',info{m});
+            fprintf(fid,'#%s\n',info{m});
         end
     end
 end
