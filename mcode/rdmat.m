@@ -67,8 +67,8 @@ inputs={'recordName'};
 defGain=200; %Default value for missing gains
 
 % Different wfdbnan for each signal format 
-wfdbformats = {'16', '24', '32', '61', '80', '160', '212', '310', '311'}; % None for format 8
-wfdbNaNs = [-32768, -8388608, -2.1475e+09, -32768, -128, -32768, -2048, -512, -512];
+wfdbformats = {'80','16', '32'}; % wfdb2mat currently only writes these 3 formats
+wfdbNaNs = [-128, -32768, -2147483648];
 mapNaNs = containers.Map(wfdbformats,wfdbNaNs);
 
 for n=1:nargin
@@ -99,8 +99,7 @@ M=info{2}; %Number of signals present
 Fs=info{3};
 
 %Process Signal Specification lines. Assumes no comments between lines.
-siginfo=[];
-FMT=cell(M,1); % Store all formats for later
+siginfo(M)=struct();
 for m = 1:M
     str=fgetl(fid);
     info=textscan(str,'%s %s %s %d %d %f %d %d %s');
@@ -142,7 +141,7 @@ for m = 1:M
     siginfo(m).Description=info{9}{:};
     
     % Store format for later
-    FMT{m}=fmt(1:strfind(fmt,'+')-1);
+    siginfo(m).fmt=fmt(1:strfind(fmt,'+')-1);
     
 end
 fclose(fid);
@@ -150,23 +149,18 @@ fclose(fid);
 load([recordName '.mat']);
 
 for m = 1:M
-    %Convert from digital units to physical units.
-    % Mapping should be similar to that of rdsamp.c:
-    % http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
-    
-    % Interpreting digital values of byte offset formats 
-    if strcmp(FMT{m}, '80') 
+    % Interpreting digital values of byte offset format 80
+    if strcmp(siginfo(m).fmt, '80') 
         val(m,:)=val(m,:)-128;
-    elseif strcmp(FMT{m}, '160')
-        val(m,:)=val(m,:)-32768;  
     end
     
     % Fill in NaNs before subtracting and dividing. 
-    if strcmp(FMT{m}, '8') == 0 % fmt 8 has no nan
-        wfdbNaN=mapNaNs(FMT{m});
-        val(m, val(m,:)==wfdbNaN)=nan;
-    end
+    wfdbNaN=mapNaNs(siginfo(m).fmt);
+    val(m, val(m,:)==wfdbNaN)=nan;
     
+    %Convert from digital units to physical units.
+    % Mapping should be similar to that of rdsamp.c:
+    % http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
     val(m, :) = (val(m, :) - siginfo(m).Baseline ) / siginfo(m).Gain;
 end
 
