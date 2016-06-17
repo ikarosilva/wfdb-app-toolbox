@@ -134,8 +134,8 @@ for i=1:nargin
 end
 [N,M]=size(x);
 
-if isempty(adu) % default unit: 'V'
-    adu=repmat({'V'},[M 1]);
+if isempty(adu) % default unit: 'mV'
+    adu=repmat({'mV'},[M 1]);
 elseif iscell(adu) 
     % adu directly input as a cell array of strings
 elseif ischar(adu)
@@ -261,9 +261,9 @@ min_x=min(x(~isnan(x)));
 nan_ind=isnan(x);
 rg=max(x(~isnan(x)))-min_x;
 if(isempty(baseline))
-    baseline=min_x + (rg/2);
+    baseline=min_x + (rg/2); % This is the physical baseline, not the digital one passed out by the function.
 end
-x=x-baseline;
+x=x-baseline; % Min and max value now equidistant to zero. 
 
 if(isempty(gain))
     %ADC gain (ADC units per physical unit). This value is a floating-point number
@@ -274,9 +274,17 @@ if(isempty(gain))
     %that the signal amplitude is uncalibrated; in such cases, a value of 200 (DEFGAIN,
     %defined in <wfdb/wfdb.h>) ADC units per physical unit may be assumed.
     
-    %Dynamic range of encoding / Dynamic Range of Data --but leave 1 quant level for NaN
-    adc_gain=(2^(bit_res-1)-1)/(rg/2);
+    if rg==0 % Manually set adc_gain if there is 0 range, or gain will become infinite.
+        adc_gain=1; % If the signal is all zeros, store all digital values as 0 and gain as 1.
+        % Because of the x=x-baseline line, all mono-valued signals= will equal to 0 at this point.
+        % So therefore we just store all mono-valued signals as 0. 
+    else
+        %Dynamic range of encoding / Dynamic Range of Data --but leave 1 quant level for NaN
+        adc_gain=(2^(bit_res-1)-1)/(rg/2);
+    end
+    
     y=x.*adc_gain;
+    
     
     if(isint)
         %Use this option if you know the signal is quantitized, and you
@@ -295,7 +303,6 @@ else
     adc_gain=gain;
     y=x;
 end
-
 
 %convert to appropiate bit type
 eval(['y=int' num2str(bit_res) '(y);'])
