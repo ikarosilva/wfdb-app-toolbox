@@ -108,7 +108,7 @@ function [varargout]=mat2wfdb(varargin)
 %%%%%%%% End of Example 1%%%%%%%%%
 
 %endOfHelp
-machine_format='l';
+machine_format='l'; % all wfdb formats are little endian except fmt 61 which this function does not support. Do NOT change this.
 skip=0;
 
 %Set default parameters
@@ -307,11 +307,18 @@ end
 %convert to appropiate bit type
 eval(['y=int' num2str(bit_res) '(y);'])
 
-%Shift WFDB NaN int value to a lower value so that they will not be read as NaN's by WFDB
-WFDBNAN=-32768;
-iswfdbnan=find(y==WFDBNAN); %-12^15 are NaNs in WFDB
+%Shift WFDB NaN int values to a higher value so that they will not be read as NaN's by WFDB
+switch bit_res % WFDB will interpret the smallest value as nan. 
+    case 8
+        WFDBNAN=-128;
+    case 16
+        WFDBNAN=-32768;
+    case 32
+        WFDBNAN=-2147483648;
+end
+iswfdbnan=find(y==WFDBNAN); 
 if(~isempty(iswfdbnan))
-    y(iswfdbnan)=WFDBNAN-1;
+    y(iswfdbnan)=WFDBNAN+1;
 end
 
 %Set NaNs to WFDBNAN
