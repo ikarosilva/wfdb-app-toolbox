@@ -132,6 +132,16 @@ for i=1:nargin
         eval([params{i} '= varargin{i};'])
     end
 end
+
+switch bit_res % Write formats. 
+    case 8
+        fmt='80';
+    case 16
+        fmt='16';
+    case 32
+        fmt='32';
+end
+
 [N,M]=size(x);
 
 if isempty(adu) % default unit: 'mV'
@@ -185,7 +195,17 @@ head_str(1)={[fname ' ' num2str(M) ' ' num2str(Fs) ' ' num2str(N)]};
 
 %Loop through all signals, digitizing them and generating lines in header
 %file
-eval(['y=int' num2str(bit_res) '(zeros(N,M));'])  %allocate space
+%eval(['y=int' num2str(bit_res) '(zeros(N,M));'])  %allocate space
+
+switch bit_res % Allocate space for digital signals
+    case 8
+        y=uint8(zeros(N,M));
+    case 16
+        y=int16(zeros(N,M));
+    case 32
+        y=int32(zeros(N,M));
+end
+    
 for m=1:M
     nameArray = regexp(fname,'/','split');
     if ~isempty(nameArray)
@@ -196,7 +216,7 @@ for m=1:M
         bit_res,gain{m},baseline{m},isint);
     
     y(:,m)=tmp_bit1;
-    head_str(m+1)={[fname '.dat ' num2str(bit_res) ' ' num2str(bit_gain) '(' ...
+    head_str(m+1)={[fname '.dat ' fmt ' ' num2str(bit_gain) '(' ...
         num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 ' num2str(tmp_bit1(1)) ' ' num2str(ck_sum) ' 0 ' sg_name{m}]};
 end
 if(length(y)<1)
@@ -209,7 +229,13 @@ if(~fid)
     error(['Could not create data file for writing: ' fname])
 end
 
-count=fwrite(fid,y',['int' num2str(bit_res)],skip,machine_format);
+
+if (bit_res==8)
+    count=fwrite(fid,y','uint8',skip,machine_format);
+else
+    count=fwrite(fid,y',['int' num2str(bit_res)],skip,machine_format);
+end
+
 
 if(~count)
     fclose(fid);
@@ -243,6 +269,8 @@ if(nargout==1)
 end
 fprintf(['Generated *.hea file: ' fname '\n'])
 fclose(fid);
+
+end
 
 %%%End of Main %%%%
 
@@ -285,7 +313,6 @@ if(isempty(gain))
     
     y=x.*adc_gain;
     
-    
     if(isint)
         %Use this option if you know the signal is quantitized, and you
         %want to remove round-off error by setting the original values to
@@ -304,24 +331,27 @@ else
     y=x;
 end
 
-%convert to appropiate bit type
-eval(['y=int' num2str(bit_res) '(y);'])
+% signal has been converted to digital range
 
+%Convert signals to appropriate integer type. 
 %Shift WFDB NaN int values to a higher value so that they will not be read as NaN's by WFDB
 switch bit_res % WFDB will interpret the smallest value as nan. 
     case 8
         WFDBNAN=-128;
+        y=int8(y); 
     case 16
         WFDBNAN=-32768;
+        y=int16(y);
     case 32
         WFDBNAN=-2147483648;
+        y=int32(y);
 end
 iswfdbnan=find(y==WFDBNAN); 
 if(~isempty(iswfdbnan))
     y(iswfdbnan)=WFDBNAN+1;
 end
 
-%Set NaNs to WFDBNAN
+%Set original NaNs to WFDBNAN
 y(nan_ind)=WFDBNAN;
 
 %Calculate the 16-bit signed checksum of all samples in the signal
@@ -341,13 +371,19 @@ else
     end
 end
 
+% Note that checksum must be calculated on actual digital samples for format 80,
+% not the shifted ones. Therefore we only converting to real format now. 
+if bit_res==8
+    y=uint8(int16(y)+128); % Convert into unsigned for writing byte offset format. 
+end
+
 %Calculate baseline (ADC units):
 %The baseline is an integer that specifies the sample
 %value corresponding to 0 physical units.
-baseline=baseline.*adc_gain;
+baseline=baseline.*adc_gain; % Wait... why is this how baseline is calculated? Is this responsible for all the roundoff errors? 
 baseline=-round(baseline);
 
-
+end
 
 
 function y=get_names(str,deli)
@@ -361,6 +397,6 @@ for i=1:length(ind)
     old=ind(i)+1;
 end
 
-
+end
 
 
