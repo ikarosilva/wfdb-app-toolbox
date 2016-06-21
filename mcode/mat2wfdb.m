@@ -1,8 +1,8 @@
 function [varargout]=mat2wfdb(varargin)
 %
-% [xbit]=mat2wfdb(X,fname,Fs,bit_res,adu,info,gain,sg_name,baseline,isint)
+% [xbit]=mat2wfdb(X,fname,Fs,bit_res,adu,info,gain,sg_name,baseline,isdigital, isquant)
 %
-% Convert data readable in matlab into WFDB Physionet format.
+% Convert data from a matlab array into Physionet WFDB format file.
 %
 % Input Paramater are:
 %
@@ -18,8 +18,8 @@ function [varargout]=mat2wfdb(varargin)
 %                      each signal.
 %                      1x1 : If all the signals should have the same bit depth
 %          Options are: 8,  16, and 32 ( all are signed types). 16 is the default.
-% adu     -(Optional) Describes the physical units (default is 'V').
-%          Three input options:
+% adu     -(Optional) Describes the physical units (default is 'mV').
+%          Three input formats:
 %            - String delimited by forward slashes (e.g. 'V/mV/mmHg'), with
 %            M-1 slash characters
 %            - Single string (e.g. 'V'), in which case all signals will 
@@ -30,23 +30,35 @@ function [varargout]=mat2wfdb(varargin)
 %           For multi-lined comments, use a cell array of strings. Each
 %           cell will be output on a new line. Note that comments in the
 %           header file are automatically prefixed with a pound symbol (#)
-% gain    -(Optional) Scalar, if provided, no automatic scaling will be applied before the
-%          quantitzation of the signal. If a gain is passed,  in will be the same one set
-%          on the header file. The signal will be scaled by this gain prior to the quantization
-%          process. Use this options if you want to have a standard gain and quantization
-%          process for all signals in a dataset (the function will not attempt to quantitized
+% gain    -(Optional) Scalar or Mx1 array of floats indicating the difference in sample values 
+%           that would be observed if a step of one physical unit occurred in the original 
+%           analog signal. If a gain is provided, no scaling will be applied before the
+%          quantitzation of the signal and it will be the same one written to the header file. 
+%          The signal will be scaled by this gain prior to the quantization
+%          process. Use this option if you want to have a standard gain and quantization
+%          process for all signals in a dataset (the function will not attempt to quantitize
 %          individual waveforms based on their individual range and baseline).
-%baseline   -(Optional) Offset (ADC zero) Mx1 array of integers that represents the amplitude (sample
-%           value) that would be observed if the analog signal present at the ADC inputs had a
-%           level that fell exactly in the middle of the input range of the ADC.
+% baseline -(Optional) Mx1 array of integers that specifies the sample value for each channel
+%           corresponding to 0 physical units. Not to be confused with 'ADC zero' which 
+%           is currently always taken and written as 0 in this function. 
 % sg_name -(Optional) Cell array of strings describing signal names.
 %
-% isint  -(Optional) Logical value (default=0). Use this option if you know
-%           the signal is already quantitized, and you want to remove round-off
+% isquant   -(Optional) Logical value (default=0). Use this option if the
+%           input signal is already quantitized, and you want to remove round-off
 %           error by setting the original values to integers prior to fixed
-%           point conversion.
+%           point conversion. This field is only used for input physical
+%           signals. If 'isdigital' is set to 1, this field is ignored.
 %
-% Ouput Parameters are:
+% isdigital -(Optional) Logical value (default=0). Specifies whether the input signal is 
+%            digital or physical (default). If it is digital, the signal values will be 
+%            directly written to the file without scaling. If the signal is physical, 
+%            the optimal gain and baseline will be calculated and used to digitize the signal
+%            to write the WFDB file. This flag also decides the allowed
+%            input combinations of the 'gain' and 'baseline' fields.
+%            Digital signals must have both, and physical signals must have
+%            neither (as the ideal values will be automatically calculated). 
+%
+% Ouput Parameter:
 %
 % xbit    -(Optional)  NxM the quantitized signals that written to file (possible
 %          rescaled if no gain was provided at input). Useful for comparing
@@ -111,19 +123,20 @@ function [varargout]=mat2wfdb(varargin)
 machine_format='l'; % all wfdb formats are little endian except fmt 61 which this function does not support. Do NOT change this.
 skip=0;
 
-%Set default parameters
-params={'x','fname','Fs','bit_res','adu','info','gain','sg_name','baseline','isint'};
+% Set default parameters
+params={'x','fname','Fs','bit_res','adu','info','gain','sg_name','baseline','isquant', 'isdigital'};
 Fs=1;
 adu=[];
 info=[];
-isint=0;
+isquant=0;
+isdigital=0;
 %Use cell array for baseline and gain in case of empty conditions
 baseline=[];
 gain=[];
 sg_name=[];
 x=[];
 fname=[];
-%Convert signal from double to appropiate type
+%Used to convert signal from double to appropiate type
 bit_res = 16 ;
 bit_res_suport=[8 16 32];
 
@@ -133,6 +146,18 @@ for i=1:nargin
     end
 end
 
+% Check valid gain and baseline combinations depending on whether the input is digital or physical.
+if isdigital % digital input signal
+    if ~(gain && baseline)
+        error('Input digital signals are directly written to files without scaling. Must also input gain and baseline for correct interpretation of written file.');   
+    end
+else % physical input signal
+    if ( ~isempty(gain) || ~isempty(baseline)) % User inputs gain or baseline to map the physical to digital values.
+        % Sorry, we cannot trust that they did it correctly... 
+        warning('Input gain and baseline fields ignored for physical input signal. This function automatically calculates and applies the ideal values');
+    end
+end
+    
 switch bit_res % Write formats. 
     case 8
         fmt='80';
@@ -165,8 +190,6 @@ if(isempty(gain))
     gain=cell(M,1); %Generate empty cells as default
 elseif(length(gain)==1)
     gain=repmat(gain,[M 1]);
-else
-    gain=gain;
 end
 % ensure gain is a cell array
 if isnumeric(gain)
@@ -177,7 +200,7 @@ if(isempty(sg_name))
     sg_name=repmat({''},[M 1]);
 end
 if ~isempty(setdiff(bit_res,bit_res_suport))
-    error(['Bit res should be any of: ' num2str(bit_res_suport)]);
+    error(['Bit res should be one of: ' num2str(bit_res_suport)]);
 end
 if(isempty(baseline))
     baseline=cell(M,1); %Generate empty cells as default
@@ -189,13 +212,9 @@ if isnumeric(baseline)
     baseline=num2cell(baseline);
 end
 
-%Header string
+%Head record specification line
 head_str=cell(M+1,1);
 head_str(1)={[fname ' ' num2str(M) ' ' num2str(Fs) ' ' num2str(N)]};
-
-%Loop through all signals, digitizing them and generating lines in header
-%file
-%eval(['y=int' num2str(bit_res) '(zeros(N,M));'])  %allocate space
 
 switch bit_res % Allocate space for digital signals
     case 8
@@ -205,7 +224,8 @@ switch bit_res % Allocate space for digital signals
     case 32
         y=int32(zeros(N,M));
 end
-    
+
+%Loop through all signals, digitizing them and generating lines in header file
 for m=1:M
     nameArray = regexp(fname,'/','split');
     if ~isempty(nameArray)
@@ -213,9 +233,11 @@ for m=1:M
     end
     
     [tmp_bit1,bit_gain,baseline_tmp,ck_sum]=quant(x(:,m), ...
-        bit_res,gain{m},baseline{m},isint);
+        bit_res, gain{m}, baseline{m}, isquant, isdigital);
     
     y(:,m)=tmp_bit1;
+    
+    % Header file signal specification lines
     head_str(m+1)={[fname '.dat ' fmt ' ' num2str(bit_gain) '(' ...
         num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 ' num2str(tmp_bit1(1)) ' ' num2str(ck_sum) ' 0 ' sg_name{m}]};
 end
@@ -231,9 +253,9 @@ end
 
 
 if (bit_res==8)
-    count=fwrite(fid,y','uint8',skip,machine_format);
+    count=fwrite(fid, y','uint8',skip,machine_format);
 else
-    count=fwrite(fid,y',['int' num2str(bit_res)],skip,machine_format);
+    count=fwrite(fid, y',['int' num2str(bit_res)],skip,machine_format);
 end
 
 
@@ -275,66 +297,62 @@ end
 %%%End of Main %%%%
 
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
 %Helper function
-function [y,adc_gain,baseline,check_sum]=quant(x,bit_res,gain,baseline,isint)
+function [y,adc_gain,baseline,check_sum]=quant(x, bit_res, gain, baseline, isquant, isdigital)
 %shift so that the signal midrange is at 0
 
 min_x=min(x(~isnan(x)));
+max_x=max(x(~isnan(x)));
 nan_ind=isnan(x);
-rg=max(x(~isnan(x)))-min_x;
-if(isempty(baseline))
-    baseline=min_x + (rg/2); % This is the physical baseline, not the digital one passed out by the function.
-end
-x=x-baseline; % Min and max value now equidistant to zero. 
+rg=max_x-min_x;
 
-if(isempty(gain))
-    %ADC gain (ADC units per physical unit). This value is a floating-point number
-    %that specifies the difference in sample values that would be observed if a step
-    %of one physical unit occurred in the original analog signal. For ECGs, the gain
-    %is usually roughly equal to the R-wave amplitude in a lead that is roughly parallel
-    %to the mean cardiac electrical axis. If the gain is zero or missing, this indicates
-    %that the signal amplitude is uncalibrated; in such cases, a value of 200 (DEFGAIN,
-    %defined in <wfdb/wfdb.h>) ADC units per physical unit may be assumed.
-    
-    if rg==0 % Manually set adc_gain if there is 0 range, or gain will become infinite.
-        adc_gain=1; % If the signal is all zeros, store all digital values as 0 and gain as 1.
-        % Because of the x=x-baseline line, all mono-valued signals= will equal to 0 at this point.
-        % So therefore we just store all mono-valued signals as 0. 
-    else
-        %Dynamic range of encoding / Dynamic Range of Data --but leave 1 quant level for NaN
-        adc_gain=(2^(bit_res-1)-1)/(rg/2);
+if(isdigital) 
+    % Digital input signal. Do not scale or shift the signal. The gain/baseline will only 
+    % be used to write the header file to interpret the output wfdb record.
+    if ((min_x < -2^(bit_res-1)) || (max_x > (2^(bit_res-1)-1 )))
+        error('Digital input signal exceeds allowed range of specified format: [-2^(bit_res-1) < x < 2^(bit_res-1)-1]');
     end
-    
-    y=x.*adc_gain;
-    
-    if(isint)
-        %Use this option if you know the signal is quantitized, and you
-        %want to remove round-off error by setting the original values to
-        %integers prior to fixed point conversion
-        df_db=min(diff(sort(unique(y))));
-        y=y/df_db;
-        adc_gain=adc_gain/df_db;
-    end
-    
-else
-    %if gain is alreay passed don't do anything to the signal
-    %the gain will be used in the header file only
-    %Convert the signal to integers before encoding in order minimize round off
-    %error
     adc_gain=gain;
     y=x;
-end
-
-% signal has been converted to digital range
+    
+else
+    % Physical input signal - calculate the gain and baseline to minimize
+    % the detail loss during ADC conversion: y = gain*x + baseline
+    % Ignore any input gain or baseline
+    
+    % Calculate the adc_gain
+    if rg==0 % Zero-range signal. Manually set adc_gain or gain will be infinite.
+        adc_gain=1; % If the signal is all zeros, store all digital values as the min digital
+                    % value and gain as 1. 
+        
+        % Need to test both cases where signal is all 0's and all non-zero.
+        
+    else % Normal case 
+        % adc_gain = (range of encoding / range of Data) -- remember 1 quant level is for storing NaN
+        adc_gain=((2^bit_res)-1)/rg;
+    end
+    
+    %Calculate baseline and map the signal to digital. 
+    if(isquant)
+        % The input signal was already quantitized, remove round-off error by setting the 
+        % original values to integers prior to fixed point conversion
+        
+        df_db=min(diff(sort(unique(x)))); % An estimate of the smallest increment in the input signal
+        adc_gain=1/df_db; % 1 digital unit corresponds to the smallest physical increment. 
+        baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);  
+        y=x*adc_gain+baseline; 
+        
+    else % Input signal was not quantized. 
+        baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);  
+        y=x*adc_gain+baseline; 
+    end
+    
+end % signal is in digital range and adc_gain and baseline have been calculated. 
 
 %Convert signals to appropriate integer type. 
-%Shift WFDB NaN int values to a higher value so that they will not be read as NaN's by WFDB
+%Shift any WFDB NaN int values to a higher value so that they will not be read as NaN's by WFDB
 switch bit_res % WFDB will interpret the smallest value as nan. 
     case 8
         WFDBNAN=-128;
@@ -372,16 +390,12 @@ else
 end
 
 % Note that checksum must be calculated on actual digital samples for format 80,
-% not the shifted ones. Therefore we only converting to real format now. 
+% not the shifted ones. Therefore we only convert to real format now. 
 if bit_res==8
     y=uint8(int16(y)+128); % Convert into unsigned for writing byte offset format. 
 end
 
-%Calculate baseline (ADC units):
-%The baseline is an integer that specifies the sample
-%value corresponding to 0 physical units.
-baseline=baseline.*adc_gain; % Wait... why is this how baseline is calculated? Is this responsible for all the roundoff errors? 
-baseline=-round(baseline);
+% Signal is ready to be written to dat file. 
 
 end
 
