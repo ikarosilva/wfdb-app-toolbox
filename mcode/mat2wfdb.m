@@ -149,6 +149,9 @@ if isdigital % digital input signal
     if (isempty(gain) || isempty(baseline))
         error('Input digital signals are directly written to files without scaling. Must also input gain and baseline for correct interpretation of written file.');   
     end
+    if (~isempty(find(baseline>2147483647))||~isempty(find(baseline<-2147483648))) % baseline stored as int in wfdb library. 
+        error('Baseline field must lie between 2^-31 and 2^31-1 for this WFDB version'); % Prevent bit overflow
+    end
 else % physical input signal
     if ( ~isempty(gain) || ~isempty(baseline)) % User inputs gain or baseline to map the physical to digital values.
         % Sorry, we cannot trust that they did it correctly... 
@@ -317,32 +320,38 @@ if(isdigital)
     
 else
     % Physical input signal - calculate the gain and baseline to minimize
-    % the detail loss during ADC conversion: y = gain*x + baseline
-    % Ignore any input gain or baseline
+    % the detail loss during ADC conversion: y = gain*x + baseline. Ignore any input gain or baseline
     
     % Calculate the adc_gain
+    
     if rg==0 % Zero-range signal. Manually set adc_gain or gain will be infinite.
-        adc_gain=1; % If the signal is all zeros, store all digital values as the min digital
-                    % value and gain as 1. 
-        
-        % Need to test both cases where signal is all 0's and all non-zero.
-        
-    else % Normal case 
-        % adc_gain = (range of encoding / range of Data) -- remember 1 quant level is for storing NaN
-        adc_gain=((2^bit_res)-1)/rg;
+        % Make sure baseline doesn't go beyond 4 byte integer range for fmt 32. 
+        if x(1)>0
+            adc_gain=-1; % If the signal is all positive, gain as -1
+        else
+            adc_gain=1; % If the signal is all zeros or a negative number, store all digital values as 
+                        % the min digital value and gain as 1. 
+        end            
+    else % Non flatline signal: adc_gain = (range of encoding / range of Data) -- remember 1 quant level is for storing NaN
+        % Constraint - baseline must be stored as a 4 byte integer for the WFDB library. 
+        if ((min_x>0) && (bit_res==32)) % All values are +ve, map baseline = 2^-31+1
+            adc_gain=((2^bit_res)-1)/max_x; 
+        elseif((max_x<0) && (bit_res==32)) % All values are -ve, map baseline = 2^31-1
+            adc_gain=((2^bit_res)-1)/abs(min_x); 
+        else % Signal has both +ve and -ve values or fmt is not 32. Can use full range of bits. 
+            adc_gain=((2^bit_res)-1)/rg;
+        end
     end
     
     %Calculate baseline and map the signal to digital. 
-    if(isquant)
+    if(isquant && (rg~=0))
         % The input signal was already quantitized, remove round-off error by setting the 
         % original values to integers prior to fixed point conversion
-        
         df_db=min(diff(sort(unique(x)))); % An estimate of the smallest increment in the input signal
         adc_gain=1/df_db; % 1 digital unit corresponds to the smallest physical increment. 
         baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);  
         y=x*adc_gain+baseline; 
-        
-    else % Input signal was not quantized. 
+    else % Input signal was not quantized, or signal was flatline. 
         baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);  
         y=x*adc_gain+baseline; 
     end
