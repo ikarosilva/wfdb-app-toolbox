@@ -32,15 +32,13 @@ function [varargout]=mat2wfdb(varargin)
 %           header file are automatically prefixed with a pound symbol (#)
 % gain    -(Optional) Scalar or Mx1 array of floats indicating the difference in sample values 
 %           that would be observed if a step of one physical unit occurred in the original 
-%           analog signal. If a gain is provided, no scaling will be applied before the
-%          quantitzation of the signal and it will be the same one written to the header file. 
-%          The signal will be scaled by this gain prior to the quantization
-%          process. Use this option if you want to have a standard gain and quantization
-%          process for all signals in a dataset (the function will not attempt to quantitize
-%          individual waveforms based on their individual range and baseline).
+%           analog signal. If the 'isdigital' field is 1, this field is mandatory. Otherwise,
+%           this field is ignored if present. 
 % baseline -(Optional) Mx1 array of integers that specifies the sample value for each channel
 %           corresponding to 0 physical units. Not to be confused with 'ADC zero' which 
-%           is currently always taken and written as 0 in this function. 
+%           is currently always taken and written as 0 in this function. If
+%           the 'isdigital' field is 1, this field is mandatory. Otherwise,
+%           this field is ignored if present. 
 % sg_name -(Optional) Cell array of strings describing signal names.
 %
 % isquant   -(Optional) Logical value (default=0). Use this option if the
