@@ -322,7 +322,7 @@ else
     % Physical input signal - calculate the gain and baseline to minimize
     % the detail loss during ADC conversion: y = gain*x + baseline. Ignore any input gain or baseline
     
-    % Calculate the adc_gain
+    % Calculate the adc_gain, baseline, and map the signal to digital
     
     if rg==0 % Zero-range signal. Manually set adc_gain or gain will be infinite.
         % Make sure baseline doesn't go beyond 4 byte integer range for fmt 32. 
@@ -331,35 +331,40 @@ else
         else
             adc_gain=1; % If the signal is all zeros or a negative number, store all digital values as 
                         % the min digital value and gain as 1. 
-        end            
+        end       
+        baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);  
     else % Non flatline signal: adc_gain = (range of encoding / range of Data) -- remember 1 quant level is for storing NaN
         % Constraint - baseline must be stored as a 4 byte integer for the WFDB library. 
-        if ((min_x>0) && (bit_res==32)) % All values are +ve, map baseline = 2^-31+1
+        if ((min_x>0) && (bit_res==32)) % All values are +ve, map baseline = -2^31+1
             adc_gain=((2^bit_res)-1)/max_x; 
+            baseline=-2147483647;
         elseif((max_x<0) && (bit_res==32)) % All values are -ve, map baseline = 2^31-1
-            adc_gain=((2^bit_res)-1)/abs(min_x); 
+            adc_gain=((2^bit_res)-1)/abs(min_x);
+            baseline=2147483647;
         else % Signal has both +ve and -ve values or fmt is not 32. Can use full range of bits. 
             adc_gain=((2^bit_res)-1)/rg;
+            baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);
+        end
+        if(isquant)
+            % The input signal was already quantitized (and not flatline). Remove round-off error 
+            % by setting the original values to integers prior to fixed point conversion
+            df_db=min(diff(sort(unique(x)))); % An estimate of the smallest increment in the input signal
+            
+            
+            % THIS NEEDS WORK - avoid baseline escaping 4 byte range. 
+            adc_gain=1/df_db; % 1 digital unit corresponds to the smallest physical increment.
+            
+            baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);
+            
         end
     end
-    
-    %Calculate baseline and map the signal to digital. 
-    if(isquant && (rg~=0))
-        % The input signal was already quantitized, remove round-off error by setting the 
-        % original values to integers prior to fixed point conversion
-        df_db=min(diff(sort(unique(x)))); % An estimate of the smallest increment in the input signal
-        adc_gain=1/df_db; % 1 digital unit corresponds to the smallest physical increment. 
-        baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);  
-        y=x*adc_gain+baseline; 
-    else % Input signal was not quantized, or signal was flatline. 
-        baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);  
-        y=x*adc_gain+baseline; 
-    end
-    
-end % signal is in digital range and adc_gain and baseline have been calculated. 
 
-%Convert signals to appropriate integer type. 
-%Shift any WFDB NaN int values to a higher value so that they will not be read as NaN's by WFDB
+    y=x*adc_gain+baseline;
+    
+end % signal is in digital range. adc_gain and baseline have been calculated. 
+
+% Convert signals to appropriate integer type, and shift any WFDB NaN int values to 
+% a higher value so that they will not be read as NaN's by WFDB
 switch bit_res % WFDB will interpret the smallest value as nan. 
     case 8
         WFDBNAN=-128;
