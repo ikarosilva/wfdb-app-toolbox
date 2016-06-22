@@ -302,7 +302,6 @@ end
 
 %Helper function
 function [y,adc_gain,baseline,check_sum]=quant(x, bit_res, gain, baseline, isquant, isdigital)
-%shift so that the signal midrange is at 0
 
 min_x=min(x(~isnan(x)));
 max_x=max(x(~isnan(x)));
@@ -323,7 +322,6 @@ else
     % the detail loss during ADC conversion: y = gain*x + baseline. Ignore any input gain or baseline
     
     % Calculate the adc_gain, baseline, and map the signal to digital
-    
     if rg==0 % Zero-range signal. Manually set adc_gain or gain will be infinite.
         % Make sure baseline doesn't go beyond 4 byte integer range for fmt 32. 
         if x(1)>0
@@ -348,14 +346,12 @@ else
         if(isquant)
             % The input signal was already quantitized (and not flatline). Remove round-off error 
             % by setting the original values to integers prior to fixed point conversion
-            df_db=min(diff(sort(unique(x)))); % An estimate of the smallest increment in the input signal
-            
+            incmin=min(diff(sort(unique(x)))); % An estimate of the smallest possible increment in the input signal
             
             % THIS NEEDS WORK - avoid baseline escaping 4 byte range. 
-            adc_gain=1/df_db; % 1 digital unit corresponds to the smallest physical increment.
+            adc_gain=1/incmin; % 1 digital unit corresponds to the smallest physical increment.
             
             baseline=round(-(2^(bit_res-1))+1-min_x*adc_gain);
-            
         end
     end
 
