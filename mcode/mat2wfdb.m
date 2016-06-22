@@ -148,7 +148,7 @@ end
 
 % Check valid gain and baseline combinations depending on whether the input is digital or physical.
 if isdigital % digital input signal
-    if ~(gain && baseline)
+    if (isempty(gain) || isempty(baseline))
         error('Input digital signals are directly written to files without scaling. Must also input gain and baseline for correct interpretation of written file.');   
     end
 else % physical input signal
