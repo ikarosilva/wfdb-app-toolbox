@@ -30,11 +30,11 @@ function [varargout]=mat2wfdb(varargin)
 %           For multi-lined comments, use a cell array of strings. Each
 %           cell will be output on a new line. Note that comments in the
 %           header file are automatically prefixed with a pound symbol (#)
-% gain    -(Optional) Scalar or Mx1 array of floats indicating the difference in sample values 
+% gain    -(Required for digital only) Scalar or Mx1 array of floats indicating the difference in sample values 
 %           that would be observed if a step of one physical unit occurred in the original 
 %           analog signal. If the 'isdigital' field is 1, this field is mandatory. Otherwise,
 %           this field is ignored if present. 
-% baseline -(Optional) Mx1 array of integers that specifies the sample value for each channel
+% baseline -(Required for digital only) Mx1 array of integers that specifies the sample value for each channel
 %           corresponding to 0 physical units. Not to be confused with 'ADC zero' which 
 %           is currently always taken and written as 0 in this function. If
 %           the 'isdigital' field is 1, this field is mandatory. Otherwise,
@@ -213,6 +213,15 @@ if isnumeric(baseline)
     baseline=num2cell(baseline);
 end
 
+if isempty(isquant)
+    isquant = zeros(M,1);
+elseif numel(isquant)==1
+    isquant = repmat(isquant,[M,1]);
+elseif numel(isquant)~=M
+    error('isquant:wrongNumberOfElements','isquant  array has incorrect number of elements');
+end
+
+
 %Head record specification line
 head_str=cell(M+1,1);
 head_str(1)={[fname ' ' num2str(M) ' ' num2str(Fs) ' ' num2str(N)]};
@@ -234,7 +243,7 @@ for m=1:M
     end
     
     [tmp_bit1,bit_gain,baseline_tmp,ck_sum]=quant(x(:,m), ...
-        bit_res, gain{m}, baseline{m}, isquant, isdigital);
+        bit_res, gain{m}, baseline{m}, isquant(m), isdigital);
     
     y(:,m)=tmp_bit1;
     
@@ -358,7 +367,7 @@ else
             % the full increment range is less than the 2^N increments able to be encoded
             % by the chosen bit resolution. The incmin estimate will always
             % be equal to or larger than the true incmin, so it won't
-            % trigger errors in this validation step. 
+            % wrongly trigger errors in this validation step. 
             
             if (quantlevels>2^bit_res)
                 if bit_res==32
@@ -366,8 +375,8 @@ else
                         'Cannot directly map all input values to integers. Up to 1 bit of roundoff error may occur. Continuing...']);
                     calcquant=0; % Skip the integer matching and keep the old baseline/gain calculated. 
                 else
-                    error(['The input signal has more quantization levels than the chosen bit resolution.' ...
-                        'Please choose a higher resolution to prevent bit overflow, or remove the isquant option to allow up to 1 bit of roundoff error']);
+                    error(['The input signal has more quantization levels than the chosen bit resolution. ' ...
+                        'Please choose a higher resolution or remove the isquant option to allow up to 1 bit of roundoff error']);
                 end
             else
                 calcquant=1;
