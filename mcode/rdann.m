@@ -173,7 +173,11 @@ if(nargout ==1)
     if(config.inOctave)
         ann=java2mat(ann);
     end
-    ann=ann(:,1);
+    if size(ann,2)==6
+        ann=ann(:,2);
+    else
+        ann=ann(:,1);
+    end
 else
     
     %TODO: Improve the parsing of data. To avoid doing this at the ML wrapper
