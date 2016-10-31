@@ -84,7 +84,7 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'recordName','annotator','N','N0','signal','threshold', ...
+inputs={'recordName','N','N0','signal','threshold', ...
     'findJ','powerLineFrequency','resample'};
 N=[];
 N0=1;
