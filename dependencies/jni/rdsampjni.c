@@ -17,8 +17,8 @@ To get field signatures for the JNI API, run
 #include <jni.h>
 #include <stdio.h>
 #include <wfdb/wfdb.h>
-#include <malloc.h>
 #include <stdlib.h>
+#include "org_physionet_wfdb_jni_Rdsamp.h"
 
 long nSamples=0;
 double fs;
