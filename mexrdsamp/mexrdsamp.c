@@ -247,7 +247,7 @@ void rdsamp(int argc, char *argv[]){
 int* checkMLinputs(int ninputs, const mxArray* inputs[]){
 
   /* Indicator of which fields are to be passed into rdsamp.  Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
-  int inputfields[]=[1, 0, 0, 0, 1, 0, 3], i; 
+  int inputfields[]={1, 0, 0, 0, 1, 0, 3}, i; 
   /* Initial mandatory 3: rdsamp -r recordName */
   
   if (ninputs > 6){
@@ -347,7 +347,7 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
 char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
   
-  char *argv[inputfields[6]], charto[20], charfrom[20];
+  char *argv[inputfields[6]], charto[20], charfrom[20], charsig[inputfields[1]][20];
 
   /* Check all possible input options to add */
   for (i=0;i<6;i++){
@@ -368,14 +368,18 @@ char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
 
       case 1: /* signalList */
 
-	
         if (inputfields[1]){
-	  int numsig[];
+	  
+	  double *signalList;
+	  mxSetPr(plhs[1],signalList);
+	  argv[argind]="-s";
+	  argind++;
 	  
 	  for (int chan=0;chan<inputfields[1];chan++){
-	    argv[argind]=numsig[chan];
+	    sprintf(charsig[chan], "%d" , (int)signalList[chan]);
+	    argv[argind+chan]=charsig[chan];
 	  }
-	  argind=argind+1+inputfields[1];
+	  argind=argind+inputfields[1];
 	}
 	
 	break;
@@ -414,7 +418,6 @@ char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
 	}
 	break;
     }
-
   }
 
   
@@ -440,7 +443,12 @@ void mexFunction( int nlhs, mxArray *plhs[],
   /* Create argument strings to pass into rdsamp */
   char *argv[]=rdsampInputArgs(inputfields, phrs);
   
-    
+
+  for (int jj=0;jj<argc;jj++){
+    mexPrintf("argv[%d]: %s", jj, argv[jj]);
+  }
+
+  
   /* Check output arguments */
 
   
@@ -477,7 +485,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 /* To Do
 
 
-Check that signal list does not lie outside index range of signal. Does original rdsamp already do that? 
+Check that signal list does not lie outside index range of signal. Does original rdsamp already do that? It should
 
 
 
