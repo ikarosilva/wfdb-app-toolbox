@@ -230,14 +230,25 @@ void rdsamp(int argc, char *argv[]){
 
 
 
-/* Helper function to validate inputs and convert them to strings to pass into rdsamp */
+
+
+
+
+
+
+
+
+
+
+
+
+/* Validate the matlab user input variables.  */
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
-char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
+int* checkMLinputs(int ninputs, const mxArray* inputs[]){
 
-  /* Indicator of fields to be passed into rdsamp.  Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H) */
-  int inputfields[]=[1, 0, 0, 0, 1, 0]; 
-  int argc=3; /* Initial mandatory: rdsamp -r recordName */
-
+  /* Indicator of which fields are to be passed into rdsamp.  Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
+  int inputfields[]=[1, 0, 0, 0, 1, 0, 3], i; 
+  /* Initial mandatory 3: rdsamp -r recordName */
   
   if (ninputs > 6){
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyinputs",
@@ -245,11 +256,10 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
   }
   if (ninputs < 1) {
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:missingrecordName",
-		       "Record Name required.");
+		       "Record name required.");
   }
-
   
-  /* Switch through the matlab input variables in order */
+  /* Switch through the matlab input variables sequentially */
   for(i=0; i<ninputs; i++){ 
     switch (i){
     case 0: /* recordname */
@@ -270,9 +280,11 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
 			  "signalList must be a 1xM row vector.");
 	}
 	
-	inputfields[1]=1;
+	inputfields[1]=nsig;
 
-	/* argc+???????? THIS IS HARD*/
+
+	
+	/* inputfields[6]=inputfields[6]+1+nsig */
 	
       }
       break;
@@ -283,7 +295,7 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
 			  "N must be a 1x1 scalar.");
 	}
 	inputfields[2]=1;
-	argc=argc+2;
+	inputfields[6]=inputfields[6]+2;
       }
       break;
     case 3: /* N0 */
@@ -293,7 +305,7 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
 			  "N0 must be a 1x1 scalar.");
 	}
 	inputfields[3]=1;
-	argc=argc+2;
+	inputfields[6]=inputfields[6]+2;
       }
       break;
     case 4: /* rawUnits */
@@ -305,7 +317,7 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
 	/* Find out whether to set -P. Default is yes */
 	int rawUnits=(int)mxGetScalar(prhs[4]);
 	if (rawUnits){ // Add -P 
-	  argc++; 	  
+	  inputfields[6]++; 	  
 	}
 	else{
 	  inputfields[4]=0;
@@ -321,7 +333,7 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
 	/* Find out whether to set -H. Default is no */
 	int highResolution=(int)mxGetScalar(prhs[5]);
 	if (highResolution){ // Add -H 
-	  argc++;
+	  inputfields[6]++;
 	  inputfields[5]=1;
 	}
       }
@@ -329,69 +341,94 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
     }
     
   }
-
-
   
-  /* Construct the argv array of strings to feed into rdsamp */
-  char *argv[argc];
-  for (i=0;i<6;i++){
-    switch (inputfields[i]){
-      case 1:
-	
-    }
-
-  }
-
-
-  
-  /* Pass out the final argc and argv for rdsamp */
-  *argcout=argc;
-  return argv;
-
+  return inputfields
 }
 
 
 
 
 
-/* Gateway Function */
+
+
+
+
+
+
+
+
+/* Create the argv array of strings to pass into rdsamp */
+char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
+  
+  char *argv[inputfields[6]];
+
+  for (i=0;i<6;i++){
+    switch (i){
+      case 0:
+	argv[0]="rdsamp";
+	argv[1]="-r";
+	
+	status = mxGetString(prhs[0], rec_name, (mwSize)reclen);
+
+
+	char *rec_name;
+	size_t reclen;
+	reclen = mxGetN(prhs[0])*sizeof(mxChar)+1;
+	rec_name = malloc(sizeof(long));
+
+	(void)mxGetString(prhs[0], rec_name, (mwSize)reclen);
+
+	argv[2]=rec_name; 
+
+	argind=3;
+
+
+
+      case 1: /* signalList */
+
+	/* Pretty tough! */
+	
+	break;
+      case 2: /* N */
+	if (inputfields[2]){
+	  argv[argind]="-f";
+	  argv[argind+1]=
+	}
+      
+	
+    }
+
+  }
+
+  
+  return argv;
+}
+
+
+
+
+
+
+
+/* Matlab gateway function */
 /* Matlab call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits,highResolution) */
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray* prhs[] ){
 
   
+  /* Check input arguments */
+  int inputfields[]=checkMLinputs(nrhs, prhs, argcp);
+  int argc=inputfields[6];
+
+  /* Create argument strings to pass into rdsamp */
+  char *argv[]=rdsampInputArgs(inputfields, phrs);
   
-  /* Check and process input arguments */
-  int *argcp;
-  char *argv[]=processinputs(nrhs, prhs, argcp);
-  //int argc=sizeof(argv)/sizeof(argv[0]);
-  int argc=*argcp; 
     
   /* Check output arguments */
-  
-  
-
-  /* End of checking inputs/outputs */
 
   
 
-  /* Get record name */
-  char *rec_name;
-  size_t reclen;
-  reclen = mxGetN(prhs[0])*sizeof(mxChar)+1;
-  rec_name = malloc(sizeof(long));
-
-  int status;
-  status = mxGetString(prhs[0], rec_name, (mwSize)reclen);
-
-
-  /* Get other specified input variables */
-
-  
-
-
-  /* Should actually set arguments... 
-  
+  /*  
   int argc=5;
   char *argv[argc];
   argv[0]="canbewhatevergargehere";
@@ -399,14 +436,13 @@ void mexFunction( int nlhs, mxArray *plhs[],
   argv[2] = rec_name;
   argv[3] = "-t";
   argv[4] = "s5";
-
   */ 
 
-  /*Call WFDB Code */
+  /*Call main WFDB Code */
   rdsamp(argc,argv);
 
-  /* Create a 0-by-0 mxArray; memory
-   * will be allocated dynamically by rdsamp */
+  /* Create a 0-by-0 mxArray. Memory
+     will be allocated dynamically by rdsamp */
   plhs[0] = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
 
   /* Set output variable to the allocated memory space */
