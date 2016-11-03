@@ -275,17 +275,12 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListtype",
 			  "signalList must be a double array.");
 	}
-	if (mxGetM(prhs[1]) != 1){
+	if (int nsig=(int)mxGetM(prhs[1]) != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListshape",
-			  "signalList must be a 1xM row vector.");
+			  "signalList must be a 1xN row vector.");
 	}
-	
 	inputfields[1]=nsig;
-
-
-	
-	/* inputfields[6]=inputfields[6]+1+nsig */
-	
+	inputfields[6]=inputfields[6]+1+nsig */
       }
       break;
     case 2: /* N */
@@ -333,13 +328,12 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
 	/* Find out whether to set -H. Default is no */
 	int highResolution=(int)mxGetScalar(prhs[5]);
 	if (highResolution){ // Add -H 
-	  inputfields[6]++;
 	  inputfields[5]=1;
+	  inputfields[6]++;
 	}
       }
       break;
     }
-    
   }
   
   return inputfields
@@ -349,53 +343,76 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
 
 
 
-
-
-
-
-
-
-
-
 /* Create the argv array of strings to pass into rdsamp */
+/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
 char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
   
-  char *argv[inputfields[6]];
+  char *argv[inputfields[6]], charto[20], charfrom[20];
 
+  /* Check all possible input options to add */
   for (i=0;i<6;i++){
     switch (i){
       case 0:
-	argv[0]="rdsamp";
-	argv[1]="-r";
 	
-	status = mxGetString(prhs[0], rec_name, (mwSize)reclen);
-
-
+	
 	char *rec_name;
-	size_t reclen;
-	reclen = mxGetN(prhs[0])*sizeof(mxChar)+1;
+	size_t reclen = mxGetN(prhs[0])*sizeof(mxChar)+1;
 	rec_name = malloc(sizeof(long));
 
 	(void)mxGetString(prhs[0], rec_name, (mwSize)reclen);
-
+	
+	argv[0]="rdsamp";
+	argv[1]="-r";
 	argv[2]=rec_name; 
-
 	argind=3;
-
-
 
       case 1: /* signalList */
 
-	/* Pretty tough! */
+	
+        if (inputfields[1]){
+	  int numsig[];
+	  
+	  for (int chan=0;chan<inputfields[1];chan++){
+	    argv[argind]=numsig[chan];
+	  }
+	  argind=argind+1+inputfields[1];
+	}
 	
 	break;
       case 2: /* N */
 	if (inputfields[2]){
-	  argv[argind]="-f";
-	  argv[argind+1]=
+
+	  unsigned long numto=(unsigned long)mxGetScalar(inputs[2]);
+	  sprintf(charto, "%lu", numto);
+
+	  argv[argind]="-t";
+	  argv[argind+1]=charto;
+	  argind=argind+2;
 	}
-      
-	
+	break;
+      case 3: /* N0 */
+	if (inputfields[3]){
+
+	  unsigned long numfrom=(unsigned long)mxGetScalar(inputs[3]);
+	  sprintf(charfrom, "%lu", numfrom);
+
+	  argv[argind]="-f";
+	  argv[argind+1]=charfrom;
+	  argind=argind+2;
+	}
+	break;
+
+      case 4: /* rawUnits */
+	if (inputfields[2]){
+	  argv[argind]="-P";
+	  argind++;
+	}
+	break;
+      case 5: /* highResolution */
+	if (inputfields[5]){
+	  argv[argind]="-H";
+	}
+	break;
     }
 
   }
