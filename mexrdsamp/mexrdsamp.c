@@ -232,11 +232,12 @@ void rdsamp(int argc, char *argv[]){
 
 /* Helper function to validate inputs and convert them to strings to pass into rdsamp */
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
-char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
+char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argcout){
 
-  /* Indicator of fields to be passed into rdsamp.  Different from argc argv which give the number of strings */
-  /* recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H)*/
+  /* Indicator of fields to be passed into rdsamp.  Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H) */
   int inputfields[]=[1, 0, 0, 0, 1, 0]; 
+  int argc=3; /* Initial mandatory: rdsamp -r recordName */
+
   
   if (ninputs > 6){
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyinputs",
@@ -256,7 +257,6 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
 	mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrecordName",
 			  "Record Name must be a string.");
       }
-      *argc=3; /* Start with mandatory: rdsamp -r record*/
       break;
     case 1: /* signalList */
       if(!mxIsEmpty(prhs[1])){
@@ -271,6 +271,8 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
 	}
 	
 	inputfields[1]=1;
+
+	/* argc+???????? THIS IS HARD*/
 	
       }
       break;
@@ -281,6 +283,7 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
 			  "N must be a 1x1 scalar.");
 	}
 	inputfields[2]=1;
+	argc=argc+2;
       }
       break;
     case 3: /* N0 */
@@ -290,6 +293,7 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
 			  "N0 must be a 1x1 scalar.");
 	}
 	inputfields[3]=1;
+	argc=argc+2;
       }
       break;
     case 4: /* rawUnits */
@@ -298,9 +302,12 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrawUnits",
 			  "rawUnits must be a 1x1 scalar.");
 	}
-	/* Find out whether -P is 0 or 1. Remember default is 1 */
+	/* Find out whether to set -P. Default is yes */
 	int rawUnits=(int)mxGetScalar(prhs[4]);
-	if (!rawUnits){ 
+	if (rawUnits){ // Add -P 
+	  argc++; 	  
+	}
+	else{
 	  inputfields[4]=0;
 	}
       }
@@ -311,7 +318,12 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidhighResolution",
 			  "highResolution must be a 1x1 scalar.");
 	}
-	inputfields[5]=1;
+	/* Find out whether to set -H. Default is no */
+	int highResolution=(int)mxGetScalar(prhs[5]);
+	if (highResolution){ // Add -H 
+	  argc++;
+	  inputfields[5]=1;
+	}
       }
       break;
     }
@@ -319,14 +331,22 @@ char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
   }
 
 
+  
   /* Construct the argv array of strings to feed into rdsamp */
+  char *argv[argc];
   for (i=0;i<6;i++){
     switch (inputfields[i]){
-
+      case 1:
+	
     }
 
   }
+
+
   
+  /* Pass out the final argc and argv for rdsamp */
+  *argcout=argc;
+  return argv;
 
 }
 
