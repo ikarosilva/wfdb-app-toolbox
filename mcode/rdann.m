@@ -169,10 +169,14 @@ end
 if(nargout ==1)
     %Optmize the parsing for cases in which we are interested only in the sample number
     %annotation values
+    disp('hi');
+    javaWfdbExec.execToDoubleArray(wfdb_argument)
     ann=javaWfdbExec.execToDoubleArray(wfdb_argument);
+    disp('hi2');
     if(config.inOctave)
         ann=java2mat(ann);
     end
+    disp(ann)
     if size(ann,2)==6
         ann=ann(:,2);
     else
@@ -186,6 +190,7 @@ else
     %outputs={ann,type,subtype,chan,num,comments};
     dataJava=javaWfdbExec.execToStringList(wfdb_argument);
     data=dataJava.toArray();
+    disp(data);
     N=length(data);
     ann=zeros(N,1);
     type=[];             % Size to be defined at runtime
