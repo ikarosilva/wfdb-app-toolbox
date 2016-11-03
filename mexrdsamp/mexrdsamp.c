@@ -230,33 +230,103 @@ void rdsamp(int argc, char *argv[]){
 
 
 
-/* Helper function to validate inputs */
-/* [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits,highResolution) */
-void checkinputs(int ninputs, const mxArray* inputs[]){
+/* Helper function to validate inputs and convert them to strings to pass into rdsamp */
+/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
+char *argv[] processinputs(int ninputs, const mxArray* inputs[], int *argc){
 
-  if (ninputs < 6){
+  /* Indicator of fields to be passed into rdsamp.  Different from argc argv which give the number of strings */
+  /* recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H)*/
+  int inputfields[]=[1, 0, 0, 0, 1, 0]; 
+  
+  if (ninputs > 6){
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyinputs",
-		      "Too many input variables.");
+		      "Too many input variables.\nFormat: [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution)");
   }
   if (ninputs < 1) {
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:missingrecordName",
 		       "Record Name required.");
   }
 
+  
+  /* Switch through the matlab input variables in order */
   for(i=0; i<ninputs; i++){ 
-    switch (argnum){
-    case 0:
+    switch (i){
+    case 0: /* recordname */
       if(!mxIsChar(prhs[0])){
 	mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrecordName",
 			  "Record Name must be a string.");
       }
+      *argc=3; /* Start with mandatory: rdsamp -r record*/
       break;
-    case 1:
+    case 1: /* signalList */
+      if(!mxIsEmpty(prhs[1])){
+
+	if (!mxIsDouble(prhs[1])){
+	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListtype",
+			  "signalList must be a double array.");
+	}
+	if (mxGetM(prhs[1]) != 1){
+	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListshape",
+			  "signalList must be a 1xM row vector.");
+	}
+	
+	inputfields[1]=1;
+	
+      }
       break;
-    
-    
+    case 2: /* N */
+      if(!mxIsEmpty(prhs[2])){
+	if (!mxIsDouble(prhs[2]) || mxGetNumberOfElements(prhs[2]) != 1){
+	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidN",
+			  "N must be a 1x1 scalar.");
+	}
+	inputfields[2]=1;
+      }
+      break;
+    case 3: /* N0 */
+      if(!mxIsEmpty(prhs[3])){
+	if (!mxIsDouble(prhs[3]) || mxGetNumberOfElements(prhs[3]) != 1){
+	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidN0",
+			  "N0 must be a 1x1 scalar.");
+	}
+	inputfields[3]=1;
+      }
+      break;
+    case 4: /* rawUnits */
+      if(!mxIsEmpty(prhs[4])){
+	if (!mxIsDouble(prhs[4]) || mxGetNumberOfElements(prhs[4]) != 1){
+	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrawUnits",
+			  "rawUnits must be a 1x1 scalar.");
+	}
+	/* Find out whether -P is 0 or 1. Remember default is 1 */
+	int rawUnits=(int)mxGetScalar(prhs[4]);
+	if (!rawUnits){ 
+	  inputfields[4]=0;
+	}
+      }
+      break;
+    case 5: /* highResolution */
+      if(!mxIsEmpty(prhs[5])){
+	if (!mxIsDouble(prhs[5]) || mxGetNumberOfElements(prhs[5]) != 1){
+	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidhighResolution",
+			  "highResolution must be a 1x1 scalar.");
+	}
+	inputfields[5]=1;
+      }
+      break;
     }
+    
   }
+
+
+  /* Construct the argv array of strings to feed into rdsamp */
+  for (i=0;i<6;i++){
+    switch (inputfields[i]){
+
+    }
+
+  }
+  
 
 }
 
@@ -269,26 +339,20 @@ void checkinputs(int ninputs, const mxArray* inputs[]){
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray* prhs[] ){
 
-  int argc=3; /* Minimum: rdsamp -r recordname */ 
-
   
   
-  /* Check and capture input and output arguments */
+  /* Check and process input arguments */
+  int *argcp;
+  char *argv[]=processinputs(nrhs, prhs, argcp);
+  //int argc=sizeof(argv)/sizeof(argv[0]);
+  int argc=*argcp; 
+    
+  /* Check output arguments */
   
- 
   
-  
-  
-  
-  
-  
-  /* ADD: Check that recordname is a string */
 
   /* End of checking inputs/outputs */
 
-
-  /* argv structure: rdsamp -r record -f -t -s -P*/
-  char *argv[argc]; 
   
 
   /* Get record name */
@@ -336,3 +400,22 @@ void mexFunction( int nlhs, mxArray *plhs[],
 }
 
 
+
+/* To Do
+
+
+Check that signal list does not lie outside index range of signal. Does original rdsamp already do that? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ */
