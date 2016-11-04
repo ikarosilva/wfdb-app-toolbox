@@ -28,13 +28,14 @@ Modified by Chen Xie 2016
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <malloc.h>
 #include <math.h>
 #include <wfdb/wfdb.h>
 #include "matrix.h"
 #include "mex.h"
 
-double* dynamicData; // GLOBAL VARIABLES??? WHY????????? 
+double* dynamicData; /* GLOBAL VARIABLES??? WHY????????? */
 unsigned long nSamples;
 long nsig;
 long maxSamples = 2000000;
@@ -48,7 +49,7 @@ void rdsamp(int argc, char *argv[]){
   char* pname ="mexrdsamp1";
   char *record = NULL, *search = NULL;
   char *invalid, speriod[16], tustr[16];
-  int  highres = 0, i, isiglist, nosig = 0, s,
+  int  highres = 0, i, isiglist, nosig = 0, pflag = 0, s,
     *sig = NULL;
   WFDB_Frequency freq;
   WFDB_Sample *datum;
@@ -244,7 +245,7 @@ void rdsamp(int argc, char *argv[]){
 
 /* Validate the matlab user input variables.  */
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
-int* checkMLinputs(int ninputs, const mxArray* inputs[]){
+void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
 
   /* Indicator of which fields are to be passed into rdsamp.  Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
   int inputfields[]={1, 0, 0, 0, 1, 0, 3}, i; 
@@ -263,29 +264,29 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
   for(i=0; i<ninputs; i++){ 
     switch (i){
     case 0: /* recordname */
-      if(!mxIsChar(prhs[0])){
+      if(!mxIsChar(MLinputs[0])){
 	mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrecordName",
 			  "Record Name must be a string.");
       }
       break;
     case 1: /* signalList */
-      if(!mxIsEmpty(prhs[1])){
-
-	if (!mxIsDouble(prhs[1])){
+      if(!mxIsEmpty(MLinputs[1])){
+	int nsig;
+	if (!mxIsDouble(MLinputs[1])){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListtype",
 			  "signalList must be a double array.");
 	}
-	if (int nsig=(int)mxGetM(prhs[1]) != 1){
+	if (nsig=(int)mxGetM(MLinputs[1]) != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListshape",
 			  "signalList must be a 1xN row vector.");
 	}
 	inputfields[1]=nsig;
-	inputfields[6]=inputfields[6]+1+nsig */
+	inputfields[6]=inputfields[6]+1+nsig;
       }
       break;
     case 2: /* N */
-      if(!mxIsEmpty(prhs[2])){
-	if (!mxIsDouble(prhs[2]) || mxGetNumberOfElements(prhs[2]) != 1){
+      if(!mxIsEmpty(MLinputs[2])){
+	if (!mxIsDouble(MLinputs[2]) || mxGetNumberOfElements(MLinputs[2]) != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidN",
 			  "N must be a 1x1 scalar.");
 	}
@@ -294,8 +295,8 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
       }
       break;
     case 3: /* N0 */
-      if(!mxIsEmpty(prhs[3])){
-	if (!mxIsDouble(prhs[3]) || mxGetNumberOfElements(prhs[3]) != 1){
+      if(!mxIsEmpty(MLinputs[3])){
+	if (!mxIsDouble(MLinputs[3]) || mxGetNumberOfElements(MLinputs[3]) != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidN0",
 			  "N0 must be a 1x1 scalar.");
 	}
@@ -304,14 +305,14 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
       }
       break;
     case 4: /* rawUnits */
-      if(!mxIsEmpty(prhs[4])){
-	if (!mxIsDouble(prhs[4]) || mxGetNumberOfElements(prhs[4]) != 1){
+      if(!mxIsEmpty(MLinputs[4])){
+	if (!mxIsDouble(MLinputs[4]) || mxGetNumberOfElements(MLinputs[4]) != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrawUnits",
 			  "rawUnits must be a 1x1 scalar.");
 	}
 	/* Find out whether to set -P. Default is yes */
-	int rawUnits=(int)mxGetScalar(prhs[4]);
-	if (rawUnits){ // Add -P 
+	int rawUnits=(int)mxGetScalar(MLinputs[4]);
+	if (rawUnits){ /* Add -P */
 	  inputfields[6]++; 	  
 	}
 	else{
@@ -320,14 +321,14 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
       }
       break;
     case 5: /* highResolution */
-      if(!mxIsEmpty(prhs[5])){
-	if (!mxIsDouble(prhs[5]) || mxGetNumberOfElements(prhs[5]) != 1){
+      if(!mxIsEmpty(MLinputs[5])){
+	if (!mxIsDouble(MLinputs[5]) || mxGetNumberOfElements(MLinputs[5]) != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidhighResolution",
 			  "highResolution must be a 1x1 scalar.");
 	}
 	/* Find out whether to set -H. Default is no */
-	int highResolution=(int)mxGetScalar(prhs[5]);
-	if (highResolution){ // Add -H 
+	int highResolution=(int)mxGetScalar(MLinputs[5]);
+	if (highResolution){ /* Add -H */
 	  inputfields[5]=1;
 	  inputfields[6]++;
 	}
@@ -336,7 +337,9 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
     }
   }
   
-  return inputfields
+  for (i=0;i<7;i++){
+    *(inputflags+i)=inputfields[i];
+  }
 }
 
 
@@ -345,37 +348,40 @@ int* checkMLinputs(int ninputs, const mxArray* inputs[]){
 
 /* Create the argv array of strings to pass into rdsamp */
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
-char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
+void rdsampInputArgs(int *inputfields, const mxArray* MLinputs[], char *finalargs){
   
-  char *argv[inputfields[6]], charto[20], charfrom[20], charsig[inputfields[1]][20];
-
+  char *argv[inputfields[6]], charto[20], charfrom[20], charsig[inputfields[1]][20], *recname;
+  int argind, i;
+  size_t reclen;
+  unsigned long numfrom, numto; 
+  
   /* Check all possible input options to add */
   for (i=0;i<6;i++){
     switch (i){
       case 0:
-	
-	
-	char *rec_name;
-	size_t reclen = mxGetN(prhs[0])*sizeof(mxChar)+1;
-	rec_name = malloc(sizeof(long));
+	reclen = mxGetN(MLinputs[0])*sizeof(mxChar)+1;
+	recname = malloc(sizeof(long));
 
-	(void)mxGetString(prhs[0], rec_name, (mwSize)reclen);
+	(void)mxGetString(MLinputs[0], recname, (mwSize)reclen);
 	
 	argv[0]="rdsamp";
 	argv[1]="-r";
-	argv[2]=rec_name; 
+	argv[2]=recname; 
 	argind=3;
+	free(recname);
+	break;
 
       case 1: /* signalList */
 
         if (inputfields[1]){
 	  
 	  double *signalList;
-	  mxSetPr(plhs[1],signalList);
+	  int chan;
+	  mxSetPr(MLinputs[1],signalList);
 	  argv[argind]="-s";
 	  argind++;
 	  
-	  for (int chan=0;chan<inputfields[1];chan++){
+	  for (chan=0;chan<inputfields[1];chan++){
 	    sprintf(charsig[chan], "%d" , (int)signalList[chan]);
 	    argv[argind+chan]=charsig[chan];
 	  }
@@ -386,7 +392,7 @@ char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
       case 2: /* N */
 	if (inputfields[2]){
 
-	  unsigned long numto=(unsigned long)mxGetScalar(inputs[2]);
+	  numto=(unsigned long)mxGetScalar(MLinputs[2]);
 	  sprintf(charto, "%lu", numto);
 
 	  argv[argind]="-t";
@@ -397,7 +403,7 @@ char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
       case 3: /* N0 */
 	if (inputfields[3]){
 
-	  unsigned long numfrom=(unsigned long)mxGetScalar(inputs[3]);
+	  numfrom=(unsigned long)mxGetScalar(MLinputs[3]);
 	  sprintf(charfrom, "%lu", numfrom);
 
 	  argv[argind]="-f";
@@ -420,8 +426,10 @@ char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
     }
   }
 
-  
-  return argv;
+  for (i=0;i<inputfields[6];i++){
+    strcpy(finalargs[i], argv[i]);
+  }
+
 }
 
 
@@ -435,16 +443,20 @@ char *rdsampInputArgs(int *inputfields, const mxArray* inputs[]){
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray* prhs[] ){
 
+
+  int jj;
   
   /* Check input arguments */
-  int inputfields[]=checkMLinputs(nrhs, prhs, argcp);
+  int inputfields[6];
+  checkMLinputs(nrhs, prhs, inputfields);
   int argc=inputfields[6];
 
   /* Create argument strings to pass into rdsamp */
-  char *argv[]=rdsampInputArgs(inputfields, phrs);
+  char *argv[inputfields[6]];
+  rdsampInputArgs(inputfields, phrs, argv);
   
 
-  for (int jj=0;jj<argc;jj++){
+  for (jj=0;jj<argc;jj++){
     mexPrintf("argv[%d]: %s", jj, argv[jj]);
   }
 
@@ -474,10 +486,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
   mxSetPr(plhs[0],dynamicData);
   mxSetM(plhs[0],nSamples);
   mxSetN(plhs[0],nsig);
-  /* free local memory */
-  free(rec_name);
-  return;
 
+  return;
 }
 
 
