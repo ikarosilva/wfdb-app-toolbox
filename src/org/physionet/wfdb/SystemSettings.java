@@ -30,37 +30,20 @@ public class SystemSettings {
 	public static void loadLib(String libName){
 		if(getOsName().contains("windows")){
 			try {
-				//Windows is messy, so I am hard-coding this here ....
-				//This is only valid when called from Rdsamp.java. No other class should call
-				//this (if it does, input arg is ignored)
 				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
-						+ "\\bin\\"  +"libcurl-4.dll");
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
-						+ "\\bin\\"  +"wfdb-10.5.dll");
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
-						+ "\\bin\\"  + "librdsampjni.exe.exe" );
+						+ "\\bin\\lib"  + libName + ".dll");
 			} catch (UnsatisfiedLinkError e) {
 				System.err.println("Native code library failed to load.\n" + e);
 				System.exit(1);
 			}
 
 		}else if(getOsName().contains("mac")){
-			try{
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
-						+ "/bin/" + libName + ".dylib");
-			}catch (Exception e){
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
-						+ "/bin/lib" + libName + ".dylib");
-			}
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+					+ "/lib/lib" + libName + ".dylib");
 		}else{
 			//Default to Linux
-			try{
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
-						+ "/lib64/" + libName + ".so");
-			}catch(Exception e){
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
-						+ "/lib64/lib" + libName + ".so");
-			}
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+					+ "/lib/lib" + libName + ".so");
 		}
 	}
 
