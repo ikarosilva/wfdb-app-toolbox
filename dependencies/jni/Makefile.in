@@ -1,0 +1,67 @@
+CC = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+DEFS = @DEFS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+LIBTOOL = @LIBTOOL@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+libdir = @libdir@
+
+SHELL = @SHELL@
+top_builddir = @top_builddir@
+top_srcdir = @top_srcdir@
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+JNI_CFLAGS = @JNI_CFLAGS@
+WFDB_CFLAGS = @WFDB_CFLAGS@
+WFDB_LIBS = @WFDB_LIBS@
+
+JAVA = @JAVA@
+JAVAH = @JAVAH@
+
+classdir = $(srcdir)/../../bin/classes
+
+all: librdsampjni.la
+
+# FIXME: this doesn't work
+# it tries to look for the shared libraries in absurd places
+# plus it doesn't actually test anything
+check: librdsampjni.la
+	LD_LIBRARY_PATH=".libs:$(LD_LIBRARY_PATH)" $(JAVA) -classpath $(classdir) org.physionet.wfdb.jni.Rdsamp
+
+install: librdsampjni.la
+	mkdir -p $(libdir)
+	$(LIBTOOL) --mode=install cp librdsampjni.la $(libdir)
+
+librdsampjni.la: rdsampjni.lo
+	$(LIBTOOL) --mode=link $(CC) $(CLFAGS) $(LDFLAGS) \
+	  -avoid-version -no-undefined -rpath /fnord \
+	  rdsampjni.lo -o librdsampjni.la \
+	  $(WFDB_LIBS) $(LIBS)
+
+rdsampjni.lo: rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
+	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) \
+	  $(DEFS) $(WFDB_CFLAGS) $(JNI_CFLAGS) -I. \
+	  -c $(srcdir)/rdsampjni.c
+
+org_physionet_wfdb_jni_Rdsamp.h: $(classdir)/org/physionet/wfdb/jni/Rdsamp.class
+	$(JAVAH) -classpath $(classdir) org.physionet.wfdb.jni.Rdsamp
+
+clean:
+	$(LIBTOOL) --mode=clean rm -f *.la *.lo
+	rm -f org_physionet_wfdb_jni_Rdsamp.h
+
+distclean: clean
+	rm -f config.status config.log libtool
+	rm -f Makefile
+
+Makefile: Makefile.in config.status
+	$(SHELL) ./config.status
+config.status: configure
+	$(SHELL) ./config.status --recheck
+
+.PHONY: all clean distclean install check

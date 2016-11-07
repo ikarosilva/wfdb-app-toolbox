@@ -21,3 +21,10 @@
 /mcode/html/*.html
 !/mcode/html/template.html
 !/mcode/html/template_bottom.html
+/dependencies/jni/aclocal.m4
+/dependencies/jni/autom4te.cache/*
+/dependencies/jni/configure
+/dependencies/jni/config.guess
+/dependencies/jni/config.sub
+/dependencies/jni/install-sh
+/dependencies/jni/ltmain.sh
