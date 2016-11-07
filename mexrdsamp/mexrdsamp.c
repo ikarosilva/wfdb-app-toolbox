@@ -248,8 +248,8 @@ void rdsamp(int argc, char *argv[]){
 void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
 
   /* Indicator of which fields are to be passed into rdsamp.  Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
-  int inputfields[]={1, 0, 0, 0, 1, 0, 3}, i; 
-  /* Initial mandatory 3: rdsamp -r recordName */
+  int inputfields[]={1, 0, 0, 0, 1, 0, 4}, i; 
+  /* Initial default 4: rdsamp -r recordName */
   
   if (ninputs > 6){
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyinputs",
@@ -271,17 +271,23 @@ void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
       break;
     case 1: /* signalList */
       if(!mxIsEmpty(MLinputs[1])){
-	int nsig;
+	int nrows, ncols;
 	if (!mxIsDouble(MLinputs[1])){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListtype",
 			  "signalList must be a double array.");
 	}
-	if (nsig=(int)mxGetM(MLinputs[1]) != 1){
+	nrows=(int)mxGetM(MLinputs[1]);
+	if (nrows != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidsignalListshape",
 			  "signalList must be a 1xN row vector.");
 	}
-	inputfields[1]=nsig;
-	inputfields[6]=inputfields[6]+1+nsig;
+	ncols=(int)mxGetN(MLinputs[1]);
+	inputfields[1]=ncols;
+	inputfields[6]=inputfields[6]+1+ncols;
+
+
+	mexPrintf("nrows: %d\n", nrows);
+	mexPrintf("ncols: %d\n", ncols);
       }
       break;
     case 2: /* N */
@@ -312,11 +318,9 @@ void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
 	}
 	/* Find out whether to set -P. Default is yes */
 	int rawUnits=(int)mxGetScalar(MLinputs[4]);
-	if (rawUnits){ /* Add -P */
-	  inputfields[6]++; 	  
-	}
-	else{
+	if (!rawUnits){ /* Remove the -P option */
 	  inputfields[4]=0;
+	  inputfields[6]--;
 	}
       }
       break;
@@ -346,27 +350,33 @@ void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
 
 
 
+
+
+
 /* Create the argv array of strings to pass into rdsamp */
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
-void rdsampInputArgs(int *inputfields, const mxArray* MLinputs[], char *finalargs){
+void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
   
-  char *argv[inputfields[6]], charto[20], charfrom[20], charsig[inputfields[1]][20], *recname;
+  char charto[20], charfrom[20], charsig[inputfields[1]][20], *recname;
   int argind, i;
   size_t reclen;
   unsigned long numfrom, numto; 
   
   /* Check all possible input options to add */
+  /* When constructing argv, don't forget to allocate for/add the extra null */
   for (i=0;i<6;i++){
     switch (i){
       case 0:
 	reclen = mxGetN(MLinputs[0])*sizeof(mxChar)+1;
-	recname = malloc(sizeof(long));
-
+	recname = (char *)malloc(sizeof(long));
 	(void)mxGetString(MLinputs[0], recname, (mwSize)reclen);
-	
-	argv[0]="rdsamp";
-	argv[1]="-r";
-	argv[2]=recname; 
+
+	argv[0]=(char *)malloc(7*sizeof(char));
+	argv[1]=(char *)malloc(3*sizeof(char));
+	argv[2]=(char *)malloc(strlen(recname)*sizeof(char)+1);
+	strcpy(argv[0], "rdsamp");
+	strcpy(argv[1], "-r");
+	strcpy(argv[2], recname); 
 	argind=3;
 	free(recname);
 	break;
@@ -374,18 +384,21 @@ void rdsampInputArgs(int *inputfields, const mxArray* MLinputs[], char *finalarg
       case 1: /* signalList */
 
         if (inputfields[1]){
-	  
-	  double *signalList;
+	  mexPrintf("in case 1...");
+	  double *signalList=(double *)mxMalloc(inputfields[1]*sizeof(double));
 	  int chan;
-	  mxSetPr(MLinputs[1],signalList);
-	  argv[argind]="-s";
+	  mxSetPr(MLinputs[1], signalList);
+	  argv[argind]=(char *)malloc(3*sizeof(char));
+	  strcpy(argv[argind], "-s");
 	  argind++;
 	  
 	  for (chan=0;chan<inputfields[1];chan++){
 	    sprintf(charsig[chan], "%d" , (int)signalList[chan]);
-	    argv[argind+chan]=charsig[chan];
+	    argv[argind+chan]=(char *)malloc(strlen(charsig[chan])*sizeof(char)+1);
+	    strcpy(argv[argind+chan], charsig[chan]);
 	  }
 	  argind=argind+inputfields[1];
+	  mxFree(signalList);
 	}
 	
 	break;
@@ -393,10 +406,12 @@ void rdsampInputArgs(int *inputfields, const mxArray* MLinputs[], char *finalarg
 	if (inputfields[2]){
 
 	  numto=(unsigned long)mxGetScalar(MLinputs[2]);
-	  sprintf(charto, "%lu", numto);
+	  sprintf(charto, "s%lu", numto);
 
-	  argv[argind]="-t";
-	  argv[argind+1]=charto;
+	  argv[argind]=(char *)malloc(3*sizeof(char));
+	  argv[argind+1]=(char *)malloc(strlen(charto)*sizeof(char)+1);
+	  strcpy(argv[argind], "-t");
+	  strcpy(argv[argind+1], charto);
 	  argind=argind+2;
 	}
 	break;
@@ -404,32 +419,32 @@ void rdsampInputArgs(int *inputfields, const mxArray* MLinputs[], char *finalarg
 	if (inputfields[3]){
 
 	  numfrom=(unsigned long)mxGetScalar(MLinputs[3]);
-	  sprintf(charfrom, "%lu", numfrom);
+	  sprintf(charfrom, "s%lu", numfrom);
 
-	  argv[argind]="-f";
-	  argv[argind+1]=charfrom;
+	  argv[argind]=(char *)malloc(3*sizeof(char));
+	  argv[argind+1]=(char *)malloc(strlen(charfrom)*sizeof(char)+1);
+	  strcpy(argv[argind], "-f");
+	  strcpy(argv[argind+1], charfrom);
 	  argind=argind+2;
 	}
 	break;
 
       case 4: /* rawUnits */
-	if (inputfields[2]){
-	  argv[argind]="-P";
+	if (inputfields[4]){
+	  argv[argind]=(char *)malloc(3*sizeof(char));
+	  strcpy(argv[argind], "-P");
 	  argind++;
 	}
 	break;
       case 5: /* highResolution */
 	if (inputfields[5]){
-	  argv[argind]="-H";
+	  argv[argind]=(char *)malloc(3*sizeof(char));
+	  strcpy(argv[argind], "-H");	  
 	}
 	break;
     }
+    
   }
-
-  for (i=0;i<inputfields[6];i++){
-    strcpy(finalargs[i], argv[i]);
-  }
-
 }
 
 
@@ -441,23 +456,28 @@ void rdsampInputArgs(int *inputfields, const mxArray* MLinputs[], char *finalarg
 /* Matlab gateway function */
 /* Matlab call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits,highResolution) */
 void mexFunction( int nlhs, mxArray *plhs[], 
-		  int nrhs, const mxArray* prhs[] ){
-
-
-  int jj;
+		  int nrhs, const mxArray *prhs[] ){
   
-  /* Check input arguments */
-  int inputfields[6];
+  int argc, i, inputfields[7];
+
+  /* Check the matlab input arguments */
   checkMLinputs(nrhs, prhs, inputfields);
-  int argc=inputfields[6];
 
-  /* Create argument strings to pass into rdsamp */
-  char *argv[inputfields[6]];
-  rdsampInputArgs(inputfields, phrs, argv);
+  for (i=0;i<7;i++){
+    mexPrintf("inputfields[%d]: %d\n\n", i, inputfields[i]);
+  }
   
+  argc=inputfields[6];
+  char *argv[argc];
 
-  for (jj=0;jj<argc;jj++){
-    mexPrintf("argv[%d]: %s", jj, argv[jj]);
+  mexPrintf("\n\nReached tag 0\n");
+  
+  /* Create argument strings to pass into rdsamp */
+  rdsampInputArgs(inputfields, prhs, argv);
+  
+  
+  for (i=0;i<argc;i++){
+    mexPrintf("argv[%d]: %s\n", i, argv[i]);
   }
 
   
@@ -475,8 +495,19 @@ void mexFunction( int nlhs, mxArray *plhs[],
   argv[4] = "s5";
   */ 
 
+  mexPrintf("\n\nReached tag 1\n");
+  
   /*Call main WFDB Code */
   rdsamp(argc,argv);
+
+
+  mexPrintf("Reached tag 2\n");
+  
+  for (i=0; i<argc; i++){
+    free(argv[i]);
+  }
+
+  mexPrintf("Reached tag 3\n");
 
   /* Create a 0-by-0 mxArray. Memory
      will be allocated dynamically by rdsamp */
@@ -487,6 +518,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
   mxSetM(plhs[0],nSamples);
   mxSetN(plhs[0],nsig);
 
+  mexPrintf("Reached tag 4\n");
+  
   return;
 }
 
@@ -495,11 +528,11 @@ void mexFunction( int nlhs, mxArray *plhs[],
 /* To Do
 
 
-Check that signal list does not lie outside index range of signal. Does original rdsamp already do that? It should
+Check that signal list does not lie outside index range of signal. Does original rdsamp already do that? It should. THe memory allocation is dynamic anyway for signal indices. 
 
 
 
-
+- return and exit from inner loop of rdsamp. exit whole program. 
 
 
 
