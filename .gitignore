@@ -19,6 +19,5 @@
 /mcode/nativelibs/*/lib/*
 /mcode/nativelibs/*/lib64/*
 /mcode/html/*.html
-!/dependencies/ecgpuwave-gfortran-addon.zip
 !/mcode/html/template.html
 !/mcode/html/template_bottom.html
