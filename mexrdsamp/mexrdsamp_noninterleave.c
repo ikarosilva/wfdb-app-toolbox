@@ -17,10 +17,8 @@ Optional Parameters:
                returned (default = all)
 - N - Integer specifying the sample number at which to stop reading the record
       file. 
-- N0- Integer specifying the sample number at which to start reading the record
-      file. 
-- rawUnits - Scalar (0 or 1) specifying whether to return the samples in raw 
-             or physical values. Default = 0 for physical. 
+- N0
+- rawUnits
 - highResolution
 
 Written by Ikaro Silvia 2014
@@ -37,12 +35,14 @@ Modified by Chen Xie 2016
 #include "matrix.h"
 #include "mex.h"
 
-double* dynamicData; /* Array of data */
-unsigned long nSamples; /* Number of samples read */
-int nsig; /* Number of signals/channels output */
-unsigned long maxSamples = 2000000; /* The data array allocation length (can grow) */
-unsigned long reallocIncrement= 1000000;   /* allow the input buffer to grow (the increment is arbitrary) */
-
+double* dynamicData; /* GLOBAL VARIABLES??? WHY????????? */
+unsigned long nSamples;
+long nsig;
+long maxSamples = 2000000; /* The data array allocation length (can grow) */
+long reallocIncrement= 1000000;   /* allow the input buffer to grow (the increment is arbitrary) */
+/* input data buffer; to be allocated and returned
+ * channel samples will be interleaved
+ */
 
 /* Work function */
 void rdsamp(int argc, char *argv[]){
@@ -51,7 +51,7 @@ void rdsamp(int argc, char *argv[]){
   char *invalid, speriod[16], tustr[16];
   int  highres = 0, i, isiglist, nosig = 0, pflag = 0, s,
     *sig = NULL;
-  double MLnan=mxGetNaN();
+  double MLnan=mxGetNaN(void);
   WFDB_Frequency freq;
   WFDB_Sample *datum; 
   WFDB_Siginfo *info;
@@ -137,22 +137,15 @@ void rdsamp(int argc, char *argv[]){
     mexPrintf("Cannot open input files\n");
     return;
   }
-  if ((datum = (WFDB_Sample *)mxMalloc(nsig * sizeof(WFDB_Sample))) == NULL ||
-      (info = (WFDB_Siginfo *)mxMalloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+  if ((datum = malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+      (info = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
     mexPrintf( "%s: insufficient memory\n", pname);
     return;
   }
   
 
-
-  mexPrintf("Before isigopen\n");
-  
   if ((nsig = isigopen(record, info, nsig)) <= 0)
     return;
-
-  mexPrintf("After isigopen\n");
-
-  
   for (i = 0; i < nsig; i++)
     if (info[i].gain == 0.0) info[i].gain = WFDB_DEFGAIN;
   if (highres)
@@ -164,12 +157,9 @@ void rdsamp(int argc, char *argv[]){
     return;
   if (to > 0L && (to = strtim(argv[to])) < 0L)
     to = -to;
-
-  mexPrintf("\n\nIn rdsamp, after getting sig info\n\n");
-
   
   if (nosig) {	/* print samples only from specified signals */
-    if ((sig = (int *)mxMalloc((unsigned)nosig*sizeof(int))) == NULL) {
+    if ((sig = (int *)malloc((unsigned)nosig*sizeof(int))) == NULL) {
       mexPrintf( "%s: insufficient memory\n", pname);
       return;
     }
@@ -184,7 +174,7 @@ void rdsamp(int argc, char *argv[]){
     nsig = nosig;
   }
   else {	/* print samples from all signals */
-    if ((sig = (int *)mxMalloc( (unsigned) nsig*sizeof(int) ) ) == NULL) {
+    if ((sig = (int *) malloc( (unsigned) nsig*sizeof(int) ) ) == NULL) {
       mexPrintf( "%s: insufficient memory\n", pname);
       return;
     }
@@ -206,33 +196,31 @@ void rdsamp(int argc, char *argv[]){
     to = from + maxl;
 
 
-  mexPrintf("\n\nIn rdsamp, before allocating initial data \n\n"); /* This was last msg */
- 
+
   
   /* Allocate initial elements for the output data array */
-  if ( (dynamicData= (double *)mxRealloc(dynamicData,maxSamples * nsig * sizeof(double)) ) == NULL) {
+  if ( (dynamicData= mxRealloc(dynamicData,maxSamples * nsig * sizeof(double)) ) == NULL) {
     mexPrintf("Unable to allocate enough memory to read record!");
     mxFree(dynamicData);
     return;
   }
 
 
-  mexPrintf("\n\nIn rdsamp, before reading data\n\n");
-
   /* Read in the data in raw units */
   while ((to == 0 || from < to) && getvec(datum) >= 0) {
     for (i = 0; i < nsig; i++){
       /* Allocate more memory if necessary */
       if (nSamples >= maxSamples) {
+	mexPrintf("nSamples=%u\n",nSamples);
 	maxSamples=maxSamples+ (reallocIncrement * nsig );
-	mexPrintf("Reallocating output matrix to %u samples\n", maxSamples);
-	if ((dynamicData = (double *)mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
+	mexPrintf("reallocating output matrix to %u\n", maxSamples);
+	if ((dynamicData = mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
 	  mexPrintf("Unable to allocate enough memory to read record!");
 	  mxFree(dynamicData);
 	  return;
 	}
       }
-      /* Return physical values if specified */
+      /* Convert data to physical units if specified */
       if (pflag){
 	if (datum[sig[i]] == WFDB_INVALID_SAMPLE){
 	  dynamicData[nSamples]=MLnan; 
@@ -241,11 +229,7 @@ void rdsamp(int argc, char *argv[]){
 	  dynamicData[nSamples] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
 	}
       }
-      /* Return raw values if specified */
-      else{
-	dynamicData[nSamples]=datum[sig[i]];
-      }
-      nSamples++;
+      nsamples++;
     }
   }
   return;
@@ -375,6 +359,8 @@ void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
 
 
 
+
+
 /* Create the argv array of strings to pass into rdsamp */
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
 void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
@@ -385,25 +371,26 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
   unsigned long numfrom, numto; 
   
   /* Check all possible input options to add */
+  /* When constructing argv, don't forget to allocate for/add the extra null */
   for (i=0;i<6;i++){
     switch (i){
       case 0:
 	reclen = mxGetN(MLinputs[0])*sizeof(mxChar)+1;
-	recname = (char *)mxMalloc(sizeof(long));
+	recname = (char *)malloc(sizeof(long));
 	(void)mxGetString(MLinputs[0], recname, (mwSize)reclen);
 	if (strcmp(recname, "")==0){
 	    mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrecordName",
 			  "recordName cannot be empty.");	    
 	}
 	
-	argv[0]=(char *)mxMalloc(7*sizeof(char));
-	argv[1]=(char *)mxMalloc(3*sizeof(char));
-	argv[2]=(char *)mxMalloc(strlen(recname)*sizeof(char)+1);
+	argv[0]=(char *)malloc(7*sizeof(char));
+	argv[1]=(char *)malloc(3*sizeof(char));
+	argv[2]=(char *)malloc(strlen(recname)*sizeof(char)+1);
 	strcpy(argv[0], "rdsamp");
 	strcpy(argv[1], "-r");
 	strcpy(argv[2], recname); 
 	argind=3;
-	mxFree(recname);
+	free(recname);
 	break;
 
       case 1: /* signalList */
@@ -413,14 +400,13 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	  double *signalList=(double *)mxMalloc(inputfields[1]*sizeof(double));
 	  int chan;
 	  mxSetPr(MLinputs[1], signalList);
-	  
-	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
+	  argv[argind]=(char *)malloc(3*sizeof(char));
 	  strcpy(argv[argind], "-s");
 	  argind++;
 	  
 	  for (chan=0;chan<inputfields[1];chan++){
-	    sprintf(charsig[chan], "%d" , (int)signalList[chan]-1); /* -1 for matlab to c */
-	    argv[argind+chan]=(char *)mxMalloc(strlen(charsig[chan])*sizeof(char)+1);
+	    sprintf(charsig[chan], "%d" , (int)signalList[chan]);
+	    argv[argind+chan]=(char *)malloc(strlen(charsig[chan])*sizeof(char)+1);
 	    strcpy(argv[argind+chan], charsig[chan]);
 	  }
 	  argind=argind+inputfields[1];
@@ -434,8 +420,8 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	  numto=(unsigned long)mxGetScalar(MLinputs[2]);
 	  sprintf(charto, "s%lu", numto);
 
-	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
-	  argv[argind+1]=(char *)mxMalloc(strlen(charto)*sizeof(char)+1);
+	  argv[argind]=(char *)malloc(3*sizeof(char));
+	  argv[argind+1]=(char *)malloc(strlen(charto)*sizeof(char)+1);
 	  strcpy(argv[argind], "-t");
 	  strcpy(argv[argind+1], charto);
 	  argind=argind+2;
@@ -447,8 +433,8 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	  numfrom=(unsigned long)mxGetScalar(MLinputs[3]);
 	  sprintf(charfrom, "s%lu", numfrom);
 
-	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
-	  argv[argind+1]=(char *)mxMalloc(strlen(charfrom)*sizeof(char)+1);
+	  argv[argind]=(char *)malloc(3*sizeof(char));
+	  argv[argind+1]=(char *)malloc(strlen(charfrom)*sizeof(char)+1);
 	  strcpy(argv[argind], "-f");
 	  strcpy(argv[argind+1], charfrom);
 	  argind=argind+2;
@@ -457,14 +443,14 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 
       case 4: /* rawUnits */
 	if (inputfields[4]){
-	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
+	  argv[argind]=(char *)malloc(3*sizeof(char));
 	  strcpy(argv[argind], "-P");
 	  argind++;
 	}
 	break;
       case 5: /* highResolution */
 	if (inputfields[5]){
-	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
+	  argv[argind]=(char *)malloc(3*sizeof(char));
 	  strcpy(argv[argind], "-H");	  
 	}
 	break;
@@ -506,21 +492,34 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexPrintf("argv[%d]: %s\n", i, argv[i]);
   }
 
-
-  mexPrintf("\n\nReached before rdsamp\n");
-  /*Call main WFDB Code */
+  
+  /* Check output arguments */
 
   
+
+  /*  
+  int argc=5;
+  char *argv[argc];
+  argv[0]="canbewhatevergargehere";
+  argv[1] = "-r";
+  argv[2] = rec_name;
+  argv[3] = "-t";
+  argv[4] = "s5";
+  */ 
+
+  mexPrintf("\n\nReached before rdsamp\n");
+  
+  /*Call main WFDB Code */
   rdsamp(argc,argv);
 
 
   mexPrintf("Reached after rdsamp\n");
   
   for (i=0; i<argc; i++){
-    mxFree(argv[i]);
+    free(argv[i]);
   }
 
-  mexPrintf("Reached after mxFree argv\n");
+  mexPrintf("Reached tag 3\n");
 
   /* Create a 0-by-0 mxArray. Memory
      will be allocated dynamically by rdsamp */
@@ -528,14 +527,11 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   /* Set output variable to the allocated memory space */
   mxSetPr(plhs[0],dynamicData);
-  mxSetM(plhs[0],nSamples/nsig);
+  mxSetM(plhs[0],nSamples);
   mxSetN(plhs[0],nsig);
 
-  mexPrintf("Reached just before quit\n");
-
-  wfdbquit();
-
-  mexPrintf("Reached return\n");
+  mexPrintf("Reached tag 4\n");
+  
   return;
 }
 
@@ -548,14 +544,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
 - return and exit from inner loop of rdsamp. exit whole program. 
 
+- change all mallocs, Calloc and free to mx versions. 
+
 - Is mexrdsamp going to use environment variable wfdbpath? ..... 
-
-- Check whether can allocate fixed memory beforehand
-
-- This error:
- warning (init):
- record mitdb/100 duration differs from that of previously opened record
-
 
 
  */
