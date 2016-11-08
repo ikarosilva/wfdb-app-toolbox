@@ -51,7 +51,7 @@ void rdsamp(int argc, char *argv[]){
   char *invalid, speriod[16], tustr[16];
   int  highres = 0, i, isiglist, nosig = 0, pflag = 0, s,
     *sig = NULL;
-  double MLnan=mxGetNaN(void);
+  double MLnan=mxGetNaN();
   WFDB_Frequency freq;
   WFDB_Sample *datum; 
   WFDB_Siginfo *info;
@@ -229,7 +229,7 @@ void rdsamp(int argc, char *argv[]){
 	  dynamicData[nSamples] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
 	}
       }
-      nsamples++;
+      nSamples++;
     }
   }
   return;
