@@ -125,15 +125,10 @@ double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
     mexErrMsgTxt("mexrdsamp: insufficient memory\n");
   }
   
-
-
-  mexPrintf("Before isigopen\n");
   
   if ((nsig = isigopen(record, info, nsig)) <= 0){
     mexErrMsgTxt("mexrdsamp: failed to open record");
   }
-
-  mexPrintf("After isigopen\n");
 
   
   for (i = 0; i < nsig; i++)
@@ -147,8 +142,6 @@ double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
     mexErrMsgTxt("mexrdsamp: failed to set starting samples");
   if (to > 0L && (to = strtim(argv[to])) < 0L)
     to = -to;
-
-  mexPrintf("\n\nIn rdsamp, after getting sig info\n\n");
 
   
   if (nosig) {	/* print samples only from specified signals */
@@ -184,9 +177,6 @@ double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
     maxl = -maxl;
   if (maxl && (to == 0L || to > from + maxl))
     to = from + maxl;
-
-
-  mexPrintf("\n\nIn rdsamp, before allocating initial data \n\n"); /* This was last msg */
  
   
   /* Allocate initial elements for the output data array */
@@ -194,12 +184,10 @@ double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
     mxFree(dynamicData);
     mexErrMsgTxt("Unable to allocate enough memory to read record!");    
   }
-
-
-  mexPrintf("\n\nIn rdsamp, before reading data\n\n");
-
+  
   /* Read in the data in raw units */
   while ((to == 0 || from < to) && getvec(datum) >= 0) {
+    from++;
     for (i = 0; i < nsig; i++){
       /* Allocate more memory if necessary */
       if (nsamp >= maxSamples) {
@@ -226,9 +214,9 @@ double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
       nsamp++;
     }
   }
-
   *nsamples=nsamp;
-  *nsignals=nsig;  
+  *nsignals=nsig;
+
   return dynamicData;
 }
 
@@ -305,7 +293,7 @@ void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
 	}
 	/* Find out whether to set -P. Default is yes */
 	int rawUnits=(int)mxGetScalar(MLinputs[4]);
-	if (!rawUnits){ /* Remove the -P option */
+	if (rawUnits){ /* Remove the -P option if they want raw units */
 	  inputfields[4]=0;
 	  inputfields[6]--;
 	}
@@ -380,10 +368,6 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
 	  strcpy(argv[argind], "-s");
 	  argind++;
-	  
-	  for (chan=0;chan<inputfields[1];chan++){
-	    mexPrintf("*signalList+%d: %d\n", chan, *(signalList+chan));
-	  }
 	  
 	  for (chan=0;chan<inputfields[1];chan++){
 	    sprintf(charsig[chan], "%d" , ((int)(signalList[chan])-1)); /* -1 for matlab to c */
@@ -473,34 +457,24 @@ void mexFunction( int nlhs, mxArray *plhs[],
   }
 
 
-  mexPrintf("\n\nReached before rdsamp\n");
   /*Call main WFDB Code */
-
-  
   dynamicData=rdsamp(argc,argv, &nsamples, &nsig);
-
-
-  mexPrintf("Reached after rdsamp\n");
   
   for (i=0; i<argc; i++){
     mxFree(argv[i]);
   }
 
-  mexPrintf("Reached after mxFree argv\n");
   
-  /* Create a 0-by-0 mxArray. Memory
-     will be allocated dynamically by rdsamp */
+  /* Create a 0-by-0 output mxArray */
   plhs[0] = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
 
   /* Set output variable to the allocated memory space */
-
-
   mxSetPr(plhs[0],dynamicData); /* SetPr used by Ikaro, for reshaping? */
   /* dynamicData = mxGetPr(plhs[0]); */ /* GetPr used in example*/
 
+  /* Reshape the output matrix*/
   mxSetM(plhs[0],nsamples/nsig);
   mxSetN(plhs[0],nsig);
-
 
   wfdbquit();
   return;
@@ -510,19 +484,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
 /* To Do
 
-
-
-
-- return and exit from inner loop of rdsamp. exit whole program. 
-
 - Is mexrdsamp going to use environment variable wfdbpath? ..... 
 
 - Check whether can allocate fixed memory beforehand
-
-- This error:
- warning (init):
- record mitdb/100 duration differs from that of previously opened record
-
-
 
  */
