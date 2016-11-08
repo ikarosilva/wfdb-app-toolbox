@@ -35,14 +35,12 @@ Modified by Chen Xie 2016
 #include "matrix.h"
 #include "mex.h"
 
-double* dynamicData; /* GLOBAL VARIABLES??? WHY????????? */
-unsigned long nSamples;
-long nsig;
+double* dynamicData; /* Array of data */
+unsigned long nSamples; /* Number of samples read */
+long nsig; /* Number of signals/channels output */
 long maxSamples = 2000000; /* The data array allocation length (can grow) */
 long reallocIncrement= 1000000;   /* allow the input buffer to grow (the increment is arbitrary) */
-/* input data buffer; to be allocated and returned
- * channel samples will be interleaved
- */
+
 
 /* Work function */
 void rdsamp(int argc, char *argv[]){
@@ -51,7 +49,7 @@ void rdsamp(int argc, char *argv[]){
   char *invalid, speriod[16], tustr[16];
   int  highres = 0, i, isiglist, nosig = 0, pflag = 0, s,
     *sig = NULL;
-  double MLnan=mxGetNaN(void);
+  double MLnan=mxGetNaN();
   WFDB_Frequency freq;
   WFDB_Sample *datum; 
   WFDB_Siginfo *info;
@@ -137,8 +135,8 @@ void rdsamp(int argc, char *argv[]){
     mexPrintf("Cannot open input files\n");
     return;
   }
-  if ((datum = malloc(nsig * sizeof(WFDB_Sample))) == NULL ||
-      (info = malloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
+  if ((datum = mxMalloc(nsig * sizeof(WFDB_Sample))) == NULL ||
+      (info = mxMalloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
     mexPrintf( "%s: insufficient memory\n", pname);
     return;
   }
@@ -159,7 +157,7 @@ void rdsamp(int argc, char *argv[]){
     to = -to;
   
   if (nosig) {	/* print samples only from specified signals */
-    if ((sig = (int *)malloc((unsigned)nosig*sizeof(int))) == NULL) {
+    if ((sig = (int *)mxMalloc((unsigned)nosig*sizeof(int))) == NULL) {
       mexPrintf( "%s: insufficient memory\n", pname);
       return;
     }
@@ -229,7 +227,7 @@ void rdsamp(int argc, char *argv[]){
 	  dynamicData[nSamples] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
 	}
       }
-      nsamples++;
+      nSamples++;
     }
   }
   return;
@@ -492,23 +490,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
     mexPrintf("argv[%d]: %s\n", i, argv[i]);
   }
 
-  
-  /* Check output arguments */
-
-  
-
-  /*  
-  int argc=5;
-  char *argv[argc];
-  argv[0]="canbewhatevergargehere";
-  argv[1] = "-r";
-  argv[2] = rec_name;
-  argv[3] = "-t";
-  argv[4] = "s5";
-  */ 
 
   mexPrintf("\n\nReached before rdsamp\n");
-  
   /*Call main WFDB Code */
   rdsamp(argc,argv);
 
@@ -527,7 +510,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
   /* Set output variable to the allocated memory space */
   mxSetPr(plhs[0],dynamicData);
-  mxSetM(plhs[0],nSamples);
+  mxSetM(plhs[0],nSamples/nsig);
   mxSetN(plhs[0],nsig);
 
   mexPrintf("Reached tag 4\n");
@@ -547,6 +530,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
 - change all mallocs, Calloc and free to mx versions. 
 
 - Is mexrdsamp going to use environment variable wfdbpath? ..... 
+
+- Check whether can allocate fixed memory beforehand
 
 
  */
