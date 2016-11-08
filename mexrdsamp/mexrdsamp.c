@@ -14,7 +14,7 @@ Required Parameters:
 
 Optional Parameters:
 - signalList - A Mx1 array of integers specifying the channel indices to be
-               returned (default = all)
+               returned (default = all). Indices start from 1, not 0.
 - N - Integer specifying the sample number at which to stop reading the record
       file. 
 - N0- Integer specifying the sample number at which to start reading the record
@@ -37,33 +37,31 @@ Modified by Chen Xie 2016
 #include "matrix.h"
 #include "mex.h"
 
-double* dynamicData; /* Array of data */
-unsigned long nSamples; /* Number of samples read */
-int nsig; /* Number of signals/channels output */
-unsigned long maxSamples = 2000000; /* The data array allocation length (can grow) */
-unsigned long reallocIncrement= 1000000;   /* allow the input buffer to grow (the increment is arbitrary) */
+#define initialAlloc 2000000 /* The initial number of elements to allocate for the data */
+#define reallocIncrement 1000000   /* allow the input buffer to grow (the increment is arbitrary) */
 
 
 /* Work function */
-void rdsamp(int argc, char *argv[]){
-  char* pname ="mexrdsamp";
+double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
+
+  double *dynamicData;
   char *record = NULL, *search = NULL;
   char *invalid, speriod[16], tustr[16];
-  int  highres = 0, i, isiglist, nosig = 0, pflag = 0, s,
+  int  highres = 0, i, isiglist, nsig, nosig = 0, pflag = 0, s,
     *sig = NULL;
   double MLnan=mxGetNaN();
+  unsigned long maxSamples = initialAlloc, nsamp=0; /* The data array allocation length (can grow) */
   WFDB_Frequency freq;
   WFDB_Sample *datum; 
   WFDB_Siginfo *info;
   WFDB_Time from = 0L, maxl = 0L, to = 0L;
-
+  
   /* Reading input parameters */
   for(i = 1 ; i < argc; i++){
     if (*argv[i] == '-') switch (*(argv[i]+1)) {
       case 'f':	/* starting time */
 	if (++i >= argc) {
-	  mexPrintf( "%s: time must follow -f\n", pname);
-	  return;
+	  mexErrMsgTxt("mexrdsamp: time must follow -f\n");
 	}
 	from = i;
 	break;
@@ -72,9 +70,7 @@ void rdsamp(int argc, char *argv[]){
 	break;
       case 'l':	/* maximum length of output follows */
 	if (++i >= argc) {
-	  mexPrintf("%s: max output length must follow -l\n",
-		     pname);
-	  return;
+	  mexErrMsgTxt("mexrdsamp: max output length must follow -l\n");
 	}
 	maxl = i;
 	break;
@@ -83,9 +79,7 @@ void rdsamp(int argc, char *argv[]){
 	    break;
       case 'r':	/* record name */
 	if (++i >= argc) {
-	  mexPrintf("%s: record name must follow -r\n",
-		     pname);
-	  return;
+	  mexErrMsgTxt("mexrdsamp: record name must follow -r\n");
 	}
 	record = argv[i];
 	break;
@@ -96,59 +90,48 @@ void rdsamp(int argc, char *argv[]){
 	  nosig++;	/* number of elements in signal list */
 	}
 	if (nosig == 0) {
-	  mexPrintf("%s: signal list must follow -s\n",
-		     pname);
-	  return;
+	  mexErrMsgTxt("mexrdsamp: signal list must follow -s\n");
 	}
 	break;
       case 'S':	/* search for valid sample of specified signal */
 	if (++i >= argc) {
-	  mexPrintf("%s: signal name or number must follow -S\n",
-		    pname);
-	  return;
+	  mexErrMsgTxt("mexrdsamp: signal name or number must follow -S\n");
 	}
 	search = argv[i];
 	break;
       case 't':	/* end time */
 	if (++i >= argc) {
-	  mexPrintf("%s: time must follow -t\n",pname);
-	  return;
+	  mexErrMsgTxt("%s: time must follow -t\n");
 	}
 	to = i;
 	break;
       default:
-	mexPrintf( "%s: unrecognized option %s\n", pname,
-		   argv[i]);
-	return;
+	mexErrMsgTxt("mexrdsamp: unrecognized option %s\n");
       }
     else {
-      mexPrintf( "%s: unrecognized argument %s\n", pname,
-		 argv[i]);
-      return;
+      mexErrMsgTxt("mexrdsamp: unrecognized argument %s\n");
     }
   }
   if (record == NULL) {
-    mexPrintf("No record name specified\n");
-    return;
+    mexErrMsgTxt("No record name specified\n");
   }
   
   /* Read Input Files*/
   if ((nsig = isigopen(record, NULL, 0)) <= 0){
-    mexPrintf("Cannot open input files\n");
-    return;
+    mexErrMsgTxt("Cannot open input files\n");
   }
   if ((datum = (WFDB_Sample *)mxMalloc(nsig * sizeof(WFDB_Sample))) == NULL ||
       (info = (WFDB_Siginfo *)mxMalloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
-    mexPrintf( "%s: insufficient memory\n", pname);
-    return;
+    mexErrMsgTxt("mexrdsamp: insufficient memory\n");
   }
   
 
 
   mexPrintf("Before isigopen\n");
   
-  if ((nsig = isigopen(record, info, nsig)) <= 0)
-    return;
+  if ((nsig = isigopen(record, info, nsig)) <= 0){
+    mexErrMsgTxt("mexrdsamp: failed to open record");
+  }
 
   mexPrintf("After isigopen\n");
 
@@ -161,7 +144,7 @@ void rdsamp(int argc, char *argv[]){
   if (from > 0L && (from = strtim(argv[from])) < 0L)
     from = -from;
   if (isigsettime(from) < 0)
-    return;
+    mexErrMsgTxt("mexrdsamp: failed to set starting samples");
   if (to > 0L && (to = strtim(argv[to])) < 0L)
     to = -to;
 
@@ -170,14 +153,12 @@ void rdsamp(int argc, char *argv[]){
   
   if (nosig) {	/* print samples only from specified signals */
     if ((sig = (int *)mxMalloc((unsigned)nosig*sizeof(int))) == NULL) {
-      mexPrintf( "%s: insufficient memory\n", pname);
-      return;
+      mexErrMsgTxt("mexrdsamp: insufficient memory\n");
     }
     for (i = 0; i < nosig; i++) {
       if ((s = findsig(argv[isiglist+i])) < 0) {
-	mexPrintf( "%s: can't read signal '%s'\n", pname,
-		   argv[isiglist+i]);
-	return;
+	mexPrintf("mexrdsamp: can't read signal '%s'\n", argv[isiglist+i]);
+	mexErrMsgTxt("Invalid signal number");
       }
       sig[i] = s;
     }
@@ -185,8 +166,7 @@ void rdsamp(int argc, char *argv[]){
   }
   else {	/* print samples from all signals */
     if ((sig = (int *)mxMalloc( (unsigned) nsig*sizeof(int) ) ) == NULL) {
-      mexPrintf( "%s: insufficient memory\n", pname);
-      return;
+      mexErrMsgTxt("mexrdsamp: insufficient memory\n");
     }
     for (i = 0; i < nsig; i++)
       sig[i] = i;
@@ -195,8 +175,8 @@ void rdsamp(int argc, char *argv[]){
   /* Reset 'from' if a search was requested. */
   if (search &&
       ((s = findsig(search)) < 0 || (from = tnextvec(s, from)) < 0)) {
-    mexPrintf( "%s: can't read signal '%s'\n", pname, search);
-    return;
+    mexPrintf("mexrdsamp: can't read signal '%s'\n", search);
+    mexErrMsgTxt("from sample failed");
   }
 
   /* Reset 'to' if a duration limit was specified. */
@@ -210,10 +190,9 @@ void rdsamp(int argc, char *argv[]){
  
   
   /* Allocate initial elements for the output data array */
-  if ( (dynamicData= (double *)mxRealloc(dynamicData,maxSamples * nsig * sizeof(double)) ) == NULL) {
-    mexPrintf("Unable to allocate enough memory to read record!");
+  if ( (dynamicData= (double *)mxMalloc(maxSamples * nsig * sizeof(double)) ) == NULL) {
     mxFree(dynamicData);
-    return;
+    mexErrMsgTxt("Unable to allocate enough memory to read record!");    
   }
 
 
@@ -223,58 +202,46 @@ void rdsamp(int argc, char *argv[]){
   while ((to == 0 || from < to) && getvec(datum) >= 0) {
     for (i = 0; i < nsig; i++){
       /* Allocate more memory if necessary */
-      if (nSamples >= maxSamples) {
+      if (nsamp >= maxSamples) {
 	maxSamples=maxSamples+ (reallocIncrement * nsig );
 	mexPrintf("Reallocating output matrix to %u samples\n", maxSamples);
 	if ((dynamicData = (double *)mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
-	  mexPrintf("Unable to allocate enough memory to read record!");
 	  mxFree(dynamicData);
-	  return;
+	  mexErrMsgTxt("Unable to allocate enough memory to read record!");
 	}
       }
       /* Return physical values if specified */
       if (pflag){
 	if (datum[sig[i]] == WFDB_INVALID_SAMPLE){
-	  dynamicData[nSamples]=MLnan; 
+	  dynamicData[nsamp]=MLnan; 
 	}
 	else{
-	  dynamicData[nSamples] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
+	  dynamicData[nsamp] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
 	}
       }
       /* Return raw values if specified */
       else{
-	dynamicData[nSamples]=datum[sig[i]];
+	dynamicData[nsamp]=datum[sig[i]];
       }
-      nSamples++;
+      nsamp++;
     }
   }
-  return;
+
+  *nsamples=nsamp;
+  *nsignals=nsig;  
+  return dynamicData;
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Validate the matlab user input variables.  */
+/* Validate the matlab user input variables. */
 /* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
-void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
+void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
 
-  /* Indicator of which fields are to be passed into rdsamp.  Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
-  int inputfields[]={1, 0, 0, 0, 1, 0, 4}, i; 
+  /* Indicator of which fields are to be passed into rdsamp. Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
+  int i, inputfields[]={1, 0, 0, 0, 1, 0, 4}; 
   /* Initial default 4: rdsamp -r recordName */
-  
+
   if (ninputs > 6){
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyinputs",
 		      "Too many input variables.\nFormat: [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution)");
@@ -308,10 +275,6 @@ void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
 	ncols=(int)mxGetN(MLinputs[1]);
 	inputfields[1]=ncols;
 	inputfields[6]=inputfields[6]+1+ncols;
-
-
-	mexPrintf("nrows: %d\n", nrows);
-	mexPrintf("ncols: %d\n", ncols);
       }
       break;
     case 2: /* N */
@@ -364,7 +327,6 @@ void checkMLinputs(int ninputs, const mxArray* MLinputs[], int* inputflags){
       break;
     }
   }
-  
   for (i=0;i<7;i++){
     *(inputflags+i)=inputfields[i];
   }
@@ -409,22 +371,26 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
       case 1: /* signalList */
 
         if (inputfields[1]){
-	  mexPrintf("in case 1...");
-	  double *signalList=(double *)mxMalloc(inputfields[1]*sizeof(double));
+	  /*double *signalList=(double *)mxMalloc(inputfields[1]*sizeof(double)); */
+	  double *signalList;
 	  int chan;
-	  mxSetPr(MLinputs[1], signalList);
+	  
+	  signalList=mxGetPr(MLinputs[1]);
 	  
 	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
 	  strcpy(argv[argind], "-s");
 	  argind++;
 	  
 	  for (chan=0;chan<inputfields[1];chan++){
-	    sprintf(charsig[chan], "%d" , (int)signalList[chan]-1); /* -1 for matlab to c */
+	    mexPrintf("*signalList+%d: %d\n", chan, *(signalList+chan));
+	  }
+	  
+	  for (chan=0;chan<inputfields[1];chan++){
+	    sprintf(charsig[chan], "%d" , ((int)(signalList[chan])-1)); /* -1 for matlab to c */
 	    argv[argind+chan]=(char *)mxMalloc(strlen(charsig[chan])*sizeof(char)+1);
 	    strcpy(argv[argind+chan], charsig[chan]);
 	  }
 	  argind=argind+inputfields[1];
-	  mxFree(signalList);
 	}
 	
 	break;
@@ -469,7 +435,6 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	}
 	break;
     }
-    
   }
 }
 
@@ -482,10 +447,13 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 /* Matlab gateway function */
 /* Matlab call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits,highResolution) */
 void mexFunction( int nlhs, mxArray *plhs[], 
-		  int nrhs, const mxArray *prhs[] ){
+		  int nrhs, const mxArray *prhs[]){
   
+  double *dynamicData; /* Array of data */
+  unsigned long nsamples=0; /* Number of samples read */
+  int nsig; /* Number of signals/channels output */
   int argc, i, inputfields[7];
-
+  
   /* Check the matlab input arguments */
   checkMLinputs(nrhs, prhs, inputfields);
 
@@ -495,8 +463,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
   
   argc=inputfields[6];
   char *argv[argc];
-
-  mexPrintf("\n\nReached tag 0\n");
   
   /* Create argument strings to pass into rdsamp */
   rdsampInputArgs(inputfields, prhs, argv);
@@ -511,7 +477,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   /*Call main WFDB Code */
 
   
-  rdsamp(argc,argv);
+  dynamicData=rdsamp(argc,argv, &nsamples, &nsig);
 
 
   mexPrintf("Reached after rdsamp\n");
@@ -521,21 +487,22 @@ void mexFunction( int nlhs, mxArray *plhs[],
   }
 
   mexPrintf("Reached after mxFree argv\n");
-
+  
   /* Create a 0-by-0 mxArray. Memory
      will be allocated dynamically by rdsamp */
   plhs[0] = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
 
   /* Set output variable to the allocated memory space */
-  mxSetPr(plhs[0],dynamicData);
-  mxSetM(plhs[0],nSamples/nsig);
+
+
+  mxSetPr(plhs[0],dynamicData); /* SetPr used by Ikaro, for reshaping? */
+  /* dynamicData = mxGetPr(plhs[0]); */ /* GetPr used in example*/
+
+  mxSetM(plhs[0],nsamples/nsig);
   mxSetN(plhs[0],nsig);
 
-  mexPrintf("Reached just before quit\n");
 
   wfdbquit();
-
-  mexPrintf("Reached return\n");
   return;
 }
 
