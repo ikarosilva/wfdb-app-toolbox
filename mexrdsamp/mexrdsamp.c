@@ -37,20 +37,21 @@ Modified by Chen Xie 2016
 #include "matrix.h"
 #include "mex.h"
 
-#define initialAlloc 2000000 /* The initial number of elements to allocate for the data */
+/* Constants for allocating dynamic data when signal length is unknown */
+#define initialAlloc 2000000 /* Initial number of elements to allocate for the data */
 #define reallocIncrement 1000000   /* allow the input buffer to grow (the increment is arbitrary) */
 
-
 /* Work function */
-double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
+double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
 
-  double *dynamicData;
+  /* Data is the final returned signal. dynamicData as initial step when no siglen in header.*/
+  double *dynamicData, *Data; 
   char *record = NULL, *search = NULL;
   char *invalid, speriod[16], tustr[16];
   int  highres = 0, i, isiglist, nsig, nosig = 0, pflag = 0, s,
     *sig = NULL;
   double MLnan=mxGetNaN();
-  unsigned long maxSamples = initialAlloc, nsamp=0; /* The data array allocation length (can grow) */
+  unsigned long maxSamples = initialAlloc, nsamp=0, siglen; /* The data array allocation length (can grow). siglen is the number of samples read per channel, nsamp is the total number of samples read */
   WFDB_Frequency freq;
   WFDB_Sample *datum; 
   WFDB_Siginfo *info;
@@ -177,47 +178,104 @@ double *rdsamp(int argc, char *argv[], unsigned long *nsamples, int *nsignals){
     maxl = -maxl;
   if (maxl && (to == 0L || to > from + maxl))
     to = from + maxl;
- 
-  
-  /* Allocate initial elements for the output data array */
-  if ( (dynamicData= (double *)mxMalloc(maxSamples * nsig * sizeof(double)) ) == NULL) {
-    mxFree(dynamicData);
-    mexErrMsgTxt("Unable to allocate enough memory to read record!");    
-  }
-  
-  /* Read in the data in raw units */
-  while ((to == 0 || from < to) && getvec(datum) >= 0) {
-    from++;
-    for (i = 0; i < nsig; i++){
-      /* Allocate more memory if necessary */
-      if (nsamp >= maxSamples) {
-	maxSamples=maxSamples+ (reallocIncrement * nsig );
-	mexPrintf("Reallocating output matrix to %u samples\n", maxSamples);
-	if ((dynamicData = (double *)mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
-	  mxFree(dynamicData);
-	  mexErrMsgTxt("Unable to allocate enough memory to read record!");
-	}
-      }
-      /* Return physical values if specified */
-      if (pflag){
-	if (datum[sig[i]] == WFDB_INVALID_SAMPLE){
-	  dynamicData[nsamp]=MLnan; 
+
+
+  /* Signal length written in file. Preallocation. */
+  if (info->nsamp){
+    mexPrintf("Preallocation\n");
+    if(to){ /* If the -t was specified, limit it to the signal length */
+      if(to>info->nsamp){
+	mexPrintf("Input sample limit N: %lu, is larger than signal length. Setting N = %lu", to, info->nsamp);
+	to=info->nsamp;
+      }  
+    }
+    else{
+      to=info->nsamp;
+    }
+    /* Number of samples to read per signal */
+    siglen=to-from;
+
+
+    mexPrintf("to: %lu\nfrom: %lu\nSiglen: %lu\nnsig: %d\n", to, from, siglen, nsig);
+    
+    /* Allocate entire known output data array */
+    if ( (Data= (double *)mxMalloc(siglen * nsig * sizeof(double)) ) == NULL) {
+      mxFree(Data);
+      mexErrMsgTxt("Unable to allocate enough memory to read record!");    
+    }
+    for (from=0; from<siglen; from++){
+      (void)getvec(datum);
+      for (i=0; i<nsig; i++){
+	if (pflag){
+	  if(datum[sig[i]]==WFDB_INVALID_SAMPLE){
+	    Data[from+i*siglen]=MLnan;
+	  }
+	  else{
+	    Data[from+i*siglen]=((double)datum[sig[i]]-info[sig[i]].baseline)/info[sig[i]].gain;
+	  }
 	}
 	else{
-	  dynamicData[nsamp] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
+	  Data[from+i*siglen]=datum[sig[i]];
 	}
       }
-      /* Return raw values if specified */
-      else{
-	dynamicData[nsamp]=datum[sig[i]];
-      }
-      nsamp++;
     }
   }
-  *nsamples=nsamp;
+  /* No signal length written in file. Dynamic allocation and copy to de-interleave. */
+  else{
+    mexPrintf("Dynamic Allocation");
+    /* Allocate initial elements for the output data array */
+    if ( (dynamicData= (double *)mxMalloc(maxSamples * nsig * sizeof(double)) ) == NULL) {
+      mxFree(dynamicData);
+      mexErrMsgTxt("Unable to allocate enough memory to read record!");    
+    }
+    unsigned long frominit=from;
+    /* Read in the data */
+    while ((to == 0 || from < to) && getvec(datum) >= 0) {
+      from++;
+      for (i = 0; i < nsig; i++){
+	/* Allocate more memory if necessary */
+	if (nsamp >= maxSamples) {
+	  maxSamples=maxSamples+ (reallocIncrement * nsig );
+	  mexPrintf("Reallocating output matrix to %u samples\n", maxSamples);
+	  if ((dynamicData = (double *)mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
+	    mxFree(dynamicData);
+	    mexErrMsgTxt("Unable to allocate enough memory to read record!");
+	  }
+	}
+	/* Store the data */
+	if (pflag){
+	  if (datum[sig[i]] == WFDB_INVALID_SAMPLE){
+	    dynamicData[nsamp]=MLnan; 
+	  }
+	  else{
+	    dynamicData[nsamp] =( (double) datum[sig[i]] - info[sig[i]].baseline ) / info[sig[i]].gain;
+	  }
+	}
+	else{
+	  dynamicData[nsamp]=datum[sig[i]];
+	}
+	nsamp++;
+      }
+    }
+    siglen=nsamp/nsig;
+
+    /* Done reading data. Copy over and de-interleave the samples.*/
+    if ((Data= (double *)mxMalloc(siglen * nsig * sizeof(double)) ) == NULL) {
+      mxFree(Data);
+      mexErrMsgTxt("Unable to allocate enough memory to read record!");    
+    }
+    for(from=frominit; from<(from+nsamp); from++){
+      for(i=0; i<nsig; s++){
+	Data[from+i*siglen]=dynamicData[from*nsig+i];
+      }
+    }
+    mxFree(dynamicData);
+  }
+  
+  *siglength=siglen;
   *nsignals=nsig;
 
-  return dynamicData;
+  return Data;
 }
 
 
@@ -433,8 +491,8 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray *prhs[]){
   
-  double *dynamicData; /* Array of data */
-  unsigned long nsamples=0; /* Number of samples read */
+  double *Data; /* Array of data */
+  unsigned long siglen=0; /* Number of samples read per channel*/
   int nsig; /* Number of signals/channels output */
   int argc, i, inputfields[7];
   
@@ -458,7 +516,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
 
   /*Call main WFDB Code */
-  dynamicData=rdsamp(argc,argv, &nsamples, &nsig);
+  Data=rdsamp(argc,argv, &siglen, &nsig);
   
   for (i=0; i<argc; i++){
     mxFree(argv[i]);
@@ -469,12 +527,12 @@ void mexFunction( int nlhs, mxArray *plhs[],
   plhs[0] = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
 
   /* Set output variable to the allocated memory space */
-  mxSetPr(plhs[0],dynamicData); /* SetPr used by Ikaro, for reshaping? */
-  /* dynamicData = mxGetPr(plhs[0]); */ /* GetPr used in example*/
+  mxSetPr(plhs[0], Data); /* SetPr used by Ikaro, for reshaping? */
+  /* Data = mxGetPr(plhs[0]); */ /* GetPr used in example*/
 
   /* Reshape the output matrix*/
-  mxSetM(plhs[0],nsamples/nsig);
-  mxSetN(plhs[0],nsig);
+  mxSetM(plhs[0], siglen);
+  mxSetN(plhs[0], nsig);
 
   wfdbquit();
   return;
@@ -486,6 +544,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
 - Is mexrdsamp going to use environment variable wfdbpath? ..... 
 
-- Check whether can allocate fixed memory beforehand
+- Make sure from and to are +ve. Also make sure from<to.  
 
  */
