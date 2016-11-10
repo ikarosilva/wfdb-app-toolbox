@@ -2,7 +2,7 @@
    http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
 
 -------------------------------------------------------------------------------
-Call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits,highResolution)
+Call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits)
 
 Reads a WFDB record and returns:
 - signal - NxM matrix storing the record signal
@@ -13,18 +13,16 @@ Required Parameters:
                current directory
 
 Optional Parameters:
-- signalList - A Mx1 array of integers specifying the channel indices to be
+  signalList - A Mx1 array of integers specifying the channel indices to be
                returned (default = all). Indices start from 1, not 0.
-- N - Integer specifying the sample number at which to stop reading the record
-      file. 
-- N0- Integer specifying the sample number at which to start reading the record
-      file. 
-- rawUnits - Scalar (0 or 1) specifying whether to return the samples in raw 
+           N - Integer specifying the sample number at which to stop reading
+               the record file. 
+          N0 - Integer specifying the sample number at which to start reading
+               the record file. 
+    rawUnits - Scalar (0 or 1) specifying whether to return the samples in raw 
              or physical values. Default = 0 for physical. 
-- highResolution
 
-Written by Ikaro Silvia 2014
-Modified by Chen Xie 2016
+Written by Ikaro Silvia and Chen Xie 2016
 -------------------------------------------------------------------------------
 
 */
@@ -45,7 +43,7 @@ Modified by Chen Xie 2016
 /* Work function */
 double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
 
-  /* Data is the final returned signal. dynamicData as initial step when no siglength in header.*/
+  /* Data is the returned signal. dynamicData as intermediate when no siglength in header.*/
   double *dynamicData, *Data; 
   char *record = NULL, *search = NULL;
   char *invalid, speriod[16], tustr[16];
@@ -119,6 +117,7 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   }
   
   /* Read Input Files*/
+  wfdbquit(); /* Precaution against previously opened files/global variables */
   if ((nsig = isigopen(record, NULL, 0)) <= 0){
     mexErrMsgTxt("Cannot open input files\n");
   }
@@ -126,8 +125,6 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
       (info = (WFDB_Siginfo *)mxMalloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
     mexErrMsgTxt("mexrdsamp: insufficient memory\n");
   }
-  
-  
   if ((nsig = isigopen(record, info, nsig)) <= 0){
     mexErrMsgTxt("mexrdsamp: failed to open record");
   }
@@ -145,8 +142,7 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   if (to > 0L && (to = strtim(argv[to])) < 0L)
     to = -to;
 
-  
-  if (nosig) {	/* print samples only from specified signals */
+  if (nosig) {	/* store samples only from specified signals */
     if ((sig = (int *)mxMalloc((unsigned)nosig*sizeof(int))) == NULL) {
       mexErrMsgTxt("mexrdsamp: insufficient memory\n");
     }
@@ -159,7 +155,7 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
     }
     nsig = nosig;
   }
-  else {	/* print samples from all signals */
+  else {	/* store samples from all signals */
     if ((sig = (int *)mxMalloc( (unsigned) nsig*sizeof(int) ) ) == NULL) {
       mexErrMsgTxt("mexrdsamp: insufficient memory\n");
     }
@@ -180,19 +176,8 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   if (maxl && (to == 0L || to > from + maxl))
     to = from + maxl;
 
-
-  /* Find out what is read in multi-segment records*/
-  /* 
-  mexPrintf("\n\nData gathered:\n");
-  wfdbquit();
-  mexErrMsgTxt("Stopping just because"); 
-  */
-
-
-  
   /* Signal length written in file. Preallocation. */
-  if (info->nsamp==999){
-    mexPrintf("\n\nPreallocation\n");
+  if (strtim("e")){
     if(to){ /* If the -t was specified, limit it to the signal length */
       if(to>info->nsamp){
 	mexPrintf("Input sample limit N: %lu, is larger than signal length. Setting N = %lu", to, info->nsamp);
@@ -200,17 +185,10 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
       }  
     }
     else{
-      to=info->nsamp;
+      to=strtim("e");
     }
     /* Number of samples to read per signal */
     siglen=to-from;
-
-
-    mexPrintf("to: %lu\nfrom: %lu\nSiglen: %lu\nnsig: %d\n", to, from, siglen, nsig);
-
-    
-    wfdbquit();
-    mexErrMsgTxt("Stopping just because"); 
     
     /* Allocate entire known output data array */
     if ( (Data= (double *)mxMalloc(siglen * nsig * sizeof(double)) ) == NULL) {
@@ -237,16 +215,11 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   
   /* No signal length written in file. Dynamic allocation and copy to de-interleave. */
   else{
-    mexPrintf("\nSignal length not present in file. Dynamically allocating memory.\n"
-	      "Initial allocation: %lu samples\n", maxSamples);
     /* Allocate initial elements for the output data array */
     if ( (dynamicData= (double *)mxMalloc(maxSamples * sizeof(double)) ) == NULL) {
       mxFree(dynamicData);
       mexErrMsgTxt("Unable to allocate enough memory to read record!");    
     }
-    /*
-    wfdbquit();
-    mexErrMsgTxt("Stopping just because\n"); */
     /* Read in the data */
     while ((to == 0 || from < to) && getvec(datum) >= 0) {
       from++;
@@ -255,7 +228,6 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
 	if (nsamp >= maxSamples) {
 	  /* maxSamples=maxSamples + reallocIncrement; */
 	  maxSamples=maxSamples*2; /* Recommended reallocation is multiplicative*/
-	  mexPrintf("Reallocating output matrix to %u samples\n", maxSamples);
 	  if ((dynamicData = (double *)mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
 	    mxFree(dynamicData);
 	    mexErrMsgTxt("Unable to allocate enough memory to read record!");
@@ -277,11 +249,6 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
       }
     }
     siglen=nsamp/nsig;
-
-    /*
-    wfdbquit();
-    mexErrMsgTxt("Stopping just because\n");
-    */
     
     /* Done reading data. Copy over and de-interleave the samples.*/
     if ((Data= (double *)mxMalloc( nsamp * sizeof(double)) ) == NULL) {
@@ -303,18 +270,17 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
 }
 
 
-
 /* Validate the matlab user input variables. */
-/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
+/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits) */
 void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
 
   /* Indicator of which fields are to be passed into rdsamp. Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
   int i, inputfields[]={1, 0, 0, 0, 1, 0, 4}; 
   /* Initial default 4: rdsamp -r recordName */
 
-  if (ninputs > 6){
+  if (ninputs > 5){
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyinputs",
-		      "Too many input variables.\nFormat: [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution)");
+		      "Too many input variables.\nFormat: [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits)");
   }
   if (ninputs < 1) {
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:missingrecordName",
@@ -381,7 +347,7 @@ void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
 	}
       }
       break;
-    case 5: /* highResolution */
+    case 5: /* highResolution (for future version) */
       if(!mxIsEmpty(MLinputs[5])){
 	if (!mxIsDouble(MLinputs[5]) || mxGetNumberOfElements(MLinputs[5]) != 1){
 	  mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidhighResolution",
@@ -402,19 +368,14 @@ void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
   }
 }
 
-
-
-
-
-
 /* Create the argv array of strings to pass into rdsamp */
-/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits,highResolution) */
+/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits) */
 void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
   
   char charto[20], charfrom[20], charsig[inputfields[1]][20], *recname;
   int argind, i;
   size_t reclen;
-  unsigned long numfrom, numto; 
+  unsigned long numfrom=-1, numto=-1; 
   
   /* Check all possible input options to add */
   for (i=0;i<6;i++){
@@ -427,7 +388,6 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	    mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrecordName",
 			  "recordName cannot be empty.");	    
 	}
-	
 	argv[0]=(char *)mxMalloc(7*sizeof(char));
 	argv[1]=(char *)mxMalloc(3*sizeof(char));
 	argv[2]=(char *)mxMalloc(strlen(recname)*sizeof(char)+1);
@@ -439,7 +399,6 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	break;
 
       case 1: /* signalList */
-
         if (inputfields[1]){
 	  /*double *signalList=(double *)mxMalloc(inputfields[1]*sizeof(double)); */
 	  double *signalList;
@@ -458,7 +417,6 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	  }
 	  argind=argind+inputfields[1];
 	}
-	
 	break;
       case 2: /* N */
 	if (inputfields[2]){
@@ -478,7 +436,10 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 
 	  numfrom=(unsigned long)mxGetScalar(MLinputs[3]);
 	  sprintf(charfrom, "s%lu", numfrom);
-
+	  if ((numto!=-1)&&(numfrom>numto)){
+	      mexErrMsgIdAndTxt("MATLAB:mexrdsamp:fromGTto",
+				"N0 cannot be greater than N.");	       
+	  }
 	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
 	  argv[argind+1]=(char *)mxMalloc(strlen(charfrom)*sizeof(char)+1);
 	  strcpy(argv[argind], "-f");
@@ -486,7 +447,6 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	  argind=argind+2;
 	}
 	break;
-
       case 4: /* rawUnits */
 	if (inputfields[4]){
 	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
@@ -505,13 +465,8 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 }
 
 
-
-
-
-
-
 /* Matlab gateway function */
-/* Matlab call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits,highResolution) */
+/* Matlab call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits) */
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray *prhs[]){
   
@@ -522,22 +477,12 @@ void mexFunction( int nlhs, mxArray *plhs[],
   
   /* Check the matlab input arguments */
   checkMLinputs(nrhs, prhs, inputfields);
-
-  for (i=0;i<7;i++){
-    mexPrintf("inputfields[%d]: %d\n\n", i, inputfields[i]);
-  }
-  
+ 
   argc=inputfields[6];
   char *argv[argc];
   
   /* Create argument strings to pass into rdsamp */
   rdsampInputArgs(inputfields, prhs, argv);
-  
-  
-  for (i=0;i<argc;i++){
-    mexPrintf("argv[%d]: %s\n", i, argv[i]);
-  }
-
 
   /*Call main WFDB Code */
   Data=rdsamp(argc,argv, &siglen, &nsig);
@@ -545,38 +490,17 @@ void mexFunction( int nlhs, mxArray *plhs[],
   for (i=0; i<argc; i++){
     mxFree(argv[i]);
   }
-
   
   /* Create a 0-by-0 output mxArray */
   plhs[0] = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
 
   /* Set output variable to the allocated memory space */
-  mxSetPr(plhs[0], Data); /* SetPr used by Ikaro, for reshaping? */
-  /* Data = mxGetPr(plhs[0]); */ /* GetPr used in example*/
+  mxSetPr(plhs[0], Data); 
 
   /* Reshape the output matrix*/
   mxSetM(plhs[0], siglen);
   mxSetN(plhs[0], nsig);
 
-  
   return;
 }
 
-
-
-/* To Do
-
-- Is mexrdsamp going to use environment variable wfdbpath? ..... 
-
-- Make sure from and to are +ve. Also make sure from<to.  
-
-- When do we have to call free? 
-
-
- init: record mimic2wdb/30/3002760/ cannot be nested in another multi-segment record
-init: record mimic2wdb/30/3002760/3002760 cannot be nested in another multi-segment record
-init: record mimic2wdb/30/3013004/ cannot be nested in another multi-segment record
-init: record mimic2wdb/30/3045253/ cannot be nested in another multi-segment record
-
-
- */
