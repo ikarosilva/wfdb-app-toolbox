@@ -38,13 +38,14 @@ Modified by Chen Xie 2016
 #include "mex.h"
 
 /* Constants for allocating dynamic data when signal length is unknown */
-#define initialAlloc 2000000 /* Initial number of elements to allocate for the data */
+#define initialAlloc 1000000 /* Initial number of elements to allocate for the data */
 #define reallocIncrement 1000000   /* allow the input buffer to grow (the increment is arbitrary) */
+
 
 /* Work function */
 double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
 
-  /* Data is the final returned signal. dynamicData as initial step when no siglen in header.*/
+  /* Data is the final returned signal. dynamicData as initial step when no siglength in header.*/
   double *dynamicData, *Data; 
   char *record = NULL, *search = NULL;
   char *invalid, speriod[16], tustr[16];
@@ -180,9 +181,18 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
     to = from + maxl;
 
 
+  /* Find out what is read in multi-segment records*/
+  /* 
+  mexPrintf("\n\nData gathered:\n");
+  wfdbquit();
+  mexErrMsgTxt("Stopping just because"); 
+  */
+
+
+  
   /* Signal length written in file. Preallocation. */
-  if (info->nsamp){
-    mexPrintf("Preallocation\n");
+  if (info->nsamp==999){
+    mexPrintf("\n\nPreallocation\n");
     if(to){ /* If the -t was specified, limit it to the signal length */
       if(to>info->nsamp){
 	mexPrintf("Input sample limit N: %lu, is larger than signal length. Setting N = %lu", to, info->nsamp);
@@ -197,6 +207,10 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
 
 
     mexPrintf("to: %lu\nfrom: %lu\nSiglen: %lu\nnsig: %d\n", to, from, siglen, nsig);
+
+    
+    wfdbquit();
+    mexErrMsgTxt("Stopping just because"); 
     
     /* Allocate entire known output data array */
     if ( (Data= (double *)mxMalloc(siglen * nsig * sizeof(double)) ) == NULL) {
@@ -220,22 +234,27 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
       }
     }
   }
+  
   /* No signal length written in file. Dynamic allocation and copy to de-interleave. */
   else{
-    mexPrintf("Dynamic Allocation");
+    mexPrintf("\nSignal length not present in file. Dynamically allocating memory.\n"
+	      "Initial allocation: %lu samples\n", maxSamples);
     /* Allocate initial elements for the output data array */
-    if ( (dynamicData= (double *)mxMalloc(maxSamples * nsig * sizeof(double)) ) == NULL) {
+    if ( (dynamicData= (double *)mxMalloc(maxSamples * sizeof(double)) ) == NULL) {
       mxFree(dynamicData);
       mexErrMsgTxt("Unable to allocate enough memory to read record!");    
     }
-    unsigned long frominit=from;
+    /*
+    wfdbquit();
+    mexErrMsgTxt("Stopping just because\n"); */
     /* Read in the data */
     while ((to == 0 || from < to) && getvec(datum) >= 0) {
       from++;
       for (i = 0; i < nsig; i++){
 	/* Allocate more memory if necessary */
 	if (nsamp >= maxSamples) {
-	  maxSamples=maxSamples+ (reallocIncrement * nsig );
+	  /* maxSamples=maxSamples + reallocIncrement; */
+	  maxSamples=maxSamples*2; /* Recommended reallocation is multiplicative*/
 	  mexPrintf("Reallocating output matrix to %u samples\n", maxSamples);
 	  if ((dynamicData = (double *)mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
 	    mxFree(dynamicData);
@@ -259,13 +278,18 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
     }
     siglen=nsamp/nsig;
 
+    /*
+    wfdbquit();
+    mexErrMsgTxt("Stopping just because\n");
+    */
+    
     /* Done reading data. Copy over and de-interleave the samples.*/
-    if ((Data= (double *)mxMalloc(siglen * nsig * sizeof(double)) ) == NULL) {
+    if ((Data= (double *)mxMalloc( nsamp * sizeof(double)) ) == NULL) {
       mxFree(Data);
       mexErrMsgTxt("Unable to allocate enough memory to read record!");    
     }
-    for(from=frominit; from<(from+nsamp); from++){
-      for(i=0; i<nsig; s++){
+    for(from=0; from<siglen; from++){
+      for(i=0; i<nsig; i++){
 	Data[from+i*siglen]=dynamicData[from*nsig+i];
       }
     }
@@ -274,7 +298,7 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   
   *siglength=siglen;
   *nsignals=nsig;
-
+  wfdbquit();
   return Data;
 }
 
@@ -534,7 +558,7 @@ void mexFunction( int nlhs, mxArray *plhs[],
   mxSetM(plhs[0], siglen);
   mxSetN(plhs[0], nsig);
 
-  wfdbquit();
+  
   return;
 }
 
@@ -545,5 +569,14 @@ void mexFunction( int nlhs, mxArray *plhs[],
 - Is mexrdsamp going to use environment variable wfdbpath? ..... 
 
 - Make sure from and to are +ve. Also make sure from<to.  
+
+- When do we have to call free? 
+
+
+ init: record mimic2wdb/30/3002760/ cannot be nested in another multi-segment record
+init: record mimic2wdb/30/3002760/3002760 cannot be nested in another multi-segment record
+init: record mimic2wdb/30/3013004/ cannot be nested in another multi-segment record
+init: record mimic2wdb/30/3045253/ cannot be nested in another multi-segment record
+
 
  */
