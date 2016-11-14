@@ -149,7 +149,8 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
     }
     for (i = 0; i < nosig; i++) {
       if ((s = findsig(argv[isiglist+i])) < 0) {
-	mexPrintf("mexrdsamp: can't read signal '%s'\n", argv[isiglist+i]);
+	char *blank;
+	mexPrintf("mexrdsamp: can't read signal '%ld'\n", (strtol(argv[isiglist+i],&blank , 10))+1);
 	mexErrMsgTxt("Invalid signal number");
       }
       sig[i] = s;
