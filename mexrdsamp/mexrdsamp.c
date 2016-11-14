@@ -29,7 +29,6 @@ Written by Ikaro Silvia and Chen Xie 2016
 
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
 #include <math.h>
 #include <wfdb/wfdb.h>
 #include "matrix.h"
@@ -115,12 +114,14 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   if (record == NULL) {
     mexErrMsgTxt("No record name specified\n");
   }
+
   
   /* Read Input Files*/
   wfdbquit(); /* Precaution against previously opened files/global variables */
   if ((nsig = isigopen(record, NULL, 0)) <= 0){
     mexErrMsgTxt("Cannot open input files\n");
   }
+
   if ((datum = (WFDB_Sample *)mxMalloc(nsig * sizeof(WFDB_Sample))) == NULL ||
       (info = (WFDB_Siginfo *)mxMalloc(nsig * sizeof(WFDB_Siginfo))) == NULL) {
     mexErrMsgTxt("mexrdsamp: insufficient memory\n");
@@ -176,6 +177,8 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   if (maxl && (to == 0L || to > from + maxl))
     to = from + maxl;
 
+
+  
   /* Try to get total signal length and decide how to allocate data */
   totalsiglen=strtim("e");
   
@@ -196,8 +199,9 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
     /* Allocate entire known output data array */
     if ( (Data= (double *)mxMalloc(siglen * nsig * sizeof(double)) ) == NULL) {
       mxFree(Data);
-      mexErrMsgTxt("Unable to allocate enough memory to read record!");    
+      mexErrMsgTxt("Unable to allocate enough memory to read record!\n");    
     }
+    
     for (from=0; from<siglen; from++){
       (void)getvec(datum);
       for (i=0; i<nsig; i++){
@@ -221,7 +225,7 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
     /* Allocate initial elements for the output data array */
     if ( (dynamicData= (double *)mxMalloc(maxSamples * sizeof(double)) ) == NULL) {
       mxFree(dynamicData);
-      mexErrMsgTxt("Unable to allocate enough memory to read record!");    
+      mexErrMsgTxt("Unable to allocate enough memory to read record!\n");    
     }
     /* Read in the data */
     while ((to == 0 || from < to) && getvec(datum) >= 0) {
@@ -233,7 +237,7 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
 	  maxSamples=maxSamples*2; /* Recommended reallocation is multiplicative*/
 	  if ((dynamicData = (double *)mxRealloc(dynamicData, maxSamples * sizeof(double))) == NULL) {
 	    mxFree(dynamicData);
-	    mexErrMsgTxt("Unable to allocate enough memory to read record!");
+	    mexErrMsgTxt("Unable to allocate enough memory to read record!\n");
 	  }
 	}
 	/* Store the data */
@@ -377,16 +381,13 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
   
   char charto[20], charfrom[20], charsig[inputfields[1]][20], *recname;
   int argind, i;
-  size_t reclen;
   unsigned long numfrom=-1, numto=-1; 
   
   /* Check all possible input options to add */
   for (i=0;i<6;i++){
     switch (i){
       case 0:
-	reclen = mxGetN(MLinputs[0])*sizeof(mxChar)+1;
-	recname = (char *)mxMalloc(sizeof(long));
-	(void)mxGetString(MLinputs[0], recname, (mwSize)reclen);
+	recname=mxArrayToString(MLinputs[0]);
 	if (strcmp(recname, "")==0){
 	    mexErrMsgIdAndTxt("MATLAB:mexrdsamp:invalidrecordName",
 			  "recordName cannot be empty.");	    
@@ -400,10 +401,8 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	argind=3;
 	mxFree(recname);
 	break;
-
       case 1: /* signalList */
         if (inputfields[1]){
-	  /*double *signalList=(double *)mxMalloc(inputfields[1]*sizeof(double)); */
 	  double *signalList;
 	  int chan;
 	  
@@ -457,7 +456,7 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 	  argind++;
 	}
 	break;
-      case 5: /* highResolution */
+      case 5: /* highResolution for future versions */
 	if (inputfields[5]){
 	  argv[argind]=(char *)mxMalloc(3*sizeof(char));
 	  strcpy(argv[argind], "-H");	  
@@ -477,16 +476,16 @@ void mexFunction( int nlhs, mxArray *plhs[],
   unsigned long siglen=0; /* Number of samples read per channel*/
   int nsig; /* Number of signals/channels output */
   int argc, i, inputfields[7];
-  
+
   /* Check the matlab input arguments */
   checkMLinputs(nrhs, prhs, inputfields);
- 
+
   argc=inputfields[6];
   char *argv[argc];
   
   /* Create argument strings to pass into rdsamp */
   rdsampInputArgs(inputfields, prhs, argv);
-
+  
   /*Call main WFDB Code */
   Data=rdsamp(argc,argv, &siglen, &nsig);
   
@@ -500,10 +499,11 @@ void mexFunction( int nlhs, mxArray *plhs[],
   /* Set output variable to the allocated memory space */
   mxSetPr(plhs[0], Data); 
 
-  /* Reshape the output matrix*/
+  /* Reshape the output matrix */
   mxSetM(plhs[0], siglen);
   mxSetN(plhs[0], nsig);
 
+  
   return;
 }
 
