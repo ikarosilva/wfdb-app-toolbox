@@ -54,7 +54,7 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   WFDB_Frequency freq;
   WFDB_Sample *datum; 
   WFDB_Siginfo *info;
-  WFDB_Time from = 0L, maxl = 0L, to = 0L;
+  WFDB_Time from = 0L, maxl = 0L, to = 0L, totalsiglen;
   
   /* Reading input parameters */
   for(i = 1 ; i < argc; i++){
@@ -176,16 +176,19 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   if (maxl && (to == 0L || to > from + maxl))
     to = from + maxl;
 
+  /* Try to get total signal length and decide how to allocate data */
+  totalsiglen=strtim("e");
+  
   /* Signal length written in file. Preallocation. */
-  if (strtim("e")){
+  if (totalsiglen){
     if(to){ /* If the -t was specified, limit it to the signal length */
-      if(to>info->nsamp){
-	mexPrintf("Input sample limit N: %lu, is larger than signal length. Setting N = %lu", to, info->nsamp);
-	to=info->nsamp;
+      if(to>totalsiglen){
+	mexPrintf("Input sample limit N: %lu, is larger than signal length. Setting N = %ld", to, totalsiglen);
+	to=totalsiglen;
       }  
     }
     else{
-      to=strtim("e");
+      to=totalsiglen;
     }
     /* Number of samples to read per signal */
     siglen=to-from;
