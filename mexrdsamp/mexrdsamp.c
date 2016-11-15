@@ -2,11 +2,11 @@
    http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
 
 -------------------------------------------------------------------------------
-Call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits)
+Call: [signal, fs] = mexrdsamp(recordName,signaList,N,N0,rawUnits)
 
 Reads a WFDB record and returns:
-- signal - NxM matrix storing the record signal
-
+ signal - NxM matrix storing the record signal
+     fs - Scalar value of the record's sampling frequency
 
 Required Parameters:
 - recordName - String specifying the name of the record in the WFDB path or
@@ -40,7 +40,7 @@ Written by Ikaro Silvia and Chen Xie 2016
 
 
 /* Work function */
-double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
+double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals, double *fs){
 
   /* Data is the returned signal. dynamicData as intermediate when no siglength in header.*/
   double *dynamicData, *Data; 
@@ -273,13 +273,28 @@ double *rdsamp(int argc, char *argv[], unsigned long *siglength, int *nsignals){
   
   *siglength=siglen;
   *nsignals=nsig;
+  *fs=freq;
   wfdbquit();
   return Data;
 }
 
+void checkMLoutputs(int noutputs){
+  
+  if (noutputs > 2){
+    mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyoutputs",
+		      "Too many output variables.\nFormat: [signal, fs] = mexrdsamp(recordName,signalList,N,N0,rawUnits)");
+  }
+  else if (noutputs < 0) {
+    mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toofewoutputs",
+		      "Too few output variables.\nFormat: [signal, fs] = mexrdsamp(recordName,signalList,N,N0,rawUnits)");
+  }
+ 
+}
 
+
+		   
 /* Validate the matlab user input variables. */
-/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits) */
+/* [signal, fs] = mexrdsamp(recordName,signalList,N,N0,rawUnits) */
 void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
 
   /* Indicator of which fields are to be passed into rdsamp. Different from argc argv which give the (number of) strings themselves. 6 Elements indicate: recordName (-r), signalList (-s), N (-t), N0 (-f), rawUnits=0 (P), highRes (H). The fields are binary except element[1] which may store the number of input signals. The extra final element is argc to be passed into rdsampInputArgs() */
@@ -288,7 +303,7 @@ void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
 
   if (ninputs > 5){
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:toomanyinputs",
-		      "Too many input variables.\nFormat: [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits)");
+		      "Too many input variables.\nFormat: [signal, fs] = mexrdsamp(recordName,signalList,N,N0,rawUnits)");
   }
   if (ninputs < 1) {
     mexErrMsgIdAndTxt("MATLAB:mexrdsamp:missingrecordName",
@@ -377,7 +392,7 @@ void checkMLinputs(int ninputs, const mxArray *MLinputs[], int *inputflags){
 }
 
 /* Create the argv array of strings to pass into rdsamp */
-/* [signal] = mexrdsamp(recordName,signalList,N,N0,rawUnits) */
+/* [signal, fs] = mexrdsamp(recordName,signalList,N,N0,rawUnits) */
 void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
   
   char charto[20], charfrom[20], charsig[inputfields[1]][20], *recname;
@@ -469,41 +484,45 @@ void rdsampInputArgs(int *inputfields, const mxArray *MLinputs[], char *argv[]){
 
 
 /* Matlab gateway function */
-/* Matlab call: [signal] = mexrdsamp(recordName,signaList,N,N0,rawUnits) */
+/* Matlab call: [signal, fs] = mexrdsamp(recordName,signaList,N,N0,rawUnits) */
 void mexFunction( int nlhs, mxArray *plhs[], 
 		  int nrhs, const mxArray *prhs[]){
   
-  double *Data; /* Array of data */
+  double *Data, fs; /* Array of data */
   unsigned long siglen=0; /* Number of samples read per channel*/
   int nsig; /* Number of signals/channels output */
-  int argc, i, inputfields[7];
+  int argc, i, inputfields[7], outputflag;
 
+  /* Check the matlab output arguments */
+  checkMLoutputs(nlhs);
+  
   /* Check the matlab input arguments */
   checkMLinputs(nrhs, prhs, inputfields);
-
-  argc=inputfields[6];
-  char *argv[argc];
   
   /* Create argument strings to pass into rdsamp */
+  argc=inputfields[6];
+  char *argv[argc];
   rdsampInputArgs(inputfields, prhs, argv);
   
-  /*Call main WFDB Code */
-  Data=rdsamp(argc,argv, &siglen, &nsig);
-  
+  /* Call main WFDB Code */
+  Data=rdsamp(argc, argv, &siglen, &nsig, &fs);
   for (i=0; i<argc; i++){
     mxFree(argv[i]);
   }
+
   
-  /* Create a 0-by-0 output mxArray */
+  /* Return the signal */
   plhs[0] = mxCreateNumericMatrix(0, 0, mxDOUBLE_CLASS, mxREAL);
-
-  /* Set output variable to the allocated memory space */
+  /* Set the first output variable to the allocated memory space */
   mxSetPr(plhs[0], Data); 
-
-  /* Reshape the output matrix */
+  /* Reshape the output data matrix */
   mxSetM(plhs[0], siglen);
   mxSetN(plhs[0], nsig);
-
+  
+  /* Return the fs */
+  if (nlhs==2){
+    plhs[1] = mxCreateDoubleScalar(fs);
+  }
   
   return;
 }
