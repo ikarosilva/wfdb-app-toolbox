@@ -277,6 +277,8 @@ public class Wfdbexec {
 		return execToStringList();
 	}
 
+
+    
 	public double[][] execToDoubleArray(String[] args) throws Exception {
 		setArguments(args);   
 		gen_exec_arguments();
@@ -309,7 +311,7 @@ public class Wfdbexec {
 			char[] tmpCharArr=null;
 			int colInd;
 			int dataCheck=0;
-
+			
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
 			long thisTime=System.currentTimeMillis();
@@ -333,49 +335,77 @@ public class Wfdbexec {
 			if(output.ready()){
 				logger.finest("\n\t***Streamed communication received, checking if error or data...");
 			}
-			while ((line = output.readLine()) != null){
+
+			/* The number of columns for the output array */
+			int N=1;
+			
+			/* Just get the second column. We only care about annotation samples */
+			if (commandName.equals("rdann")){
+			    while ((line = output.readLine()) != null){
+				tmpStr=line.trim().split("\\s+");
+				tmpArr=new Double[1];
+				tmpArr[0] = Double.valueOf(tmpStr[1]);
+				
+				if(results.isEmpty() && dataCheck==tmpStr.length){
+				    System.err.println("Error: Cannot convert to double: ");
+				    System.err.println(line);
+				    throw new NumberFormatException("Cannot convert");
+				}else {
+				    results.add(tmpArr);
+				}
+			    }
+			}
+			/* For non rdann function calls */
+			else{
+			    while ((line = output.readLine()) != null){
 				tmpStr=line.trim().split("\\s+");
 				tmpArr=new Double[tmpStr.length];
 				//loop through columns
 				for(colInd=0;colInd<tmpStr.length;colInd++){
-					try{    
-						tmpArr[colInd]= Double.valueOf(tmpStr[colInd]);
-					}catch (NumberFormatException e){
-						//Deal with cases that are not numbers 
-						//but in an expected format
-						if(tmpStr[colInd].equals("-")){
-							//Dealing with NaN , so we need to convert 
-							//WFDB Syntax "-" to Java's Double NaN
-							tmpArr[colInd]=Double.NaN;	
-						}else if((tmpStr[colInd].contains(":"))){
-							//This column is likely a time column
-							//for now, set values to NaN and remove column
-							tmpArr[colInd]=Double.NaN;
-							if(isTime<0){
-								isTime=colInd;
-							}
-							dataCheck++;
-						}else {
-							//Attempt to convert single characters to integers
-							try{
-								tmpCharArr=tmpStr[colInd].toCharArray();
-								tmpArr[colInd]= (double) tmpCharArr[0];
-								dataCheck++;
-							}catch(Exception e2) {
-								System.err.println("Could not convert to double: " + line);
-								throw new Exception(e2.toString());
-							}
-						}
+				    try{    
+					tmpArr[colInd]= Double.valueOf(tmpStr[colInd]);
+				    }catch (NumberFormatException e){
+					//Deal with cases that are not numbers 
+					//but in an expected format
+					if(tmpStr[colInd].equals("-")){
+					    //Dealing with NaN , so we need to convert 
+					    //WFDB Syntax "-" to Java's Double NaN
+					    tmpArr[colInd]=Double.NaN;	
+					}else if((tmpStr[colInd].contains(":"))){
+					    //This column is likely a time column
+					    //for now, set values to NaN and remove column
+					    tmpArr[colInd]=Double.NaN;
+					    if(isTime<0){
+						isTime=colInd;
+					    }
+					    dataCheck++;
+					}else {
+					    //Attempt to convert single characters to integers
+					    try{
+						tmpCharArr=tmpStr[colInd].toCharArray();
+						tmpArr[colInd]= (double) tmpCharArr[0];
+						dataCheck++;
+					    }catch(Exception e2) {
+						System.err.println("Could not convert to double: " + line);
+						throw new Exception(e2.toString());
+					    }
 					}
+				    }
 				}
 
 				if(results.isEmpty() && dataCheck==tmpStr.length){
-					System.err.println("Error: Cannot convert to double: ");
-					System.err.println(line);
-					throw new NumberFormatException("Cannot convert");
+				    System.err.println("Error: Cannot convert to double: ");
+				    System.err.println(line);
+				    throw new NumberFormatException("Cannot convert");
 				}else {
-					results.add(tmpArr);
+				    results.add(tmpArr);
 				}
+			    }
+			    /* Basing ncolumns on the last row of stream. */
+			    N=tmpStr.length;
+			    if(isTime>-1){
+				N--;
+			    }
 			}
 
 			//Wait to for exit value
@@ -384,10 +414,7 @@ public class Wfdbexec {
 				System.err.println("Command exited with non-zero status!!");
 			}
 			//Convert data to Double Array
-			int N=tmpStr.length;
-			if(isTime>-1){
-				N--;
-			}
+			
 			//TODO: find a way to use .toArray in case of column deletion
 			//data=new double[results.size()][N];
 			//data=results.toArray(data); this should replace the loops below
@@ -421,6 +448,7 @@ public class Wfdbexec {
 		}   
 		return data;
 	}
+    
 	
 	public ArrayList<Double> execToDoubleList(String[] args) throws Exception {
 		setArguments(args);   

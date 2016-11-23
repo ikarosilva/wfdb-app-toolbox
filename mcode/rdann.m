@@ -165,18 +165,13 @@ if(~isempty(C))
     wfdb_argument{end+1}=[num2str(C-1)];
 end
 
-
 if(nargout ==1)
     %Optmize the parsing for cases in which we are interested only in the sample number
     %annotation values
+    wfdb_argument{end+1}='-e'; % Ensure first column is just elapsed time so it can be skipped. 
     ann=javaWfdbExec.execToDoubleArray(wfdb_argument);
     if(config.inOctave)
         ann=java2mat(ann);
-    end
-    if size(ann,2)==6
-        ann=ann(:,2);
-    else
-        ann=ann(:,1);
     end
 else
     
