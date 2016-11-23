@@ -31,10 +31,8 @@ function varargout=wrann(varargin)
 %       in the current directory.
 %
 % ann
-%       Nx1 vector of the integers. The time of the annotation, in samples,
-%       with respect to the signals in recordName. The values of ann are
-%       sample numbers (indices) with respect to the begining of the
-%       record.
+%       Nx1 vector of the integers. The sample number of the annotation
+%       with respect to the begining of the record.
 %
 % annType
 %       Nx1 vector of the chars or scalar describing annotation type. Default is 'N'.
@@ -43,16 +41,18 @@ function varargout=wrann(varargin)
 %
 % subType
 %       Nx1 vector of the chars or scalar describing annotation subtype.
-%       Default is '0'.
+%       Default is '0'. Range must be from -128 to 127.
 %
 % chan
 %       Nx1 vector of the ints or scalar describing annotation CHAN. Default is 0.
+%       Range must be from 0 to 255.
 %
 % num
 %       Nx1 vector of the ints or scalar describing annotation NUM. Default is 0.
+%       Range must be from -128 to 127.
 %
 % comments
-%       Nx1 vector of the chars or scalar describing annotation comments. Default is ''.
+%       Nx1 cell of strings describing annotation comments. Default is blank.
 %
 %
 %%Example- Creates a *.test file in your current directory
@@ -92,7 +92,7 @@ annType='N';
 subType='0';
 chan=0;
 num=0;
-comments=' ';
+comments='';
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -105,44 +105,48 @@ wfdb_argument={'-r',recordName,'-a',annotator};
 if(any(isnan(ann(:))))
    error('Annotation array contains NaNs...not able to write file!');
 end
+if (min(ann)<0)
+    error('Annotation samples must be positive');
+end
 
 %Convert all the annoation to 0 based index and then to strings, in order to set as standard input
 ann=ann-1;
-del=repmat(' ',size(ann));
 
-%WRANN expects the first column to be timestamps. So convert use the first
-%column of data to generate the timestamps
 %RDANN annotation fields are according to the following format:
-%printf("%s  %7ld", mstimstr(annot.time), annot.time);
-%printf("%6s%5d%5d%5d", annstr(annot.anntyp), annot.subtyp,annot.chan, annot.num);
-%printf("\t%s", annot.aux + 1)
+% HH:MM:SS.mmm   %d     %c    %d    %d    %d\t%s
+% But since it doesn't actually use the time/date to write samples, and just uses the samples,
+% put in any filler. WFDB annotation files only store samples (and possibly a fs).  
 
-[annTimeStamp,annDateStamp]=wfdbtime(recordName,ann);
-L=length(annTimeStamp);
+L=length(ann);
+ann=num2str(reshape(ann, [], 1));
+
 data=cell(L,1);
-if(length(annType)==1);
+if(length(annType)==1)
     annType=repmat(annType,[1 L]);
 end
-if(length(subType)==1);
+if(length(subType)==1)
     subType=repmat(subType,[1 L]);
 end
-if(length(chan)==1);
+if(length(chan)==1)
     chan=repmat(num2str(chan),[1 L]);
 end
 if(isnumeric(chan))
     chan=num2str(chan);
 end
-if(length(num)==1);
+if(length(num)==1)
     num=repmat(num2str(num),[1 L]);
 end
 if(isnumeric(num))
     num=num2str(num);
 end
-if(length(comments)==1);
-    comments=num2cell(repmat(num2str(comments),[1 L]));
+
+% Only write aux field if user specifies non-empty value.
+if(length(comments)<2)
+    if (~isempty(comments))
+        comments=num2cell(repmat(num2str(comments),[1 L]));
+    end
 end
 
-ann=num2str(reshape(ann, [], 1));
 if(iscell(comments{1}))
     %For compatiblitiy with output of RDANN
     for i=1:L
@@ -150,17 +154,15 @@ if(iscell(comments{1}))
     end
 end
 
-padDate=~strcmp(annDateStamp{1}(1),'[');
 tab=char(9);
 for i=1:L
-    if(padDate)
-        deli=strfind(annTimeStamp{i},':');
-        if(deli==2)
-            annDateStamp{i} = ['0' annDateStamp{i}];
-        end
+    if isempty(comments{i})
+        data{i}=['00:00.000 ' ann(i,:) ' ' annType(i) ' ' ...
+        subType(i,:) ' ' chan(i,:) ' ' num(i,:)];
+    else
+        data{i}=['00:00.000 ' ann(i,:) ' ' annType(i) ' ' ...
+        subType(i,:) ' ' chan(i,:) ' ' num(i,:) tab comments{i}];
     end
-    data{i}=[annDateStamp{i} ' ' ann(i,:) ' ' annType(i) ' ' ...
-        subType(i) ' ' chan(i) ' ' num(i) tab comments{i}];
 end
 
 javaWfdbExec.setArguments(wfdb_argument);
