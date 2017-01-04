@@ -1,6 +1,6 @@
 function varargout=wrann(varargin)
 %
-% wrann(recordName,annotator,ann,annType,subType,chan,num,comments)
+% wrann(recordName,annotator,ann,anntype,subtype,chan,num,comments)
 %
 %    Wrapper to WFDB WRANN:
 %         http://www.physionet.org/physiotools/wag/wrann-1.htm
@@ -8,8 +8,8 @@ function varargout=wrann(varargin)
 % Writes data into a WFDB annotation file. The file will be saved at the
 % current directory (if the record is in the current directory) or, if a using
 % a PhysioNet web record , a subdirectory in the current directory, with
-% the relative path determined by recordName. The files will have the same
-% name is the recordName but with a 'annotator' extension. You can use RDANN to
+% the relative path determined by recordName. The files will have the
+% name 'recordName" with the 'annotator' extension. You can use RDANN to
 % verify that the write was completed sucessfully (see example below).
 %
 %
@@ -22,37 +22,43 @@ function varargout=wrann(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
 % annotator
-%       String specifying the name of the annotation file in the WFDB path or
-%       in the current directory.
+%       String specifying file extension of the annotation file to be
+%       written.
 %
 % ann
-%       Nx1 vector of the integers. The sample number of the annotation
-%       with respect to the begining of the record.
+%       Nx1 integer vector containing the sample numbers of the annotations
+%       with respect to the begining of the record. Samples must be >=1.
 %
-% annType
-%       Nx1 vector of the chars or scalar describing annotation type. Default is 'N'.
-%       For a list of standard annotation codes used by PhyioNet, please see:
-%             http://www.physionet.org/physiobank/annotations.shtml
+% anntype
+%       Nx1 (single) character vector, or single character, describing each annotation type. 
+%       Default is 'N'. For a list of standard annotation codes used by PhyioNet, 
+%       please see: http://www.physionet.org/physiobank/annotations.shtml
+%       If the description is longer than one character, use the 'comments'
+%       field.
 %
-% subType
-%       Nx1 vector of the chars or scalar describing annotation subtype.
+% subtype
+%       Nx1 integer vector, or single scalar, describing annotation subtype.
 %       Default is '0'. Range must be from -128 to 127.
 %
 % chan
-%       Nx1 vector of the ints or scalar describing annotation CHAN. Default is 0.
-%       Range must be from 0 to 255.
+%       Nx1 integer vector, or single scalar, describing annotation CHAN. 
+%       Default is 0. Range must be from 0 to 255.
 %
 % num
-%       Nx1 vector of the ints or scalar describing annotation NUM. Default is 0.
-%       Range must be from -128 to 127.
+%       Nx1 integer vector, or single scalar, describing annotation NUM. 
+%       Default is 0. Range must be from -128 to 127.
 %
 % comments
-%       Nx1 cell of strings describing annotation comments. Default is blank.
+%       Nx1 or single cell of strings describing annotation comments. 
+%       Default is blank {''}.
+%
+% Note: annType, subType, chan, num, and comments can be of dimension Nx1
+% or 1x1. If they are 1x1, this function will repeat the element N times.
 %
 %
 %%Example- Creates a *.test file in your current directory
@@ -86,13 +92,14 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wrann');
 end
 
-%Set default pararamter values
+% Set default pararamter values
 inputs={'recordName','annotator','ann','annType','subType','chan','num','comments'};
 annType='N';
-subType='0';
+subType=0;
 chan=0;
 num=0;
-comments='';
+comments={''};
+% Read in input arguments
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -101,72 +108,106 @@ end
 
 wfdb_argument={'-r',recordName,'-a',annotator};
 
-%Exit if any annotatinos have a NaN
+% Check the main input variable ann - the annotation samples
 if(any(isnan(ann(:))))
-   error('Annotation array contains NaNs...not able to write file!');
+   error('Annotation array contains NaNs. Not able to write file.');
 end
 if (min(ann)<0)
     error('Annotation samples must be positive');
 end
+N=length(ann);
 
-%Convert all the annoation to 0 based index and then to strings, in order to set as standard input
+% Convert all the annoation to 0 based index and then to strings
 ann=ann-1;
-
-%RDANN annotation fields are according to the following format:
-% HH:MM:SS.mmm   %d     %c    %d    %d    %d\t%s
-% But since it doesn't actually use the time/date to write samples, and just uses the samples,
-% put in any filler. WFDB annotation files only store samples (and possibly a fs).  
-
-L=length(ann);
 ann=num2str(reshape(ann, [], 1));
 
-data=cell(L,1);
+
+% Check all other input variables:
+%   - Check data type
+%   - Check input shape
+%   - Convert integers to strings
+%   - Extend length 1 inputs to length N 
+
+% annType - characters
+if(~ischar(annType))
+    error('annType must be a character or an Nx1 character vector');
+end
+checksize(annType, 'annType', N);
 if(length(annType)==1)
-    annType=repmat(annType,[1 L]);
-end
-if(length(subType)==1)
-    subType=repmat(subType,[1 L]);
-end
-if(length(chan)==1)
-    chan=repmat(num2str(chan),[1 L]);
-end
-if(isnumeric(chan))
-    chan=num2str(chan);
-end
-if(length(num)==1)
-    num=repmat(num2str(num),[1 L]);
-end
-if(isnumeric(num))
-    num=num2str(num);
+    annType=repmat(annType,[N 1]);
 end
 
-% Only write aux field if user specifies non-empty value.
-if(length(comments)<2)
-    if (~isempty(comments))
-        comments=num2cell(repmat(num2str(comments),[1 L]));
-    end
+% subType, chan, and num - integers
+checksize(subType, 'subType', N);
+subType = num2chararray(subType, 'subType', N);
+
+checksize(chan, 'chan', N);
+chan = num2chararray(chan, 'chan', N);
+
+checksize(num, 'num', N);
+num = num2chararray(num, 'num', N);
+
+% comments - cells
+if (~iscell(comments))
+    error('comments must be a 1x1 or Nx1 cell of strings');
+end
+checksize(comments, 'comments', N);
+if(length(comments)==1)
+    comments=repmat(comments,N, 1);
 end
 
-if(iscell(comments{1}))
-    %For compatiblitiy with output of RDANN
-    for i=1:L
-        comments{i}=cell2mat(comments{i});
-    end
-end
-
+% Create the strings to feed into wrann
+data=cell(N,1); % The cells storing the input strings to feed into wrann
 tab=char(9);
-for i=1:L
+for i=1:N
+    % wrann reads in the following format:
+    % HH:MM:SS.mmm   %d     %c    %d    %d    %d\t%s
+    % But since it doesn't actually use the time/date, and just uses the samples,
+    % put in any filler. WFDB annotation files only store samples (and possibly a fs).  
     if isempty(comments{i})
         data{i}=['00:00.000 ' ann(i,:) ' ' annType(i) ' ' ...
         subType(i,:) ' ' chan(i,:) ' ' num(i,:)];
     else
+        % Only write aux field if user specifies a non-empty string.
         data{i}=['00:00.000 ' ann(i,:) ' ' annType(i) ' ' ...
         subType(i,:) ' ' chan(i,:) ' ' num(i,:) tab comments{i}];
     end
 end
 
+% Run the wfdb wrann executable
 javaWfdbExec.setArguments(wfdb_argument);
 err=javaWfdbExec.execWithStandardInput(data);
 if(~isempty(strfind(err.toString,['annopen: can''t'])))
     error(char(err.toString))
+end
+
+end
+
+% Check that the input argument dimension is consistent with the number of
+% annotations. 
+function [] = checksize(inputarg, argname, numannots)
+    inputsize = size(inputarg);
+    if ((inputsize ~= [1,1]) & (inputsize ~= [numannots,1]) & (inputsize ~= [1, numannots]))
+        error(strcat(argname, ' must have length 1 or N, where N = the number of annotations.'));
+    end
+end
+
+
+% Convert an integer scalar or integer vector into a Nx[] character array
+% Raises error if input argument is not a numeric. 
+function chararray = num2chararray(intarg, argname, numannots)
+
+    if(~isnumeric(intarg))
+        error(strcat(argname, ' must be an integer or an Nx1 integer vector'));
+    end
+    
+    if(length(intarg)==1)
+        chararray=repmat(num2str(intarg),[numannots 1]);
+    else
+        if (size(intarg) == [1, numannots])
+            intarg = intarg';
+        end
+        chararray = num2str(intarg);
+    end
+
 end

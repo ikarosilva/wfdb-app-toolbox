@@ -1,6 +1,6 @@
 function varargout=rdann(varargin)
 %
-% [ann,type,subtype,chan,num,comments]=rdann(recordName,annotator,C,N,N0,type)
+% [ann,anntype,subtype,chan,num,comments]=rdann(recordName, annotator, C, N, N0, AT)
 %
 %    Wrapper to WFDB RDANN:
 %         http://www.physionet.org/physiotools/wag/rdann-1.htm
@@ -15,27 +15,26 @@ function varargout=rdann(varargin)
 %
 %
 % ann
-%       Nx1 vector of the ints. The time of the annotation in samples
-%       with respect to the fist sample in the signals in recordName.
+%       Nx1 integer vector of the annotation locations in samples
+%       with respect to the beginning of the record. 
 %       To convert this vector to a string of time stamps see WFDBTIME.
 %
-% type
-%       NxT vector of the chars describing annotation type. Usually
-%       (but not always) T is 1.
-%
-% subtype
-%       Nx1 vector of the chars describing annotation subtype.
-%       For a list of standard annotation codes used by PhyioNet, please see:
+% anntype
+%       Nx1 character vector describing the annotation types.
+%       For a list of standard annotation codes used by PhyioNet, see:
 %             http://www.physionet.org/physiobank/annotations.shtml
 %
+% subtype
+%       Nx1 integer vector describing annotation subtype.
+%       
 % chan
-%       Nx1 vector of ints describing annotation subtype.
+%       Nx1 integer vector describing annotation channel.
 %
 % num
-%       Nx1 vector of ints describing annotation NUM.
+%       Nx1 integer vector describing annotation NUM.
 %
 % comments
-%       Nx1 vector of cells describing annotation comments.
+%       Nx1 cell of strings describing annotation comments.
 %
 %
 % Required Parameters:
@@ -51,17 +50,17 @@ function varargout=rdann(varargin)
 % Optional Parameters are:
 %
 % C
-%       A 1x1 integer. Read only the annotations for signal C.
+%       An integer scalar. Return only the annotations with chan = C.
 % N
-%       A 1x1 integer specifying the sample number at which to stop reading the
-%       record file (default read all = N).
+%       An integer specifying the sample number at which to stop reading the
+%       record file. Default read all.
 % N0
 %       A 1x1 integer specifying the sample number at which to start reading the
-%       annotion file (default 1 = begining of the record).
+%       annotion file. Default = 1, begining of the record.
 %
-% type
-%       A 1x1 String specifying the type of annotation to output (default is
-%       empty, which gets all annotations).
+% AT
+%       The anntype character. Return only annotations with subtype = S. 
+%       Default is empty, which returns all annotations.
 %
 %
 %
@@ -69,7 +68,7 @@ function varargout=rdann(varargin)
 % only the annotation sample vector is required, ie for function calls of
 % the type:
 %
-%  ann=rdann(recordName,annotator,C,N,N0,type);
+%  ann=rdann(recordName, annotator, C, N, N0, AT);
 %
 %  For these cases, no string parsing is required and the formatting is
 %  done at the Java level, increasing substantially the processing speed.
@@ -77,7 +76,7 @@ function varargout=rdann(varargin)
 %
 %
 % Written by Ikaro Silva, 2013
-% Last Modified: March 23, 2015
+% Last Modified: January 4, 2017
 % Version 2.1
 % Since 0.0.1
 %
@@ -91,7 +90,7 @@ function varargout=rdann(varargin)
 % ann=rdann('mitdb/100','atr',[],500);
 %
 %
-%%Example 3- Read only a certain type of annotation
+%%Example 3- Read annotations with anntype = 'V' only. 
 % annV=rdann('mitdb/100', 'atr', [],[],[],'V');
 %
 %
@@ -106,13 +105,13 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-% [ann,type,subtype,chan,num,comments]=rdann(recordName,annotator,C,N,N0)
-inputs={'recordName','annotator','C','N','N0','type'};
-outputs={'ann','type','subtype','chan','num','comments'};
+% [ann, anntype, subtype, chan, num, comments] = rdann(recordName, annotator, C, N, N0, AT)
+inputs={'recordName','annotator','C','N','N0','AT'};
+outputs={'ann','anntype','subtype','chan','num','comments'};
 N=[];
 N0=[];
 C=[];
-type=[];
+AT=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -127,7 +126,6 @@ end
 wfdb_argument={'-r',recordName,'-a',annotator};
 
 if(~isempty(N0) && N0>1)
-    
     %-1 is necessary because WFDB is 0 based indexed.
     %RDANN expects timestamp, so convert from sample to timestamp
     start_time=wfdbtime(recordName,N0-1);
@@ -139,7 +137,6 @@ if(~isempty(N0) && N0>1)
     end
     
 end
-
 
 if(~isempty(N))
     %-1 is necessary because WFDB is 0 based indexed.
@@ -153,10 +150,10 @@ if(~isempty(N))
     end
 end
 
-if(~isempty(type))
+if(~isempty(AT))
     wfdb_argument{end+1}='-p';
     %-1 is necessary because WFDB is 0 based indexed.
-    wfdb_argument{end+1}=type;
+    wfdb_argument{end+1}=AT;
 end
 
 if(~isempty(C))
@@ -178,13 +175,13 @@ else
     %TODO: Improve the parsing of data. To avoid doing this at the ML wrapper
     %level! The parsing assumes each line starts with a "[" and that not "["
     %occurs at the comment.
-    %outputs={ann,type,subtype,chan,num,comments};
+    %outputs={ann,anntype,subtype,chan,num,comments};
     dataJava=javaWfdbExec.execToStringList(wfdb_argument);
     data=dataJava.toArray();
     N=length(data);
     ann=zeros(N,1);
-    type=[];             % Size to be defined at runtime
-    subtype=char(zeros(N,1));
+    anntype=[];             % Size to be defined at runtime
+    subtype=zeros(N,1);
     chan=zeros(N,1);
     num=zeros(N,1);
     comments=cell(N,1);
@@ -193,10 +190,10 @@ else
         error(str)
     end
     if(~isempty(str) && strcmp(str(1),'['))
-        %In this case it is possible that there is a data stamp
+        % Absolute time stamp. Also possibly a date stamp
         % right after the timestamp such as:
         % [00:11:30.628 09/11/1989]      157     N    0    1    0
-        % but not always, the following case is also possible:
+        % but not always. The following case is also possible:
         % [00:11:30.628]      157     N    0    1    0
         %
         % So we remove the everything between [ * ]  prior to parsing
@@ -205,28 +202,17 @@ else
             if(~isempty(str))
                 del_str=findstr(str,']');
                 str(1:del_str)=[];
-                C=textscan(str,'%u %s %s %u %u %[^\n\r]');
+                C=textscan(str,'%u %s %u %u %u %[^\n\r]');
                 ann(n)=C{1};
-                if(isempty(type))
+                if(isempty(anntype))
                     T=size(C{2},2);
-                    type=zeros(N,T);
+                    anntype=zeros(N,T);
                 end
                 CN=length(char(C{2}));
-                type(n,1:CN)=char(C{2});
-                try
-                    subtype(n)=C{3}{:};
-                catch
-                    warning(['Ignoring annotation subtype. Annotation subtype has multiple characters: ' ...
-                        C{3}{:}]);
-                    subtype(n)='0';
-                end
-                try
-                    chan(n)=C{4}+1;%Convert to MATLAB indexing
-                catch
-                    warning(['Ignoring channel label. Channel label has multiple characters: ' ...
-                        C{4}]);
-                    chan(n)='0';
-                end
+                anntype(n,1:CN)=char(C{2});  
+                subtype(n)=C{3};
+                chan(n)=C{4}+1;%Convert to MATLAB indexing
+                
                 if(~isempty(C{5}))
                     num(n)=C{5};
                 end
@@ -236,7 +222,7 @@ else
             end
         end
     else
-        %In this case there is only timestamp such as:
+        %In this case there is only a relative timestamp such as:
         % 0:00.355      355     N    0    0    0
         str=data(1);
         if(~isempty(strfind(str,['annopen: can''t read annotator'])))
@@ -246,31 +232,21 @@ else
             str=char(data(n));
             if(~isempty(str))
                 if(config.inOctave)
-                    C= textscan(str,'%s %u %s %s %u %u %s');
+                    C= textscan(str,'%s %u %s %u %u %u %s');
                 else
-                    C= textscan(str,'%s %u %s %s %u %u %[^\n\r]');
+                    C= textscan(str,'%s %u %s %u %u %u %[^\n\r]');
                 end
                 ann(n)=C{2};
-                if(isempty(type))
+                if(isempty(anntype))
                     T=size(C{3}{:},2);
-                    type=zeros(N,T);
+                    anntype=zeros(N,T);
                 end
                 CN=length(C{3}{:});
-                type(n,1:CN)=C{3}{:};
-                try
-                    subtype(n)=C{4}{:};
-                catch
-                    warning(['Ignoring annotation subtype. Annotation subtype has multiple characters: ' ...
-                        C{4}{:}]);
-                    subtype(n)='0';
-                end
-                try
-                    chan(n)=C{5}+1;%Convert to MATLAB indexing
-                catch
-                    warning(['Ignoring channel label. Channel label has multiple characters: ' ...
-                        C{5}]);
-                    chan(n)='0';
-                end
+                anntype(n,1:CN)=C{3}{:};
+                
+                subtype(n)=C{4};
+                chan(n)=C{5}+1;%Convert to MATLAB indexing
+                
                 if(~isempty(C{6}))
                     num(n)=C{6};
                 end
@@ -280,12 +256,10 @@ else
             end
         end
     end
-    type=char(type);
+    anntype=char(anntype);
 end
 
 ann=ann+1; %Convert to MATLAB indexing
-
-
 
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
