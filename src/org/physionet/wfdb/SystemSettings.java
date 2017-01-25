@@ -27,10 +27,10 @@ public class SystemSettings {
 
 	}
 
-	public static void loadLib(String libName){
+	private static void loadLib(String libName, Boolean customArch){
 		if(getOsName().contains("windows")){
 			try {
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+				System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
 						+ "\\bin\\lib"  + libName + ".dll");
 			} catch (UnsatisfiedLinkError e) {
 				System.err.println("Native code library failed to load.\n" + e);
@@ -38,15 +38,23 @@ public class SystemSettings {
 			}
 
 		}else if(getOsName().contains("mac")){
-			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
 					+ "/lib/lib" + libName + ".dylib");
 		}else{
 			//Default to Linux
-			System.load(SystemSettings.getWFDB_NATIVE_BIN(false) 
+			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
 					+ "/lib/lib" + libName + ".so");
 		}
 	}
 
+	public static void loadLib(String libName){
+		try {
+			loadLib(libName, true);
+		}
+		catch (UnsatisfiedLinkError e) {
+			loadLib(libName, false);
+		}
+	}
 
 	public static String getosArch(){
 		//Returns the JVM type
