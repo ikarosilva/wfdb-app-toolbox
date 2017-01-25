@@ -15,9 +15,15 @@
 *.class
 *.zip
 *.jar
+/mcode/nativelibs/*.c
+/mcode/nativelibs/*.tar.gz
 /mcode/nativelibs/*/bin/*
+/mcode/nativelibs/*/build/*
+/mcode/nativelibs/*/database/*
+/mcode/nativelibs/*/include/*
 /mcode/nativelibs/*/lib/*
 /mcode/nativelibs/*/lib64/*
+/mcode/nativelibs/*/share/*
 /mcode/html/*.html
 !/mcode/html/template.html
 !/mcode/html/template_bottom.html
