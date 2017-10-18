@@ -98,10 +98,11 @@ all: curl wfdb mse edr ecgpuwave dfa librdsampjni
 ################################################################
 ## Prebuilt binaries for Toolbox releases
 
-## GNU/Linux (x86_64) binaries: built on Debian squeeze
+## GNU/Linux (x86_64) binaries: built on Debian wheezy
 ##  * make, gcc, gfortran, gcj-jdk
 install-linux:
 	schroot -cwfdb-toolbox-build $(MAKE) install host=linux
+	$(MAKE) installclean host=linux
 clean-linux:
 	$(MAKE) clean host=linux
 
@@ -118,6 +119,8 @@ install-windows:
 	  JAVA_HOME=/home/benjamin/packages/zulu8.13.0.5-jdk8.0.72-win_x64 \
 	  WINEPREFIX=$(SRC_DIR)/windows/build/.wine \
 	  WINEARCH=win64 WINEDEBUG=warn+dll DISPLAY=
+	rm -rf $(SRC_DIR)/windows/build/.wine
+	$(MAKE) installclean host=windows
 clean-windows:
 	$(MAKE) clean host=windows
 
@@ -129,7 +132,7 @@ install-macosx: install-macosx-x86_64 install-macosx-i686
 	mkdir -p macosx/bin
 	mkdir -p macosx/lib
 	( set -e; cd macosx/x86_64; \
-	  for f in bin/* lib/*; do if [ -f $$f ]; then \
+	  for f in bin/* lib/*.dylib; do if [ -f $$f ]; then \
 	    x86_64-apple-darwin9-lipo -create ../i686/$$f $$f -output ../$$f; \
 	  fi; done )
 	rm -rf macosx/x86_64/bin macosx/x86_64/lib
@@ -137,9 +140,11 @@ install-macosx: install-macosx-x86_64 install-macosx-i686
 install-macosx-x86_64:
 	$(MAKE) install host=macosx/x86_64 MFLAGS= nocheck=1 \
 	  crosshost=x86_64-apple-darwin9
+	$(MAKE) installclean host=macosx/x86_64
 install-macosx-i686:
 	$(MAKE) install host=macosx/i686 MFLAGS= nocheck=1 \
 	  crosshost=i686-apple-darwin9
+	$(MAKE) installclean host=macosx/i686
 clean-macosx:
 	$(MAKE) clean host=macosx
 	$(MAKE) clean host=macosx/x86_64
