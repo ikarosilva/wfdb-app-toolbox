@@ -53,6 +53,14 @@ package: jar7 doc unit-test.zip
 unit-test.zip:
 	zip -r $@ UnitTests -x@zipexclude.lst
 
+check:
+	set -e; unset DISPLAY; mcodedir=`pwd`/mcode; \
+	cd UnitTests && octave -q --eval \
+	 "pkg load signal; \
+	  addpath('$$mcodedir'); \
+	  confirm_recursive_rmdir(0); \
+	  BatchTest"
+
 jartest: mcode/$(JAR7_NAME) unit-test.zip
 	cd mcode; \
 	java -cp $(JAR7_NAME) org.physionet.wfdb.Wfdbexec rdsamp -r mitdb/100 -t s5
