@@ -101,13 +101,7 @@ if(isempty(isloaded))
         ml_jar_version=['Java ' ml_jar_version];
     end
     %Check if path has not been added yet
-    if(~isempty(strfind(ml_jar_version,'Java 1.7')))
-        wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-9-10.jar'];
-    elseif(~isempty(strfind(ml_jar_version,'Java 1.8')))
-        wfdb_path=[wfdb_path 'wfdb-app-JVM8-0-9-10.jar'];
-    else
-        error(['Cannot load WFDB JAR on unsupported JVM: ' ml_jar_version])
-    end
+    wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-9-10.jar'];
     javaaddpath(wfdb_path)
     isloaded=1;
     

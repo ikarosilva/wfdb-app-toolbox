@@ -66,11 +66,6 @@ function varargout=rdmat(varargin)
 inputs={'recordName'};
 defGain=200; %Default value for missing gains
 
-% Different wfdbnan for each signal format 
-wfdbformats = {'80','16', '32'}; % wfdb2mat currently only writes these 3 formats
-wfdbNaNs = [-128, -32768, -2147483648];
-mapNaNs = containers.Map(wfdbformats,wfdbNaNs);
-
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};'])
@@ -152,10 +147,14 @@ for m = 1:M
     % Interpreting digital values of byte offset format 80
     if strcmp(siginfo(m).fmt, '80') 
         val(m,:)=val(m,:)-128;
+        wfdbNaN=-128;
+    elseif strcmp(siginfo(m).fmt, '16')
+        wfdbNaN=-32768;
+    else
+        wfdbNaN=-2147483648;
     end
     
     % Fill in NaNs before subtracting and dividing. 
-    wfdbNaN=mapNaNs(siginfo(m).fmt);
     val(m, val(m,:)==wfdbNaN)=nan;
     
     %Convert from digital units to physical units.

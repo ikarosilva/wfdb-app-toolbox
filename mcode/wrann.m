@@ -165,11 +165,11 @@ for i=1:N
     % But since it doesn't actually use the time/date, and just uses the samples,
     % put in any filler. WFDB annotation files only store samples (and possibly a fs).  
     if isempty(comments{i})
-        data{i}=['00:00.000 ' ann(i,:) ' ' annType(i) ' ' ...
+        data{i}=['--------- ' ann(i,:) ' ' annType(i) ' ' ...
         subType(i,:) ' ' chan(i,:) ' ' num(i,:)];
     else
         % Only write aux field if user specifies a non-empty string.
-        data{i}=['00:00.000 ' ann(i,:) ' ' annType(i) ' ' ...
+        data{i}=['--------- ' ann(i,:) ' ' annType(i) ' ' ...
         subType(i,:) ' ' chan(i,:) ' ' num(i,:) tab comments{i}];
     end
 end
