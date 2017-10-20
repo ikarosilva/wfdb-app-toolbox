@@ -202,7 +202,7 @@ else
             if(~isempty(str))
                 del_str=findstr(str,']');
                 str(1:del_str)=[];
-                C=textscan(str,'%u %s %u %u %u %[^\n\r]');
+                C=textscan(str,'%d %s %d %d %d',1);
                 ann(n)=C{1};
                 if(isempty(anntype))
                     T=size(C{2},2);
@@ -216,8 +216,9 @@ else
                 if(~isempty(C{5}))
                     num(n)=C{5};
                 end
-                if(~isempty(C{6}))
-                    comments(n)=C{6};
+                tabpos=findstr(str,char(9));
+                if(tabpos)
+                    comments{n}=str(tabpos(1)+1:end);
                 end
             end
         end
@@ -231,11 +232,7 @@ else
         for n=1:N
             str=char(data(n));
             if(~isempty(str))
-                if(config.inOctave)
-                    C= textscan(str,'%s %u %s %u %u %u %s');
-                else
-                    C= textscan(str,'%s %u %s %u %u %u %[^\n\r]');
-                end
+                C=textscan(str,'%s %d %s %d %d %d',1);
                 ann(n)=C{2};
                 if(isempty(anntype))
                     T=size(C{3}{:},2);
@@ -250,8 +247,9 @@ else
                 if(~isempty(C{6}))
                     num(n)=C{6};
                 end
-                if(~isempty(C{7}))
-                    comments(n)=C{7};
+                tabpos=findstr(str,char(9));
+                if(tabpos)
+                    comments{n}=str(tabpos(1)+1:end);
                 end
             end
         end
