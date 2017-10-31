@@ -78,6 +78,7 @@ buildbindir = $(BUILD_DIR)/bin
 MATLAB=matlab
 
 export nocheck
+export nojavacheck
 export PATH
 
 # ensure that libraries installed in $(libdir) are visible to binaries
@@ -118,7 +119,7 @@ install-windows:
 	  f77_extra_libs="-Wl,-Bstatic -lgfortran -lquadmath -Wl,-Bdynamic" \
 	  JAVA_HOME=/home/benjamin/packages/zulu8.13.0.5-jdk8.0.72-win_x64 \
 	  WINEPREFIX=$(SRC_DIR)/windows/build/.wine \
-	  WINEARCH=win64 WINEDEBUG=warn+dll DISPLAY=
+	  WINEARCH=win64 WINEDEBUG=warn+dll DISPLAY= nojavacheck=1
 	rm -rf $(SRC_DIR)/windows/build/.wine
 	$(MAKE) installclean host=windows
 clean-windows:
@@ -346,7 +347,11 @@ $(BUILD_DIR)/librdsampjni.isconfig: $(BUILD_DIR)/wfdb.isbuilt
 	touch $(BUILD_DIR)/librdsampjni.isconfig
 $(BUILD_DIR)/librdsampjni.isbuilt: $(BUILD_DIR)/librdsampjni.isconfig
 	( cd $(BUILD_DIR)/librdsampjni && $(MAKE) install )
-#	[ -n "$(nocheck)" ] || ( cd $(BUILD_DIR)/librdsampjni && $(MAKE) check )
+	[ -n "$(nocheck)$(nojavacheck)" ] || ( cd $(BUILD_DIR)/librdsampjni && $(MAKE) check )
+	set -e; if [ -f $(bindir)/librdsampjni.dll ]; then \
+	  ( cd $(bindir); ls libcurl-*.dll > librdsampjni.dep ); \
+	  ( cd $(bindir); ls wfdb-*.*.dll >> librdsampjni.dep ); \
+	fi
 librdsampjni: $(BUILD_DIR)/librdsampjni.isbuilt
 installclean-librdsampjni:
 	rm -f $(BUILD_DIR)/librdsampjni.isbuilt
