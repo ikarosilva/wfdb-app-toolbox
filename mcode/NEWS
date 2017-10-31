@@ -1,6 +1,16 @@
 For a detailed list of changes see the repository Log at:
    http://github.com/ikarosilva/wfdb-app-toolbox.git
 
+0.10.0 (October 31, 2017)
+       Updated WFDB library and applications to version 10.5.25pre1.
+
+       The API for the RDSAMP function has changed with this version.
+       Note that the matrix of sample values is now the *first* output
+       value rather than the third.
+
+       The toolbox is now compatible with MATLAB/Octave releases that
+       use Java 1.8 (or later.)
+
 0.9.10 (March 13, 2015)
 	   Added the function SNIP to the library. Added local caching of PhysioNet files to the {wfdbroot}/databases directory.
 	   Updated native libraries to WFDB 10.5.24. Implement RSDSAMP via the JNI for improvement in memory and speed.
