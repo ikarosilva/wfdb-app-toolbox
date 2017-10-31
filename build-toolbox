@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -e
+set -x
+
+if [ $# != 3 ]; then
+   echo "Usage: $0 repository branch version" >&2
+   exit 1
+fi
+
+repo=$1
+branch=$2
+version=$3
+
+package=wfdb-app-toolbox-$version
+
+builddir=/tmp/toolbox-build
+outdir=/tmp
+make="make -j"
+
+rm -rf $builddir
+
+git clone --branch $branch --depth 1 $repo $builddir
+
+cd $builddir
+
+git archive --prefix=wfdb-app-toolbox-$version/ HEAD | gzip -c -9 > $outdir/$package.tar.gz
+
+# FIXME: use wfdb-toolbox-build chroot for this
+schroot -cjessie make jar7 &> jar7.log
+
+$make -C mcode/nativelibs download &> download.log
+
+(cd dependencies/jni && ./autogen.sh) &> autogen.log
+
+$make -C mcode/nativelibs install-linux install-windows install-macosx &> nativelibs.log
+
+make package APP_NAME=wfdb-app-toolbox-$version.zip
+mv $package.zip $outdir/
