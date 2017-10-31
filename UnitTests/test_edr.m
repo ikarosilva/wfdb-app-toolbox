@@ -9,7 +9,8 @@ for n=1:nargin
 end
 
 %Test the examples 
- 
+% Note: This requires the Signal Processing toolbox
+
 test_string={['signal=''fantasia/f1o02'';r_peaks=''ecg'';' ...
              'data_type=1;channel=2;y=edr(data_type,signal,r_peaks,[],[],[],channel);' ...
              'wfdb2mat(''f1o02'');[~,signal,Fs,~]=rdmat(''f1o02m'');' ...
