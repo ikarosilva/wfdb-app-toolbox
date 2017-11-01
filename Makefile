@@ -16,7 +16,7 @@ ANT = ant
 #There is really no reason by the *.jar and *.zip should need to have the same
 #version numbers, as they are really modular...But for now we keep them at the same
 #versioning level in order to avoid (or increase?) confusion.
-VERSION=0-9-10
+VERSION=0-10-0
 APP_NAME=wfdb-app-toolbox-$(VERSION).zip
 JAR7_NAME=wfdb-app-JVM7-$(VERSION).jar
 

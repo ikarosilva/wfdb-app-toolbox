@@ -101,7 +101,7 @@ if(isempty(isloaded))
         ml_jar_version=['Java ' ml_jar_version];
     end
     %Check if path has not been added yet
-    wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-9-10.jar'];
+    wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-10-0.jar'];
     javaaddpath(wfdb_path)
     isloaded=1;
     

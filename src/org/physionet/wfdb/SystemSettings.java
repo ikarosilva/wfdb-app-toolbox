@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class SystemSettings {
 
@@ -29,14 +32,29 @@ public class SystemSettings {
 
 	private static void loadLib(String libName, Boolean customArch){
 		if(getOsName().contains("windows")){
-			try {
-				System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
-						+ "\\bin\\lib"  + libName + ".dll");
-			} catch (UnsatisfiedLinkError e) {
-				System.err.println("Native code library failed to load.\n" + e);
-				System.exit(1);
-			}
+			// No RPATH on windows, so library dependencies can't
+			// be loaded automatically and must be pre-loaded.
 
+			// (Although Windows automatically searches for
+			// required DLLs in the *application's* directory, it
+			// doesn't do the same when loading a DLL.)
+
+			// Nasty kludge: list the required libraries in a
+			// separate text file, so they do not have to be
+			// hardcoded here.
+
+			String libdir = getWFDB_NATIVE_BIN(customArch) + "bin\\";
+			String depfile = libdir + "lib" + libName + ".dep";
+			try {
+				BufferedReader r = new BufferedReader(new FileReader(depfile));
+				String name;
+				while ((name = r.readLine()) != null) {
+					System.load(libdir + name);
+				}
+			} catch (IOException e) {
+				throw new UnsatisfiedLinkError("error reading " + depfile);
+			}
+			System.load(libdir + "lib" + libName + ".dll");
 		}else if(getOsName().contains("mac")){
 			System.load(SystemSettings.getWFDB_NATIVE_BIN(customArch) 
 					+ "/lib/lib" + libName + ".dylib");

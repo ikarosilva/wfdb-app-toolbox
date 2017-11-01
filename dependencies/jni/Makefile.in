@@ -27,11 +27,12 @@ classdir = $(srcdir)/../../bin/classes
 
 all: librdsampjni.la
 
-# FIXME: this doesn't work
-# it tries to look for the shared libraries in absurd places
-# plus it doesn't actually test anything
 check: librdsampjni.la
-	LD_LIBRARY_PATH=".libs:$(LD_LIBRARY_PATH)" $(JAVA) -classpath $(classdir) org.physionet.wfdb.jni.Rdsamp
+	rm -rf test.jar nativelibs
+	jar cf test.jar -C $(classdir) .
+	make install libdir=`pwd`/nativelibs/custom/lib
+	$(JAVA) -cp test.jar org.physionet.wfdb.jni.Rdsamp -r 100s -t s10 > 100s.out
+	diff 100s.out $(srcdir)/100s.expected
 
 install: librdsampjni.la
 	mkdir -p $(libdir)
@@ -54,6 +55,7 @@ org_physionet_wfdb_jni_Rdsamp.h: $(classdir)/org/physionet/wfdb/jni/Rdsamp.class
 clean:
 	$(LIBTOOL) --mode=clean rm -f *.la *.lo
 	rm -f org_physionet_wfdb_jni_Rdsamp.h
+	rm -rf test.jar nativelibs 100s.out
 
 distclean: clean
 	rm -f config.status config.log libtool
