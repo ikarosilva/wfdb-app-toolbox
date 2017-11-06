@@ -46,7 +46,9 @@ addpath(pwd);savepath
 ```
 ## Checking out and installing from the trunk
 
-TODO
+1) Clone repo to you local system
+2) Run "build-toolbox" shell script to build all the necessary binaries (ie, you might need to install all the cross-compiler
+tools necessary to build the binaries for Mac OS X and Windows). 
 
 ## Reference & Toolbox Technical Overview
 
