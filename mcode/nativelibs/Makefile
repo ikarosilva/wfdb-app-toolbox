@@ -24,12 +24,12 @@ CURL_ARCHIVE=$(CURL_PKG).tar.gz
 CURL_SOURCE=http://curl.haxx.se/download/$(CURL_ARCHIVE)
 CURL_SHA256=7ce35f207562674e71dbada6891b37e3f043c1e7a82915cb9c2a17ad3a9d659b
 
-WFDB_PKG=wfdb-10.5.25
+WFDB_PKG=wfdb-10.6.0
 #WFDB_ARCHIVE=$(WFDB_PKG).tar.gz
 #WFDB_SOURCE=http://www.physionet.org/physiotools/archives/wfdb-10.5/$(WFDB_ARCHIVE)
-WFDB_ARCHIVE=wfdb-10.5.25pre1.tar.gz
+WFDB_ARCHIVE=wfdb-10.6.0pre1.tar.gz
 WFDB_SOURCE=http://www.physionet.org/physiotools/beta/$(WFDB_ARCHIVE)
-WFDB_SHA256=37fb59c04f5b36d4146e3cb71d28a59108581271feb079631cd922febe21fa73
+WFDB_SHA256=5f2afaac65e6e77a56baf20a12e8a1431bc02e0e2f227f4ba4ca7c529b3289ca
 WFDB_MAJOR=10
 
 ECGPUWAVE_PKG=ecgpuwave-1.3.3
@@ -245,8 +245,6 @@ installclean-curl:
 ################################################################
 ## WFDB (requires libcurl)
 
-# FIXME: configure --without-xview; parallel make (10.5.25)
-
 clean-wfdb:
 	rm -rf $(BUILD_DIR)/$(WFDB_PKG)
 	rm -f $(BUILD_DIR)/wfdb.isconfig
@@ -264,6 +262,7 @@ $(BUILD_DIR)/wfdb.isconfig: $(WFDB_ARCHIVE) $(BUILD_DIR)/curl.isbuilt
 	  ./configure $(configure_args) \
 	    --prefix=$(prefix) \
 	    --libdir=$(libdir) \
+	    --without-xview \
 	    --with-libcurl )
 	sed -e "s/ DBDIR//" -i $(BUILD_DIR)/$(WFDB_PKG)/lib/wfdblib.h0
 	sed -e "s, /usr/database,," -i $(BUILD_DIR)/$(WFDB_PKG)/checkpkg/expected/lcheck.log-NETFILES
@@ -271,9 +270,9 @@ $(BUILD_DIR)/wfdb.isconfig: $(WFDB_ARCHIVE) $(BUILD_DIR)/curl.isbuilt
 $(BUILD_DIR)/wfdb.isbuilt: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/wfdb.isbuilt: $(BUILD_DIR)/wfdb.isconfig
 	( cd $(BUILD_DIR)/$(WFDB_PKG) && \
-	  make -j1 install CC="$(CC) -I$(includedir) -L$(libdir)" \
+	  make install CC="$(CC) -I$(includedir) -L$(libdir)" \
 	    RPATHFLAGS= )
-	[ -n "$(nocheck)" ] || ( cd $(BUILD_DIR)/$(WFDB_PKG) && make -j1 check )
+	[ -n "$(nocheck)" ] || ( cd $(BUILD_DIR)/$(WFDB_PKG) && make check )
 	rm -f $(bindir)/psfd \
 	      $(bindir)/hrmem \
 	      $(bindir)/hrfft \
