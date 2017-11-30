@@ -31,14 +31,14 @@ For a list of available databases accessible through the WFDB Toolbox, see:
 
 http://physionet.org/physiobank/database/DBS
 
-## Installing from the PhysioNet
+## Installing from PhysioNet
 
-To check out and install from the PhysioNet using MATLAB, run the following commands:
+To check out and install from PhysioNet using MATLAB, run the following commands:
 
 ```
 [old_path]=which('rdsamp');if(~isempty(old_path)) rmpath(old_path(1:end-8)); end
-wfdb_url='http://physionet.org/physiotools/matlab/wfdb-app-matlab/wfdb-app-toolbox-0-10-0.zip';
-[filestr,status] = urlwrite(wfdb_url,'wfdb-app-toolbox-0-10-0.zip');%Octave users may have to download manually
+wfdb_url='https://physionet.org/physiotools/matlab/wfdb-app-matlab/wfdb-app-toolbox-0-10-0.zip';
+[filestr,status] = urlwrite(wfdb_url,'wfdb-app-toolbox-0-10-0.zip');
 unzip('wfdb-app-toolbox-0-10-0.zip');
 cd mcode
 addpath(pwd);savepath
@@ -46,9 +46,18 @@ addpath(pwd);savepath
 ```
 ## Checking out and installing from the trunk
 
-1) Clone repo to you local system
-2) Run "build-toolbox" shell script to build all the necessary binaries (ie, you might need to install all the cross-compiler
-tools necessary to build the binaries for Mac OS X and Windows). 
+Building the toolbox requires:
+- The GNU C compiler (GCC)
+- The GNU Fortran compiler (gfortran)
+- GNU Make
+- GNU Autoconf
+- GNU Libtool
+- Java Development Kit
+- Ant
+
+To build the toolbox, simply run 'make' in the top-level directory.
+This will automatically download various dependencies from PhysioNet
+and elsewhere (see 'mcode/nativelibs/Makefile' for details.)
 
 ## Reference & Toolbox Technical Overview
 
