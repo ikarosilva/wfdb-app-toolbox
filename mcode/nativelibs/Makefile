@@ -27,9 +27,9 @@ CURL_SHA256=7ce35f207562674e71dbada6891b37e3f043c1e7a82915cb9c2a17ad3a9d659b
 WFDB_PKG=wfdb-10.6.0
 #WFDB_ARCHIVE=$(WFDB_PKG).tar.gz
 #WFDB_SOURCE=http://www.physionet.org/physiotools/archives/wfdb-10.5/$(WFDB_ARCHIVE)
-WFDB_ARCHIVE=wfdb-10.6.0pre1.tar.gz
+WFDB_ARCHIVE=wfdb-10.6.0pre2.tar.gz
 WFDB_SOURCE=http://www.physionet.org/physiotools/beta/$(WFDB_ARCHIVE)
-WFDB_SHA256=5f2afaac65e6e77a56baf20a12e8a1431bc02e0e2f227f4ba4ca7c529b3289ca
+WFDB_SHA256=7db431bb4e12a0e5ca9ebcfb072b341e58cb4daaf6d58deb5c39168941f2a562
 WFDB_MAJOR=10
 
 ECGPUWAVE_PKG=ecgpuwave-1.3.3
