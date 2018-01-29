@@ -204,7 +204,7 @@ $(CURL_ARCHIVE):
 	mv curl.tar.gz $(CURL_ARCHIVE)
 $(BUILD_DIR)/curl.isconfig: $(CURL_ARCHIVE)
 	mkdir -p $(BUILD_DIR)
-	( cd $(BUILD_DIR) && tar xfz $(SRC_DIR)/$(CURL_ARCHIVE) )
+	tar -xzf $(CURL_ARCHIVE) -C $(BUILD_DIR)
 	( cd $(BUILD_DIR)/$(CURL_PKG) && \
 	  ./configure $(configure_args) \
 	    CC="$(CC)" \
@@ -257,7 +257,7 @@ $(WFDB_ARCHIVE):
 $(BUILD_DIR)/wfdb.isconfig: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/wfdb.isconfig: $(WFDB_ARCHIVE) $(BUILD_DIR)/curl.isbuilt
 	mkdir -p $(BUILD_DIR)
-	( cd $(BUILD_DIR) && tar xfz $(SRC_DIR)/$(WFDB_ARCHIVE) )
+	tar -xzf $(WFDB_ARCHIVE) -C $(BUILD_DIR)
 	( cd $(BUILD_DIR)/$(WFDB_PKG) && \
 	  ./configure $(configure_args) \
 	    --prefix=$(prefix) \
@@ -413,7 +413,7 @@ $(BUILD_DIR)/ecgpuwave.isbuilt: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/ecgpuwave.isbuilt: $(BUILD_DIR)/wfdb.isbuilt
 $(BUILD_DIR)/ecgpuwave.isbuilt: $(ECGPUWAVE_ARCHIVE)
 	mkdir -p $(BUILD_DIR)
-	( cd $(BUILD_DIR) && tar xfz $(SRC_DIR)/$(ECGPUWAVE_ARCHIVE) )
+	tar -xzf $(ECGPUWAVE_ARCHIVE) -C $(BUILD_DIR)
 	( cd $(BUILD_DIR)/$(ECGPUWAVE_PKG) && \
 	  $(MAKE) CC="$(CC)" F77="$(F77)" \
 	    WFDB_CFLAGS="-I$(includedir)" \
