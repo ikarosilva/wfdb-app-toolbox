@@ -19,17 +19,15 @@ host=custom
 
 #Package names and versions
 
-CURL_PKG=curl-7.57.0
+CURL_PKG=curl-7.58.0
 CURL_ARCHIVE=$(CURL_PKG).tar.gz
 CURL_SOURCE=http://curl.haxx.se/download/$(CURL_ARCHIVE)
-CURL_SHA256=7ce35f207562674e71dbada6891b37e3f043c1e7a82915cb9c2a17ad3a9d659b
+CURL_SHA256=cc245bf9a1a42a45df491501d97d5593392a03f7b4f07b952793518d97666115
 
 WFDB_PKG=wfdb-10.6.0
-#WFDB_ARCHIVE=$(WFDB_PKG).tar.gz
-#WFDB_SOURCE=http://www.physionet.org/physiotools/archives/wfdb-10.5/$(WFDB_ARCHIVE)
-WFDB_ARCHIVE=wfdb-10.6.0pre2.tar.gz
-WFDB_SOURCE=http://www.physionet.org/physiotools/beta/$(WFDB_ARCHIVE)
-WFDB_SHA256=7db431bb4e12a0e5ca9ebcfb072b341e58cb4daaf6d58deb5c39168941f2a562
+WFDB_ARCHIVE=$(WFDB_PKG).tar.gz
+WFDB_SOURCE=http://www.physionet.org/physiotools/archives/wfdb-10.6/$(WFDB_ARCHIVE)
+WFDB_SHA256=6b2bcc76e0e613b91c30d6f825c087895ff7f76d50664f8f367b4008f82709fd
 WFDB_MAJOR=10
 
 ECGPUWAVE_PKG=ecgpuwave-1.3.3
@@ -204,7 +202,7 @@ $(CURL_ARCHIVE):
 	mv curl.tar.gz $(CURL_ARCHIVE)
 $(BUILD_DIR)/curl.isconfig: $(CURL_ARCHIVE)
 	mkdir -p $(BUILD_DIR)
-	( cd $(BUILD_DIR) && tar xfz $(SRC_DIR)/$(CURL_ARCHIVE) )
+	tar -xzf $(CURL_ARCHIVE) -C $(BUILD_DIR)
 	( cd $(BUILD_DIR)/$(CURL_PKG) && \
 	  ./configure $(configure_args) \
 	    CC="$(CC)" \
@@ -257,7 +255,7 @@ $(WFDB_ARCHIVE):
 $(BUILD_DIR)/wfdb.isconfig: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/wfdb.isconfig: $(WFDB_ARCHIVE) $(BUILD_DIR)/curl.isbuilt
 	mkdir -p $(BUILD_DIR)
-	( cd $(BUILD_DIR) && tar xfz $(SRC_DIR)/$(WFDB_ARCHIVE) )
+	tar -xzf $(WFDB_ARCHIVE) -C $(BUILD_DIR)
 	( cd $(BUILD_DIR)/$(WFDB_PKG) && \
 	  ./configure $(configure_args) \
 	    --prefix=$(prefix) \
@@ -413,7 +411,7 @@ $(BUILD_DIR)/ecgpuwave.isbuilt: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/ecgpuwave.isbuilt: $(BUILD_DIR)/wfdb.isbuilt
 $(BUILD_DIR)/ecgpuwave.isbuilt: $(ECGPUWAVE_ARCHIVE)
 	mkdir -p $(BUILD_DIR)
-	( cd $(BUILD_DIR) && tar xfz $(SRC_DIR)/$(ECGPUWAVE_ARCHIVE) )
+	tar -xzf $(ECGPUWAVE_ARCHIVE) -C $(BUILD_DIR)
 	( cd $(BUILD_DIR)/$(ECGPUWAVE_PKG) && \
 	  $(MAKE) CC="$(CC)" F77="$(F77)" \
 	    WFDB_CFLAGS="-I$(includedir)" \
