@@ -9,7 +9,7 @@ function varargout=wfdbtime(varargin)
 % Returns:
 %
 % timesStamp
-%       Nx1 vector of cell Strings representing times stamps with respect to the
+%       Nx1 vector of cell Strings representing time stamps with respect to the
 %       first sample in recordName.
 %
 % dateStamp
@@ -19,7 +19,7 @@ function varargout=wfdbtime(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -47,7 +47,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('wfdbtime');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','samples'};
 outputs={'timeStamp','dateStamp'};
 for n=1:nargin
@@ -56,7 +56,7 @@ for n=1:nargin
     end
 end
 
-%Convert all the annoation to strings and send them as arguments
+%Convert all the annotations to strings and send them as arguments
 %TODO: maybe send ast STDIN ?
 N=length(samples);
 timeStamp=cell(N,1);

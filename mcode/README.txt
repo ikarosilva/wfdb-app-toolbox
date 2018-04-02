@@ -16,7 +16,7 @@ wfdbdemo %Optional demoing of the toolbox
 
 
 -------Getting help and information about the WFDB Toolbox--------
-For a information about the Toolbox and the list of functions associated with it
+For information about the Toolbox and the list of functions associated with it
 type: 
 
 wfdb

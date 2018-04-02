@@ -7,11 +7,11 @@ function wfdbdemo()
 
 [~,config]=wfdbloadlib;
 echo on
-display('Reading samples ECG signal from MIT-BIH Arrhythmia Database')
+display('Reading ECG signal samples from MIT-BIH Arrhythmia Database')
 N=10000;
 [ecg,Fs,tm]=rdsamp('mitdb/100',1,N);
 
-display('Reading and plotting annotations (human labels) of QRS complexes performend on the signals')
+display('Reading and plotting annotations (human labels) of QRS complexes performed on the signals')
 %by cardiologists.
 [ann,type,subtype,chan,num]=rdann('mitdb/100','atr',1,N);
 
@@ -22,7 +22,7 @@ plot(tm(ann(ann<N)+1),ecg(ann(ann<N)+1),'ro');
 
 
 %Stack the ECG signals based on the labeled QRSs
-display('Ploting 3D version of signal and labels')
+display('Plotting 3D version of signal and labels')
 [RR,tms]=ann2rr('mitdb/100','atr',N);
 delay=round(0.1/tm(2));
 M=length(RR);

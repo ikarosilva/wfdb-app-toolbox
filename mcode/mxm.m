@@ -19,7 +19,7 @@ function varargout=mxm(varargin)
 %       String specifying the test WFDB annotation file.
 % 
 % reportFile
-%       String representing the file at which the report will be 
+%       String representing the file which the report will be
 %       written to.
 %
 %
@@ -64,7 +64,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('mxm');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','refAnn','testAnn','reportFile',...
     'beginTime','appendReport','mType','stopTime','normalize'};
 recName=[];

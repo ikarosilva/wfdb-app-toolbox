@@ -57,12 +57,12 @@ function varargout=wfdbdesc(varargin)
 %                    Status     status of patient or monitor
 %                    SV         stroke volume
 %                    Temp       temperature 
-%                    []         unkown class
+%                    []         unknown class
 %
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -90,7 +90,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('wfdbdesc');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName'};
 outputs={'siginfo','Fs','sigClass'};
 

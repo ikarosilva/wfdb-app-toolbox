@@ -28,7 +28,7 @@ function ecgpuwave(varargin)
 %
 % WARNING: 
 %   If ECGPUWAVE is used without providing an annotator file for the R peaks it relies on a Pan-Tompkins detector. 
-%   This detector may not be optimized for your particular signal, and thus may need to be tuned, yielding anempty annotation
+%   This detector may not be optimized for your particular signal, and thus may need to be tuned, yielding an empty annotation
 %   file. In this case, you may want to first run a QRS detector to generate an appropriate QRS annotation file, 
 %   which you can then check manually prior to calling ECGPUWAVE with the
 %   'qrsAnn' option described below.
@@ -37,7 +37,7 @@ function ecgpuwave(varargin)
 %     A patch to the original Fortran source files was provided by Roberto Sassi in
 %     order to compile ECGPUWAVE in 64-bit arch. This patch requires
 %     compiling the source code with gfortran (g77 is not supported in gcc 4.x), which can
-%     yield slighly different results. For more information please see:
+%     yield slightly different results. For more information please see:
 %           http://www.dti.unimi.it/~sassi/software/wfdb64HowTo.htm
 %
 %
@@ -70,7 +70,7 @@ function ecgpuwave(varargin)
 %      specifying the ending location.
 %
 % qrsAnn
-%       A String represengint the QRS annotation file that ECGPUWAVE should
+%       A String representing the QRS annotation file that ECGPUWAVE should
 %       use (must be in the WFDP PATH or within the current directory).
 %
 % pflag
@@ -109,7 +109,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('ecgpuwave');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','annFileName','startTime','stopTime','qrsAnn','pflag','signalList'};
 startTime=[];
 stopTime=[];

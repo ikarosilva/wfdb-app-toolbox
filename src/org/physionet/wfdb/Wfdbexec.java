@@ -292,16 +292,16 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
-		logger.finest("\n\t***Setting launcher in exectToDoubleArray");
+		logger.finest("\n\t***Setting launcher in execToDoubleArray");
 		try {
 			launcher = setLauncher();
-			logger.finest("\n\t***Launcher created sucessfully in exectToDoubleArray");
+			logger.finest("\n\t***Launcher created sucessfully in execToDoubleArray");
 		} catch (Exception e1) {
 			System.err.println("***Error in setting the system launcher:" + e1.toString());
 			e1.printStackTrace();
 		}
 		try {
-			logger.finest("\n\t***Starting launcher in exectToDoubleArray");
+			logger.finest("\n\t***Starting launcher in execToDoubleArray");
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream(),"US-ASCII"));
@@ -462,16 +462,16 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
-		logger.finest("\n\t***Setting launcher in exectToDoubleArray");
+		logger.finest("\n\t***Setting launcher in execToDoubleArray");
 		try {
 			launcher = setLauncher();
-			logger.finest("\n\t***Launcher created sucessfully in exectToDoubleArray");
+			logger.finest("\n\t***Launcher created sucessfully in execToDoubleArray");
 		} catch (Exception e1) {
 			System.err.println("***Error in setting the system launcher:" + e1.toString());
 			e1.printStackTrace();
 		}
 		try {
-			logger.finest("\n\t***Starting launcher in exectToDoubleArray");
+			logger.finest("\n\t***Starting launcher in execToDoubleArray");
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -563,16 +563,16 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
-		logger.finest("\n\t***Setting launcher in exectToFloatArray");
+		logger.finest("\n\t***Setting launcher in execToFloatArray");
 		try {
 			launcher = setLauncher();
-			logger.finest("\n\t***Launcher created sucessfully in exectToFloatArray");
+			logger.finest("\n\t***Launcher created sucessfully in execToFloatArray");
 		} catch (Exception e1) {
 			System.err.println("***Error in setting the system launcher:" + e1.toString());
 			e1.printStackTrace();
 		}
 		try {
-			logger.finest("\n\t***Starting launcher in exectToFloatArray");
+			logger.finest("\n\t***Starting launcher in execToFloatArray");
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -635,7 +635,7 @@ public class Wfdbexec {
 								tmpArr[colInd]= (float) tmpCharArr[0];
 								dataCheck++;
 							}catch(Exception e2) {
-								System.err.println("Could not convert to double: " + line);
+								System.err.println("Could not convert to float: " + line);
 								throw new Exception(e2.toString());
 							}
 						}
@@ -643,7 +643,7 @@ public class Wfdbexec {
 				}
 
 				if(results.isEmpty() && dataCheck==tmpStr.length){
-					System.err.println("Error: Cannot convert to double: ");
+					System.err.println("Error: Cannot convert to float: ");
 					System.err.println(line);
 					throw new NumberFormatException("Cannot convert");
 				}else {
@@ -708,16 +708,16 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
-		logger.finest("\n\t***Setting launcher in exectToLongArray");
+		logger.finest("\n\t***Setting launcher in execToLongArray");
 		try {
 			launcher = setLauncher();
-			logger.finest("\n\t***Launcher created sucessfully in exectToLongArray");
+			logger.finest("\n\t***Launcher created sucessfully in execToLongArray");
 		} catch (Exception e1) {
 			System.err.println("***Error in setting the system launcher:" + e1.toString());
 			e1.printStackTrace();
 		}
 		try {
-			logger.finest("\n\t***Starting launcher in exectToLongArray");
+			logger.finest("\n\t***Starting launcher in execToLongArray");
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -780,7 +780,7 @@ public class Wfdbexec {
 								tmpArr[colInd]= (long) tmpCharArr[0];
 								dataCheck++;
 							}catch(Exception e2) {
-								System.err.println("Could not convert to double: " + line);
+								System.err.println("Could not convert to long: " + line);
 								throw new Exception(e2.toString());
 							}
 						}
@@ -788,7 +788,7 @@ public class Wfdbexec {
 				}
 
 				if(results.isEmpty() && dataCheck==tmpStr.length){
-					System.err.println("Error: Cannot convert to double: ");
+					System.err.println("Error: Cannot convert to long: ");
 					System.err.println(line);
 					throw new NumberFormatException("Cannot convert");
 				}else {
@@ -854,16 +854,16 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
-		logger.finest("\n\t***Setting launcher in exectToShortArray");
+		logger.finest("\n\t***Setting launcher in execToShortArray");
 		try {
 			launcher = setLauncher();
-			logger.finest("\n\t***Launcher created sucessfully in exectToShortArray");
+			logger.finest("\n\t***Launcher created sucessfully in execToShortArray");
 		} catch (Exception e1) {
 			System.err.println("***Error in setting the system launcher:" + e1.toString());
 			e1.printStackTrace();
 		}
 		try {
-			logger.finest("\n\t***Starting launcher in exectToShortArray");
+			logger.finest("\n\t***Starting launcher in execToShortArray");
 			Process p = launcher.start();
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -926,7 +926,7 @@ public class Wfdbexec {
 								tmpArr[colInd]= (short) tmpCharArr[0];
 								dataCheck++;
 							}catch(Exception e2) {
-								System.err.println("Could not convert to double: " + line);
+								System.err.println("Could not convert to short: " + line);
 								throw new Exception(e2.toString());
 							}
 						}
@@ -934,7 +934,7 @@ public class Wfdbexec {
 				}
 
 				if(results.isEmpty() && dataCheck==tmpStr.length){
-					System.err.println("Error: Cannot convert to double: ");
+					System.err.println("Error: Cannot convert to short: ");
 					System.err.println(line);
 					throw new NumberFormatException("Cannot convert");
 				}else {

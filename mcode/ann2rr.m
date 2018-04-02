@@ -13,12 +13,12 @@ function varargout=ann2rr(varargin)
 %       interval in samples.
 %
 % tms
-%       Nx1 vector of integers representing the begining of the RR
+%       Nx1 vector of integers representing the beginning of the RR
 %       interval in samples.
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -33,11 +33,11 @@ function varargout=ann2rr(varargin)
 %       record file (default read all = N).
 % N0
 %       A 1x1 integer specifying the sample number at which to start reading the
-%       annotion file (default 1 = begining of the record).
+%       annotation file (default 1 = beginning of the record).
 %
 % consecutiveOnly
 %       A 1x1 boolean. If true, prints intervals between consecutive valid
-%       annotaions only (default =true).
+%       annotations only (default =true).
 %
 %
 % Written by Ikaro Silva, 2013
@@ -55,7 +55,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('ann2rr');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','annotator','N','N0','consecutiveOnly'};
 outputs={'data(:,2)','data(:,1)'};
 N=[];

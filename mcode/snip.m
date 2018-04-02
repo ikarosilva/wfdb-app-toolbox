@@ -20,12 +20,12 @@ function varargout=snip(varargin)
 %       the beginning of the input record.
 %
 % stopTime (Optional)
-%       Integer specifying end time of the output WFDB record. Defaut is
+%       Integer specifying end time of the output WFDB record. Default is
 %       end of input record.
 %
 % inputAnn (Optional)
 %       String specifying the annotation files to convert along with the
-%       given record. Defaults i none (empty).
+%       given record. Defaults to none (empty).
 %
 % outFormat (Optional)
 %       String specifying the output format (see http://www.physionet.org/physiotools/wag/header-5.htm).
@@ -33,8 +33,8 @@ function varargout=snip(varargin)
 %
 %Output Parameters:
 % err (Optional)
-%       String spefiying any error messages. If empty, conversion was
-%       sucessfull.
+%       String specifying any error messages. If empty, conversion was
+%       sucessful.
 %
 % Written by Ikaro Silva, 2015
 % Last Modified: -
@@ -61,7 +61,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('snip');
 end
 
-%Set default pararamter values
+%Set default parameter values
 
 inputs={'inputRecord','outputRecord','beginTime','stopTime','inputAnn','outFormat'};
 inputRecord=[];

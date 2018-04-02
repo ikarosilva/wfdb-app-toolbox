@@ -3,7 +3,7 @@ function Y=surrogate(x,M)
 % Y=surrogate(x,M)
 %
 % Generates M amplitude adjusted phase shuffled surrogate time series from x. 
-% Useufel for testing the underlying assumption that the null hypothesis consists
+% Useful for testing the underlying assumption that the null hypothesis consists
 % of linear dynamics with possibly non-linear, monotonically increasing,
 % measurement function.
 %

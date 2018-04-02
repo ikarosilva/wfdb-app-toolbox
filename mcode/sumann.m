@@ -7,12 +7,12 @@ function varargout=sumann(varargin)
 %
 % Reads a WFDB annotation file and summarize its contents.
 % 
-% Ouput Parameters:
+% Output Parameters:
 %
 % report 
-%       String with the contaning summary of the contents, including the 
+%       String containing a summary of the contents, including the
 %       number of annotations of each type as well the duration and number of 
-%      episodes of each rhythm and signal quality.
+%       episodes of each rhythm and signal quality.
 %
 %Input Parameters:
 % recName    
@@ -48,7 +48,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sumann');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','annName','stopTime','qrsAnnotationsOnly'};
 recName=[];
 annName=[];

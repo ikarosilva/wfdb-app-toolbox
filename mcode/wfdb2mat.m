@@ -6,12 +6,12 @@ function wfdb2mat(varargin)
 %         http://physionet.org/physiotools/wag/wfdb2m-1.htm
 %
 % Converts a WFDB-compatible signal file to MATLAB/Octave *.mat file.
-% The output files are recordNamem.mat and recordNamem.hea. The standard output of 
+% The output files are recordNamem.mat and recordNamem.hea. The standard output of
 % WFDB2MAT will be saved in a file recordNamem.info. 
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -55,7 +55,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('wfdb2mat');
 end
 
-%Set default pararameter values
+%Set default parameter values
 inputs={'recordName','signalList','N','N0'};
 signalList=[];
 N=[];

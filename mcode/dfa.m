@@ -72,7 +72,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('dfa');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'x','p','integrateFlag','minBoxSize','maxBoxSize','slideWindowFlag'};
 p=[];
 integrateFlag=false;

@@ -59,7 +59,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('visbility');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'x'};
 outputs={'k','logP'};
 k=[];
