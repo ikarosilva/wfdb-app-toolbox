@@ -38,7 +38,7 @@ public class Rdsamp {
 		return rawData;
 	}
 
-	//Utility functions, not be be used by other classes
+	//Utility functions, not to be used by other classes
 	private native void getData(String[] args);
 	
 	private void setBaseline(int[] newBaseline){

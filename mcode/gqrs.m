@@ -5,14 +5,14 @@ function varargout=gqrs(varargin)
 %    Wrapper to WFDB GQRS:
 %         http://www.physionet.org/physiotools/wag/gqrs-1.htm
 %
-%    Creates a SQRS annotation file  at the current MATLAB directory.
+%    Creates a SQRS annotation file at the current MATLAB directory.
 %    The detector algorithm is new and as yet unpublished.
-%    The annotation file will have the same name as the recorName file,
-%    but followed with the *.qrs suffix. Use RDANN to read the annoations
+%    The annotation file will have the same name as the recordName file,
+%    but followed with the *.qrs suffix. Use RDANN to read the annotations
 %    into MATLAB's workspace in order to read the sample QRS locations.
 %
 %    If recordName is the path to a record at PhysioNet's database, than
-%    the annation files will be stored in a subdirectory with the same relative
+%    the annotation files will be stored in a subdirectory with the same relative
 %    path as recordName and under the current directory.
 %
 %    NOTE: In order to read the generated annotation file using RDANN, it is
@@ -21,7 +21,7 @@ function varargout=gqrs(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -33,7 +33,7 @@ function varargout=gqrs(varargin)
 %       record file (default read all = N).
 % N0
 %       A 1x1 integer specifying the sample number at which to start reading the
-%       annotion file (default 1 = begining of the record).
+%       annotation file (default 1 = beginning of the record).
 %
 % signal
 %       A 1x1 integer. Specify the singal to obtain the annotation (default
@@ -45,7 +45,7 @@ function varargout=gqrs(varargin)
 %       if there are too many extra detections, increase threshold.
 %
 % outputName
-%       String. Save the ouput annotation file extension as *.outputName (default =
+%       String. Save the output annotation file extension as *.outputName (default =
 %       *.qrs).
 %
 % highResolution
@@ -76,7 +76,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('gqrs');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','N','N0','signal','threshold','outputName','highResolution'};
 N=[];
 N0=1;

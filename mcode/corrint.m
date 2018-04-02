@@ -1,6 +1,6 @@
 function varargout=corrint(varargin)
 %
-% [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighboorSize,estimationMode,findScaling)
+% [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighborSize,estimationMode,findScaling)
 %
 % Correlation integral analysis of a time series. Based on:
 %
@@ -24,8 +24,8 @@ function varargout=corrint(varargin)
 %
 % timeStep
 %       1x1 Integer specifying time lag distance (in samples) within
-%       each point used in the embeddedDimm vector. For example, if embeddedDim
-%       is 3 and timeStep =2, then the embedded dimension vector will consists of
+%       each point used in the embeddedDim vector. For example, if embeddedDim
+%       is 3 and timeStep =2, then the embedded dimension vector will consist of
 %       3 samples separated by 2 samples each, covering a window of size of 7 samples.
 %
 % distanceThreshold
@@ -34,7 +34,7 @@ function varargout=corrint(varargin)
 %       the same neighborhood and used for either prediction, recurrence, or the
 %       estimation of the embedded dimension.
 %
-% neighboorSize
+% neighborSize
 %      1x1 Integer specifying the number of neighbors to be used for
 %      prediction and smoothing (see 'estimationMode' parameter).
 %
@@ -42,16 +42,16 @@ function varargout=corrint(varargin)
 %       String specifying what analysis type to be done in the time series.
 %       Options are:
 %                       'recurrence'  -Calculates recurrence data to be used
-%                                      in for recurrence plots (default).
+%                                      for recurrence plots (default).
 %                       'dimension'   -Generates statistics for the estimation of the correlation dimension
 %                                      of the time series and it's scaling
 %                                      regions.
 %                       'prediction'  -Predicts second half of the time
 %                                      series using the first half as a model
-%                                      and neighboorSize nearest points.
-%                       'smooth'      -Predicts all point of the times
+%                                      and neighborSize nearest points.
+%                       'smooth'      -Predicts all points of the time
 %                                      series using all other points as a
-%                                      model and neighboorSize nearest
+%                                      model and neighborSize nearest
 %                                      points.
 %
 % findScaling
@@ -67,7 +67,7 @@ function varargout=corrint(varargin)
 % y1 
 %		Lx1 Vector of integers for state i.
 % y2 
-%		Lx1 Vector of integers for state state j that is a neighbor of state i (first column).
+%		Lx1 Vector of integers for state j that is a neighbor of state i (first column).
 %
 % Output Parameters - 'dimension' mode
 % y1 
@@ -88,14 +88,14 @@ function varargout=corrint(varargin)
 %
 % Output Parameters - 'smooth' mode
 % y1 
-%		Lx1 Vector of doubles of smoothed the time series. 
+%		Lx1 Vector of doubles of the smoothed time series.
 % y2 
 %		Lx1 Vector of doubles for original time series.
 % y3
 %       1x1 double. Optional, variance of the prediction error divided by variance of the time series. 
 %
 %
-% %%% Beging Example %%%
+% %%% Beginning Example %%%
 % 
 % N=500; %Number of points for each process
 % model_names={'linearModel','nonlinearModel'};
@@ -167,11 +167,11 @@ function varargout=corrint(varargin)
 %     surr_data=zeros(D,surrN);
 %     SURR=surrogate(x,surrN);
 %     for d=1:D;
-%         neighboorSize=K(d);
-%         [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighboorSize,estimationMode);
+%         neighborSize=K(d);
+%         [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighborSize,estimationMode);
 %         err(d)=y3;
 %         for s=1:surrN
-%             [y1,y2,y3]=corrint(SURR(:,s),embeddedDim,timeLag,timeStep,distanceThreshold,neighboorSize,estimationMode);
+%             [y1,y2,y3]=corrint(SURR(:,s),embeddedDim,timeLag,timeStep,distanceThreshold,neighborSize,estimationMode);
 %             surr_data(d,s)=y3;
 %         end
 %     end
@@ -202,14 +202,14 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('corrint');
 end
 
-%Set default pararamter values
-inputs={'x','embeddedDim','timeLag','timeStep','distanceThreshold','neighboorSize','estimationMode','findScaling'};
+%Set default parameter values
+inputs={'x','embeddedDim','timeLag','timeStep','distanceThreshold','neighborSize','estimationMode','findScaling'};
 outputs={'y1','y2','y3'};
 embeddedDim=[];
 timeLag=[];
 timeStep=[];
 distanceThreshold=[];
-neighboorSize=[];
+neighborSize=[];
 estimationMode='recurrence';
 findScaling=0;
 wfdb_argument={};
@@ -237,9 +237,9 @@ if(~isempty(distanceThreshold))
     wfdb_argument{end+1}='-r';
     wfdb_argument{end+1}=num2str(distanceThreshold);
 end
-if(~isempty(neighboorSize))
+if(~isempty(neighborSize))
     wfdb_argument{end+1}='-n';
-    wfdb_argument{end+1}=num2str(neighboorSize);
+    wfdb_argument{end+1}=num2str(neighborSize);
 end
 
 switch estimationMode
@@ -257,7 +257,7 @@ switch estimationMode
         wfdb_argument{end+1}='-S';
         y3=' ';
     otherwise
-        error(['Unkown estimation mode: ' estimationMode])
+        error(['Unknown estimation mode: ' estimationMode])
 end
 
 javaWfdbExec.setArguments(wfdb_argument);

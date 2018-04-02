@@ -7,14 +7,14 @@ function varargout=wfdbtool(varargin)
 %  the recordings of physiologic signals and time series in PhysioNet,
 %  together with their annotations (event markers).
 %
-%  NOTE: This tool is currently supported only in MATLAB 2013b or higher. On some system
+%  NOTE: This tool is currently supported only in MATLAB 2013b or higher. On some systems
 %      (such as Linux) the MATLAB default browser may not worker properly
 %      with LightWAVE. In this case you may want to try setting the
 %      'systemBrowser' to 1 (true).
 %
 % Required Input Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -35,7 +35,7 @@ function varargout=wfdbtool(varargin)
 % Optional Outputs are:
 %
 % stat
-%     A  returns the status of the web command in the variable STAT. STAT = 0 indicates successful execution. STAT = 1
+%     Returns the status of the web command in the variable STAT. STAT = 0 indicates successful execution. STAT = 1
 %     indicates that the browser was not found. STAT = 2 indicates that the
 %     browser was found, but could not be launched.
 %
@@ -62,7 +62,7 @@ function varargout=wfdbtool(varargin)
 
 %endOfHelp
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','N','N0','systemBrowser'};
 outputs={'stat','browser','url'};
 N=[];
@@ -106,7 +106,7 @@ else
 end
 
 
-%Send output, if anyd
+%Send output, if any
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end

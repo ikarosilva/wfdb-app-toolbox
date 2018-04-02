@@ -18,11 +18,11 @@ function varargout=lomb(varargin)
 %       that time.
 %
 % dcOffset (Optional)
-%       Booelan. If present add constant to input samples ( x(:,2) ), such that the mean
-%       values of the time series is zero (default=1).
+%       Boolean. If present add constant to input samples ( x(:,2) ), such that the mean
+%       value of the time series is zero (default=1).
 %
 % smooth   (Optional)
-%       Boolean String specifying the if the output should be smoothed (default =1).
+%       Boolean. String specifying the if the output should be smoothed (default=1).
 % 
 %
 %Output Parameters:
@@ -73,7 +73,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('lomb');
 end
 
-%Set default pararamter values
+%Set default parameter values
 %[Pxx,F]
 inputs={'x','dcOffset','smooth'};
 dcOffset=1;

@@ -2,22 +2,22 @@ function [varargout]=wfdbloadlib(varargin)
 %
 % [isloaded,config]=wfdbloadlib(debugLevel,networkWaitTime)
 %
-% Loads the WDFDB libarary if it has not been loaded already into the
+% Loads the WDFDB library if it has not been loaded already into the
 % MATLAB classpath. And optionally prints configuration environment and debug information
 % regarding the settings used by the classes in the JAR file.
 %
 % Inputs:
 %
 % debugLevel
-%       (Optional) 1x1 integer between 0 and 5 represeting the level of debug information to output from
+%       (Optional) 1x1 integer between 0 and 5 representing the level of debug information to output from
 %       Java class when output configuration information. Level 0 (no debug information),
 %       level =5 is maximum level of information output by the class (logger set to finest). Default is level 0.
 %
 % networkWaitTime
 %       (Optional) 1x1 integer representing the longest time in
-%       milliseconds  for which the JVM should wait for a data stream from
+%       milliseconds for which the JVM should wait for a data stream from
 %       PhysioNet (default is =1000  , ie one second). If you need to change this time to a
-%       longer value across the entire toolbox, it is better modify to default value in the source
+%       longer value across the entire toolbox, it is better to modify the default value in the source
 %       code below and restart MATLAB.
 %
 %
@@ -38,35 +38,35 @@ persistent isloaded wfdb_path wfdb_native_path config
 %NOTE: this parameter is completely ignored if the 'WFDB_COMMAND_PATH' parameter
 %described above is set (i.e.: the library will used the WFDB commands located
 % according to the path in 'WFDB_COMMAND_PATH'). 
-%You will need to restart MATLAB/Octave if to sync the changes.
-%The default is to used commands shipped with the toolbox, this location can be obtained by running the command:
+%You will need to restart MATLAB/Octave to sync the changes.
+%The default is to use commands shipped with the toolbox, this location can be obtained by running the command:
 %[~,config]=wfdbloadlib; config.WFDB_NATIVE_BIN
 WFDB_CUSTOMLIB=0;
 
 %WFDB_PATH: If empty, will use the default given config.WFDB_PATH
-%this is where the toolbox searches  for data files (*.dat, *.hea etc).
-%When unistalling the toolbox, you may wish to clear this directory to save space.
+%this is where the toolbox searches for data files (*.dat, *.hea etc).
+%When uninstalling the toolbox, you may wish to clear this directory to save space.
 %See http://www.physionet.org/physiotools/wag/setwfd-1.htm for more details.
 WFDB_PATH=[];
 
-%WFDBCAL: If empty, will use the default giveng confing.WFDBCAL
-%The WFDB library require calibration data in order to convert between sample values
+%WFDBCAL: If empty, will use the default given confing.WFDBCAL
+%The WFDB library requires calibration data in order to convert between sample values
 %(expressed in analog-to-digital converter units, or adus) and physical units.
 %See http://www.physionet.org/physiotools/wag/wfdbca-5.htm for more details.
 WFDBCAL=[];
 
-%CACHE: If CACHE==1, the toolbox will attemp to download data from 
-%CACHE_SOURCE to CACHE_DEST if the record is not found no the standard 
+%CACHE: If CACHE==1, the toolbox will attempt to download data from
+%CACHE_SOURCE to CACHE_DEST if the record is not found in the standard
 %WFDB PATH. Change CACHE_DEST path to a PhysioNet mirror, if you wish to
 %use a server closer to your geographical location. It is safe to delete files on
-%CACHE_SOURCE, as they can be re-downloaded if need me.
+%CACHE_SOURCE, as they can be re-downloaded if need be.
 
 CACHE=1; %Default is to use the cache system
 CACHE_SOURCE=[]; %If empty, defaults to last element of WFDB_PATH
 CACHE_DEST=[]; %If empty, defaults to WFDB_JAVA_HOME/../database
 
 
-%debugLevel: Ouput JVM information while running commands
+%debugLevel: Output JVM information while running commands
 debugLevel=0;
 
 %networkWaitTime: Setting maximum waiting period for fetching data from
@@ -105,11 +105,11 @@ if(isempty(isloaded))
     javaaddpath(wfdb_path)
     isloaded=1;
     
-    %Check if there are any empty space on the path directory, and 
+    %Check if there are any empty spaces on the path directory, and
     %issue a warning if there is
     warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
-       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
+       warning('Your WFDB Toolbox installation path contains white spaces!! This may cause issues with the WFDB Toolbox!')
        warning(['The installation path is set to: ' wfdb_path])
     end
 end
@@ -158,7 +158,7 @@ if(isempty(config))
         config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
             warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
-       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
+       warning('Your WFDB Toolbox installation path contains white spaces!! This may cause issues with the WFDB Toolbox!')
     end
     
     %Set CACHE configurations
@@ -186,7 +186,7 @@ if(isempty(config))
     config.CACHE_DEST=CACHE_DEST;   
     config.CACHE=CACHE; 
     
-    %Set enviroment variables used by WFBD
+    %Set environment variables used by WFBD
     setenv('WFDB',config.WFDB_PATH);
     setenv('WFDBCAL',config.WFDBCAL);
 end

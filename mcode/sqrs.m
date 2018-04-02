@@ -6,12 +6,12 @@ function varargout=sqrs(varargin)
 %         http://www.physionet.org/physiotools/wag/sqrs-1.htm
 %
 %    Creates a SQRS annotation file  at the current MATLAB directory.
-%    The annotation file will have the same name as the recorName file,
-%    but followed with the *.qrs suffix. Use RDANN to read the annoations
+%    The annotation file will have the same name as the recordName file,
+%    but followed with the *.qrs suffix. Use RDANN to read the annotations
 %    into MATLAB's workspace in order to read the sample QRS locations.
 %
 %    If recordName is the path to a record at PhysioNet's database, than
-%    the annation files will be stored in a subdirectory with the same relative 
+%    the annotation files will be stored in a subdirectory with the same relative
 %    path as recordName and under the current directory.
 %
 %    NOTE: In order to read the generated annotation file using RDANN, it is
@@ -20,7 +20,7 @@ function varargout=sqrs(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -32,7 +32,7 @@ function varargout=sqrs(varargin)
 %       record file (default read all = N).
 % N0 
 %       A 1x1 integer specifying the sample number at which to start reading the 
-%       annotion file (default 1 = begining of the record).
+%       annotation file (default 1 = beginning of the record).
 %
 % signal
 %       A 1x1 integer. Specify the singal to obtain the annotation (default
@@ -63,7 +63,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sqrs');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','annotator','N','N0','signal','threshold'};
 N=[];
 N0=1;

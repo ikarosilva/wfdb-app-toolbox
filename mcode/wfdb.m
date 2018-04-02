@@ -1,7 +1,7 @@
 function wfdb
 % wfdb
 %
-%Display list of all function available for the WFDB App Toolbox.
+%Display list of all functions available for the WFDB App Toolbox.
 % 
 %Since 0.0.1
 %

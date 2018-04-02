@@ -21,7 +21,7 @@ function varargout=rdann(varargin)
 %
 % anntype
 %       Nx1 character vector describing the annotation types.
-%       For a list of standard annotation codes used by PhyioNet, see:
+%       For a list of standard annotation codes used by PhysioNet, see:
 %             http://www.physionet.org/physiobank/annotations.shtml
 %
 % subtype
@@ -39,7 +39,7 @@ function varargout=rdann(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -56,7 +56,7 @@ function varargout=rdann(varargin)
 %       record file. Default read all.
 % N0
 %       A 1x1 integer specifying the sample number at which to start reading the
-%       annotion file. Default = 1, begining of the record.
+%       annotation file. Default = 1, beginning of the record.
 %
 % AT
 %       The anntype character. Return only annotations with subtype = S. 
@@ -104,7 +104,7 @@ if(isempty(javaWfdbExec))
     [~,config]=wfdbloadlib;
 end
 
-%Set default pararamter values
+%Set default parameter values
 % [ann, anntype, subtype, chan, num, comments] = rdann(recordName, annotator, C, N, N0, AT)
 inputs={'recordName','annotator','C','N','N0','AT'};
 outputs={'ann','anntype','subtype','chan','num','comments'};

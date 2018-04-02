@@ -1,6 +1,6 @@
 function varargout=rdsamp(varargin)
 %
-% [signal,Fs,tm]=rdsamp(recordName,signaList,N,N0,rawUnits,highResolution)
+% [signal,Fs,tm]=rdsamp(recordName,signalList,N,N0,rawUnits,highResolution)
 %
 %    Wrapper to WFDB RDSAMP:
 %         http://www.physionet.org/physiotools/wag/rdsamp-1.htm
@@ -18,7 +18,7 @@ function varargout=rdsamp(varargin)
 %       1xM Double, sampling frequency in Hz of all the signals in the
 %       record.
 %
-%% tm   (Optional)
+% tm   (Optional)
 %       Nx1 vector of doubles representing the sampling intervals.
 %       Depending on input flags (see below), this vector can either be a
 %       vector of integers (sampling number), or a vector of elapsed time
@@ -26,7 +26,7 @@ function varargout=rdsamp(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -49,7 +49,7 @@ function varargout=rdsamp(varargin)
 %       according to the following values:
 %               rawUnits=0 - Uses Java Native Interface to directly fetch  data, returning signal in physical units with double precision.
 %               rawUnits=1 -returns tm ( millisecond precision only! ) and signal in physical units with 64 bit (double) floating point precision
-%               rawUnits=2 -returns tm ( millisecond precision only! ) and signal in physical units with 32 bit (single) floating point  precision
+%               rawUnits=2 -returns tm ( millisecond precision only! ) and signal in physical units with 32 bit (single) floating point precision
 %               rawUnits=3 -returns both tm and signal as 16 bit integers (short). Use Fs to convert tm to seconds.
 %               rawUnits=4 -returns both tm and signal as 64 bit integers (long). Use Fs to convert tm to seconds.
 %
@@ -71,7 +71,7 @@ function varargout=rdsamp(varargin)
 %%Example 2-Read 1000 samples from 3 signals
 %[signal,Fs,tm]=rdsamp('mghdb/mgh001', [1 3 5],1000);
 %
-%%%Example 3- Read 1000 samples from 3 signlas in single precision format
+%%%Example 3- Read 1000 samples from 3 signals in single precision format
 %[signal,Fs,tm]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
 %
 %
@@ -88,7 +88,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('rdsamp');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','signalList','N','N0','rawUnits','highResolution'};
 outputs={'signal','Fs','tm'};
 signalList=[];
@@ -174,7 +174,7 @@ if(highResolution && (rawUnits ~=0))
 end
 
 if(~isempty(N))
-    %Its is possible where this is not true in rare cases where
+    %It is possible that this is not true in rare cases where
     %there is no signal length information on the header file
     wfdb_argument{end+1}='-t';
     wfdb_argument{end+1}=['s' num2str(N)];
@@ -192,7 +192,7 @@ switch rawUnits
     case 0
         %Use Java Native Interface wrapper
         %try
-            %Channeles are returned in interleaved fashion, in a single
+            %Channels are returned in interleaved fashion, in a single
             %array
             data=double(conv_matrix(javaWfdbRdsamp.exec(wfdb_argument)));
         %catch
@@ -257,7 +257,7 @@ if(rawUnits ~=0)
     signal=data(:,2:end);
     if(nargout>2)
         tm=data(:,1);
-        Fstest=1/(tm(2)-tm(1)); %Not exatly accurate because tm is accurate only the millisecond
+        Fstest=1/(tm(2)-tm(1)); %Not exactly accurate because tm is accurate only to the millisecond
     else
         Fstest=Fs;
     end

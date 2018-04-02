@@ -12,15 +12,15 @@ function varargout=wfdbexec(varargin)
 % output into a useful MATLAB numerical variable.
 %
 % WFDBEXEC is useful in cases where a specific command, or feature for a
-% command, is not yet in implemented in the MATLAB wrapper. This function
+% command, is not yet implemented in the MATLAB wrapper. This function
 % may be useful for those wishing to do some debugging or performance comparisons.
 %
-% The user should be very carefull when using this command. The user should
+% The user should be very careful when using this command. The user should
 % be familiar with the input and output arguments of the native command
 % that he/she is using. In some cases, information about the command can be
-% obtained by running the command by itself, of with either '-h',
+% obtained by running the command by itself, with either '-h',
 % '-help','--help' as input arguments in order to access the command help
-% information. Offcourse, you can also look at the man page or source code
+% information. Of course, you can also look at the man page or source code
 % for the command at http://www.physionet.org/.
 %
 %
@@ -28,7 +28,7 @@ function varargout=wfdbexec(varargin)
 %Required Parameters:
 %
 % commandName
-%       String specifying the command to be called. To ge a list of
+%       String specifying the command to be called. To get a list of
 %       available WFDB commands that may be runnable by system calls run
 %       this function by itself:
 %               [nativeCommands]=wfdbexec();
@@ -37,14 +37,14 @@ function varargout=wfdbexec(varargin)
 %       Cell array of strings specifying the inputArguments to the command.
 %       Each command flag is an element on the cell array. Command flags
 %       that require additional parameters should be followed by another
-%       String element with the requied parameter(s). In cases you are
-%       usign a command that is already implemente in a MATLAB wrapper, it
+%       String element with the required parameter(s). In cases where you are
+%       using a command that is already implemented in a MATLAB wrapper, it
 %       maybe helpful to look at that command's MATLAB code.
 %
 %Optional Parameters:
 %
 %       logLevel
-%       1x1 integer that specifies the logleve (verbosity) of the execution process.
+%       1x1 integer that specifies the loglevel (verbosity) of the execution process.
 %       Options are:
 %                     0 OFF (Default)
 %                     1 SEVERE

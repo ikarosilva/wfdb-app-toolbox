@@ -1,10 +1,10 @@
  function varargout=getWfdbClass(varargin)
 %
-% wfdbClass=getWfdbClass(comandName)
+% wfdbClass=getWfdbClass(commandName)
 %
 % Returns a 'wfdbClass' Java object defined my the string 'commandName' with system
 % wide run time settings defined by the toolbox WFDBLOALIB file. This class will
-% execute the WFDB native binary associate with 'commandName'.
+% execute the WFDB native binary associated with 'commandName'.
 %
 % Written by Ikaro Silva, November 23, 2013
 %         Last Modified: January 16, 2014

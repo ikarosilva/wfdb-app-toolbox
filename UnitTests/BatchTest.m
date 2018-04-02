@@ -1,7 +1,7 @@
 %Perform batch testing of the main functionalities of the WFBD App Toolbox
 clear all;close all;clc
 
-%The test generates and remove temporary files, so it is best run in at  a
+%The test generates and removes temporary files, so it is best run it in a
 %specific directory.
 total=0;
 total_failed=0;
@@ -19,7 +19,7 @@ M=length(test_suite);
 display(['***Running ' num2str(M) ' test suites...']);
 
 
-%Start with the installation test, provide a good initial assesment.
+%Start with the installation test, provides a good initial assessment.
 failed={};
 for m=1:M
     fprintf(['Testing Suite (%s/%s):  %s() ...\n'],num2str(m), num2str(M),test_suite{m});

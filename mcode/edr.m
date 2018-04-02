@@ -16,9 +16,6 @@ function y=edr(varargin)
 %       A Nx1 integer array containing the ECG signal in mV (if data_type=0)
 %       OR a char string containing record name (if data_type=1)
 %
-% fs
-%       A 1x1 integer specifying the sampling frequency in hz (for Matlab variables only)
-%
 % r_peaks
 %
 %       A Mx1 integer array containing locations of r peaks on signal in s
@@ -27,11 +24,8 @@ function y=edr(varargin)
 %
 % optional parameters:
 %
-% gain_ecg
-%       A 1x1 integer specifying dig_max/phy_max (default=1)
-%
-% channel
-%       A 1x1 integer>1 (default=1) indicating ECG channel (if data_type=1)
+% fs
+%       A 1x1 integer specifying the sampling frequency in hz (for Matlab variables only)
 %
 % pqoff
 %       A 1x1 integer>0 specifying average distance between PQ junction and
@@ -40,6 +34,12 @@ function y=edr(varargin)
 % jpoff
 %       A 1x1 integer>0 specifying average distance between R peak and
 %       J point, in samples
+%
+% gain_ecg
+%       A 1x1 integer specifying dig_max/phy_max (default=1)
+%
+% channel
+%       A 1x1 integer>1 (default=1) indicating ECG channel (if data_type=1)
 %
 % show
 %       A 1x1 boolean if true, generates a plot of the estimated
@@ -89,7 +89,7 @@ function y=edr(varargin)
 
 
 
-%Set default pararameter values
+%Set default parameter values
 inputs={'data_type','signal','r_peaks','fs','pqoff','jpoff', 'gain_ecg', 'channel' ,'show'};
 show=0;
 Ninputs=length(inputs);

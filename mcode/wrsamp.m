@@ -6,7 +6,7 @@ function varargout=wrsamp(varargin)
 %         http://www.physionet.org/physiotools/wag/wrsamp-1.htm
 %
 % Writes data into a WFDB compatible *.dat and *.hea files. The files will be saved at
-% the current directory (if the record is in the current directory) or, if a using 
+% the current directory (if the record is in the current directory) or, if using
 % a PhysioNet web record , a subdirectory in the current directory, with 
 % the relative path determined by recordName. You can use RDSAMP to
 % verify that the write was completed successfully (see example below). For
@@ -79,7 +79,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wrsamp');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'tm','data','fileName','Fs','gain','format'};
 Fs=[];
 gain=[];

@@ -92,7 +92,7 @@ if(nargin>1)
 end
 
 
-%Call repective averaging technique
+%Call respective averaging technique
 switch est_mthd
     
     case 'woody'
@@ -118,7 +118,7 @@ switch est_mthd
             end
                       
             %Get woody average from the subaverages
-            %procedure converges when there is no lag changes
+            %procedure converges when there are no lag changes
             y=gen_subave(x,ind); %Generate sub averages
             y_old=y;
             err=1;
@@ -139,7 +139,7 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%End of Maing Function%%%%%%%%
+%%%%%End of Main Function%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

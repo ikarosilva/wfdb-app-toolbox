@@ -51,7 +51,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sortann');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','annName','beginTime','stopTime','outFile'};
 recName=[];
 annName=[];

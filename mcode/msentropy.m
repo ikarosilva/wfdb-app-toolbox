@@ -5,7 +5,7 @@ function varargout=msentropy(varargin)
 %    Wrapper to the Multiscale Entropy C code written by Madalena Costa (mcosta@fas.harvard.edu):
 %         http://physionet.org/physiotools/mse/mse-1.htm
 %
-% Calculates the multi scale entropy of a signal 'x'. A tutorial on Mulsticale
+% Calculates the multi scale entropy of a signal 'x'. A tutorial on Multiscale
 % entropy is available at:
 % http://www.physionet.org/physiotools/mse/tutorial/
 %
@@ -24,7 +24,7 @@ function varargout=msentropy(varargin)
 % Required Parameters:
 %
 % x
-%       Nx1 vector of doubles in which to caculate the multiscale entropy.
+%       Nx1 vector of doubles in which to calculate the multiscale entropy.
 %
 % Optional Parameters are:
 % dn
@@ -59,7 +59,7 @@ function varargout=msentropy(varargin)
 %       estimated.
 %
 % info
-%       An optional 3x1 cell array of strings providing loggin and verbose information from
+%       An optional 3x1 cell array of strings providing logging and verbose information from
 %       the calculation.
 %
 % Wrapper written by Ikaro Silva, 2013
@@ -91,7 +91,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('mse');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'x','dn','dm','dr','N','N0','minM','maxM','maxScale','minR','maxR'};
 outputs={'y','scale','info'};
 dn=[];

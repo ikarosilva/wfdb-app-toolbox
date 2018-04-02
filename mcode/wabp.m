@@ -43,7 +43,7 @@ function varargout=wabp(varargin)
 %       (first sample) and N (last sample).
 %
 % stopTime (Optional)
-%       String or integer specifying the begin time. If string, it should be
+%       String or integer specifying the stop time. If string, it should be
 %       in WFDB time format, if it is an integer, should be between 1
 %       (first sample) and N (last sample).
 %
@@ -84,7 +84,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec]=getWfdbClass('wabp');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','beginTime','stopTime','resample','signal'};
 beginTime=[];
 stopTime=[];

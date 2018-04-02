@@ -4,7 +4,7 @@ function [varargout]=test_wrapper(varargin)
 %
 % Written by Ikaro Silva, 2013
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'test_string','clean_up','verbose'};
 outputs={'tests','pass','performance'};
 

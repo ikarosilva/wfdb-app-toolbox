@@ -145,9 +145,9 @@ switch ButtonName,
 end % switch
 
 
-set(handles.RecorListMenu,'String',records)
+set(handles.RecordListMenu,'String',records)
 current_record=current_tmp;
-set(handles.RecorListMenu,'Value',current_record)
+set(handles.RecordListMenu,'Value',current_record)
 if(isWorkspace==0)
     loadRecord(records{current_record},handles);
     loadAnnotationList(records{current_record},handles);
@@ -174,14 +174,14 @@ function PreviousButton_Callback(hObject, eventdata, handles)
 global current_record records
 
 current_record=current_record - 1;
-set(handles.RecorListMenu,'Value',current_record);
+set(handles.RecordListMenu,'Value',current_record);
 Refresh(hObject, eventdata, handles)
 
 
 function NextButton_Callback(hObject, eventdata, handles)
 global current_record records
 current_record=current_record + 1;
-set(handles.RecorListMenu,'Value',current_record);
+set(handles.RecordListMenu,'Value',current_record);
 Refresh(hObject, eventdata, handles)
 
 
@@ -215,16 +215,16 @@ end
 delete(handles.figure1)
 
 
-% --- Executes on selection change in RecorListMenu.
-function RecorListMenu_Callback(hObject, eventdata, handles)
+% --- Executes on selection change in RecordListMenu.
+function RecordListMenu_Callback(hObject, eventdata, handles)
 
 global current_record records
-current_record=get(handles.RecorListMenu,'Value');
+current_record=get(handles.RecordListMenu,'Value');
 Refresh(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function RecorListMenu_CreateFcn(hObject, eventdata, handles)
+function RecordListMenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
@@ -664,7 +664,7 @@ switch(annStr{index})
         N=length(x);
         
         %Get annotation info (which will be the same for multiple
-        %annotations
+        %annotations)
         [annType,annSubtype,annChan,annNum,annComments]=getAnnFields();
         for n=1:N
             %[~,tmp_ind]=min(abs(x(n)-samp));
@@ -738,7 +738,7 @@ switch(annStr{index})
         %Refresh annotation plot
         wfdbplot(handles)
         
-    case 'Add annotations in a range from Ann2 to Ann2'
+    case 'Add annotations in a range from Ann2 to Ann1'
         
         if(tips)
             helpdlg('Left click on waveform to select start and end of region to add from Ann2 to Ann1. Hit Enter when done.','Adding Annotations');
@@ -846,7 +846,7 @@ else
             catch
                 errordlg(lasterr)
             end
-        case 'Spectogram Analysis'
+        case 'Spectrogram Analysis'
             [analysisSignal,analysisTime,analysisYAxis,analysisUnits]=wfdbSpect(analysisSignal,Fs);
         case 'Wavelets Analysis'
             [analysisSignal,analysisYAxis,analysisUnits]=wfdbWavelets(analysisSignal,Fs);
@@ -1292,7 +1292,7 @@ if(isempty(dlgParam))
     dlgParam.maxY= floor(Fs/2);
     dlgParam.noverlap=round(dlgParam.window/2);
     dlgParam.map='jet';
-    dlgParam.name='Spectogram Parameters';
+    dlgParam.name='Spectrogram Parameters';
     dlgParam.numlines=1;
 end
 
@@ -1308,7 +1308,7 @@ if(isempty(answer))
     return;
 end
 
-h = waitbar(0,'Calculating spectogram. Please wait...');
+h = waitbar(0,'Calculating spectrogram. Please wait...');
 dlgParam.window= str2num(answer{1});
 dlgParam.noverlap= str2num(answer{2});
 analysisYAxis.minY= str2num(answer{3});
@@ -1378,8 +1378,8 @@ if(isempty(dlgParam))
     dlgParam.M=['1:' num2str(size(signal,2))];
     dlgParam.P='1';
     dlgParam.prompt={'Indices of signals to include in PCA:',...
-        'Selecta a Principal Component (equal or less than the number of indices above):'};
-    dlgParam.name='Parameters for ploting principal component';
+        'Select a Principal Component (equal or less than the number of indices above):'};
+    dlgParam.name='Parameters for plotting principal component';
     dlgParam.numlines=1;
 end
 

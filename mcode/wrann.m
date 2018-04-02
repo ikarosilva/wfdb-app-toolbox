@@ -6,7 +6,7 @@ function varargout=wrann(varargin)
 %         http://www.physionet.org/physiotools/wag/wrann-1.htm
 %
 % Writes data into a WFDB annotation file. The file will be saved at the
-% current directory (if the record is in the current directory) or, if a using
+% current directory (if the record is in the current directory) or, if using
 % a PhysioNet web record , a subdirectory in the current directory, with
 % the relative path determined by recordName. The files will have the
 % name 'recordName" with the 'annotator' extension. You can use RDANN to
@@ -32,11 +32,11 @@ function varargout=wrann(varargin)
 %
 % ann
 %       Nx1 integer vector containing the sample numbers of the annotations
-%       with respect to the begining of the record. Samples must be >=1.
+%       with respect to the beginning of the record. Samples must be >=1.
 %
 % anntype
 %       Nx1 (single) character vector, or single character, describing each annotation type. 
-%       Default is 'N'. For a list of standard annotation codes used by PhyioNet, 
+%       Default is 'N'. For a list of standard annotation codes used by PhysioNet,
 %       please see: http://www.physionet.org/physiobank/annotations.shtml
 %       If the description is longer than one character, use the 'comments'
 %       field.
@@ -92,7 +92,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wrann');
 end
 
-% Set default pararamter values
+% Set default parameter values
 inputs={'recordName','annotator','ann','annType','subType','chan','num','comments'};
 annType='N';
 subType=0;
@@ -117,7 +117,7 @@ if (min(ann)<0)
 end
 N=length(ann);
 
-% Convert all the annoation to 0 based index and then to strings
+% Convert all the annotations to 0 based index and then to strings
 ann=ann-1;
 ann=num2str(reshape(ann, [], 1));
 

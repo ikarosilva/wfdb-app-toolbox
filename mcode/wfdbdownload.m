@@ -3,19 +3,19 @@ function  varargout=wfdbdownload(varargin)
 % [success,files_saved]=wfdbdownload(recordName)
 %
 % Downloads a WFDB record with recordName 
-% and associated files from PhysioNet server and store is on the WFB Toolbox
+% and associated files from PhysioNet server and store it in the WFB Toolbox
 % cache directory.
 %
-% The toolbox cache directory is determined by the foolowing toolbox
-% configuation parameters obtained by running:
+% The toolbox cache directory is determined by the following toolbox
+% configuration parameters obtained by running:
 %  
 %  [~,config]=wfdbloadlib;
 %  
-%  config.CACHE     -Boolean. If true this wfdbdownlaod will attempt to
+%  config.CACHE     -Boolean. If true this wfdbdownload will attempt to
 %                   download record
 %
-%  config.CACHE_DEST -Destion of the cached files on the user's system.
-%                     It shoudl be safe to delete the cached files, they
+%  config.CACHE_DEST -Destination of the cached files on the user's system.
+%                     It should be safe to delete the cached files, they
 %                     can be re-obtained when CACHE==1.
 % 
 %  config.CACHE_SOURCE -Source of the cached files (default is PhysioNet's 
@@ -47,7 +47,7 @@ function  varargout=wfdbdownload(varargin)
 %endOfHelp
 
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName'};
 outputs={'success','files_saved'};
 success=0;
@@ -64,7 +64,7 @@ if(isempty(config))
     [~,config]=wfdbloadlib;
 end
 
-%Check if file exist  already, if exists in CACHE, exit
+%Check if file exists already, if exists in CACHE, exit
 file_info=dir([config.CACHE_DEST recordName '.*']);
 ind=findstr(recordName,'/'); %If empty, not in PhysioBank DB format
 

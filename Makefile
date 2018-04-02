@@ -13,7 +13,7 @@ ANT = ant
 
 #Always check that this matches with Ant's script (jarbuild.xml),
 #with the loading function wfdbloadlib.m , and with Contents.m
-#There is really no reason by the *.jar and *.zip should need to have the same
+#There is really no reason why the *.jar and *.zip should need to have the same
 #version numbers, as they are really modular...But for now we keep them at the same
 #versioning level in order to avoid (or increase?) confusion.
 VERSION=0-10-0
