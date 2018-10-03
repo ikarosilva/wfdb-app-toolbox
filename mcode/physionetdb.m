@@ -115,7 +115,7 @@ else
         for i=1:Nstr
             if(DoBatchDownload)
                 recName=rec_list{i};
-                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
+                display(['Downloading record (' num2str(i+1) ' / ' num2str(Nstr) ') : ' recName])
                 [success,files_saved]=wfdbdownload([db_name '/' recName]);
             end
         end
