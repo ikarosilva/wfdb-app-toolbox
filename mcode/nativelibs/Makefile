@@ -100,7 +100,7 @@ all: curl wfdb mse edr ecgpuwave dfa librdsampjni
 ## GNU/Linux (x86_64) binaries: built on Debian wheezy
 ##  * make, gcc, gfortran, gcj-jdk
 install-linux:
-	schroot -cwfdb-toolbox-build $(MAKE) install host=linux
+	schroot -p -cwfdb-toolbox-build $(MAKE) install host=linux
 	$(MAKE) installclean host=linux
 clean-linux:
 	$(MAKE) clean host=linux
