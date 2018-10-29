@@ -23,11 +23,15 @@ rm -rf $builddir
 git clone --branch $branch --depth 1 $repo $builddir
 
 cd $builddir
+export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+strip_nondeterminism="strip-nondeterminism -T${SOURCE_DATE_EPOCH}"
 
-git archive --prefix=wfdb-app-toolbox-$version/ HEAD | gzip -c -9 > $outdir/$package.tar.gz
+git archive --prefix=wfdb-app-toolbox-$version/ HEAD \
+    | gzip -c -9 -n > $outdir/$package.tar.gz
 
 # FIXME: use wfdb-toolbox-build chroot for this
-schroot -cjessie make jar7 &> jar7.log
+schroot -p -cjessie make jar7 &> jar7.log
+$strip_nondeterminism mcode/*.jar
 
 $make -C mcode/nativelibs download &> download.log
 
@@ -35,5 +39,10 @@ $make -C mcode/nativelibs download &> download.log
 
 $make -C mcode/nativelibs install-linux install-windows install-macosx &> nativelibs.log
 
+x86_64-apple-darwin9-strip -S mcode/nativelibs/macosx/bin/ecgpuwave
+x86_64-apple-darwin9-strip -S mcode/nativelibs/macosx/lib/librdsampjni.dylib
+x86_64-apple-darwin9-strip -S mcode/nativelibs/macosx/lib/libwfdb.10.dylib
+
 make package APP_NAME=wfdb-app-toolbox-$version.zip
+$strip_nondeterminism $package.zip
 mv $package.zip $outdir/

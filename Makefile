@@ -52,10 +52,10 @@ package: jar7 doc unit-test.zip
 	  < mcode/wfdbloadlib.m > mcode/wfdbloadlib.m.tmp; \
 	 mv -f mcode/wfdbloadlib.m.tmp mcode/wfdbloadlib.m; \
 	fi
-	zip -r $(APP_NAME) mcode -x@zipexclude.lst
+	zip -X -r $(APP_NAME) mcode -x@zipexclude.lst
 
 unit-test.zip:
-	zip -r $@ UnitTests -x@zipexclude.lst
+	zip -X -r $@ UnitTests -x@zipexclude.lst
 
 check:
 	set -e; unset DISPLAY; mcodedir=`pwd`/mcode; \
