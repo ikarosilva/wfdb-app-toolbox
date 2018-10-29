@@ -15,6 +15,9 @@
 *.class
 *.zip
 *.jar
+fort.6
+fort.20
+fort.21
 /mcode/nativelibs/*.c
 /mcode/nativelibs/*.tar.gz
 /mcode/nativelibs/*/bin/*
