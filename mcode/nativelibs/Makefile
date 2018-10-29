@@ -262,8 +262,8 @@ $(BUILD_DIR)/wfdb.isconfig: $(WFDB_ARCHIVE) $(BUILD_DIR)/curl.isbuilt
 	    --libdir=$(libdir) \
 	    --without-xview \
 	    --with-libcurl )
-	sed -e "s/ DBDIR//" -i $(BUILD_DIR)/$(WFDB_PKG)/lib/wfdblib.h0
-	sed -e "s, /usr/database,," -i $(BUILD_DIR)/$(WFDB_PKG)/checkpkg/expected/lcheck.log-NETFILES
+	sed -e "s/ DBDIR//" -i- $(BUILD_DIR)/$(WFDB_PKG)/lib/wfdblib.h0
+	sed -e "s, /usr/database,," -i- $(BUILD_DIR)/$(WFDB_PKG)/checkpkg/expected/lcheck.log-NETFILES
 	touch $(BUILD_DIR)/wfdb.isconfig
 $(BUILD_DIR)/wfdb.isbuilt: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/wfdb.isbuilt: $(BUILD_DIR)/wfdb.isconfig
