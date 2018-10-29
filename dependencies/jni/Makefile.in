@@ -30,7 +30,7 @@ all: librdsampjni.la
 check: librdsampjni.la
 	rm -rf test.jar nativelibs
 	jar cf test.jar -C $(classdir) .
-	make install libdir=`pwd`/nativelibs/custom/lib
+	$(MAKE) install libdir=`pwd`/nativelibs/custom/lib
 	$(JAVA) -cp test.jar org.physionet.wfdb.jni.Rdsamp -r 100s -t s10 > 100s.out
 	diff 100s.out $(srcdir)/100s.expected
 

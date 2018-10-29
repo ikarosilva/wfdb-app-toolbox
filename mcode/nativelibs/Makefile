@@ -268,9 +268,9 @@ $(BUILD_DIR)/wfdb.isconfig: $(WFDB_ARCHIVE) $(BUILD_DIR)/curl.isbuilt
 $(BUILD_DIR)/wfdb.isbuilt: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/wfdb.isbuilt: $(BUILD_DIR)/wfdb.isconfig
 	( cd $(BUILD_DIR)/$(WFDB_PKG) && \
-	  make install CC="$(CC) -I$(includedir) -L$(libdir)" \
+	  $(MAKE) install CC="$(CC) -I$(includedir) -L$(libdir)" \
 	    RPATHFLAGS= )
-	[ -n "$(nocheck)" ] || ( cd $(BUILD_DIR)/$(WFDB_PKG) && make check )
+	[ -n "$(nocheck)" ] || ( cd $(BUILD_DIR)/$(WFDB_PKG) && $(MAKE) check )
 	rm -f $(bindir)/psfd \
 	      $(bindir)/hrmem \
 	      $(bindir)/hrfft \
