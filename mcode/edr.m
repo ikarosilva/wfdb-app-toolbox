@@ -137,7 +137,6 @@ elseif data_type==1 %wfdb record
         fs=fs(channel);
     end
     % read the header
-    signal
     siginfo=wfdbdesc(signal);
     siginfo=siginfo(:,channel);
     gainstring=siginfo.Gain;
