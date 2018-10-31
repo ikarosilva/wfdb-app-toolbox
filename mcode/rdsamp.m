@@ -269,7 +269,7 @@ end
 %because it may not be for multiresolution signals
 if(length(signalList)==1 && rawUnits<3 && (rawUnits ~= 0) )
     err=abs(Fs-Fstest);
-    if(err>1)siginfo
+    if(err>1)
         warning([ 'Sampling frequency maybe incorrect! ' ...
             'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)]);
         Fs=Fstest;
