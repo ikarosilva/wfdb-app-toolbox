@@ -92,7 +92,7 @@ if(isempty(db_name))
         varargout(1)={db_list};
     else
         if(webBrowser)
-            web([PHYSIONET_URL 'DBS'])
+            web([PHYSIONET_URL 'DBS']);
         else
             for i=0:double(list.size)-1
                 fprintf(char(list.get(i).getDBInfo));
@@ -103,11 +103,11 @@ if(isempty(db_name))
 else
     if(DoBatchDownload)
         display(['Making directory: ' db_name ' to store record files']);
-        mkdir(db_name)
+        mkdir(db_name);
     end
     rec_list={};
     if(webBrowser)
-        web([PHYSIONET_URL 'pbi/' db_name])
+        web([PHYSIONET_URL 'pbi/' db_name]);
     else
         rec_list=deblank(urlread([PHYSIONET_URL db_name '/RECORDS']));
         rec_list=regexp(rec_list,'\s','split');

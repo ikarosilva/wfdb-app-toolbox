@@ -28,7 +28,7 @@ function [varargout]=wfdbloadlib(varargin)
 %
 
 %endOfHelp
-mlock
+mlock;
 persistent isloaded wfdb_path wfdb_native_path config
 
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
@@ -102,7 +102,7 @@ if(isempty(isloaded))
     end
     %Check if path has not been added yet
     wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-10-0.jar'];
-    javaaddpath(wfdb_path)
+    javaaddpath(wfdb_path);
     isloaded=1;
     
     %Check if there are any empty space on the path directory, and 

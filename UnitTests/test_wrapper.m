@@ -24,7 +24,7 @@ for n=1:tests
         if(verbose)
            display(test_string{n});
         end
-        tic
+        tic;
         eval(test_string{n});
         performance(n)=toc;
         if(~isempty(clean_up) && ~isempty(clean_up{n}))
@@ -43,7 +43,7 @@ for n=1:tests
         end
     end
 end
-cd(cur_dir)
+cd(cur_dir);
 for n=1:nargout
         eval(['varargout{n}=' outputs{n} ';']);
 end

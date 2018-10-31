@@ -14,7 +14,7 @@
 
 %endOfHelp
 
-mlock
+mlock;
 persistent config
 if(isempty(config))
     %Add classes to dynamic path

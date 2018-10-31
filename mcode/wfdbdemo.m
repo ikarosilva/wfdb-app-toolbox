@@ -6,7 +6,7 @@ function wfdbdemo()
 %
 
 [~,config]=wfdbloadlib;
-echo on
+echo on;
 display('Reading samples ECG signal from MIT-BIH Arrhythmia Database');
 N=10000;
 [ecg,Fs,tm]=rdsamp('mitdb/100',1,N);
@@ -68,4 +68,4 @@ fprintf(['\tYou currently have access to ' num2str(db_size) ' databases for down
 
 display('Demoing finished !!');
 display('For more information about the toolbox, type ''wfdb'' at the command prompt.');
-echo off
+echo off;
