@@ -32,7 +32,7 @@ for n=1:tests
               eval(clean_up{n});
             catch
               display('Clean up failed: ')
-              warning(lasterr)
+              warning(lasterr);
             end
         end
         pass=pass+1;

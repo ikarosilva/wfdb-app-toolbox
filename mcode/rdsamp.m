@@ -141,7 +141,7 @@ if(isempty(N) && (rawUnits ~=0))
     if(~isempty(siginfo))
         N=siginfo(1).LengthSamples;
     else
-        warning('Could not get signal information. Attempting to read signal without buffering.')
+        warning('Could not get signal information. Attempting to read signal without buffering.');
     end
 end
 
@@ -271,7 +271,7 @@ if(length(signalList)==1 && rawUnits<3 && (rawUnits ~= 0) )
     err=abs(Fs-Fstest);
     if(err>1)siginfo
         warning([ 'Sampling frequency maybe incorrect! ' ...
-            'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)])
+            'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)]);
         Fs=Fstest;
     end
 end
@@ -289,7 +289,7 @@ for n=1:nargout
     end
     if(~isempty(ListCapacity) && ~isnan(ListCapacity) )
         if((ListCapacity) ~= N )
-            warning(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity)])
+            warning(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity)]);
         end
     end
 end

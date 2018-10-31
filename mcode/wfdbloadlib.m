@@ -109,8 +109,8 @@ if(isempty(isloaded))
     %issue a warning if there is
     warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
-       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
-       warning(['The installation path is set to: ' wfdb_path])
+       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!');
+       warning(['The installation path is set to: ' wfdb_path]);
     end
 end
 
@@ -158,7 +158,7 @@ if(isempty(config))
         config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
             warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
-       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
+       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!');
     end
     
     %Set CACHE configurations
@@ -167,7 +167,7 @@ if(isempty(config))
         if(~isempty(ind))
             CACHE_SOURCE=config.WFDB_PATH(ind:end);
         else
-            warning(['Could not set CACHE, CACHE_SOURCE invalid'])
+            warning(['Could not set CACHE, CACHE_SOURCE invalid']);
             CACHE=0;   
         end
     end
@@ -179,7 +179,7 @@ if(isempty(config))
             mkdir(CACHE_DEST);
         end
         if(~isdir(CACHE_DEST))
-            warning(['Could not set CACHE, CACHE_DEST directory does not exist: ' CACHE_DEST])
+            warning(['Could not set CACHE, CACHE_DEST directory does not exist: ' CACHE_DEST]);
             CACHE=0;   
         end
     end

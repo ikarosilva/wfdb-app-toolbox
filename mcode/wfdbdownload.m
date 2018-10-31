@@ -90,7 +90,7 @@ else
                 [config.CACHE_DEST recordName wfdb_extensions{m}],'Timeout',timeout);
             if(~isempty(furl))
                 files_saved{end+1}=furl;
-                warning(['Downloaded WFDB cache file: ' furl])
+                warning(['Downloaded WFDB cache file: ' furl]);
             end
             catch
                %Do nothing, because some extensions will not exist 
