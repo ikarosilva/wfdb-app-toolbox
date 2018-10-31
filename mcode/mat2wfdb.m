@@ -144,7 +144,7 @@ for i=1:nargin
     end
 end
 
-disp(isdigital)
+disp(isdigital);
 % Check valid gain and baseline combinations depending on whether the input is digital or physical.
 if isdigital % digital input signal
     if (isempty(gain) || isempty(baseline))
@@ -274,7 +274,7 @@ if(~count)
     error(['Could not data write to file: ' fname]);
 end
 
-fprintf(['Generated *.dat file: ' fname '\n'])
+fprintf(['Generated *.dat file: ' fname '\n']);
 fclose(fid);
 
 %Write *.hea file
@@ -299,7 +299,7 @@ end
 if(nargout==1)
     varargout(1)={y};
 end
-fprintf(['Generated *.hea file: ' fname '\n'])
+fprintf(['Generated *.hea file: ' fname '\n']);
 fclose(fid);
 
 end

@@ -320,7 +320,7 @@ for j=1:50
     try
         w=bline(round(tqrs(j)-tlim2*fs):tqrs(j)-1);
     catch
-        display(j)
+        display(j);
         w=bline(1:tqrs(j)-1);
     end
     f=find(w);

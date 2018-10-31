@@ -95,14 +95,14 @@ if(isempty(db_name))
             web([PHYSIONET_URL 'DBS'])
         else
             for i=0:double(list.size)-1
-                fprintf(char(list.get(i).getDBInfo))
+                fprintf(char(list.get(i).getDBInfo));
                 fprintf('\n');
             end
         end
     end
 else
     if(DoBatchDownload)
-        display(['Making directory: ' db_name ' to store record files'])
+        display(['Making directory: ' db_name ' to store record files']);
         mkdir(db_name)
     end
     rec_list={};
@@ -115,7 +115,7 @@ else
         for i=1:Nstr
             if(DoBatchDownload)
                 recName=rec_list{i};
-                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
+                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName]);
                 [success,files_saved]=wfdbdownload([db_name '/' recName]);
             end
         end

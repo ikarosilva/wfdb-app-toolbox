@@ -22,7 +22,7 @@ performance=zeros(tests,1)+NaN;
 for n=1:tests
     try
         if(verbose)
-           display(test_string{n}) 
+           display(test_string{n});
         end
         tic
         eval(test_string{n});
@@ -31,7 +31,7 @@ for n=1:tests
             try
               eval(clean_up{n});
             catch
-              display('Clean up failed: ')
+              display('Clean up failed: ');
               warning(lasterr);
             end
         end
