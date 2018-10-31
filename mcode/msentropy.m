@@ -169,7 +169,7 @@ else
 end
 M=length(out);
 if(M<4)
-    error(['Error calculating MSE:' out{:}])
+    error(['Error calculating MSE:' out{:}]);
 end
 info=out(1:3);
 out(1:4)=[];

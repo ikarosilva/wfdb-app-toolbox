@@ -94,10 +94,10 @@ inputs={'data_type','signal','r_peaks','fs','pqoff','jpoff', 'gain_ecg', 'channe
 show=0;
 Ninputs=length(inputs);
 if nargin>Ninputs
-    error('Too many input arguments')
+    error('Too many input arguments');
 end
 if nargin<3
-    error('Not enough input arguments')
+    error('Not enough input arguments');
 end
 
 for n=1:nargin
@@ -115,7 +115,7 @@ if data_type==0 %matlab
     end
     ECGm=signal*gain_ecg;
     if isempty(r_peaks)
-        error('R peaks locations not provided')
+        error('R peaks locations not provided');
     else
         tqrs=round(r_peaks*fs); %samples where I have the R peak
     end
@@ -161,7 +161,7 @@ elseif data_type==1 %wfdb record
         tqrs=round(r_peaks*fs); %samples where I have the R peak
     end
     
-else error('format data_type must be 0 or 1')
+else error('format data_type must be 0 or 1');
 end
 
 % check if signal is upside-down

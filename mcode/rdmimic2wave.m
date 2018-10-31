@@ -134,7 +134,7 @@ if(~strcmp(cachedDataType,dataType))
         case 'waveform'
             matched=urlread('http://www.physionet.org/physiobank/database/mimic2wdb/matched/RECORDS-waveforms');
         otherwise
-            error(['Unknow dataType. Options are: ''numerics'', ''all'', or ''waveform'''])
+            error(['Unknow dataType. Options are: ''numerics'', ''all'', or ''waveform''']);
     end
     cachedDataType=dataType;
     

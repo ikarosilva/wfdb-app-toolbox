@@ -75,7 +75,7 @@ end
 outputs={'tm','val','Fs','siginfo'};
 fid = fopen([recordName, '.hea'], 'rt');
 if(fid==-1)
-    error(['Could not open file: ' recordName '.hea !'])
+    error(['Could not open file: ' recordName '.hea !']);
 end
 
 %Following the documentation described in :

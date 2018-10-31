@@ -79,7 +79,7 @@ for n=1:nargin
     end
 end
 if(webBrowser && config.inOctave)
-    error('Web browser option is not available in Octave.')
+    error('Web browser option is not available in Octave.');
 end
 
 if(isempty(db_name))

@@ -245,7 +245,7 @@ switch rawUnits
         end
         data=javaWfdbExec.execToLongArray(wfdb_argument);
     otherwise
-        error(['Unknown rawUnits option: ' num2str(rawUnits)])
+        error(['Unknown rawUnits option: ' num2str(rawUnits)]);
 end
 
 if(config.inOctave)
@@ -284,7 +284,7 @@ for n=1:nargout
     if(~isempty(signalList) )
         sList=length(signalList);
         if(sList ~= (M))
-            error(['Received: ' num2str(M) ' signals, expected: '  num2str(length(signalList))])
+            error(['Received: ' num2str(M) ' signals, expected: '  num2str(length(signalList))]);
         end
     end
     if(~isempty(ListCapacity) && ~isnan(ListCapacity) )

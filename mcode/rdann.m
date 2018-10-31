@@ -133,7 +133,7 @@ if(~isempty(N0) && N0>1)
         wfdb_argument{end+1}='-f';
         wfdb_argument{end+1}=[start_time{1}];
     else
-        error(['Could not get record header information to find start time.'])
+        error(['Could not get record header information to find start time.']);
     end
     
 end
@@ -146,7 +146,7 @@ if(~isempty(N))
         wfdb_argument{end+1}='-t';
         wfdb_argument{end+1}=[end_time{1}];
     else
-        error(['Could not get record header information to find stop time.'])
+        error(['Could not get record header information to find stop time.']);
     end
 end
 
@@ -187,7 +187,7 @@ else
     comments=cell(N,1);
     str=char(data(1));
     if(~isempty(strfind(str,'init: can''t open header for record')))
-        error(str)
+        error(str);
     end
     if(~isempty(str) && strcmp(str(1),'['))
         % Absolute time stamp. Also possibly a date stamp
@@ -227,7 +227,7 @@ else
         % 0:00.355      355     N    0    0    0
         str=data(1);
         if(~isempty(strfind(str,['annopen: can''t read annotator'])))
-            error(str)
+            error(str);
         end
         for n=1:N
             str=char(data(n));

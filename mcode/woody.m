@@ -134,7 +134,7 @@ switch est_mthd
         
         
     otherwise
-        error(['Invalid option for est_mthd parameter: ' xcorr_mthd ' valid options are: woody, weighted, and thornton'])
+        error(['Invalid option for est_mthd parameter: ' xcorr_mthd ' valid options are: woody, weighted, and thornton']);
 end
 
 
