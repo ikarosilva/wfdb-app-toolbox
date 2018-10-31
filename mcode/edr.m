@@ -253,21 +253,21 @@ if(show)
         [0.05*scrsz(3) 0.05*scrsz(4) 0.8*scrsz(3) 0.89*scrsz(4)],...
         'Color',[1 1 1]);
     ax(1)=subplot(211);
-    plot([1:length(sample)]/fs,sample)
-    hold on
-    plot([1:length(baseline)]/fs,baseline,'g')
-    plot((tqrs-pqoff)/fs,mean(ECGm)*ones(size(tqrs)),'*m')
-    plot((tqrs+jpoff)/fs,mean(ECGm)*ones(size(tqrs)),'*c')
-    legend('filtered ecg','baseline','window start','window end')
-    set(gca,'fontsize',18)
-    xlabel('time (s)','fontsize',18)
-    ylim([mean(ECGm)-5*std(ECGm) mean(ECGm)+5*std(ECGm)])
+    plot([1:length(sample)]/fs,sample);
+    hold on;
+    plot([1:length(baseline)]/fs,baseline,'g');
+    plot((tqrs-pqoff)/fs,mean(ECGm)*ones(size(tqrs)),'*m');
+    plot((tqrs+jpoff)/fs,mean(ECGm)*ones(size(tqrs)),'*c');
+    legend('filtered ecg','baseline','window start','window end');
+    set(gca,'fontsize',18);
+    xlabel('time (s)','fontsize',18);
+    ylim([mean(ECGm)-5*std(ECGm) mean(ECGm)+5*std(ECGm)]);
     ax(2)=subplot(212);
-    plot(r_peaks,y,'r')
-    title('edr','fontsize',18)
-    set(gca,'fontsize',18)
-    xlabel('time (s)','fontsize',18)
-    linkaxes(ax,'x')
+    plot(r_peaks,y,'r');
+    title('edr','fontsize',18);
+    set(gca,'fontsize',18);
+    xlabel('time (s)','fontsize',18);
+    linkaxes(ax,'x');
 end
  y=[r_peaks y];
 end

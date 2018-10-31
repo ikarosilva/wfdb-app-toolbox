@@ -16,8 +16,8 @@ display('Reading and plotting annotations (human labels) of QRS complexes perfor
 [ann,type,subtype,chan,num]=rdann('mitdb/100','atr',1,N);
 
 %Plot 2D version of signal and labels
-figure
-plot(tm(1:N),ecg(1:N));hold on;grid on
+figure;
+plot(tm(1:N),ecg(1:N));hold on;grid on;
 plot(tm(ann(ann<N)+1),ecg(ann(ann<N)+1),'ro');
 
 
@@ -38,27 +38,27 @@ end
 %Clifford GD, Azuaje F, McSharry PE, editors.
 %Advanced Methods and Tools for ECG Analysis.
 %1st ed., Norwood, MA, USA: Artech House; 2006. (Engineering in Medicine and Biology; 1).
-figure
+figure;
 [X,Y] = meshgrid(1:min(RR)+1,1:M);
-surf(Y,X,stack);hold on;grid on
-shading interp
-plot3(1:M,qrs(:,1),qrs(:,2)+offset,'go-','MarkerFaceColor','g')
+surf(Y,X,stack);hold on;grid on;
+shading interp;
+plot3(1:M,qrs(:,1),qrs(:,2)+offset,'go-','MarkerFaceColor','g');
 view(120, 30);
-axis off
+axis off;
 
 %Generate plot inspired by
 % Samenie et al
 % "Filtering Noisy ECG Signals Using Extended Kalman Filter Based on a
 % Modified Dynamic ECG Model"
 % Computers in Cardiology, 2005
-figure
+figure;
 stack=stack';
 stack=stack(:)+[0:length(stack(:))-1]'.*0.0005;
 theta=linspace(0,M*2*pi,length(stack));
 x=sin(theta);y=cos(theta);
-plot3(x,y,stack,'b')
-grid on
-axis off
+plot3(x,y,stack,'b');
+grid on;
+axis off;
 
 %Display information about databases availabe in PhysioNet
 fprintf('**Querying PhysioNet for available databases...\n');
