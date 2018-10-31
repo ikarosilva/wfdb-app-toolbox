@@ -140,7 +140,7 @@ bit_res_suport=[8 16 32];
 
 for i=1:nargin
     if(~isempty(varargin{i}))
-        eval([params{i} '= varargin{i};'])
+        eval([params{i} '= varargin{i};']);
     end
 end
 

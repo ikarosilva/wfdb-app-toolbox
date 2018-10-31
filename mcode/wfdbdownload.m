@@ -54,7 +54,7 @@ success=0;
 files_saved={};
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -101,5 +101,5 @@ else
 end
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end

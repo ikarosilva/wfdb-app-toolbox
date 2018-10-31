@@ -4,7 +4,7 @@ inputs={'verbose'};
 verbose=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
   %Example 1- Read a signal and annotaion from PhysioNet's Remote server:

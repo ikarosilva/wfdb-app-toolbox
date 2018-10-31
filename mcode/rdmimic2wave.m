@@ -116,7 +116,7 @@ sigInfo=[];
 recList=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -155,7 +155,7 @@ if(isempty(subjectID))
     %records
     recList=matched_id;
     for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ''])
+        eval(['varargout{n}=' outputs{n} '']);
     end
     return
     
@@ -178,7 +178,7 @@ if(~isempty(matched_pid))
     %Get all records that match the patient and search for a record
     %that includes the clinical time
     strSubjectID=sprintf('%05d',subjectID);
-    eval(['recs=regexp(regexp(matched,''(\<s' strSubjectID '.*)'',''match''),''\n'',''split'');'])
+    eval(['recs=regexp(regexp(matched,''(\<s' strSubjectID '.*)'',''match''),''\n'',''split'');']);
     recs=recs{:};
     N=length(recs);
     for n=1:N
@@ -224,7 +224,7 @@ end
 
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

@@ -63,7 +63,7 @@ N0=1;
 ouputSize=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -86,7 +86,7 @@ if(config.inOctave)
     data=java2mat(data);
 end
 for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ';'])
+        eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

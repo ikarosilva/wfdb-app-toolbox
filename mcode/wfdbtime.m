@@ -52,7 +52,7 @@ inputs={'recordName','samples'};
 outputs={'timeStamp','dateStamp'};
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -88,5 +88,5 @@ for n=1:length(data)
 end
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end

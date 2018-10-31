@@ -86,7 +86,7 @@ outputName=[];
 highResolution=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 

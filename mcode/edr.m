@@ -101,10 +101,10 @@ if nargin<3
 end
 
 for n=1:nargin
-    eval([inputs{n} '=varargin{n};'])
+    eval([inputs{n} '=varargin{n};']);
 end
 for n=nargin+1:Ninputs
-    eval([inputs{n} '=[];'])
+    eval([inputs{n} '=[];']);
 end
 
 % check format and obtain all the features I need

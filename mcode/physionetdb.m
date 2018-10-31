@@ -75,7 +75,7 @@ DoBatchDownload=0;
 webBrowser=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 if(webBrowser && config.inOctave)

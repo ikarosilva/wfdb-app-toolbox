@@ -68,7 +68,7 @@ defGain=200; %Default value for missing gains
 
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -172,7 +172,7 @@ tm =linspace(0,(N-1)/Fs,N);
 
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

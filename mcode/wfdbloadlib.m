@@ -78,7 +78,7 @@ networkWaitTime=1000;
 inputs={'debugLevel','networkWaitTime'};
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -133,7 +133,7 @@ if(isempty(config))
             varname=strrep(tmpstr{1},'[','');
             varname=strrep(varname,' ','');
             varname=strrep(varname,']','');
-            eval(['config.' varname '=''' tmpstr{2} ''';'])
+            eval(['config.' varname '=''' tmpstr{2} ''';']);
         end
         config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
         wver=regexp(wfdb_path,fsep,'split');
@@ -194,7 +194,7 @@ end
 
 outputs={'isloaded','config'};
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

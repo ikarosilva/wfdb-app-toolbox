@@ -111,7 +111,7 @@ y=[];
 x=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 if(~isempty(dn))
@@ -184,6 +184,6 @@ for m=1:M
 end
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 

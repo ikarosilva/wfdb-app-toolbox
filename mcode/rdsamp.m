@@ -103,7 +103,7 @@ signal=[];
 highResolution=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -277,7 +277,7 @@ if(length(signalList)==1 && rawUnits<3 && (rawUnits ~= 0) )
 end
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
     
     %Perform minor data integrity check by validating with the expected
     %sizes

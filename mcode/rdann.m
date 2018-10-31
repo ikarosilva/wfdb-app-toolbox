@@ -114,7 +114,7 @@ C=[];
 AT=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -260,7 +260,7 @@ end
 ann=ann+1; %Convert to MATLAB indexing
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 
