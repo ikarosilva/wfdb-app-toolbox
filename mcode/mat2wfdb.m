@@ -288,7 +288,7 @@ end
 
 if(~isempty(info))
     if ischar(info)
-        fprintf(fid,'#%s',info);
+        fprintf(fid,'#%s\n',info);
     elseif iscell(info)
         for m=1:numel(info)
             fprintf(fid,'#%s\n',info{m});
