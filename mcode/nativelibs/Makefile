@@ -73,6 +73,9 @@ libdir = $(INSTALL_DIR)/lib
 includedir = $(INSTALL_DIR)/include
 buildbindir = $(BUILD_DIR)/bin
 
+GETURL = wget -O
+SHA256SUM = sha256sum
+
 MATLAB=matlab
 
 export nocheck
@@ -197,8 +200,8 @@ clean-curl:
 	rm -f $(BUILD_DIR)/curl.isbuilt
 	rm -f curl.tar.gz
 $(CURL_ARCHIVE):
-	wget -O curl.tar.gz $(CURL_SOURCE)
-	echo "$(CURL_SHA256)  curl.tar.gz" | sha256sum -c
+	$(GETURL) curl.tar.gz $(CURL_SOURCE)
+	$(SHA256SUM) < curl.tar.gz | grep $(CURL_SHA256)
 	mv curl.tar.gz $(CURL_ARCHIVE)
 $(BUILD_DIR)/curl.isconfig: $(CURL_ARCHIVE)
 	mkdir -p $(BUILD_DIR)
@@ -249,8 +252,8 @@ clean-wfdb:
 	rm -f $(BUILD_DIR)/wfdb.isbuilt
 	rm -f wfdb.tar.gz
 $(WFDB_ARCHIVE):
-	wget -O wfdb.tar.gz $(WFDB_SOURCE)
-	echo "$(WFDB_SHA256)  wfdb.tar.gz" | sha256sum -c
+	$(GETURL) wfdb.tar.gz $(WFDB_SOURCE)
+	$(SHA256SUM) < wfdb.tar.gz | grep $(WFDB_SHA256)
 	mv wfdb.tar.gz $(WFDB_ARCHIVE)
 $(BUILD_DIR)/wfdb.isconfig: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/wfdb.isconfig: $(WFDB_ARCHIVE) $(BUILD_DIR)/curl.isbuilt
@@ -375,8 +378,8 @@ $(bindir)/edr: edr.c $(BUILD_DIR)/wfdb.isbuilt
 	$(CC) -I$(includedir) -L$(libdir) \
 	  -o $(bindir)/edr -O edr.c -lm -lwfdb
 edr.c:
-	wget -O edr.c.tmp $(EDR_SOURCE)
-	echo "$(EDR_SHA256)  edr.c.tmp" | sha256sum -c
+	$(GETURL) edr.c.tmp $(EDR_SOURCE)
+	$(SHA256SUM) < edr.c.tmp | grep $(EDR_SHA256)
 	mv edr.c.tmp edr.c
 
 .PHONY: edr clean-edr
@@ -391,8 +394,8 @@ $(bindir)/mse: mse.c
 	mkdir -p $(bindir)
 	$(CC) -o $(bindir)/mse -O mse.c -lm
 mse.c:
-	wget -O mse.c.tmp $(MSE_SOURCE)
-	echo "$(MSE_SHA256)  mse.c.tmp" | sha256sum -c
+	$(GETURL) mse.c.tmp $(MSE_SOURCE)
+	$(SHA256SUM) < mse.c.tmp | grep $(MSE_SHA256)
 	mv mse.c.tmp mse.c
 
 .PHONY: mse clean-mse
@@ -404,8 +407,8 @@ clean-ecgpuwave:
 	rm -rf $(BUILD_DIR)/$(ECGPUWAVE_PKG)
 	rm -f $(BUILD_DIR)/ecgpuwave.isbuilt
 $(ECGPUWAVE_ARCHIVE):
-	wget -O ecgpuwave.tar.gz $(ECGPUWAVE_SOURCE)
-	echo "$(ECGPUWAVE_SHA256)  ecgpuwave.tar.gz" | sha256sum -c
+	$(GETURL) ecgpuwave.tar.gz $(ECGPUWAVE_SOURCE)
+	$(SHA256SUM) < ecgpuwave.tar.gz | grep $(ECGPUWAVE_SHA256)
 	mv ecgpuwave.tar.gz $(ECGPUWAVE_ARCHIVE)
 $(BUILD_DIR)/ecgpuwave.isbuilt: PATH:=$(buildbindir):$(PATH)
 $(BUILD_DIR)/ecgpuwave.isbuilt: $(BUILD_DIR)/wfdb.isbuilt
@@ -433,8 +436,8 @@ ecgpuwave: $(BUILD_DIR)/ecgpuwave.isbuilt
 clean-dfa:
 	rm -f $(bindir)/dfa
 dfa.c:
-	wget -O dfa.c.tmp $(DFA_SOURCE)
-	echo "$(DFA_SHA256)  dfa.c.tmp" | sha256sum -c
+	$(GETURL) dfa.c.tmp $(DFA_SOURCE)
+	$(SHA256SUM) < dfa.c.tmp | grep $(DFA_SHA256)
 	mv dfa.c.tmp dfa.c
 dfa: $(bindir)/dfa
 $(bindir)/dfa: dfa.c
