@@ -31,7 +31,9 @@ mcode/$(JAR7_NAME): $(javasrc) $(BUILDFILE)
 nativelibs: jar7
 	cd mcode/nativelibs && $(MAKE) install
 	set -e; if grep -q '^WFDB_CUSTOMLIB=0' mcode/wfdbloadlib.m; then \
-	 sed 's/^WFDB_CUSTOMLIB=0/WFDB_CUSTOMLIB=1/' -i mcode/wfdbloadlib.m; \
+	 sed -e 's/^WFDB_CUSTOMLIB=0/WFDB_CUSTOMLIB=1/' \
+	  < mcode/wfdbloadlib.m > mcode/wfdbloadlib.m.tmp; \
+	 mv -f mcode/wfdbloadlib.m.tmp mcode/wfdbloadlib.m; \
 	fi
 
 clean:
@@ -46,12 +48,14 @@ doc:
 package: jar7 doc unit-test.zip
 	rm -f $(APP_NAME)
 	set -e; if grep -q '^WFDB_CUSTOMLIB=1' mcode/wfdbloadlib.m; then \
-	 sed 's/^WFDB_CUSTOMLIB=1/WFDB_CUSTOMLIB=0/' -i mcode/wfdbloadlib.m; \
+	 sed -e 's/^WFDB_CUSTOMLIB=1/WFDB_CUSTOMLIB=0/' \
+	  < mcode/wfdbloadlib.m > mcode/wfdbloadlib.m.tmp; \
+	 mv -f mcode/wfdbloadlib.m.tmp mcode/wfdbloadlib.m; \
 	fi
-	zip -r $(APP_NAME) mcode -x@zipexclude.lst
+	zip -X -r $(APP_NAME) mcode -x@zipexclude.lst
 
 unit-test.zip:
-	zip -r $@ UnitTests -x@zipexclude.lst
+	zip -X -r $@ UnitTests -x@zipexclude.lst
 
 check:
 	set -e; unset DISPLAY; mcodedir=`pwd`/mcode; \
