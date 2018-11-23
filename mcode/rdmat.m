@@ -68,14 +68,14 @@ defGain=200; %Default value for missing gains
 
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
 outputs={'tm','val','Fs','siginfo'};
 fid = fopen([recordName, '.hea'], 'rt');
 if(fid==-1)
-    error(['Could not open file: ' recordName '.hea !'])
+    error(['Could not open file: ' recordName '.hea !']);
 end
 
 %Following the documentation described in :
@@ -172,7 +172,7 @@ tm =linspace(0,(N-1)/Fs,N);
 
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

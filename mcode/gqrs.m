@@ -86,7 +86,7 @@ outputName=[];
 highResolution=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -121,7 +121,7 @@ end
 
 err=javaWfdbExec.execToStringList(wfdb_argument);
 if(~isempty(strfind(err.toString,['annopen: can''t'])))
-    error(err)
+    error(err);
 end
 
 

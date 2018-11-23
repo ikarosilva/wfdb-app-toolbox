@@ -82,7 +82,7 @@ slideWindowFlag=false;
 wfdb_argument={};
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 if(~isempty(p))

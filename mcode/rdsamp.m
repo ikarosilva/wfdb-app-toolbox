@@ -103,7 +103,7 @@ signal=[];
 highResolution=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -141,7 +141,7 @@ if(isempty(N) && (rawUnits ~=0))
     if(~isempty(siginfo))
         N=siginfo(1).LengthSamples;
     else
-        warning('Could not get signal information. Attempting to read signal without buffering.')
+        warning('Could not get signal information. Attempting to read signal without buffering.');
     end
 end
 
@@ -245,7 +245,7 @@ switch rawUnits
         end
         data=javaWfdbExec.execToLongArray(wfdb_argument);
     otherwise
-        error(['Unknown rawUnits option: ' num2str(rawUnits)])
+        error(['Unknown rawUnits option: ' num2str(rawUnits)]);
 end
 
 if(config.inOctave)
@@ -269,27 +269,27 @@ end
 %because it may not be for multiresolution signals
 if(length(signalList)==1 && rawUnits<3 && (rawUnits ~= 0) )
     err=abs(Fs-Fstest);
-    if(err>1)siginfo
+    if(err>1)
         warning([ 'Sampling frequency maybe incorrect! ' ...
-            'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)])
+            'Switching from ' num2str(Fs) ' to: ' num2str(Fstest)]);
         Fs=Fstest;
     end
 end
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
     
     %Perform minor data integrity check by validating with the expected
     %sizes
     if(~isempty(signalList) )
         sList=length(signalList);
         if(sList ~= (M))
-            error(['Received: ' num2str(M) ' signals, expected: '  num2str(length(signalList))])
+            error(['Received: ' num2str(M) ' signals, expected: '  num2str(length(signalList))]);
         end
     end
     if(~isempty(ListCapacity) && ~isnan(ListCapacity) )
         if((ListCapacity) ~= N )
-            warning(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity)])
+            warning(['Received: ' num2str(N) ' samples, expected: '  num2str(ListCapacity)]);
         end
     end
 end

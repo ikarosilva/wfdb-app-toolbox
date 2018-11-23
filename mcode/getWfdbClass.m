@@ -14,7 +14,7 @@
 
 %endOfHelp
 
-mlock
+mlock;
 persistent config
 if(isempty(config))
     %Add classes to dynamic path
@@ -25,7 +25,7 @@ inputs={'commandName'};
 outputs={'javaWfdbExec','config'};
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -38,5 +38,5 @@ javaWfdbExec.setWFDB_PATH(config.WFDB_PATH);
 javaWfdbExec.setWFDBCAL(config.WFDBCAL);
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end

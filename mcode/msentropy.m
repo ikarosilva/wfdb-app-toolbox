@@ -111,7 +111,7 @@ y=[];
 x=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 if(~isempty(dn))
@@ -169,7 +169,7 @@ else
 end
 M=length(out);
 if(M<4)
-    error(['Error calculating MSE:' out{:}])
+    error(['Error calculating MSE:' out{:}]);
 end
 info=out(1:3);
 out(1:4)=[];
@@ -184,6 +184,6 @@ for m=1:M
 end
 
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 

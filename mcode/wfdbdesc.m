@@ -96,7 +96,7 @@ outputs={'siginfo','Fs','sigClass'};
 
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -193,7 +193,7 @@ if(nargout>2)
     sigClass=getSignalClass(siginfo,config);
 end
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

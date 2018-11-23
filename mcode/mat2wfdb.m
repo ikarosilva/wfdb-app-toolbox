@@ -140,11 +140,11 @@ bit_res_suport=[8 16 32];
 
 for i=1:nargin
     if(~isempty(varargin{i}))
-        eval([params{i} '= varargin{i};'])
+        eval([params{i} '= varargin{i};']);
     end
 end
 
-disp(isdigital)
+disp(isdigital);
 % Check valid gain and baseline combinations depending on whether the input is digital or physical.
 if isdigital % digital input signal
     if (isempty(gain) || isempty(baseline))
@@ -254,13 +254,13 @@ for m=1:M
         num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 ' num2str(tmp_bit1(1)) ' ' num2str(ck_sum) ' 0 ' sg_name{m}]};
 end
 if(length(y)<1)
-    error(['Converted data is empty. Exiting without saving file...'])
+    error(['Converted data is empty. Exiting without saving file...']);
 end
 
 %Write *.dat file
 fid = fopen([fname '.dat'],'wb',machine_format);
 if(~fid)
-    error(['Could not create data file for writing: ' fname])
+    error(['Could not create data file for writing: ' fname]);
 end
 
 if (bit_res==8)
@@ -271,17 +271,17 @@ end
 
 if(~count)
     fclose(fid);
-    error(['Could not data write to file: ' fname])  
+    error(['Could not data write to file: ' fname]);
 end
 
-fprintf(['Generated *.dat file: ' fname '\n'])
+fprintf(['Generated *.dat file: ' fname '\n']);
 fclose(fid);
 
 %Write *.hea file
 fid = fopen([fname '.hea'],'w');
 for m=1:M+1
     if(~fid)
-        error(['Could not create header file for writing: ' fname])
+        error(['Could not create header file for writing: ' fname]);
     end
     fprintf(fid,'%s\n',head_str{m});
 end
@@ -299,7 +299,7 @@ end
 if(nargout==1)
     varargout(1)={y};
 end
-fprintf(['Generated *.hea file: ' fname '\n'])
+fprintf(['Generated *.hea file: ' fname '\n']);
 fclose(fid);
 
 end

@@ -28,7 +28,7 @@ function [varargout]=wfdbloadlib(varargin)
 %
 
 %endOfHelp
-mlock
+mlock;
 persistent isloaded wfdb_path wfdb_native_path config
 
 %%%%% SYSTEM WIDE CONFIGURATION PARAMETERS %%%%%%%
@@ -78,7 +78,7 @@ networkWaitTime=1000;
 inputs={'debugLevel','networkWaitTime'};
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -102,15 +102,15 @@ if(isempty(isloaded))
     end
     %Check if path has not been added yet
     wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-10-0.jar'];
-    javaaddpath(wfdb_path)
+    javaaddpath(wfdb_path);
     isloaded=1;
     
     %Check if there are any empty space on the path directory, and 
     %issue a warning if there is
     warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
-       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
-       warning(['The installation path is set to: ' wfdb_path])
+       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!');
+       warning(['The installation path is set to: ' wfdb_path]);
     end
 end
 
@@ -133,7 +133,7 @@ if(isempty(config))
             varname=strrep(tmpstr{1},'[','');
             varname=strrep(varname,' ','');
             varname=strrep(varname,']','');
-            eval(['config.' varname '=''' tmpstr{2} ''';'])
+            eval(['config.' varname '=''' tmpstr{2} ''';']);
         end
         config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
         wver=regexp(wfdb_path,fsep,'split');
@@ -158,7 +158,7 @@ if(isempty(config))
         config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
             warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
-       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!') 
+       warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!');
     end
     
     %Set CACHE configurations
@@ -167,7 +167,7 @@ if(isempty(config))
         if(~isempty(ind))
             CACHE_SOURCE=config.WFDB_PATH(ind:end);
         else
-            warning(['Could not set CACHE, CACHE_SOURCE invalid'])
+            warning(['Could not set CACHE, CACHE_SOURCE invalid']);
             CACHE=0;   
         end
     end
@@ -179,7 +179,7 @@ if(isempty(config))
             mkdir(CACHE_DEST);
         end
         if(~isdir(CACHE_DEST))
-            warning(['Could not set CACHE, CACHE_DEST directory does not exist: ' CACHE_DEST])
+            warning(['Could not set CACHE, CACHE_DEST directory does not exist: ' CACHE_DEST]);
             CACHE=0;   
         end
     end
@@ -194,7 +194,7 @@ end
 
 outputs={'isloaded','config'};
 for n=1:nargout
-    eval(['varargout{n}=' outputs{n} ';'])
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

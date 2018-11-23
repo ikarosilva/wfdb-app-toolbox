@@ -75,11 +75,11 @@ DoBatchDownload=0;
 webBrowser=0;
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 if(webBrowser && config.inOctave)
-    error('Web browser option is not available in Octave.')
+    error('Web browser option is not available in Octave.');
 end
 
 if(isempty(db_name))
@@ -92,22 +92,22 @@ if(isempty(db_name))
         varargout(1)={db_list};
     else
         if(webBrowser)
-            web([PHYSIONET_URL 'DBS'])
+            web([PHYSIONET_URL 'DBS']);
         else
             for i=0:double(list.size)-1
-                fprintf(char(list.get(i).getDBInfo))
+                fprintf(char(list.get(i).getDBInfo));
                 fprintf('\n');
             end
         end
     end
 else
     if(DoBatchDownload)
-        display(['Making directory: ' db_name ' to store record files'])
-        mkdir(db_name)
+        display(['Making directory: ' db_name ' to store record files']);
+        mkdir(db_name);
     end
     rec_list={};
     if(webBrowser)
-        web([PHYSIONET_URL 'pbi/' db_name])
+        web([PHYSIONET_URL 'pbi/' db_name]);
     else
         rec_list=deblank(urlread([PHYSIONET_URL db_name '/RECORDS']));
         rec_list=regexp(rec_list,'\s','split');
@@ -115,7 +115,7 @@ else
         for i=1:Nstr
             if(DoBatchDownload)
                 recName=rec_list{i};
-                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName])
+                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName]);
                 [success,files_saved]=wfdbdownload([db_name '/' recName]);
             end
         end

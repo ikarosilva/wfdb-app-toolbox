@@ -102,7 +102,7 @@ comments={''};
 % Read in input arguments
 for n=1:nargin
     if(~isempty(varargin{n}))
-        eval([inputs{n} '=varargin{n};'])
+        eval([inputs{n} '=varargin{n};']);
     end
 end
 
@@ -178,7 +178,7 @@ end
 javaWfdbExec.setArguments(wfdb_argument);
 err=javaWfdbExec.execWithStandardInput(data);
 if(~isempty(strfind(err.toString,['annopen: can''t'])))
-    error(char(err.toString))
+    error(char(err.toString));
 end
 
 end

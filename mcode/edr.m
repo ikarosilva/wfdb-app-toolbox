@@ -94,17 +94,17 @@ inputs={'data_type','signal','r_peaks','fs','pqoff','jpoff', 'gain_ecg', 'channe
 show=0;
 Ninputs=length(inputs);
 if nargin>Ninputs
-    error('Too many input arguments')
+    error('Too many input arguments');
 end
 if nargin<3
-    error('Not enough input arguments')
+    error('Not enough input arguments');
 end
 
 for n=1:nargin
-    eval([inputs{n} '=varargin{n};'])
+    eval([inputs{n} '=varargin{n};']);
 end
 for n=nargin+1:Ninputs
-    eval([inputs{n} '=[];'])
+    eval([inputs{n} '=[];']);
 end
 
 % check format and obtain all the features I need
@@ -115,7 +115,7 @@ if data_type==0 %matlab
     end
     ECGm=signal*gain_ecg;
     if isempty(r_peaks)
-        error('R peaks locations not provided')
+        error('R peaks locations not provided');
     else
         tqrs=round(r_peaks*fs); %samples where I have the R peak
     end
@@ -137,7 +137,6 @@ elseif data_type==1 %wfdb record
         fs=fs(channel);
     end
     % read the header
-    signal
     siginfo=wfdbdesc(signal);
     siginfo=siginfo(:,channel);
     gainstring=siginfo.Gain;
@@ -161,7 +160,7 @@ elseif data_type==1 %wfdb record
         tqrs=round(r_peaks*fs); %samples where I have the R peak
     end
     
-else error('format data_type must be 0 or 1')
+else error('format data_type must be 0 or 1');
 end
 
 % check if signal is upside-down
@@ -253,21 +252,21 @@ if(show)
         [0.05*scrsz(3) 0.05*scrsz(4) 0.8*scrsz(3) 0.89*scrsz(4)],...
         'Color',[1 1 1]);
     ax(1)=subplot(211);
-    plot([1:length(sample)]/fs,sample)
-    hold on
-    plot([1:length(baseline)]/fs,baseline,'g')
-    plot((tqrs-pqoff)/fs,mean(ECGm)*ones(size(tqrs)),'*m')
-    plot((tqrs+jpoff)/fs,mean(ECGm)*ones(size(tqrs)),'*c')
-    legend('filtered ecg','baseline','window start','window end')
-    set(gca,'fontsize',18)
-    xlabel('time (s)','fontsize',18)
-    ylim([mean(ECGm)-5*std(ECGm) mean(ECGm)+5*std(ECGm)])
+    plot([1:length(sample)]/fs,sample);
+    hold on;
+    plot([1:length(baseline)]/fs,baseline,'g');
+    plot((tqrs-pqoff)/fs,mean(ECGm)*ones(size(tqrs)),'*m');
+    plot((tqrs+jpoff)/fs,mean(ECGm)*ones(size(tqrs)),'*c');
+    legend('filtered ecg','baseline','window start','window end');
+    set(gca,'fontsize',18);
+    xlabel('time (s)','fontsize',18);
+    ylim([mean(ECGm)-5*std(ECGm) mean(ECGm)+5*std(ECGm)]);
     ax(2)=subplot(212);
-    plot(r_peaks,y,'r')
-    title('edr','fontsize',18)
-    set(gca,'fontsize',18)
-    xlabel('time (s)','fontsize',18)
-    linkaxes(ax,'x')
+    plot(r_peaks,y,'r');
+    title('edr','fontsize',18);
+    set(gca,'fontsize',18);
+    xlabel('time (s)','fontsize',18);
+    linkaxes(ax,'x');
 end
  y=[r_peaks y];
 end
@@ -320,7 +319,7 @@ for j=1:50
     try
         w=bline(round(tqrs(j)-tlim2*fs):tqrs(j)-1);
     catch
-        display(j)
+        display(j);
         w=bline(1:tqrs(j)-1);
     end
     f=find(w);
