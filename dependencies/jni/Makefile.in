@@ -21,7 +21,6 @@ WFDB_CFLAGS = @WFDB_CFLAGS@
 WFDB_LIBS = @WFDB_LIBS@
 
 JAVA = @JAVA@
-JAVAH = @JAVAH@
 
 classdir = $(srcdir)/../../bin/classes
 
@@ -44,17 +43,13 @@ librdsampjni.la: rdsampjni.lo
 	  rdsampjni.lo -o librdsampjni.la \
 	  $(WFDB_LIBS) $(LIBS)
 
-rdsampjni.lo: rdsampjni.c org_physionet_wfdb_jni_Rdsamp.h
+rdsampjni.lo: rdsampjni.c
 	$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) $(CPPFLAGS) \
 	  $(DEFS) $(WFDB_CFLAGS) $(JNI_CFLAGS) -I. \
 	  -c $(srcdir)/rdsampjni.c
 
-org_physionet_wfdb_jni_Rdsamp.h: $(classdir)/org/physionet/wfdb/jni/Rdsamp.class
-	$(JAVAH) -classpath $(classdir) org.physionet.wfdb.jni.Rdsamp
-
 clean:
 	$(LIBTOOL) --mode=clean rm -f *.la *.lo
-	rm -f org_physionet_wfdb_jni_Rdsamp.h
 	rm -rf test.jar nativelibs 100s.out
 
 distclean: clean
