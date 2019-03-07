@@ -114,13 +114,23 @@ if(nargout>0)
 end
 
 function reportData = bxbReader(fileName)
+d=[];
+n=0;
+f=fopen(fileName,'rt');
+s=fgetl(f);
+while(ischar(s) && isempty(strfind(s,'|')))
+    s=fgetl(f);
+end
+while(ischar(s) && ~isempty(strfind(s,'|')))
+    v=strread(s(strfind(s,'|')+1:end),'%f');
+    while(length(v)<n)
+        v=[v;nan];
+    end
+    n=length(v);
+    d=[d v];
+    s=fgetl(f);
+end
+fclose(f);
 
-%load file
-reportData = importdata(fileName);
-
-%get rid of unimportant stuff
-reportData.data(end,:) = [];
-reportData.textdata(end,:) = [];
-reportData.textdata(:,end) = [];
-
-
+reportData=struct();
+reportData.data = d';
