@@ -93,7 +93,7 @@ if(~isempty(recName))
     %Only execute this if recName is defined, otherwise we assume 
     %that the user just want to load the 'reporFile' variable into the 
     %workspace based on a previously generated 'reportFile' 
-    wfdb_argument={'-r',recName,'-a',refAnn,testAnn,'-S',reportFile,'-v'};
+    wfdb_argument={'-r',recName,'-a',refAnn,testAnn,'-S',reportFile};
     if(~isempty(beginTime))
         wfdb_argument{end+1}='-f';
         wfdb_argument{end+1}=beginTime;
