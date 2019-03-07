@@ -63,7 +63,7 @@ check:
 	 "pkg load signal; \
 	  addpath('$$mcodedir'); \
 	  confirm_recursive_rmdir(0); \
-	  BatchTest"
+	  BatchTest; exit(total_failed > 0)"
 
 jartest: mcode/$(JAR7_NAME) unit-test.zip
 	cd mcode; \
