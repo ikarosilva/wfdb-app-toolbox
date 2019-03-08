@@ -10,7 +10,7 @@ end
 
 %Test the examples 
 test_string={['[refAnn]=rdann(''mitdb/100'',''atr'');sqrs(''mitdb/100'');'...
-    '[testAnn]=rdann(''mitdb/100'',''qrs'');bxb(''mitdb/100'',''atr'',''qrs'',''bxbReport.txt'')']};
+    '[testAnn]=rdann(''mitdb/100'',''qrs'');r=bxb(''mitdb/100'',''atr'',''qrs'',''bxbReport.txt'')']};
 
 clean_up={['delete([pwd filesep ''mitdb'' filesep ''*'']);' ...
           'rmdir([pwd filesep ''mitdb''],''s'');delete([pwd filesep ''bxbReport.txt'']);';]};
