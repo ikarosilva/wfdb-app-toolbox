@@ -194,7 +194,7 @@ switch rawUnits
         %try
             %Channeles are returned in interleaved fashion, in a single
             %array
-            data=double(conv_matrix(javaWfdbRdsamp.exec(wfdb_argument)));
+            data=double(wfdbjava2mat(javaWfdbRdsamp.exec(wfdb_argument)));
         %catch
         %    javaWfdbRdsamp.reset();%Free JNI resources    
         %    error(['Could not find record: ' recordName '. Search path is set to: ''' config.WFDB_PATH '''']); 
@@ -202,7 +202,7 @@ switch rawUnits
         if(isempty(data))
            error(['Could not find record: ' recordName '. Search path is set to: ''' config.WFDB_PATH '''']); 
         end
-        baseline=double(conv_matrix(javaWfdbRdsamp.getBaseline));
+        baseline=double(wfdbjava2mat(javaWfdbRdsamp.getBaseline));
         gain=javaWfdbRdsamp.getGain;
         Fs=double(javaWfdbRdsamp.getFs);
         N=javaWfdbRdsamp.getNSamples;
@@ -248,9 +248,7 @@ switch rawUnits
         error(['Unknown rawUnits option: ' num2str(rawUnits)]);
 end
 
-if(config.inOctave)
-    data=conv_matrix(data);
-end
+data=wfdbjava2mat(data);
 
 if(rawUnits ~=0)
     %Remap variables to output variables (if not using JNI interface)
@@ -294,21 +292,4 @@ for n=1:nargout
     end
 end
 
-end
-
-% Convert a Java array into a matrix.
-function matrix = conv_matrix(array)
-    if(isnumeric(array))
-        matrix=array;
-    else
-        matrix=java2mat(array);
-        if(~isnumeric(matrix))
-            if(exist('java_matrix_autoconversion','builtin'))
-                java_matrix_autoconversion(1,'local');
-            else
-                java_convert_matrix(1,'local');
-            end
-            matrix=java2mat(javaObject('org.octave.Matrix',array));
-        end
-    end
 end

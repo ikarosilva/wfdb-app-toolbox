@@ -72,7 +72,7 @@ end
 
 if(config.inOctave)
     x=cellstr(num2str(x));
-    x=java2mat(javaWfdbExec.execWithStandardInput(x));
+    x=javaWfdbExec.execWithStandardInput(x);
     Nx=x.size;
     out=cell(Nx,1);
     for n=1:Nx

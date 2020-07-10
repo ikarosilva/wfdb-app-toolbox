@@ -167,9 +167,7 @@ if(nargout ==1)
     %annotation values
     wfdb_argument{end+1}='-e'; % Ensure first column is just elapsed time so it can be skipped. 
     ann=javaWfdbExec.execToDoubleArray(wfdb_argument);
-    if(config.inOctave)
-        ann=java2mat(ann);
-    end
+    ann=wfdbjava2mat(ann);
 else
     
     %TODO: Improve the parsing of data. To avoid doing this at the ML wrapper
