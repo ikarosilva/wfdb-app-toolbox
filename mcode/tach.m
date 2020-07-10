@@ -82,9 +82,7 @@ if(~isempty(ouputSize))
 end
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
-if(config.inOctave)
-    data=java2mat(data);
-end
+data=wfdbjava2mat(data);
 for n=1:nargout
         eval(['varargout{n}=' outputs{n} ';']);
 end
