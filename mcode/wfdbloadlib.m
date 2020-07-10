@@ -112,6 +112,14 @@ if(isempty(isloaded))
        warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!');
        warning(['The installation path is set to: ' wfdb_path]);
     end
+
+    if(isunix)
+        % work around the fact that glibc requires thread stack size
+        % to include space for thread-local variables
+        % (https://sourceware.org/bugzilla/show_bug.cgi?id=11787)
+        % and JVM "process reaper" threads use a tiny stack by default
+        javaMethod('setProperty','java.lang.System','jdk.lang.processReaperUseDefaultStackSize','true');
+    end
 end
 
 %set configuration
