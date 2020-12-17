@@ -63,7 +63,16 @@ check:
 	 "pkg load signal; \
 	  addpath('$$mcodedir'); \
 	  confirm_recursive_rmdir(0); \
-	  BatchTest"
+	  BatchTest; exit(total_failed > 0)"
+
+check-%:
+	set -e; unset DISPLAY; mcodedir=`pwd`/mcode; \
+	cd UnitTests && octave -q --eval \
+	 "pkg load signal; \
+	  addpath('$$mcodedir'); \
+	  confirm_recursive_rmdir(0); \
+	  [tests,pass,perf]=test_$*(); \
+	  exit(tests < pass)"
 
 jartest: mcode/$(JAR7_NAME) unit-test.zip
 	cd mcode; \
