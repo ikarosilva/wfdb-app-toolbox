@@ -144,6 +144,7 @@ public class Wfdbexec {
 		gen_exec_arguments();
 		ArrayList<String> results= new ArrayList<String>();
 		ProcessBuilder launcher = setLauncher();
+		ErrorReader er = null;
 		logger.fine("\n\t***Executing Launcher with commandInput : " + "\t" + commandInput);
 		String line = null;
 		try {
@@ -152,6 +153,10 @@ public class Wfdbexec {
 			logger.finer("\n\t***Creating read buffer and waiting for exec process...");
 			BufferedReader output = new BufferedReader(new InputStreamReader(
 					p.getInputStream(),"US-ASCII"));
+
+			er = new ErrorReader(p.getErrorStream(), logger);
+			er.start();
+
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
 			long thisTime=System.currentTimeMillis();
@@ -184,7 +189,11 @@ public class Wfdbexec {
 					commandName);
 			e.printStackTrace();
 			return null;
-		} 
+		} finally {
+			if (er != null) {
+				er.join();
+			}
+		}
 		return results;
 	}
 
@@ -292,6 +301,7 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
+		ErrorReader er = null;
 		logger.finest("\n\t***Setting launcher in exectToDoubleArray");
 		try {
 			launcher = setLauncher();
@@ -311,6 +321,9 @@ public class Wfdbexec {
 			char[] tmpCharArr=null;
 			int colInd;
 			int dataCheck=0;
+
+			er = new ErrorReader(p.getErrorStream(), logger);
+			er.start();
 			
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
@@ -445,7 +458,11 @@ public class Wfdbexec {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}   
+		} finally {
+			if (er != null) {
+				er.join();
+			}
+		}
 		return data;
 	}
     
@@ -462,6 +479,7 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
+		ErrorReader er = null;
 		logger.finest("\n\t***Setting launcher in exectToDoubleArray");
 		try {
 			launcher = setLauncher();
@@ -479,6 +497,9 @@ public class Wfdbexec {
 			String[] tmpStr=null;
 			char[] tmpCharArr=null;
 			int colInd;
+
+			er = new ErrorReader(p.getErrorStream(), logger);
+			er.start();
 
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
@@ -545,7 +566,11 @@ public class Wfdbexec {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}   
+		} finally {
+			if (er != null) {
+				er.join();
+			}
+		}
 		return results;
 	}
 
@@ -563,6 +588,7 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
+		ErrorReader er = null;
 		logger.finest("\n\t***Setting launcher in exectToFloatArray");
 		try {
 			launcher = setLauncher();
@@ -582,6 +608,9 @@ public class Wfdbexec {
 			char[] tmpCharArr=null;
 			int colInd;
 			int dataCheck=0;
+
+			er = new ErrorReader(p.getErrorStream(), logger);
+			er.start();
 
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
@@ -691,7 +720,11 @@ public class Wfdbexec {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}   
+		} finally {
+			if (er != null) {
+				er.join();
+			}
+		}
 		return data;
 	}
 
@@ -708,6 +741,7 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
+		ErrorReader er = null;
 		logger.finest("\n\t***Setting launcher in exectToLongArray");
 		try {
 			launcher = setLauncher();
@@ -727,6 +761,9 @@ public class Wfdbexec {
 			char[] tmpCharArr=null;
 			int colInd;
 			int dataCheck=0;
+
+			er = new ErrorReader(p.getErrorStream(), logger);
+			er.start();
 
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
@@ -836,7 +873,11 @@ public class Wfdbexec {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}   
+		} finally {
+			if (er != null) {
+				er.join();
+			}
+		}
 		return data;
 	}
 
@@ -854,6 +895,7 @@ public class Wfdbexec {
 		int isTime=-1;//Index in case one of the columns is time as string
 
 		ProcessBuilder launcher = null;
+		ErrorReader er = null;
 		logger.finest("\n\t***Setting launcher in exectToShortArray");
 		try {
 			launcher = setLauncher();
@@ -873,6 +915,9 @@ public class Wfdbexec {
 			char[] tmpCharArr=null;
 			int colInd;
 			int dataCheck=0;
+
+			er = new ErrorReader(p.getErrorStream(), logger);
+			er.start();
 
 			//Wait for the initial stream in case process is slow
 			logger.finest("\n\t***Waiting for data stream from launcher...");
@@ -982,7 +1027,11 @@ public class Wfdbexec {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}   
+		} finally {
+			if (er != null) {
+				er.join();
+			}
+		}
 		return data;
 	}
 
