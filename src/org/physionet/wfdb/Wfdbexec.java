@@ -6,8 +6,8 @@
  * (C) Copyright 2012, by Ikaro Silva
  *
  * Project Info:
- *    Code: http://code.google.com/p/wfdb-java/
- *    WFDB: http://www.physionet.org/physiotools/wfdb.shtml
+ *    Code: https://code.google.com/p/wfdb-java/
+ *    WFDB: https://archive.physionet.org/physiotools/wfdb.shtml
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -99,7 +99,7 @@ public class Wfdbexec {
 	}
 
 	public void setWFDB_PATH(String str){
-		//According to http://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
+		//According to https://www.physionet.org/physiotools/wpg/wpg_14.htm#WFDB-path-syntax
 		//use white space as best option for all the operating systems
 		logger.finest("\n\t***Setting WFDB to: " + str);
 		WFDB_PATH=str;
