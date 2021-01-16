@@ -67,15 +67,15 @@ function varargout=wabp(varargin)
 % See also RDANN, RDSAMP, WFDBDESC, WFDBTIME
 %
 %
-% %Example - Note this will create the file: ./slpdb/slp60.wabp in you
+% %Example - Note this will create the file: ./slpdb/1.0.0/slp60.wabp in you
 % %directory
 % N=2000;
-% [signal,Fs,tm]=rdsamp('slpdb/slp60',2,N);
-% [endTime,dateStamp]=wfdbtime('slpdb/slp60',N);
-% wabp('slpdb/slp60',[],endTime{1},[],2);
-% [ann]=rdann('slpdb/slp60','wabp')
-% plot(tm,x);hold on;grid on
-% plot(tm(ann),x(ann),'or')
+% [signal,Fs,tm]=rdsamp('slpdb/1.0.0/slp60',2,N);
+% [endTime,dateStamp]=wfdbtime('slpdb/1.0.0/slp60',N);
+% wabp('slpdb/1.0.0/slp60',[],endTime{1},[],2);
+% [ann]=rdann('slpdb/1.0.0/slp60','wabp')
+% plot(tm,signal);hold on;grid on
+% plot(tm(ann),signal(ann),'or')
 %
 
 %endOfHelp
