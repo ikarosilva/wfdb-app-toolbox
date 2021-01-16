@@ -21,5 +21,4 @@ function pbsearch
 %endOfHelp
 
 
-
-web('http://physionet.org/cgi-bin/pbs/pbsearch?subject=&comp_op=&sval=&name_num=&help_on=on&res_action=&sq_action=')
+web('https://archive.physionet.org/cgi-bin/pbs/pbsearch?subject=&comp_op=&sval=&name_num=&help_on=on&res_action=&sq_action=')
