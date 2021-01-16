@@ -73,18 +73,18 @@ function varargout=bxb(varargin)
 % Version 1.1
 % Since 0.9.0
 %
-% %Example (this will generate a /mitdb/100.qrs file at your directory):
+% %Example (this will generate a /mitdb/1.0.0/100.qrs file at your directory):
 % %Compares SQRS detetor with the MITDB ATR annotations
 %
-% [refAnn]=rdann('mitdb/100','atr');
-% sqrs('mitdb/100');
-% [testAnn]=rdann('mitdb/100','qrs');
-% report=bxb('mitdb/100','atr','qrs','bxbReport.txt')
+% [refAnn]=rdann('mitdb/1.0.0/100','atr');
+% sqrs('mitdb/1.0.0/100');
+% [testAnn]=rdann('mitdb/1.0.0/100','qrs');
+% report=bxb('mitdb/1.0.0/100','atr','qrs','bxbReport.txt')
 %
 %
 % %Example 2 - Load variables from a report file that has been previously
 % %generated
-%  report=bxb([],[],[],'bxbReport.txt')
+% report=bxb([],[],[],'bxbReport.txt')
 %
 %
 % See also RDANN, MXM, WFDBTIME

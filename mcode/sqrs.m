@@ -20,7 +20,7 @@ function varargout=sqrs(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -54,7 +54,7 @@ function varargout=sqrs(varargin)
 % Since 0.0.1 
 %
 % %Example
-%sqrs('challenge/2013/set-a/a01',[],1000);
+% sqrs('challenge-2013/1.0.0/set-a/a01',[],1000);
 
 %endOfHelp
 

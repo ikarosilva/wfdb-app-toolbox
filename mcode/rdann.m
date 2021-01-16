@@ -81,17 +81,17 @@ function varargout=rdann(varargin)
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
-%[signal,Fs,tm]=rdsamp('challenge/2013/set-a/a01');
-%[ann]=rdann('challenge/2013/set-a/a01','fqrs');
+%[signal,Fs,tm]=rdsamp('challenge-2013/1.0.0/set-a/a01');
+%[ann]=rdann('challenge-2013/1.0.0/set-a/a01','fqrs');
 %plot(tm,signal(:,1));hold on;grid on
 %plot(tm(ann),signal(ann,1),'ro','MarkerSize',4)
 %
 %%Example 2- Read annotation from the first 500 samples only
-% ann=rdann('mitdb/100','atr',[],500);
+% ann=rdann('mitdb/1.0.0/100','atr',[],500);
 %
 %
 %%Example 3- Read annotations with anntype = 'V' only. 
-% annV=rdann('mitdb/100', 'atr', [],[],[],'V');
+% annV=rdann('mitdb/1.0.0/100', 'atr', [],[],[],'V');
 %
 %
 % See also wfdbtime, wrann
@@ -125,7 +125,11 @@ end
 
 %Cache record and annotation
 wfdbdownload(recordName);
-wfdbdownload([recordName '.' annotator]);
+try
+    wfdbdownload([recordName '.' annotator]);
+catch
+    %This doesn't work for sqrs
+end
 
 wfdb_argument={'-r',recordName,'-a',annotator};
 
