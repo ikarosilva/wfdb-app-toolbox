@@ -63,9 +63,9 @@ function varargout=gqrs(varargin)
 %
 % %Example
 % N=5000;
-% gqrs('mitdb/100',N);
-% ann=rdann('mitdb/100','qrs',[],N);
-% [signal,Fs,tm]=rdsamp('mitdb/100',[],N);
+% gqrs('mitdb/1.0.0/100',N);
+% ann=rdann('mitdb/1.0.0/100','qrs',[],N);
+% [sig,Fs,tm]=rdsamp('mitdb/1.0.0/100',[],N);
 % plot(tm,sig(:,1));hold on;grid on
 % plot(tm(ann),sig(ann,1),'ro')
 
@@ -89,6 +89,9 @@ for n=1:nargin
         eval([inputs{n} '=varargin{n};']);
     end
 end
+
+%Cache record and annotation
+wfdbdownload(recordName);
 
 N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
 wfdb_argument={'-r',recordName,'-f',['s' N0]};

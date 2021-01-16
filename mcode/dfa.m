@@ -55,8 +55,8 @@ function [ln,lf]=dfa(varargin)
 %
 % %Example:
 %
-%  gqrs('mitdb/117');
-%  [rr]=ann2rr('mitdb/117','qrs');
+%  gqrs('mitdb/1.0.0/117');
+%  [rr]=ann2rr('mitdb/1.0.0/117','qrs');
 %  [ln,lf]=dfa(rr);
 %  plot(ln,lf)
 
