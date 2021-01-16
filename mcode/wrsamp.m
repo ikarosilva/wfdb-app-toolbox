@@ -54,15 +54,15 @@ function varargout=wrsamp(varargin)
 %       information on the available WFDB formats please see:
 %       http://www.physionet.org/physiotools/wag/signal-5.htm
 %
-%%Example- 
-%%Read signal in raw units
-%[signal,Fs,tm]=rdsamp('challenge/2013/set-a/a01',[],[],[],4);
-%[siginfo,Fs]=wfdbdesc('challenge/2013/set-a/a01');
-%%Write a copy to file
-%wrsamp(tm,signal(:,1),'a01Copy',Fs(1),200,siginfo(1).Format)
-%%Check that the signals match
-%[signalCopy,Fs,tm]=rdsamp('a01Copy',[],[],[],4);
-%err=sum(signalCopy ~= signal(:,1))
+% %Example-
+% %Read signal in raw units
+% [signal,Fs,tm]=rdsamp('challenge-2013/1.0.0/set-a/a01',[],[],[],4);
+% [siginfo,Fs]=wfdbdesc('challenge-2013/1.0.0/set-a/a01');
+% %Write a copy to file
+% wrsamp(tm,signal(:,1),'a01Copy',Fs(1),200,siginfo(1).Format)
+% %Check that the signals match
+% [signalCopy,Fs,tm]=rdsamp('a01Copy',[],[],[],4);
+% err=sum(signalCopy ~= signal(:,1))
 %
 %
 % Written by Ikaro Silva, 2013
