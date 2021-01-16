@@ -1089,24 +1089,24 @@ public class Wfdbexec {
 	//Private Methods
 	public List<String> getEnvironment(){
 		ArrayList<String> variables= new ArrayList<String>();
-		variables.add("WFDB_JAVA_HOME= " + WFDB_JAVA_HOME);
+		variables.add("WFDB_JAVA_HOME=" + WFDB_JAVA_HOME);
 		logger.finer("\n\t***WFDB_JAVA_HOME: " + WFDB_JAVA_HOME);
 
-		variables.add("WFDB_NATIVE_BIN= " + WFDB_NATIVE_BIN);
+		variables.add("WFDB_NATIVE_BIN=" + WFDB_NATIVE_BIN);
 		logger.finer("\n\t***WFDB_NATIVE_BIN: " + WFDB_NATIVE_BIN);
-		variables.add("EXECUTING_DIR= "+ EXECUTING_DIR);
+		variables.add("EXECUTING_DIR="+ EXECUTING_DIR);
 		logger.finer("\n\t***Exec dir: " + EXECUTING_DIR);
-		variables.add("osName= " + osName);
+		variables.add("osName=" + osName);
 		logger.finer("\n\t***OS: " + osName);
-		variables.add("fullOsName= " + System.getProperty("os.name"));
+		variables.add("fullOsName=" + System.getProperty("os.name"));
 		logger.finer("\n\t***fullOsName: " + System.getProperty("os.name"));
-		variables.add("osArch= " + osArch);
+		variables.add("osArch=" + osArch);
 		logger.finer("\n\t***OS Arch: " + osArch);
-		variables.add("customArchFlag= " + customArchFlag);
+		variables.add("customArchFlag=" + customArchFlag);
 		logger.finer("\n\t***customArchFlag: " + customArchFlag);
-		variables.add("OS Version= " + System.getProperty("os.version"));
+		variables.add("OS Version=" + System.getProperty("os.version"));
 		logger.finer("\n\t***OS Version: " + System.getProperty("os.version"));
-		variables.add("JVM Version= " + System.getProperty("java.version"));
+		variables.add("JVM Version=" + System.getProperty("java.version"));
 		logger.finer("\n\t***JVM Version: " + System.getProperty("java.version"));
 		return variables;
 	}

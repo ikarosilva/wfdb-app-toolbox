@@ -98,7 +98,7 @@ if(isempty(isloaded))
     jar_path=which('wfdbloadlib');
     cut=strfind(jar_path,'wfdbloadlib.m');
     wfdb_path=jar_path(1:cut-1);
-    
+
     if(~inOctave)
         ml_jar_version=version('-java');
     else
@@ -110,7 +110,7 @@ if(isempty(isloaded))
     wfdb_path=[wfdb_path 'wfdb-app-JVM7-0-10-0.jar'];
     javaaddpath(wfdb_path);
     isloaded=1;
-    
+
     %Check if there are any empty space on the path directory, and 
     %issue a warning if there is
     warnMe=strfind(wfdb_path,' ');
@@ -122,52 +122,52 @@ end
 
 %set configuration
 if(isempty(config))
-        config.MATLAB_VERSION=version;
-        config.inOctave=inOctave;
-        if(inOctave)
-            javaWfdbExec=javaObject('org.physionet.wfdb.Wfdbexec','wfdb-config',WFDB_CUSTOMLIB);
-            javaWfdbExec.setLogLevel(debugLevel);
-            config.WFDB_VERSION=char(javaMethod('execToStringList',javaWfdbExec,{'--version'}));
-        else
-            javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config',WFDB_CUSTOMLIB);
-            javaWfdbExec.setLogLevel(debugLevel);
-            config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
-        end
-        env=regexp(char(javaWfdbExec.getEnvironment),',','split');
-        for e=1:length(env)
-            tmpstr=regexp(env{e},'=','split');
-            varname=strrep(tmpstr{1},'[','');
-            varname=strrep(varname,' ','');
-            varname=strrep(varname,']','');
-            eval(['config.' varname '=''' tmpstr{2} ''';']);
-        end
-        config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
-        wver=regexp(wfdb_path,fsep,'split');
-        config.WFDB_JAVA_VERSION=wver{end};
-        config.DEBUG_LEVEL=debugLevel;
-        config.NETWORK_WAIT_TIME=networkWaitTime;
-        config.MATLAB_ARCH=computer('arch');
-        %Remove empty spaces from arch name
-        del=strfind(config.osName,' ');
-        config.osName(del)=[];
-        
-        %Define WFDB Environment variables
-        if(isempty(WFDB_PATH))
-            tmpCache=[fileparts(fileparts(config.MATLAB_PATH)) filesep 'database' filesep];
-            WFDB_PATH=['. ' tmpCache ' https://physionet.org/files/'];
-        end
-        if(isempty(WFDBCAL))
-            WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];
-        end
-        config.WFDB_DBLIST=WFDB_DBLIST;
-        config.WFDB_PATH=WFDB_PATH;
-        config.WFDBCAL=WFDBCAL;
-        config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
-            warnMe=strfind(wfdb_path,' ');
+    config.MATLAB_VERSION=version;
+    config.inOctave=inOctave;
+    if(inOctave)
+        javaWfdbExec=javaObject('org.physionet.wfdb.Wfdbexec','wfdb-config',WFDB_CUSTOMLIB);
+        javaWfdbExec.setLogLevel(debugLevel);
+        config.WFDB_VERSION=char(javaMethod('execToStringList',javaWfdbExec,{'--version'}));
+    else
+        javaWfdbExec=org.physionet.wfdb.Wfdbexec('wfdb-config',WFDB_CUSTOMLIB);
+        javaWfdbExec.setLogLevel(debugLevel);
+        config.WFDB_VERSION=char(javaWfdbExec.execToStringList('--version'));
+    end
+    env=regexp(char(javaWfdbExec.getEnvironment),',','split');
+    for e=1:length(env)
+        tmpstr=regexp(env{e},'=','split');
+        varname=strrep(tmpstr{1},'[','');
+        varname=strrep(varname,' ','');
+        varname=strrep(varname,']','');
+        eval(['config.' varname '=''' tmpstr{2} ''';']);
+    end
+    config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
+    wver=regexp(wfdb_path,fsep,'split');
+    config.WFDB_JAVA_VERSION=wver{end};
+    config.DEBUG_LEVEL=debugLevel;
+    config.NETWORK_WAIT_TIME=networkWaitTime;
+    config.MATLAB_ARCH=computer('arch');
+    %Remove empty spaces from arch name
+    del=strfind(config.osName,' ');
+    config.osName(del)=[];
+
+    %Define WFDB Environment variables
+    if(isempty(WFDB_PATH))
+        tmpCache=[fileparts(fileparts(config.MATLAB_PATH)) filesep 'database' filesep];
+        WFDB_PATH=['. ' tmpCache ' https://physionet.org/files/'];
+    end
+    if(isempty(WFDBCAL))
+        WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];
+    end
+    config.WFDB_DBLIST=WFDB_DBLIST;
+    config.WFDB_PATH=WFDB_PATH;
+    config.WFDBCAL=WFDBCAL;
+    config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;
+        warnMe=strfind(wfdb_path,' ');
     if(~isempty(warnMe))
        warning('Your WFDB Toolbox installation  path contain white spaces!! This may cause issues with the WFDB Toolbox!');
     end
-    
+
     %Set CACHE configurations
     if(isempty(CACHE_SOURCE) && CACHE)
         ind=strfind(config.WFDB_PATH,'http');
@@ -179,7 +179,7 @@ if(isempty(config))
         end
     end
     config.CACHE_SOURCE=CACHE_SOURCE;
-    
+
     if(isempty(CACHE_DEST) && CACHE)
         CACHE_DEST=[config.MATLAB_PATH '..' filesep 'database' filesep];
         if(~isdir(CACHE_DEST))
@@ -192,7 +192,7 @@ if(isempty(config))
     end
     config.CACHE_DEST=CACHE_DEST;   
     config.CACHE=CACHE; 
-    
+
     %Set enviroment variables used by WFBD
     setenv('WFDB',config.WFDB_PATH);
     setenv('WFDBCAL',config.WFDBCAL);

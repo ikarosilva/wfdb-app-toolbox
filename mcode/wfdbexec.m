@@ -134,11 +134,14 @@ else
     end
     try
         %System call
-        varargout{1}=cell(javaWfdbExec.execToStringList(varargin{2}).toArray);
+        if length(varargin{2}) > 1
+            varargout{1}=cell(javaWfdbExec.execToStringList(varargin{2}).toArray);
+        else
+            varargout{1}=cell(javaWfdbExec.execWithStandardInput(varargin{2}).toArray);
+        end
         clear javaWfdbExec; %Clean-up to avoid leaked Java classes
     catch exception
         clear javaWfdbExec %Clean-up to avoid leaked Java classes
         rethrow(exception)
     end
-    
 end
