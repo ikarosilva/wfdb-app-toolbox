@@ -28,8 +28,8 @@ function varargout=wfdbtime(varargin)
 %       relative to the first sample).
 %
 %
-%%Example
-%[timeStamp,dateStamp]=wfdbtime('challenge/2013/set-a/a01',[1 10 30]')
+% %Example
+% [timeStamp,dateStamp]=wfdbtime('challenge-2013/1.0.0/set-a/a01',[1 10 30]')
 %
 %
 %
@@ -55,6 +55,9 @@ for n=1:nargin
         eval([inputs{n} '=varargin{n};']);
     end
 end
+
+%Cache record
+wfdbdownload(recordName);
 
 %Convert all the annoation to strings and send them as arguments
 %TODO: maybe send ast STDIN ?
