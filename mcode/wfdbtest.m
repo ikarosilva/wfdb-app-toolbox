@@ -23,7 +23,7 @@ end
 if(verbose)
     fprintf('***Starting test of the WFDB Application Toolbox\n')
     fprintf('***If you experience any issues, please see our FAQ at:\n')
-    fprintf('http://physionet.org/physiotools/matlab/wfdb-app-matlab/faq.shtml\n')
+    fprintf('https://archive.physionet.org/physiotools/matlab/wfdb-app-matlab/faq.shtml\n')
 end
 
 if(usejava('jvm') )
@@ -170,14 +170,14 @@ try
     %Check if record does not exist already in current directory
     recExist=[];
     try
-        recExist=dir(['mghdb' filesep 'mgh001']);
+        recExist=dir(['mghdb' filesep '1.0.0' filesep 'mgh001']);
     catch
         %Record does not exist, go on
     end
     if(~isempty(recExist))
         warning('Cannot test because record already exists in current directory. Delete record and repeat.')
     end
-    [signal]=rdsamp('mghdb/mgh001',[1],sampleLength);
+    [signal]=rdsamp('mghdb/1.0.0/mgh001',[1],sampleLength);
     if(length(signal) ~= sampleLength)
         warning( ['Incomplete data! tm is ' num2str(length(signal))  ', expected: ' num2str(sampleLength)]);
     end

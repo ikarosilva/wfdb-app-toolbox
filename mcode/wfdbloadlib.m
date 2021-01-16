@@ -49,6 +49,12 @@ WFDB_CUSTOMLIB=0;
 %See http://www.physionet.org/physiotools/wag/setwfd-1.htm for more details.
 WFDB_PATH=[];
 
+%WFDB_DBLIST: Determines where to find the list of databases on PhysioNet.
+%Could use the REST API feature though this returns a messy result, so
+%instead we resort to the detailed list provided on the Database Overview
+%page.
+WFDB_DBLIST='https://physionet.org/about/database/';
+
 %WFDBCAL: If empty, will use the default giveng confing.WFDBCAL
 %The WFDB library require calibration data in order to convert between sample values
 %(expressed in analog-to-digital converter units, or adus) and physical units.
@@ -70,7 +76,7 @@ CACHE_DEST=[]; %If empty, defaults to WFDB_JAVA_HOME/../database
 debugLevel=0;
 
 %networkWaitTime: Setting maximum waiting period for fetching data from
-%PhysioNet servers (default location: http://physionet.org/physiobank).
+%PhysioNet servers (default location: https://physionet.org/data/).
 networkWaitTime=1000;
 
 %%%% END OF SYSTEM WIDE CONFIGURATION PARAMETERS
@@ -147,12 +153,13 @@ if(isempty(config))
         
         %Define WFDB Environment variables
         if(isempty(WFDB_PATH))
-            tmpCache=[config.MATLAB_PATH '..' filesep 'database' filesep];
-            WFDB_PATH=['. ' tmpCache ' http://physionet.org/physiobank/database/'];
+            tmpCache=[fileparts(fileparts(config.MATLAB_PATH)) filesep 'database' filesep];
+            WFDB_PATH=['. ' tmpCache ' https://physionet.org/files/'];
         end
         if(isempty(WFDBCAL))
             WFDBCAL=[config.WFDB_JAVA_HOME fsep 'database' fsep 'wfdbcal'];
         end
+        config.WFDB_DBLIST=WFDB_DBLIST;
         config.WFDB_PATH=WFDB_PATH;
         config.WFDBCAL=WFDBCAL;
         config.WFDB_CUSTOMLIB=WFDB_CUSTOMLIB;

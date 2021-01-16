@@ -65,18 +65,18 @@ function varargout=rdsamp(varargin)
 % Since 0.0.1
 %
 % %Example 1- Read a signal from PhysioNet's Remote server:
-%[signal,Fs,tm]=rdsamp('mitdb/100',[],1000);
+%[signal,Fs,tm]=rdsamp('mitdb/1.0.0/100',[],1000);
 %plot(tm,signal(:,1))
 %
 %%Example 2-Read 1000 samples from 3 signals
-%[signal,Fs,tm]=rdsamp('mghdb/mgh001', [1 3 5],1000);
+%[signal,Fs,tm]=rdsamp('mghdb/1.0.0/mgh001', [1 3 5],1000);
 %
 %%%Example 3- Read 1000 samples from 3 signlas in single precision format
-%[signal,Fs,tm]=rdsamp('mghdb/mgh001', [1 3 5],1000,[],2);
+%[signal,Fs,tm]=rdsamp('mghdb/1.0.0/mgh001', [1 3 5],1000,[],2);
 %
 %
 %%%Example 4- Read a multiresolution signal with 32 samples per frame
-% [sig,Fs,tm] = rdsamp('drivedb/drive02',[1],[],[],[],1);
+% [sig,Fs,tm] = rdsamp('drivedb/1.0.0/drive02',[1],[],[],[],1);
 %
 %
 % See also WFDBDESC, PHYSIONETDB, WFDBDOWNLOAD

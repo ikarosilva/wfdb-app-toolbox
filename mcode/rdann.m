@@ -22,7 +22,7 @@ function varargout=rdann(varargin)
 % anntype
 %       Nx1 character vector describing the annotation types.
 %       For a list of standard annotation codes used by PhyioNet, see:
-%             http://www.physionet.org/physiobank/annotations.shtml
+%             https://archive.physionet.org/physiobank/annotations.shtml
 %
 % subtype
 %       Nx1 integer vector describing annotation subtype.
@@ -122,6 +122,10 @@ end
 if(length(recordName)>4 && strcmp(recordName(end-3:end),'.dat'))
     recordName=recordName(1:end-4);
 end
+
+%Cache record and annotation
+wfdbdownload(recordName);
+wfdbdownload([recordName '.' annotator]);
 
 wfdb_argument={'-r',recordName,'-a',annotator};
 

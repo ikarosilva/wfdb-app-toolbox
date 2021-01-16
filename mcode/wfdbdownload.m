@@ -3,7 +3,7 @@ function  varargout=wfdbdownload(varargin)
 % [success,files_saved]=wfdbdownload(recordName)
 %
 % Downloads a WFDB record with recordName 
-% and associated files from PhysioNet server and store is on the WFB Toolbox
+% and associated files from PhysioNet server and store is on the WFDB Toolbox
 % cache directory.
 %
 % The toolbox cache directory is determined by the foolowing toolbox
@@ -19,7 +19,7 @@ function  varargout=wfdbdownload(varargin)
 %                     can be re-obtained when CACHE==1.
 % 
 %  config.CACHE_SOURCE -Source of the cached files (default is PhysioNet's 
-%                       server at physionet.org/physiobank/database/
+%                       server at https://physionet.org/data/
 %
 %
 % Optional output parameters:
@@ -71,32 +71,45 @@ ind=findstr(recordName,'/'); %If empty, not in PhysioBank DB format
 if(~isempty(file_info) || isempty(ind) || (config.CACHE==0))
     success=-1;
 else
-    
+
     db_name=recordName(1:ind(end));
     db_dir=[config.CACHE_DEST db_name];
     if(~isdir(db_dir))
         mkdir(db_dir);
     end
     if(isdir(db_dir))
-        %File extensions to download
-        wfdb_extensions={'.dat','.atr','.edf','.rec','.hea','.hea-','.trigger','.mat'};
-        M=length(wfdb_extensions);
+        %Download single specific file if desired
+        file_name=recordName(ind(end)+1:end);
+        ext=file_name(findstr(file_name,'.'):end);
         timeout=600; %timeout in seconds
-        
-        %File does not exist on cache, attempt to download from server
-        for m=1:M
-            try
-            [furl] = urlwrite([config.CACHE_SOURCE recordName wfdb_extensions{m}],...
-                [config.CACHE_DEST recordName wfdb_extensions{m}],'Timeout',timeout);
+
+        if(~isempty(ext))
+            [furl] = urlwrite([config.CACHE_SOURCE recordName],...
+                [config.CACHE_DEST recordName],'Timeout',timeout);
             if(~isempty(furl))
                 files_saved{end+1}=furl;
-                warning(['Downloaded WFDB cache file: ' furl]);
+                warning(['Downloaded WFDB cache file: ' furl])
             end
-            catch
-               %Do nothing, because some extensions will not exist 
+        else
+            %File extensions to download
+            wfdb_extensions={'.dat','.atr','.edf','.rec','.hea','.hea-','.trigger','.mat'};
+            M=length(wfdb_extensions);
+
+            %File does not exist on cache, attempt to download from server
+            for m=1:M
+                try
+                [furl] = urlwrite([config.CACHE_SOURCE recordName wfdb_extensions{m}],...
+                    [config.CACHE_DEST recordName wfdb_extensions{m}],'Timeout',timeout);
+                if(~isempty(furl))
+                    files_saved{end+1}=furl;
+                    warning(['Downloaded WFDB cache file: ' furl])
+                end
+                catch
+                   %Do nothing, because some extensions will not exist 
+                end
             end
+            success=length(files_saved);
         end
-        success=length(files_saved);
     end
 end
 

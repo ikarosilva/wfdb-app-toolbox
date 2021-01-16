@@ -4,7 +4,7 @@ function varargout=physionetdb(varargin)
 %
 %
 % Lists all the available databases at PhysioNet
-% (http://physionet.org/physiobank/) or list all available records in a database.
+% (https://physionet.org/data/) or list all available records in a database.
 % Users can read the signals (waveforms) or annotations (labels) using the WFDB
 % App Toolbox's functions such as RDSAMP. Options are
 %
@@ -49,14 +49,14 @@ function varargout=physionetdb(varargin)
 % %Example 2 - List all available databases from PhysioNet in web browser
 % physionetdb([],[],1)
 %
-% %Example 3- List all available records in the ucddb database.
-% db_list=physionetdb('ucddb')
+% %Example 3- List all available records in the ucddb database version 1.0.0.
+% db_list=physionetdb('ucddb/1.0.0')
 %
-% %Example 4- Download all records for database MITDB
-%  physionetdb('mitdb',1);
+% %Example 4- Download all records for database MITDB version 1.0.0
+% physionetdb('mitdb/1.0.0',1);
 %
-% %Example 5- List all records for database MITDB on a web browser
-% physionetdb('mitdb',[],1);
+% %Example 5- List all records for database MITDB version 1.0.0 on a web browser
+% physionetdb('mitdb/1.0.0',[],1);
 %
 
 %endOfHelp
@@ -92,7 +92,7 @@ if(isempty(db_name))
         varargout(1)={db_list};
     else
         if(webBrowser)
-            web([PHYSIONET_URL 'DBS']);
+            web([config.WFDB_DBLIST]);
         else
             for i=0:double(list.size)-1
                 fprintf(char(list.get(i).getDBInfo));
@@ -107,7 +107,7 @@ else
     end
     rec_list={};
     if(webBrowser)
-        web([PHYSIONET_URL 'pbi/' db_name]);
+        web([PHYSIONET_URL db_name]);
     else
         rec_list=deblank(urlread([PHYSIONET_URL db_name '/RECORDS']));
         rec_list=regexp(rec_list,'\s','split');
@@ -115,7 +115,7 @@ else
         for i=1:Nstr
             if(DoBatchDownload)
                 recName=rec_list{i};
-                display(['Downloading record (' num2str(i+1) ' / ' Nstr ') : ' recName]);
+                display(['Downloading record (' num2str(i+1) ' / ' num2str(Nstr) ') : ' recName]);
                 [success,files_saved]=wfdbdownload([db_name '/' recName]);
             end
         end
