@@ -37,7 +37,7 @@ function varargout=lomb(varargin)
 % CITING CREDIT: To credit this function, please cite the following paper at your work:
 %
 %Moody, G.B.
-%    Spectral analysis of heart rate without resampling. Computers in Cardiology 1993, pp. 715-718 (IEEE Computer Society Press, 1993). http://www.physionet.org/physiotools/lomb/lomb.html . 
+%    Spectral analysis of heart rate without resampling. Computers in Cardiology 1993, pp. 715-718 (IEEE Computer Society Press, 1993). https://archive.physionet.org/physiotools/lomb/lomb.html.
 %
 %
 %Additional References:
@@ -48,7 +48,7 @@ function varargout=lomb(varargin)
 %Press, W.H. Teukolsky, S.A., Vetterling, W.T., and Flannery, B.P.
 %    Numerical Recipes in C: the Art of Scientific Computing, pp. 575-584 (Cambridge Univ. Press, 1992). 
 %Moody, G.B.
-%    Spectral analysis of heart rate without resampling. Computers in Cardiology 1993, pp. 715-718 (IEEE Computer Society Press, 1993). http://www.physionet.org/physiotools/lomb/lomb.html . 
+%    Spectral analysis of heart rate without resampling. Computers in Cardiology 1993, pp. 715-718 (IEEE Computer Society Press, 1993). https://archive.physionet.org/physiotools/lomb/lomb.html.
 %
 %
 %
@@ -59,8 +59,8 @@ function varargout=lomb(varargin)
 %
 %
 % %Example: Heart Rate Spectral Analysis:
-% [signal,Fs,tm]=rdsamp('mitdb/100',1);
-% [ann]=rdann('mitdb/100','atr');
+% [signal,Fs,tm]=rdsamp('mitdb/1.0.0/100',1);
+% [ann]=rdann('mitdb/1.0.0/100','atr');
 % [Pxx,F]=lomb([tm(ann) signal(ann)]);
 % plot(F,Pxx);grid on;hold on
 %
