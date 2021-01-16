@@ -75,7 +75,7 @@ function varargout=wqrs(varargin)
 % Since 0.0.1
 %
 % %Example - Requires write permission to current directory
-%wqrs('challenge/2013/set-a/a01');
+% wqrs('challenge-2013/1.0.0/set-a/a01');
 
 %endOfHelp
 persistent javaWfdbExec
@@ -98,6 +98,9 @@ for n=1:nargin
         eval([inputs{n} '=varargin{n};']);
     end
 end
+
+%Cache record and annotation
+wfdbdownload(recordName);
 
 N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
 wfdb_argument={'-r',recordName,'-f',['s' N0]};
@@ -132,6 +135,3 @@ if(~isempty(resample) && resample)
 end
 
 javaWfdbExec.execToStringList(wfdb_argument);
-    
-
-

@@ -51,8 +51,8 @@ function mrgann(varargin)
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
 % %and merge with calculated WRQS annotation
-% wqrs('mitdb/100'); 
-% mrgann('mitdb/100','atr','wqrs','testAnn')
+% wqrs('mitdb/1.0.0/100');
+% mrgann('mitdb/1.0.0/100','atr','wqrs','testAnn')
 %
 %
 % 
