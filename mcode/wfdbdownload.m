@@ -39,7 +39,7 @@ function  varargout=wfdbdownload(varargin)
 %
 % Since 0.0.1
 % %Example:
-%[success,files_saved]=wfdbdownload('mitdb/102')
+% [success,files_saved]=wfdbdownload('mitdb/1.0.0/102')
 %
 %
 % See also WFDBLOADLIB, RDSAMP
