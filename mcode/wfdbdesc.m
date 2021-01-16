@@ -36,7 +36,7 @@ function varargout=wfdbdesc(varargin)
 %
 % sigClass (Optional)
 %       Nx1 cell array of strings for the corresponding signal class based on
-%       information from PhysioNet: www.physionet.org/physiobank/signals.shtml.
+%       information from PhysioNet: https://archive.physionet.org/physiobank/signals.shtml.
 %       The signal class will be one of the following:
 %                    BP         blood pressure
 %                    CO         cardiac output
@@ -68,11 +68,11 @@ function varargout=wfdbdesc(varargin)
 %
 %
 % %Example
-% siginfo=wfdbdesc('challenge/2013/set-a/a01')
+% siginfo=wfdbdesc('challenge-2013/1.0.0/set-a/a01')
 %
 %
 % %Example 2 -Get signal Classes
-% [siginfo,Fs,sigClass]=wfdbdesc('mitdb/100')
+% [siginfo,Fs,sigClass]=wfdbdesc('mitdb/1.0.0/100')
 %
 %
 % Written by Ikaro Silva, 2013
@@ -99,6 +99,9 @@ for n=1:nargin
         eval([inputs{n} '=varargin{n};']);
     end
 end
+
+%Cache record
+wfdbdownload(recordName);
 
 wfdb_argument={recordName};
 data=char(javaWfdbExec.execToStringList(wfdb_argument));
@@ -207,7 +210,7 @@ persistent class_def
 if(isempty(class_def))
     %Get signal class information from PhysioNet's servers
     %and store information locally ( persistent )
-    class_def=urlread([config.CACHE_SOURCE '../signals.shtml']);
+    class_def=urlread(['https://archive.physionet.org/physiobank/signals.shtml']);
     st_ind=findstr(class_def,'<td><b>Description</b></td><td></td></tr>');
     class_def(1:st_ind+1)=[];
     end_ind=findstr(class_def,'</table></center>');
@@ -225,7 +228,3 @@ for m=1:M
     str=regexprep(str{2},'<td>','');
     sigClass(m)={str};
 end
-
-
-
-
