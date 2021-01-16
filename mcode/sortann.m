@@ -37,10 +37,10 @@ function varargout=sortann(varargin)
 % Version 1.0
 % Since 0.9.0
 %
-% %Example (this will generate a /mitdb/100.sortedATR file at your directory):
+% %Example (this will generate a /mitdb/1.0.0/100.sortedATR file at your directory):
 %
-% sortann('mitdb/100','atr',[],[],'sortedATR');
-% ann=rdann('mitdb/100','sortedATR');
+% sortann('mitdb/1.0.0/100','atr',[],[],'sortedATR');
+% ann=rdann('mitdb/1.0.0/100','sortedATR');
 %
 %
 % See also RDANN 
