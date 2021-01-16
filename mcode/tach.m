@@ -46,8 +46,8 @@ function varargout=tach(varargin)
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
-%[hr]=tach('challenge/2013/set-a/a01','fqrs'); 
-%plot(hr);grid on;hold on
+% [hr]=tach('challenge-2013/1.0.0/set-a/a01','fqrs');
+% plot(hr);grid on;hold on
 
 %endOfHelp
 persistent javaWfdbExec config
@@ -65,6 +65,14 @@ for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};']);
     end
+end
+
+%Cache record and annotation
+wfdbdownload(recordName);
+try
+    wfdbdownload([recordName '.' annotator]);
+catch
+    %Catch for future calls without need for annotation
 end
 
 N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
