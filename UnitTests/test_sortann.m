@@ -9,8 +9,8 @@ for n=1:nargin
 end
 
 %Test the examples 
-test_string={['sortann(''mitdb/100'',''atr'',[],[],''sortedATR'');' ...
-               'ann=rdann(''mitdb/100'',''sortedATR'');']};
+test_string={['sortann(''mitdb/1.0.0/100'',''atr'',[],[],''sortedATR'');' ...
+               'ann=rdann(''mitdb/1.0.0/100'',''sortedATR'');']};
 
 clean_up={['delete([pwd filesep ''mitdb'' filesep ''*'']);' ...
           'rmdir([pwd filesep ''mitdb''],''s'');';]};

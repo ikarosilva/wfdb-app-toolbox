@@ -8,7 +8,7 @@ for n=1:nargin
     end
 end
 %Test the examples 
-test_string={'[rr,tm]=ann2rr(''challenge/2013/set-a/a01'',''fqrs'');'...
+test_string={'[rr,tm]=ann2rr(''challenge-2013/1.0.0/set-a/a01'',''fqrs'');'...
              };
 
 [tests,pass,perf]=test_wrapper(test_string,[],verbose);
