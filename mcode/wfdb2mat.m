@@ -42,7 +42,7 @@ function wfdb2mat(varargin)
 % Since 0.9.7
 %
 % %Example:
-% wfdb2mat('mitdb/200')
+% wfdb2mat('mitdb/1.0.0/200')
 % [tm,signal,Fs,labels]=rdmat('200m');
 % 
 %
@@ -66,6 +66,9 @@ for n=1:nargin
     end
 end
 
+%Cache record
+wfdbdownload(recordName);
+
 wfdb_argument={'-r',recordName,'-f',['s' num2str(N0-1)]};
 
 if(~isempty(N))
@@ -82,5 +85,3 @@ if(~isempty(signalList))
 end
 
 data=javaWfdbExec.execToStringList(wfdb_argument);
-
-

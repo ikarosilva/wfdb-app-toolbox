@@ -52,9 +52,9 @@ function varargout=rdmat(varargin)
 % Since 0.9.7
 %
 % %Example:
-% wfdb2mat('mitdb/200')
-%tic;[tm,signal,Fs,siginfo]=rdmat('200m');toc
-%tic;[signal2]=rdsamp('200m');toc
+% wfdb2mat('mitdb/1.0.0/200')
+% tic;[tm,signal,Fs,siginfo]=rdmat('200m');toc
+% tic;[signal2]=rdsamp('200m');toc
 % sum(abs(signal-signal2))
 %
 %
@@ -159,7 +159,7 @@ for m = 1:M
     
     %Convert from digital units to physical units.
     % Mapping should be similar to that of rdsamp.c:
-    % http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
+    % https://archive.physionet.org/physiotools/wfdb/app/rdsamp.c
     val(m, :) = (val(m, :) - siginfo(m).Baseline ) / siginfo(m).Gain;
 end
 
