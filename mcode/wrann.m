@@ -37,7 +37,7 @@ function varargout=wrann(varargin)
 % anntype
 %       Nx1 (single) character vector, or single character, describing each annotation type. 
 %       Default is 'N'. For a list of standard annotation codes used by PhyioNet, 
-%       please see: http://www.physionet.org/physiobank/annotations.shtml
+%       please see: https://archive.physionet.org/physiobank/annotations.shtml
 %       If the description is longer than one character, use the 'comments'
 %       field.
 %
@@ -61,22 +61,22 @@ function varargout=wrann(varargin)
 % or 1x1. If they are 1x1, this function will repeat the element N times.
 %
 %
-%%Example- Creates a *.test file in your current directory
-%[ann,type,subtype,chan,num]=rdann('challenge/2013/set-a/a01','fqrs');
-% wrann('challenge/2013/set-a/a01','test',ann,type,subtype,chan,num)
+% %Example- Creates a *.test file in your current directory
+% [ann,type,subtype,chan,num]=rdann('challenge-2013/1.0.0/set-a/a01','fqrs');
+% wrann('challenge-2013/1.0.0/set-a/a01','test',ann,type,subtype,chan,num)
 %
 %
 % %Reading the file again should give the same results
-%[ann,type,subtype,chan,num]=rdann('challenge/2013/set-a/a01','fqrs');
-%wrann('challenge/2013/set-a/a01','test',ann,type,subtype,chan,num);
-%[ann2,type2,subtype2,chan2,num2]=rdann('challenge/2013/set-a/a01','test',[],[],1);
-%err=sum(ann ~= ann2)
+% [ann,type,subtype,chan,num]=rdann('challenge-2013/1.0.0/set-a/a01','fqrs');
+% wrann('challenge-2013/1.0.0/set-a/a01','test',ann,type,subtype,chan,num);
+% [ann2,type2,subtype2,chan2,num2]=rdann('challenge-2013/1.0.0/set-a/a01','test',[],[],1);
+% err=sum(ann ~= ann2)
 %
 %
 %
 % %Example 2
-%[ann,type,subtype,chan,num]=rdann('mitdb/100','atr');
-%wrann('mitdb/100','test',ann,type,subtype,chan,num);
+% [ann,type,subtype,chan,num]=rdann('mitdb/1.0.0/100','atr');
+% wrann('mitdb/1.0.0/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: November 4, 2014
