@@ -46,7 +46,7 @@ function varargout=ann2rr(varargin)
 %
 % Since 0.0.1
 % %Example
-%[rr,tm]=ann2rr('challenge/2013/set-a/a01','fqrs');
+% [rr,tm]=ann2rr('challenge-2013/1.0.0/set-a/a01','fqrs');
 
 %endOfHelp
 
@@ -65,6 +65,14 @@ for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};']);
     end
+end
+
+%Cache record and annotation
+wfdbdownload(recordName);
+try
+    wfdbdownload([recordName '.' annotator]);
+catch
+    %This doesn't work for sqrs
 end
 
 N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
