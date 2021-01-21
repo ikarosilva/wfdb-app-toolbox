@@ -186,7 +186,7 @@ function varargout=corrint(varargin)
 %
 % %%% End Example %%%
 %
-% Written by Ikaro Silva, 20134
+% Written by Ikaro Silva, 2013
 % Last Modified: November 23, 2014
 % Version 1.0
 %
