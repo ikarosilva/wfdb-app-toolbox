@@ -43,7 +43,7 @@ function varargout=rdmimic2wave(varargin)
 % Input Parameters:
 %
 % subjectID
-%       A 1x1 Double specifying a valid MIMIC II subject ID. For a list
+%       A 1x1 Double specifying a valid MIMIC III subject ID. For a list
 %       of valid subjectID with matched waveform use this to query:
 %
 %       [~,~,~,recList]=rdmimic2wave([],[],dataType);
@@ -55,7 +55,7 @@ function varargout=rdmimic2wave(varargin)
 % clinicalTimeStamp
 %      String specifying the clinical  time of the event. This string
 %      should have the following format (as described in
-%       http://www.physionet.org/physiobank/database/mimic2wdb/matched/) :
+%       https://physionet.org/files/mimic3wdb/1.0/matched/):
 %
 %      'YYYY-MM-DD-hh-mm'
 %
@@ -84,10 +84,10 @@ function varargout=rdmimic2wave(varargin)
 %
 %
 % % Example:
-%[tm,signal,Fs,recList,sigInfo]=rdmimic2wave(32805,'2986-12-15-10-00',[],0,2);
-%plot(tm,signal(:,2))
-%title(['Found data in record: ' recList]) 
-%legend(sigInfo(2).Description)
+% [tm,signal,Fs,recList,sigInfo]=rdmimic2wave(30011,'2158-03-31-15-00',[],0,2);
+% plot(tm,signal(:,2))
+% title(['Found data in record: ' recList])
+% legend(sigInfo(2).Description)
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: December 1, 2014
@@ -108,7 +108,7 @@ subjectID=[];
 beginWindow=60; %beginWindow in minutes!
 endWindow=60; %endWindow in minutes!
 dataType='numerics';
-dBName='mimic2wdb/matched/';
+dBName='mimic3wdb/1.0/matched/';
 tm=[];
 signal=[];
 Fs=[];
@@ -127,19 +127,19 @@ persistent cachedDataType matched_id matched
 if(~strcmp(cachedDataType,dataType))
     switch (dataType)
         case 'numerics'
-            matched=urlread('http://www.physionet.org/physiobank/database/mimic2wdb/matched/RECORDS-numerics');
+            matched=urlread('https://physionet.org/files/mimic3wdb/1.0/matched/RECORDS-numerics');
             %case 'all'
             % Dont want to mess around with mixed sample rates yet...
-            %%matched=urlread('http://www.physionet.org/physiobank/database/mimic2wdb/matched/RECORDS');
+            %%matched=urlread('https://physionet.org/files/mimic3wdb/1.0/matched/RECORDS');
         case 'waveform'
-            matched=urlread('http://www.physionet.org/physiobank/database/mimic2wdb/matched/RECORDS-waveforms');
+            matched=urlread('https://physionet.org/files/mimic3wdb/1.0/matched/RECORDS-waveforms');
         otherwise
             error(['Unknow dataType. Options are: ''numerics'', ''all'', or ''waveform''']);
     end
     cachedDataType=dataType;
     
     %Get patient ID list
-    matched_id=regexprep(regexp(matched,'(\<s\d\d\d\d\d)','match'),'s','');
+    matched_id=regexprep(regexp(matched,'(p\d\d\d\d\d\d)','match'),'p','');
     for n=1:length(matched_id)
         matched_id{n}=str2num(matched_id{n});
     end
@@ -178,13 +178,13 @@ if(~isempty(matched_pid))
     %Get all records that match the patient and search for a record
     %that includes the clinical time
     strSubjectID=sprintf('%05d',subjectID);
-    eval(['recs=regexp(regexp(matched,''(\<s' strSubjectID '.*)'',''match''),''\n'',''split'');']);
-    recs=recs{:};
+    eval(['recs=regexp(matched,''p0' strSubjectID(1) '/p0' strSubjectID '.+?\n'',''match'',''all'');']);
+    
     N=length(recs);
     for n=1:N
         
-        recName=recs(n); %File name
-        thisTimeStamp=regexp(recName,'/s\d\d\d\d\d-','end');
+        recName=regexprep(recs(n),'[\n\r]+',''); %File name
+        thisTimeStamp=regexp(recName,'p\d\d\d\d\d\d-','end');
         if(isempty(recName{1}))
             %Empty name, keep moving...
            continue; 

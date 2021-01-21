@@ -108,7 +108,11 @@ for n=1:nargin
 end
 
 %Cache record
-wfdbdownload(recordName);
+try
+    wfdbdownload(recordName);
+catch
+    %
+end
 javaWfdbRdsamp=[];
 if(isempty(javaWfdbRdsamp) && (rawUnits ==0))
     javaWfdbRdsamp=javaObject('org.physionet.wfdb.jni.Rdsamp');

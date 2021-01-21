@@ -98,8 +98,24 @@ else
             %File does not exist on cache, attempt to download from server
             for m=1:M
                 try
-                [furl] = urlwrite([config.CACHE_SOURCE recordName wfdb_extensions{m}],...
-                    [config.CACHE_DEST recordName wfdb_extensions{m}],'Timeout',timeout);
+                    [furl] = urlwrite([config.CACHE_SOURCE recordName wfdb_extensions{m}],...
+                        [config.CACHE_DEST recordName wfdb_extensions{m}],'Timeout',timeout);
+                    % Download all files described in header
+                    if strcmp(wfdb_extensions{m},'.hea')
+                        fid = fopen([config.CACHE_DEST recordName wfdb_extensions{m}]);
+                        while ~feof(fid)
+                            tline = fgetl(fid);
+                            % Find the file names
+                            tline = regexp(tline,'.+?\s','match');
+                            find_string = regexp(tline{1},'.*\..+?\s','match');
+                            if(~isempty(find_string))
+                                fn = strrep(find_string,' ','');
+                                [furl] = urlwrite([config.CACHE_SOURCE db_name fn{1}],...
+                                    [config.CACHE_DEST db_name fn{1}],'Timeout',timeout);
+                            end
+                        end
+                        fclose(fid);
+                    end
                 if(~isempty(furl))
                     files_saved{end+1}=furl;
                     warning(['Downloaded WFDB cache file: ' furl])
