@@ -70,7 +70,7 @@ function varargout=wrsamp(varargin)
 % Since 0.0.1
 %
 %
-% See also rdsamp, wfdbdesc, mat2wfdb
+% See also RSAMP, WFDBDESC, MAT2WFDB
 %
 
 %endOfHelp

@@ -83,7 +83,7 @@ function y=edr(varargin)
 % legend('edr','respiratory signal')
 % xlabel('time (s)')
 %
-% see also: ecgpuwave, gqrs
+% See also: ECGPUWAVE, GQRS
 
 %endOfHelp
 

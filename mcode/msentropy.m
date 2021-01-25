@@ -24,7 +24,7 @@ function varargout=msentropy(varargin)
 % Required Parameters:
 %
 % x
-%       Nx1 vector of doubles in which to caculate the multiscale entropy.
+%       Nx1 vector of doubles in which to calculate the multiscale entropy.
 %
 % Optional Parameters are:
 % dn
@@ -40,11 +40,11 @@ function varargout=msentropy(varargin)
 %       1x1 integer. Begin the analysis with row N0.
 %       By default, analysis begins with row 1.
 % minM
-%       1x1 integer betwee 1-10. Set the minimum pattern length for SampEn to minN (1-10; default: 2).
+%       1x1 integer between 1-10. Set the minimum pattern length for SampEn to minN (1-10; default: 2).
 % maxM
-%        1x1 integer betwee 1-10. Set the maximum m to maxM (1-10; default: 2).
+%        1x1 integer between 1-10. Set the maximum m to maxM (1-10; default: 2).
 % maxScale
-%        1x1 integer betwee 1-40. Set the maximum scale for coarse-graining to maxScale (1-40; default: 20).
+%        1x1 integer between 1-40. Set the maximum scale for coarse-graining to maxScale (1-40; default: 20).
 % minR
 %        1x1 double >0. Set the minimum similarity criterion for SampEn to minR (>0; default: 0.15).
 % maxR
@@ -59,7 +59,7 @@ function varargout=msentropy(varargin)
 %       estimated.
 %
 % info
-%       An optional 3x1 cell array of strings providing loggin and verbose information from
+%       An optional 3x1 cell array of strings providing logging and verbose information from
 %       the calculation.
 %
 % Wrapper written by Ikaro Silva, 2013

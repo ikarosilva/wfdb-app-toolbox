@@ -10,7 +10,7 @@ function varargout=physionetdb(varargin)
 %
 % Optional Input Parameters:
 % db_name
-%          String specifying the datbase to query for available records.
+%          String specifying the database to query for available records.
 %          If left empty (default) a list of available database names is
 %          returned. NOTE: Some databases (such as 'mimic2db') have a huge
 %          number of records so that querying the records in the database
@@ -24,7 +24,7 @@ function varargout=physionetdb(varargin)
 %          write permission to the current directory.
 %
 %          NOTE: This function currently does not perform any checksum in order
-%          to verify that the files were dwnloaded properly.
+%          to verify that the files were downloaded properly.
 %
 % webBrowserFlag
 %          Boolean. If true, displays database information in MATLAB's

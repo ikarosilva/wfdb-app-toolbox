@@ -18,7 +18,7 @@ function varargout=lomb(varargin)
 %       that time.
 %
 % dcOffset (Optional)
-%       Booelan. If present add constant to input samples ( x(:,2) ), such that the mean
+%       Boolean. If present add constant to input samples ( x(:,2) ), such that the mean
 %       values of the time series is zero (default=1).
 %
 % smooth   (Optional)
@@ -36,18 +36,18 @@ function varargout=lomb(varargin)
 %
 % CITING CREDIT: To credit this function, please cite the following paper at your work:
 %
-%Moody, G.B.
+% Moody, G.B.
 %    Spectral analysis of heart rate without resampling. Computers in Cardiology 1993, pp. 715-718 (IEEE Computer Society Press, 1993). https://archive.physionet.org/physiotools/lomb/lomb.html.
 %
 %
-%Additional References:
-%Lomb, N.R.
+% Additional References:
+% Lomb, N.R.
 %    Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39:447-462 (1976). 
-%Press, W.H, and Rybicki, G.B.
+% Press, W.H, and Rybicki, G.B.
 %    Fast algorithm for spectral analysis of unevenly sampled data. Astrophysical J. 338:277-280 (1989). 
-%Press, W.H. Teukolsky, S.A., Vetterling, W.T., and Flannery, B.P.
+% Press, W.H. Teukolsky, S.A., Vetterling, W.T., and Flannery, B.P.
 %    Numerical Recipes in C: the Art of Scientific Computing, pp. 575-584 (Cambridge Univ. Press, 1992). 
-%Moody, G.B.
+% Moody, G.B.
 %    Spectral analysis of heart rate without resampling. Computers in Cardiology 1993, pp. 715-718 (IEEE Computer Society Press, 1993). https://archive.physionet.org/physiotools/lomb/lomb.html.
 %
 %
@@ -73,7 +73,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('lomb');
 end
 
-%Set default pararamter values
+%Set default parameter values
 %[Pxx,F]
 inputs={'x','dcOffset','smooth'};
 dcOffset=1;

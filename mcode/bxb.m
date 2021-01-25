@@ -8,7 +8,7 @@ function varargout=bxb(varargin)
 % Creates a report file ("reportFile) using
 % ANSI/AAMI-standard beat-by-beat annotation comparator.
 %
-% Ouput Parameters:
+% Output Parameters:
 %
 % report (Optional)
 %       Returns a structure containing information on the 'reportFile'.
@@ -96,7 +96,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('bxb');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','refAnn','testAnn','reportFile','beginTime','stopTime','matchWindow'};
 recName=[];
 refAnn=[];
@@ -112,9 +112,9 @@ for n=1:nargin
 end
 
 if(~isempty(recName))
-    %Only execute this if recName is defined, otherwise we assume 
-    %that the user just want to load the 'reporFile' variable into the 
-    %workspace based on a previously generated 'reportFile' 
+    %Only execute this if recName is defined, otherwise we assume
+    %that the user just want to load the 'reportFile' variable into the
+    %workspace based on a previously generated 'reportFile'
     wfdb_argument={'-r',recName,'-a',refAnn,testAnn,'-S',reportFile};
     if(~isempty(beginTime))
         wfdb_argument{end+1}='-f';

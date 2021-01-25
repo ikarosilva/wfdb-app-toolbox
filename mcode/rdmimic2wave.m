@@ -24,20 +24,20 @@ function varargout=rdmimic2wave(varargin)
 %       match the timeStamp. If no match is found an empty matrix is
 %       returned.
 %
-% Optional Ouput:
+% Optional Output:
 %
 % Fs
 %       A 1x1 double representing the sampling frequency (in Hz).
 %
-%recList
+% recList
 %       A Lx1 double specifying a list of valid subjectIDs  or matched record. You can use this
 %       field to find which IDs are in the matched waveform list (see below). If the
 %       subjectID is defined in the function signature, recList will be
 %       equal to the first found matched record if it exists.
 %
 %
-%sigInfo
-%       A Mx1 structure containing meta information about the waverforms in the 'signal' output. 
+% sigInfo
+%       A Mx1 structure containing meta information about the waveforms in the 'signal' output.
 %
 %
 % Input Parameters:
@@ -73,12 +73,12 @@ function varargout=rdmimic2wave(varargin)
 %
 % beginMinute (Optional)
 %     1x1 Double specifying time in minutes of
-%     how much of the signal to get before clinicalTimeStamp occured.
+%     how much of the signal to get before clinicalTimeStamp occurred.
 %     Default is 60 minutes.
 %
 % endMinute (Optional)
 %     1x1 Double specifying time in minutes of
-%     how much of the signal to get after clinicalTimeStamp occured.
+%     how much of the signal to get after clinicalTimeStamp occurred.
 %     Default is 60 minutes.
 %
 %
@@ -98,7 +98,7 @@ function varargout=rdmimic2wave(varargin)
 %
 %
 %
-% See also rdsamp, wfdbdesc
+% See also RDSAMP, WFDBDESC
 
 %endOfHelp
 
@@ -161,7 +161,7 @@ if(isempty(subjectID))
     
 end
     
-%Convert timestam to serial data (in days)
+%Convert timestamp to serial data (in days)
 dateFormat='yyyy-mm-dd-HH-MM';
 clinicalDateNum=datenum(clinicalTimeStamp,dateFormat);
 
@@ -171,7 +171,7 @@ endTime=clinicalDateNum + (endWindow/(60*24));
 
 
 %If id exists loop through the files to see if any file is within the
-%specific time range of the clinial event
+%specific time range of the clinical event
 matched_pid=find(matched_id==subjectID,1);
 if(~isempty(matched_pid))
     
@@ -219,7 +219,7 @@ if(~isempty(matched_pid))
                 break;
             end
         end %of thisDateNum< beginTime
-    end %of matched record sublit
+    end %of matched record subject
 end
 
 

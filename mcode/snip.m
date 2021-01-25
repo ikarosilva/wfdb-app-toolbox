@@ -8,7 +8,7 @@ function varargout=snip(varargin)
 % Copy an excerpt of a WFDB record
 %
 %
-%Input Parameters:
+% Input Parameters:
 % inputRecord
 %       String specifying the input WFDB record file.
 %
@@ -20,7 +20,7 @@ function varargout=snip(varargin)
 %       the beginning of the input record.
 %
 % stopTime (Optional)
-%       Integer specifying end time of the output WFDB record. Defaut is
+%       Integer specifying end time of the output WFDB record. Default is
 %       end of input record.
 %
 % inputAnn (Optional)
@@ -31,10 +31,10 @@ function varargout=snip(varargin)
 %       String specifying the output format (see http://www.physionet.org/physiotools/wag/header-5.htm).
 %       Default is the same as input record.
 %
-%Output Parameters:
+% Output Parameters:
 % err (Optional)
-%       String spefiying any error messages. If empty, conversion was
-%       sucessfull.
+%       String specifying any error messages. If empty, conversion was
+%       successful.
 %
 % Written by Ikaro Silva, 2015
 % Last Modified: -
@@ -61,7 +61,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('snip');
 end
 
-%Set default pararamter values
+%Set default parameter values
 
 inputs={'inputRecord','outputRecord','beginTime','stopTime','inputAnn','outFormat'};
 inputRecord=[];

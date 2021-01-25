@@ -19,7 +19,7 @@ function varargout=wfdbtime(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -59,7 +59,7 @@ end
 %Cache record
 wfdbdownload(recordName);
 
-%Convert all the annoation to strings and send them as arguments
+%Convert all the annotation to strings and send them as arguments
 %TODO: maybe send ast STDIN ?
 N=length(samples);
 timeStamp=cell(N,1);

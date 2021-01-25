@@ -2,14 +2,14 @@ function [varargout]=wfdbloadlib(varargin)
 %
 % [isloaded,config]=wfdbloadlib(debugLevel,networkWaitTime)
 %
-% Loads the WDFDB libarary if it has not been loaded already into the
+% Loads the WDFDB library if it has not been loaded already into the
 % MATLAB classpath. And optionally prints configuration environment and debug information
 % regarding the settings used by the classes in the JAR file.
 %
 % Inputs:
 %
 % debugLevel
-%       (Optional) 1x1 integer between 0 and 5 represeting the level of debug information to output from
+%       (Optional) 1x1 integer between 0 and 5 representing the level of debug information to output from
 %       Java class when output configuration information. Level 0 (no debug information),
 %       level =5 is maximum level of information output by the class (logger set to finest). Default is level 0.
 %
@@ -45,7 +45,7 @@ WFDB_CUSTOMLIB=0;
 
 %WFDB_PATH: If empty, will use the default given config.WFDB_PATH
 %this is where the toolbox searches  for data files (*.dat, *.hea etc).
-%When unistalling the toolbox, you may wish to clear this directory to save space.
+%When uninstalling the toolbox, you may wish to clear this directory to save space.
 %See http://www.physionet.org/physiotools/wag/setwfd-1.htm for more details.
 WFDB_PATH=[];
 
@@ -55,13 +55,13 @@ WFDB_PATH=[];
 %page.
 WFDB_DBLIST='https://physionet.org/about/database/';
 
-%WFDBCAL: If empty, will use the default giveng confing.WFDBCAL
+%WFDBCAL: If empty, will use the default given config.WFDBCAL
 %The WFDB library require calibration data in order to convert between sample values
 %(expressed in analog-to-digital converter units, or adus) and physical units.
 %See http://www.physionet.org/physiotools/wag/wfdbca-5.htm for more details.
 WFDBCAL=[];
 
-%CACHE: If CACHE==1, the toolbox will attemp to download data from 
+%CACHE: If CACHE==1, the toolbox will attempt to download data from 
 %CACHE_SOURCE to CACHE_DEST if the record is not found no the standard 
 %WFDB PATH. Change CACHE_DEST path to a PhysioNet mirror, if you wish to
 %use a server closer to your geographical location. It is safe to delete files on
@@ -72,7 +72,7 @@ CACHE_SOURCE=[]; %If empty, defaults to last element of WFDB_PATH
 CACHE_DEST=[]; %If empty, defaults to WFDB_JAVA_HOME/../database
 
 
-%debugLevel: Ouput JVM information while running commands
+%debugLevel: Output JVM information while running commands
 debugLevel=0;
 
 %networkWaitTime: Setting maximum waiting period for fetching data from
@@ -193,7 +193,7 @@ if(isempty(config))
     config.CACHE_DEST=CACHE_DEST;   
     config.CACHE=CACHE; 
 
-    %Set enviroment variables used by WFBD
+    %Set environment variables used by WFBD
     setenv('WFDB',config.WFDB_PATH);
     setenv('WFDBCAL',config.WFDBCAL);
 end

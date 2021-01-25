@@ -14,7 +14,7 @@ function varargout=wfdbtool(varargin)
 %
 % Required Input Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -62,7 +62,7 @@ function varargout=wfdbtool(varargin)
 
 %endOfHelp
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','N','N0','systemBrowser'};
 outputs={'stat','browser','url'};
 N=[];
@@ -106,7 +106,7 @@ else
 end
 
 
-%Send output, if anyd
+%Send output, if any
 for n=1:nargout
     eval(['varargout{n}=' outputs{n} ';'])
 end

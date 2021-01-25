@@ -6,12 +6,12 @@ function varargout=wqrs(varargin)
 %         http://www.physionet.org/physiotools/wag/wqrs-1.htm
 %
 %    Creates a WQRS annotation file  at the current MATLAB directory.
-%    The annotation file will have the same name as the recorName file,
-%    but followed with the *.wqrs suffix. Use RDANN to read the annoations
+%    The annotation file will have the same name as the recordName file,
+%    but followed with the *.wqrs suffix. Use RDANN to read the annotations
 %    into MATLAB's workspace in order to read the sample QRS locations.
 %
 %    If recordName is the path to a record at PhysioNet's database, then
-%    the annation files will be stored in a subdirectory with the same relative 
+%    the annotation files will be stored in a subdirectory with the same relative
 %    path as recordName and under the current directory.
 %
 %
@@ -28,7 +28,7 @@ function varargout=wqrs(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -40,7 +40,7 @@ function varargout=wqrs(varargin)
 %       record file (default read all = N).
 % N0 
 %       A 1x1 integer specifying the sample number at which to start reading the 
-%       annotion file (default 1 = begining of the record).
+%       annotation file (default 1 = beginning of the record).
 %
 % signal
 %       A 1x1 integer. Specify the signal to obtain the annotation (default
@@ -76,6 +76,7 @@ function varargout=wqrs(varargin)
 %
 % %Example - Requires write permission to current directory
 % wqrs('challenge-2013/1.0.0/set-a/a01');
+%
 
 %endOfHelp
 persistent javaWfdbExec

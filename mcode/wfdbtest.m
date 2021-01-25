@@ -1,5 +1,5 @@
 function wfdbtest(varargin)
-%This script will test the installation of the WFDB Application Toolbox
+% This script will test the installation of the WFDB Application Toolbox
 %
 % Written by Ikaro Silva, 2013
 %
@@ -8,7 +8,7 @@ function wfdbtest(varargin)
 % Version 1.2
 % Since 0.0.1
 %
-% See also wfdb, rdsamp
+% See also WFDB, RDSAMP
 
 %endOfHelp
 inputs={'verbose'};

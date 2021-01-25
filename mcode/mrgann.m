@@ -36,7 +36,7 @@ function mrgann(varargin)
 % Optional Parameters are:
 %
 % verbose
-%       Boolean. If true warns about simultaneous annoations with matching
+%       Boolean. If true warns about simultaneous annotations with matching
 %       chan fields (default = true).
 %
 %
@@ -45,8 +45,6 @@ function mrgann(varargin)
 % Version 1.0
 %
 % Since 0.9.0
-% 
-% See also BXB, RDANN, WRANN
 %
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
@@ -55,8 +53,7 @@ function mrgann(varargin)
 % mrgann('mitdb/1.0.0/100','atr','wqrs','testAnn')
 %
 %
-% 
-% See also wfdbtime, wrann
+% See also BXB, RDANN, WRANN, WFDBTIME
 
 %endOfHelp
 
@@ -65,7 +62,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('mrgann');
 end
 
-%Set default pararamter values
+%Set default parameter values
 % [ann,type,subtype,chan,num]=rdann(recordName,annotator,C,N,N0)
 inputs={'recName','annName1','annName2','outAnn','verbose'};
 verbose=1;

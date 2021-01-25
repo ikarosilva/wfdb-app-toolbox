@@ -10,7 +10,7 @@ function varargout=wrann(varargin)
 % a PhysioNet web record , a subdirectory in the current directory, with
 % the relative path determined by recordName. The files will have the
 % name 'recordName" with the 'annotator' extension. You can use RDANN to
-% verify that the write was completed sucessfully (see example below).
+% verify that the write was completed successfully (see example below).
 %
 %
 %
@@ -32,7 +32,7 @@ function varargout=wrann(varargin)
 %
 % ann
 %       Nx1 integer vector containing the sample numbers of the annotations
-%       with respect to the begining of the record. Samples must be >=1.
+%       with respect to the beginning of the record. Samples must be >=1.
 %
 % anntype
 %       Nx1 (single) character vector, or single character, describing each annotation type. 
@@ -92,7 +92,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wrann');
 end
 
-% Set default pararamter values
+% Set default parameter values
 inputs={'recordName','annotator','ann','annType','subType','chan','num','comments'};
 annType='N';
 subType=0;
@@ -117,7 +117,7 @@ if (min(ann)<0)
 end
 N=length(ann);
 
-% Convert all the annoation to 0 based index and then to strings
+% Convert all the annotation to 0 based index and then to strings
 ann=ann-1;
 ann=num2str(reshape(ann, [], 1));
 

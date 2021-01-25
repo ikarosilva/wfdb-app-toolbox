@@ -39,7 +39,7 @@ function varargout=rdann(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -56,7 +56,7 @@ function varargout=rdann(varargin)
 %       record file. Default read all.
 % N0
 %       A 1x1 integer specifying the sample number at which to start reading the
-%       annotion file. Default = 1, begining of the record.
+%       annotation file. Default = 1, beginning of the record.
 %
 % AT
 %       The anntype character. Return only annotations with subtype = S. 
@@ -81,20 +81,20 @@ function varargout=rdann(varargin)
 % Since 0.0.1
 %
 % %Example 1- Read a signal and annotation from PhysioNet's Remote server:
-%[signal,Fs,tm]=rdsamp('challenge-2013/1.0.0/set-a/a01');
-%[ann]=rdann('challenge-2013/1.0.0/set-a/a01','fqrs');
-%plot(tm,signal(:,1));hold on;grid on
-%plot(tm(ann),signal(ann,1),'ro','MarkerSize',4)
+% [signal,Fs,tm]=rdsamp('challenge-2013/1.0.0/set-a/a01');
+% [ann]=rdann('challenge-2013/1.0.0/set-a/a01','fqrs');
+% plot(tm,signal(:,1));hold on;grid on
+% plot(tm(ann),signal(ann,1),'ro','MarkerSize',4)
 %
-%%Example 2- Read annotation from the first 500 samples only
+% %Example 2- Read annotation from the first 500 samples only
 % ann=rdann('mitdb/1.0.0/100','atr',[],500);
 %
 %
-%%Example 3- Read annotations with anntype = 'V' only. 
+% %Example 3- Read annotations with anntype = 'V' only.
 % annV=rdann('mitdb/1.0.0/100', 'atr', [],[],[],'V');
 %
 %
-% See also wfdbtime, wrann
+% See also WFDBTIME, WRANN
 
 %endOfHelp
 
@@ -104,7 +104,7 @@ if(isempty(javaWfdbExec))
     [~,config]=wfdbloadlib;
 end
 
-%Set default pararamter values
+%Set default parameter values
 % [ann, anntype, subtype, chan, num, comments] = rdann(recordName, annotator, C, N, N0, AT)
 inputs={'recordName','annotator','C','N','N0','AT'};
 outputs={'ann','anntype','subtype','chan','num','comments'};
@@ -171,7 +171,7 @@ if(~isempty(C))
 end
 
 if(nargout ==1)
-    %Optmize the parsing for cases in which we are interested only in the sample number
+    %Optimize the parsing for cases in which we are interested only in the sample number
     %annotation values
     wfdb_argument{end+1}='-e'; % Ensure first column is just elapsed time so it can be skipped. 
     ann=javaWfdbExec.execToDoubleArray(wfdb_argument);

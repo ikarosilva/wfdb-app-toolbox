@@ -6,16 +6,16 @@ function  varargout=wfdbdownload(varargin)
 % and associated files from PhysioNet server and store is on the WFDB Toolbox
 % cache directory.
 %
-% The toolbox cache directory is determined by the foolowing toolbox
-% configuation parameters obtained by running:
+% The toolbox cache directory is determined by the following toolbox
+% configuration parameters obtained by running:
 %  
 %  [~,config]=wfdbloadlib;
 %  
 %  config.CACHE     -Boolean. If true this wfdbdownlaod will attempt to
 %                   download record
 %
-%  config.CACHE_DEST -Destion of the cached files on the user's system.
-%                     It shoudl be safe to delete the cached files, they
+%  config.CACHE_DEST -Destination of the cached files on the user's system.
+%                     It should be safe to delete the cached files, they
 %                     can be re-obtained when CACHE==1.
 % 
 %  config.CACHE_SOURCE -Source of the cached files (default is PhysioNet's 
@@ -47,7 +47,7 @@ function  varargout=wfdbdownload(varargin)
 %endOfHelp
 
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName'};
 outputs={'success','files_saved'};
 success=0;

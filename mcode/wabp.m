@@ -26,7 +26,7 @@ function varargout=wabp(varargin)
 % Computers in Cardiology 2003, 30, 259-262. IEEE.
 %
 %
-%Required Parameters:
+% Required Parameters:
 %
 % recName
 %       String specifying the name of the record in the WFDB path or
@@ -84,7 +84,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec]=getWfdbClass('wabp');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','beginTime','stopTime','resample','signal'};
 beginTime=[];
 stopTime=[];

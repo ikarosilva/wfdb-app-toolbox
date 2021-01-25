@@ -14,7 +14,7 @@ function varargout=visgraph(varargin)
 %
 %
 %
-% Written by Ikaro Silva, 20134
+% Written by Ikaro Silva, 2013
 % Last Modified: November 24, 2014
 % Version 1.0
 %
@@ -59,7 +59,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('visbility');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'x'};
 outputs={'k','logP'};
 k=[];

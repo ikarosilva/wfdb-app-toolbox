@@ -1,6 +1,6 @@
 function varargout=rdsamp(varargin)
 %
-% [signal,Fs,tm]=rdsamp(recordName,signaList,N,N0,rawUnits,highResolution)
+% [signal,Fs,tm]=rdsamp(recordName,signalList,N,N0,rawUnits,highResolution)
 %
 %    Wrapper to WFDB RDSAMP:
 %         http://www.physionet.org/physiotools/wag/rdsamp-1.htm
@@ -18,7 +18,7 @@ function varargout=rdsamp(varargin)
 %       1xM Double, sampling frequency in Hz of all the signals in the
 %       record.
 %
-%% tm   (Optional)
+% tm   (Optional)
 %       Nx1 vector of doubles representing the sampling intervals.
 %       Depending on input flags (see below), this vector can either be a
 %       vector of integers (sampling number), or a vector of elapsed time
@@ -26,7 +26,7 @@ function varargout=rdsamp(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -65,17 +65,17 @@ function varargout=rdsamp(varargin)
 % Since 0.0.1
 %
 % %Example 1- Read a signal from PhysioNet's Remote server:
-%[signal,Fs,tm]=rdsamp('mitdb/1.0.0/100',[],1000);
-%plot(tm,signal(:,1))
+% [signal,Fs,tm]=rdsamp('mitdb/1.0.0/100',[],1000);
+% plot(tm,signal(:,1))
 %
-%%Example 2-Read 1000 samples from 3 signals
-%[signal,Fs,tm]=rdsamp('mghdb/1.0.0/mgh001', [1 3 5],1000);
+% %Example 2-Read 1000 samples from 3 signals
+% [signal,Fs,tm]=rdsamp('mghdb/1.0.0/mgh001', [1 3 5],1000);
 %
-%%%Example 3- Read 1000 samples from 3 signlas in single precision format
-%[signal,Fs,tm]=rdsamp('mghdb/1.0.0/mgh001', [1 3 5],1000,[],2);
+% %Example 3- Read 1000 samples from 3 signals in single precision format
+% [signal,Fs,tm]=rdsamp('mghdb/1.0.0/mgh001', [1 3 5],1000,[],2);
 %
 %
-%%%Example 4- Read a multiresolution signal with 32 samples per frame
+% %Example 4- Read a multiresolution signal with 32 samples per frame
 % [sig,Fs,tm] = rdsamp('drivedb/1.0.0/drive02',[1],[],[],[],1);
 %
 %
@@ -88,7 +88,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('rdsamp');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','signalList','N','N0','rawUnits','highResolution'};
 outputs={'signal','Fs','tm'};
 signalList=[];
@@ -196,7 +196,7 @@ switch rawUnits
     case 0
         %Use Java Native Interface wrapper
         %try
-            %Channeles are returned in interleaved fashion, in a single
+            %Channels are returned in interleaved fashion, in a single
             %array
             data=double(conv_matrix(javaWfdbRdsamp.exec(wfdb_argument)));
         %catch
@@ -261,7 +261,7 @@ if(rawUnits ~=0)
     signal=data(:,2:end);
     if(nargout>2)
         tm=data(:,1);
-        Fstest=1/(tm(2)-tm(1)); %Not exatly accurate because tm is accurate only the millisecond
+        Fstest=1/(tm(2)-tm(1)); %Not exactly accurate because tm is accurate only the millisecond
     else
         Fstest=Fs;
     end
