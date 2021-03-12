@@ -38,8 +38,21 @@ for n=1:tests
         pass=pass+1;
     catch
         fprintf(['\t****Failed test: %s\n'],num2str(n));
-        if(verbose)
-            display(['Last error: ' lasterr]);
+
+        display(['Last error: ' lasterr]);
+        if(exist('lasterror'))
+            err=lasterror;
+            for m=1:length(err.stack)
+                if(isfield(err.stack(m),'column'))
+                    colstr=[', column ' num2str(err.stack(m).column)];
+                else
+                    colstr='';
+                end
+                display([' in ' err.stack(m).name ...
+                         ' (' err.stack(m).file ...
+                         ', line ' num2str(err.stack(m).line) ...
+                         colstr ')']);
+            end
         end
     end
 end
