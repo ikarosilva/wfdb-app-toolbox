@@ -71,8 +71,8 @@ check-%:
 	 "pkg load signal; \
 	  addpath('$$mcodedir'); \
 	  confirm_recursive_rmdir(0); \
-	  [tests,pass,perf]=test_$*(); \
-	  exit(tests < pass)"
+	  [tests,pass,perf]=test_$*(1); \
+	  exit(pass < tests)"
 
 jartest: mcode/$(JAR7_NAME) unit-test.zip
 	cd mcode; \
