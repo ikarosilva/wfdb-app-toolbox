@@ -38,8 +38,15 @@ for n=1:tests
         pass=pass+1;
     catch
         fprintf(['\t****Failed test: %s\n'],num2str(n));
-        if(verbose)
-            display(['Last error: ' lasterr]);
+
+        display(['Last error: ' lasterr]);
+        if(exist('lasterror'))
+            for m=1:length(lasterror.stack)
+                display([' in ' lasterror.stack(m).name ...
+                         ' (' lasterror.stack(m).file ...
+                         ', line ' num2str(lasterror.stack(m).line) ...
+                         ', column ' num2str(lasterror.stack(m).column) ')'])
+            end
         end
     end
 end
