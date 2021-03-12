@@ -44,6 +44,9 @@ MSE_SHA256=98b53053f2bbfa0fbd4522fa092a2be453eb6fb952ef5145834401c41b46bdea
 DFA_SOURCE=http://www.physionet.org/physiotools/dfa/dfa-1.0.c
 DFA_SHA256=37be78e9a9744c277b879b89046acb32ab9fb6e5f68b3a886e3c9bdf1a17d639
 
+VISIBILITY_SOURCE=https://github.com/ikarosilva/nonlinear-analysis/raw/73c986d324d9274c5830e6a051b297f8dd6f58e9/visibility/src/visibility.c
+VISIBILITY_SHA256=6de04d71859d362ba79dead2fad501be72d5ccf27a8908fa5f9491ff18411ece
+
 ifneq ($(crosshost),)
 CC=$(crosshost)-gcc $(extra_ldflags)
 F77=$(crosshost)-gfortran -std=legacy -ffixed-line-length-none -fno-automatic $(extra_ldflags)
@@ -93,7 +96,7 @@ export WINEPATH:=$(bindir);$(WINEPATH)
 # '$' getting mangled by subsequent scripts and makefiles
 export LD_RUN_PATH=$$ORIGIN/../lib
 
-all: curl wfdb mse edr ecgpuwave dfa librdsampjni
+all: curl wfdb mse edr ecgpuwave dfa visibility librdsampjni
 
 .PHONY: all
 
@@ -175,7 +178,7 @@ distclean: clean
 	rm -f curl-*.tar.gz
 	rm -f wfdb-*.tar.gz
 	rm -f ecgpuwave-*.tar.gz
-	rm -f edr.c mse.c dfa.c
+	rm -f edr.c mse.c dfa.c visibility.c
 	rm -rf custom/*
 	rm -rf linux/*
 	rm -rf macosx/*
@@ -187,7 +190,7 @@ distclean: clean
 ## Download all dependencies without installing anything
 
 download: $(CURL_ARCHIVE) $(WFDB_ARCHIVE) $(ECGPUWAVE_ARCHIVE) \
-	  edr.c mse.c dfa.c
+	  edr.c mse.c dfa.c visibility.c
 
 .PHONY: download
 
@@ -445,6 +448,22 @@ $(bindir)/dfa: dfa.c
 	$(CC) -o $(bindir)/dfa -O dfa.c -lm
 
 .PHONY: dfa clean-dfa
+
+################################################################
+## visibility (Visibility graph)
+
+clean-visibility:
+	rm -f $(bindir)/visibility
+visibility.c:
+	$(GETURL) visibility.c.tmp $(VISIBILITY_SOURCE)
+	$(SHA256SUM) < visibility.c.tmp | grep $(VISIBILITY_SHA256)
+	mv visibility.c.tmp visibility.c
+visibility: $(bindir)/visibility
+$(bindir)/visibility: visibility.c
+	mkdir -p $(bindir)
+	$(CC) -o $(bindir)/visibility -O visibility.c
+
+.PHONY: visibility clean-visibility
 
 ################################################################
 ## Install files from build into bin and/or lib

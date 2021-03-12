@@ -56,7 +56,7 @@ function varargout=visgraph(varargin)
 
 persistent javaWfdbExec config
 if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('visbility');
+    [javaWfdbExec,config]=getWfdbClass('visibility');
 end
 
 %Set default pararamter values
