@@ -19,10 +19,10 @@ host=custom
 
 #Package names and versions
 
-CURL_PKG=curl-7.64.0
+CURL_PKG=curl-7.75.0
 CURL_ARCHIVE=$(CURL_PKG).tar.gz
 CURL_SOURCE=http://curl.haxx.se/download/$(CURL_ARCHIVE)
-CURL_SHA256=cb90d2eb74d4e358c1ed1489f8e3af96b50ea4374ad71f143fa4595e998d81b5
+CURL_SHA256=4d51346fe621624c3e4b9f86a8fd6f122a143820e17889f59c18f245d2d8e7a6
 
 WFDB_PKG=wfdb-10.6.2b
 WFDB_ARCHIVE=$(WFDB_PKG).tar.gz
