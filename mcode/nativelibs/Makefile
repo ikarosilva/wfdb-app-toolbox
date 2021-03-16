@@ -24,10 +24,10 @@ CURL_ARCHIVE=$(CURL_PKG).tar.gz
 CURL_SOURCE=http://curl.haxx.se/download/$(CURL_ARCHIVE)
 CURL_SHA256=cb90d2eb74d4e358c1ed1489f8e3af96b50ea4374ad71f143fa4595e998d81b5
 
-WFDB_PKG=wfdb-10.6.0
+WFDB_PKG=wfdb-10.6.2b
 WFDB_ARCHIVE=$(WFDB_PKG).tar.gz
-WFDB_SOURCE=http://www.physionet.org/physiotools/archives/wfdb-10.6/$(WFDB_ARCHIVE)
-WFDB_SHA256=6b2bcc76e0e613b91c30d6f825c087895ff7f76d50664f8f367b4008f82709fd
+WFDB_SOURCE=https://github.com/bemoody/wfdb/archive/10.6.2b.tar.gz
+WFDB_SHA256=09d0f0285d169e915d93a148ad4c7b09fd623806800fa796c9df6a4c25a2187a
 WFDB_MAJOR=10
 
 ECGPUWAVE_PKG=ecgpuwave-1.3.4
