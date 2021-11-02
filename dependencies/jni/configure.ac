@@ -12,9 +12,9 @@ AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
 AC_ARG_VAR([JAVA], [Java interpreter])
-AC_ARG_VAR([JAVAH], [JNI header generator])
+AC_ARG_VAR([JAVAC], [Java compiler])
 AC_CHECK_PROGS([JAVA], [java])
-AC_CHECK_PROGS([JAVAH], [javah])
+AC_CHECK_PROGS([JAVAC], [javac])
 
 # try to guess where JNI headers might be
 # (partially inspired by Don Anderson's AC_JNI_INCLUDE_DIR)
@@ -23,10 +23,10 @@ AC_ARG_VAR([JNI_CFLAGS], [C compiler flags for JNI])
 if test "x$JNI_CFLAGS" = "x"; then
     if test "x$JAVA_HOME" = "x" && test "x$host_alias" = "x$build_alias"; then
         # If JAVA_HOME not set, and we are not cross-compiling, try to
-        # infer it from the location of 'javah' (after following
+        # infer it from the location of 'javac' (after following
         # symlinks.)
-        AC_PATH_PROG([_JAVAH], [$JAVAH])
-        _cur=$_JAVAH
+        AC_PATH_PROG([_JAVAC], [$JAVAC])
+        _cur=$_JAVAC
         while ls -ld "$_cur" 2>/dev/null | grep " -> " >/dev/null; do
             AC_MSG_CHECKING(symlink for $_cur)
             _slink=`ls -ld "$_cur" | sed 's/.* -> //'`
