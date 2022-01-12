@@ -104,10 +104,7 @@ function ecgpuwave(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('ecgpuwave');
-end
+javaWfdbExec=getWfdbClass('ecgpuwave');
 
 %Set default pararamter values
 inputs={'recordName','annFileName','startTime','stopTime','qrsAnn','pflag','signalList'};

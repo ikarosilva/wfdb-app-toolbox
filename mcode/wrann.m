@@ -87,10 +87,8 @@ function varargout=wrann(varargin)
 %
 
 %endOfHelp
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('wrann');
-end
+
+javaWfdbExec=getWfdbClass('wrann');
 
 % Set default pararamter values
 inputs={'recordName','annotator','ann','annType','subType','chan','num','comments'};

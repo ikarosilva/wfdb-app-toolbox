@@ -66,11 +66,7 @@ function [ln,lf]=dfa(varargin)
 
 %endOfHelp
 
-
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('dfa');
-end
+[javaWfdbExec,config]=getWfdbClass('dfa');
 
 %Set default pararamter values
 inputs={'x','p','integrateFlag','minBoxSize','maxBoxSize','slideWindowFlag'};

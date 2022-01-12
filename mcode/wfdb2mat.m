@@ -50,10 +50,7 @@ function wfdb2mat(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('wfdb2mat');
-end
+[javaWfdbExec,config]=getWfdbClass('wfdb2mat');
 
 %Set default pararameter values
 inputs={'recordName','signalList','N','N0'};

@@ -42,10 +42,8 @@ function varargout=wfdbtime(varargin)
 %
 
 %endOfHelp
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('wfdbtime');
-end
+
+[javaWfdbExec,config]=getWfdbClass('wfdbtime');
 
 %Set default pararamter values
 inputs={'recordName','samples'};

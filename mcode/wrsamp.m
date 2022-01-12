@@ -74,10 +74,8 @@ function varargout=wrsamp(varargin)
 %
 
 %endOfHelp
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('wrsamp');
-end
+
+javaWfdbExec=getWfdbClass('wrsamp');
 
 %Set default pararamter values
 inputs={'tm','data','fileName','Fs','gain','format'};

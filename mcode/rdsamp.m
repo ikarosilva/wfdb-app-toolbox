@@ -83,10 +83,7 @@ function varargout=rdsamp(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('rdsamp');
-end
+[javaWfdbExec,config]=getWfdbClass('rdsamp');
 
 %Set default pararamter values
 inputs={'recordName','signalList','N','N0','rawUnits','highResolution'};

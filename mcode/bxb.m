@@ -91,10 +91,7 @@ function varargout=bxb(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('bxb');
-end
+javaWfdbExec=getWfdbClass('bxb');
 
 %Set default pararamter values
 inputs={'recName','refAnn','testAnn','reportFile','beginTime','stopTime','matchWindow'};

@@ -71,10 +71,7 @@ function varargout=gqrs(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('gqrs');
-end
+javaWfdbExec=getWfdbClass('gqrs');
 
 %Set default pararamter values
 inputs={'recordName','N','N0','signal','threshold','outputName','highResolution'};

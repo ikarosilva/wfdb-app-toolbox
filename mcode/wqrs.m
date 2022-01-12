@@ -78,10 +78,8 @@ function varargout=wqrs(varargin)
 %wqrs('challenge/2013/set-a/a01');
 
 %endOfHelp
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('wqrs');
-end
+
+javaWfdbExec=getWfdbClass('wqrs');
 
 %Set default pararamter values
 inputs={'recordName','N','N0','signal','threshold', ...

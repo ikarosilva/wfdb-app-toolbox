@@ -50,10 +50,7 @@ function varargout=ann2rr(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('ann2rr');
-end
+[javaWfdbExec,config]=getWfdbClass('ann2rr');
 
 %Set default pararamter values
 inputs={'recordName','annotator','N','N0','consecutiveOnly'};
