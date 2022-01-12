@@ -14,12 +14,8 @@
 
 %endOfHelp
 
-mlock;
-persistent config
-if(isempty(config))
-    %Add classes to dynamic path
-    [~,config]=wfdbloadlib;
-end
+%Add classes to dynamic path
+[~,config]=wfdbloadlib;
 
 inputs={'commandName'};
 outputs={'javaWfdbExec','config'};
