@@ -80,11 +80,9 @@ function varargout=wfdbexec(varargin)
 
 %endOfHelp
 logLevel=[];
-persistent config
 
-if(isempty(config))
-    [~,config]=wfdbloadlib;
-end
+[~,config]=wfdbloadlib;
+
 if(nargin==0)
     %With no arguments passed in, we provide the user a list of native
     %commands available for this OS.
