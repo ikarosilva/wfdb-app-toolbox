@@ -14,6 +14,8 @@
 
 %endOfHelp
 
+persistent classCache;
+
 %Add classes to dynamic path
 [~,config]=wfdbloadlib;
 
@@ -26,8 +28,14 @@ for n=1:nargin
 end
 
 %Load the Java class in memory if it has not been loaded yet
-%with system wide parameters defined by wfdbloadlib.m
-javaWfdbExec=javaObject('org.physionet.wfdb.Wfdbexec',commandName,config.WFDB_CUSTOMLIB);
+if(isfield(classCache,commandName))
+    javaWfdbExec=classCache.(commandName);
+else
+    javaWfdbExec=javaObject('org.physionet.wfdb.Wfdbexec',commandName,config.WFDB_CUSTOMLIB);
+    classCache.(commandName)=javaWfdbExec;
+end
+
+%Set system-wide parameters defined by wfdbloadlib.m
 javaWfdbExec.setInitialWaitTime(config.NETWORK_WAIT_TIME);
 javaWfdbExec.setLogLevel(config.DEBUG_LEVEL);
 javaWfdbExec.setWFDB_PATH(config.WFDB_PATH);
