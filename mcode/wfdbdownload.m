@@ -58,11 +58,7 @@ for n=1:nargin
     end
 end
 
-persistent config 
-
-if(isempty(config))
-    [~,config]=wfdbloadlib;
-end
+[~,config]=wfdbloadlib;
 
 %Check if file exist  already, if exists in CACHE, exit
 file_info=dir([config.CACHE_DEST recordName '.*']);
