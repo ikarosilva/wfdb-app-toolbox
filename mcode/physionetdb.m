@@ -61,12 +61,9 @@ function varargout=physionetdb(varargin)
 
 %endOfHelp
 
-persistent isloaded config
+%Add classes to path
+[isloaded,config]=wfdbloadlib;
 
-if(isempty(isloaded) || ~isloaded)
-    %Add classes to path
-    [isloaded,config]=wfdbloadlib;
-end
 %URL to PhysioBank database in PhysioNet
 PHYSIONET_URL=config.CACHE_SOURCE;
 inputs={'db_name','DoBatchDownload','webBrowser'};
