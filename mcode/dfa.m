@@ -4,7 +4,7 @@ function [ln,lf]=dfa(varargin)
 %
 %
 % Wrapper to the DFA Algorithm in:
-%    http://www.physionet.org/physiotools/dfa/
+%    https://www.physionet.org/content/dfa/1.0.0/
 %
 % References: 
 % Peng C-K, Buldyrev SV, Havlin S, Simons M, Stanley HE, Goldberger AL. Mosaic organization of DNA nucleotides. Phys Rev E 1994;49:1685-1689.
@@ -55,11 +55,11 @@ function [ln,lf]=dfa(varargin)
 %
 % %Example:
 %
-%  gqrs('mitdb/117');
-%  [rr]=ann2rr('mitdb/117','qrs');
-%  [ln,lf]=dfa(rr);
-%  plot(ln,lf)
-
+% gqrs('mitdb/1.0.0/117');
+% [rr]=ann2rr('mitdb/1.0.0/117','qrs');
+% [ln,lf]=dfa(rr);
+% plot(ln,lf)
+%
 %
 %
 % See also MSENTROPY, SURROGATE
@@ -72,7 +72,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('dfa');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'x','p','integrateFlag','minBoxSize','maxBoxSize','slideWindowFlag'};
 p=[];
 integrateFlag=false;

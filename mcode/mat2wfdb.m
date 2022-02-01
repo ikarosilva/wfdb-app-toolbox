@@ -2,18 +2,18 @@ function [varargout]=mat2wfdb(varargin)
 %
 % [xbit]=mat2wfdb(X,fname,Fs,bit_res,adu,info,gain,sg_name,baseline,isquant, isdigital)
 %
-% Convert data from a matlab array into Physionet WFDB format file.
+% Convert data from a matlab array into PhysioNet WFDB format file.
 %
-% Input Paramater are:
+% Input Parameter are:
 %
 % X       -(required)  NxM matrix of M signals with N samples each. The
 %                      signals can be of type double.The signals are assumed to be
 %                      in physical units already and will be converted to
 %                      ADU.
 % fname   -(required)  String where the the header (*.hea) and data (*.dat)
-%          files will be saved (one single name for both, with no sufix).
+%          files will be saved (one single name for both, with no suffix).
 % Fs      -(Optional)  1x1 sampling frequency in Hz (all signals must have
-%          been sampled at the same frquency). Default is 1 Hz.
+%          been sampled at the same frequency). Default is 1 Hz.
 % bit_res -(Optional)  1xM (or Mx1):scalar determining the bit depth of the conversion for
 %                      each signal.
 %                      1x1 : If all the signals should have the same bit depth
@@ -42,7 +42,7 @@ function [varargout]=mat2wfdb(varargin)
 % sg_name -(Optional) Cell array of strings describing signal names.
 %
 % isquant   -(Optional) Logical value (default=0). Use this option if the
-%           input signal is already quantitized and you want to remove round-off
+%           input signal is already quantized and you want to remove round-off
 %           error by mapping the original values to integers prior to fixed
 %           point conversion. This field is only used for input physical
 %           signals. If 'isdigital' is set to 1, this field is ignored.
@@ -58,17 +58,17 @@ function [varargout]=mat2wfdb(varargin)
 %
 % Ouput Parameter:
 %
-% xbit    -(Optional)  NxM the quantitized signals that written to file (possible
+% xbit    -(Optional)  NxM the quantized signals that written to file (possible
 %          rescaled if no gain was provided at input). Useful for comparing
-%          and estimating quatitization error with the input double signal X
+%          and estimating quantization error with the input double signal X
 %          (see examples below).
 %
 %
 %  NOTE: The signals can have different amplitudes, they will all be scaled to
 %  a reference gain, with the scaling factor saved in the *.hea file.
 %
-%Written by Ikaro Silva 2010
-%Modified by Louis Mayaud 2011, Alistair Johson 2016
+% Written by Ikaro Silva 2010
+% Modified by Louis Mayaud 2011, Alistair Johnson 2016
 % Version 1.0
 %
 % Since 0.0.1
@@ -105,7 +105,7 @@ function [varargout]=mat2wfdb(varargin)
 % mat2wfdb(sig,'Ex1',Fs,[],adu,info)
 %
 % % %NOTE: If you have WFDB installed you can check the conversion by
-% % %uncomenting and this section and running (notice that all signals are scaled
+% % %uncommenting and this section and running (notice that all signals are scaled
 % % %to unit amplitude during conversion, with the header files keeping the gain info):
 %
 % % !rdsamp -r Ex1 > foo
@@ -134,9 +134,9 @@ gain=[];
 sg_name=[];
 x=[];
 fname=[];
-%Used to convert signal from double to appropiate type
+%Used to convert signal from double to appropriate type
 bit_res = 16 ;
-bit_res_suport=[8 16 32];
+bit_res_support=[8 16 32];
 
 for i=1:nargin
     if(~isempty(varargin{i}))
@@ -201,8 +201,8 @@ end
 if(isempty(sg_name))
     sg_name=repmat({''},[M 1]);
 end
-if ~isempty(setdiff(bit_res,bit_res_suport))
-    error(['Bit res should be one of: ' num2str(bit_res_suport)]);
+if ~isempty(setdiff(bit_res,bit_res_support))
+    error(['Bit res should be one of: ' num2str(bit_res_support)]);
 end
 if(isempty(baseline))
     baseline=cell(M,1); %Generate empty cells as default
@@ -361,7 +361,7 @@ else
             
         end
         if(isquant)
-            % The (non flatline) input signal was already quantitized. Remove round-off error 
+            % The (non flatline) input signal was already quantized. Remove round-off error
             % by setting the original values to integers prior to fixed point conversion
             
             xvalues=sort(unique(x(~isnan(x)))); % All the values of x

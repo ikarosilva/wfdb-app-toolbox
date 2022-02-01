@@ -3,7 +3,7 @@ function Y=surrogate(x,M)
 % Y=surrogate(x,M)
 %
 % Generates M amplitude adjusted phase shuffled surrogate time series from x. 
-% Useufel for testing the underlying assumption that the null hypothesis consists
+% Useful for testing the underlying assumption that the null hypothesis consists
 % of linear dynamics with possibly non-linear, monotonically increasing,
 % measurement function.
 %
@@ -25,7 +25,7 @@ function Y=surrogate(x,M)
 %
 % References:
 %
-%[1] Kaplan, Daniel, and Leon Glass. Understanding nonlinear dynamics. Vol. 19. Springer, 1995.
+% [1] Kaplan, Daniel, and Leon Glass. Understanding nonlinear dynamics. Vol. 19. Springer, 1995.
 %
 %
 % Written by Ikaro Silva, 2014
@@ -94,7 +94,7 @@ if(~mod(N,2))
     Y(mid+2:end)=conj(flipud(Y(2:mid)));
     Y(mid+1)=X(mid+1);
 else
-    %Odd series is fully symetric except for DC
+    %Odd series is fully symmetric except for DC
     Y(mid+1:end)=conj(flipud(Y(2:mid)));
 end
 

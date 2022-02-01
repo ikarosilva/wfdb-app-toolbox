@@ -9,11 +9,11 @@ function wfdbdemo()
 echo on;
 display('Reading samples ECG signal from MIT-BIH Arrhythmia Database');
 N=10000;
-[ecg,Fs,tm]=rdsamp('mitdb/100',1,N);
+[ecg,Fs,tm]=rdsamp('mitdb/1.0.0/100',1,N);
 
-display('Reading and plotting annotations (human labels) of QRS complexes performend on the signals');
+display('Reading and plotting annotations (human labels) of QRS complexes performed on the signals');
 %by cardiologists.
-[ann,type,subtype,chan,num]=rdann('mitdb/100','atr',1,N);
+[ann,type,subtype,chan,num]=rdann('mitdb/1.0.0/100','atr',1,N);
 
 %Plot 2D version of signal and labels
 figure;
@@ -22,8 +22,8 @@ plot(tm(ann(ann<N)+1),ecg(ann(ann<N)+1),'ro');
 
 
 %Stack the ECG signals based on the labeled QRSs
-display('Ploting 3D version of signal and labels');
-[RR,tms]=ann2rr('mitdb/100','atr',N);
+display('Plotting 3D version of signal and labels');
+[RR,tms]=ann2rr('mitdb/1.0.0/100','atr',N);
 delay=round(0.1/tm(2));
 M=length(RR);
 offset=0.3;
@@ -60,7 +60,7 @@ plot3(x,y,stack,'b');
 grid on;
 axis off;
 
-%Display information about databases availabe in PhysioNet
+%Display information about databases available in PhysioNet
 fprintf('**Querying PhysioNet for available databases...\n');
 db_list=physionetdb;
 db_size=length(db_list);

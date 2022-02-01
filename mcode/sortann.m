@@ -13,7 +13,7 @@ function varargout=sortann(varargin)
 % have used the outFile option.  
 % 
 %
-%Input Parameters:
+% Input Parameters:
 % recName    
 %       String specifying the WFDB record file.
 %
@@ -37,10 +37,10 @@ function varargout=sortann(varargin)
 % Version 1.0
 % Since 0.9.0
 %
-% %Example (this will generate a /mitdb/100.sortedATR file at your directory):
+% %Example (this will generate a /mitdb/1.0.0/100.sortedATR file at your directory):
 %
-% sortann('mitdb/100','atr',[],[],'sortedATR');
-% ann=rdann('mitdb/100','sortedATR');
+% sortann('mitdb/1.0.0/100','atr',[],[],'sortedATR');
+% ann=rdann('mitdb/1.0.0/100','sortedATR');
 %
 %
 % See also RDANN 
@@ -51,7 +51,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sortann');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','annName','beginTime','stopTime','outFile'};
 recName=[];
 annName=[];
@@ -67,16 +67,16 @@ end
 wfdb_argument={'-r',recName,'-a',annName};
 
 if(~isempty(beginTime))
-     wfdb_argument{end+1}='-f';
+    wfdb_argument{end+1}='-f';
     wfdb_argument{end+1}=beginTime;
 end
 if(~isempty(stopTime))
-     wfdb_argument{end+1}='-t';
+    wfdb_argument{end+1}='-t';
     wfdb_argument{end+1}=stopTime;
 end
 if(~isempty(outFile))
     wfdb_argument{end+1}='-o';
-     wfdb_argument{end+1}=outFile;
+    wfdb_argument{end+1}=outFile;
 end
 
 javaWfdbExec.execToStringList(wfdb_argument);

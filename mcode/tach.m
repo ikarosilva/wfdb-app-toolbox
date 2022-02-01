@@ -1,6 +1,6 @@
 function varargout=tach(varargin)
 %
-% [hr]=tach(recordName,annotator,N,N0,ouputSize)
+% [hr]=tach(recordName,annotator,N,N0,outputSize)
 %
 %    Wrapper to WFDB TACH:
 %         http://www.physionet.org/physiotools/wag/tach-1.htm
@@ -15,7 +15,7 @@ function varargout=tach(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -30,7 +30,7 @@ function varargout=tach(varargin)
 %       annotation file (default read all = N).
 % N0 
 %       A 1x1 integer specifying the sample number at which to start reading the 
-%       annotation file (default 1 = begining of the record).
+%       annotation file (default 1 = beginning of the record).
 %
 % outputSize
 %
@@ -45,9 +45,10 @@ function varargout=tach(varargin)
 %
 % Since 0.0.1
 %
-% %Example 1- Read a signal and annotaion from PhysioNet's Remote server:
-%[hr]=tach('challenge/2013/set-a/a01','fqrs'); 
-%plot(hr);grid on;hold on
+% %Example 1- Read a signal and annotation from PhysioNet's Remote server:
+% [hr]=tach('challenge-2013/1.0.0/set-a/a01','fqrs');
+% plot(hr);grid on;hold on
+%
 
 %endOfHelp
 persistent javaWfdbExec config
@@ -55,16 +56,24 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('tach');
 end
 
-%Set default pararamter values
-inputs={'recordName','annotator','N','N0','ouputSize'};
+%Set default parameter values
+inputs={'recordName','annotator','N','N0','outputSize'};
 outputs={'data(:,1)'};
 N=[];
 N0=1;
-ouputSize=[];
+outputSize=[];
 for n=1:nargin
     if(~isempty(varargin{n}))
         eval([inputs{n} '=varargin{n};']);
     end
+end
+
+%Cache record and annotation
+wfdbdownload(recordName);
+try
+    wfdbdownload([recordName '.' annotator]);
+catch
+    %Catch for future calls without need for annotation
 end
 
 N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
@@ -76,15 +85,15 @@ if(~isempty(N))
     wfdb_argument{end+1}=['s' num2str(N-1)];
 end
     
-if(~isempty(ouputSize))
+if(~isempty(outputSize))
     wfdb_argument{end+1}='-n';
-    wfdb_argument{end+1}=[num2str(ouputSize)];
+    wfdb_argument{end+1}=[num2str(outputSize)];
 end
 
 data=javaWfdbExec.execToDoubleArray(wfdb_argument);
 data=wfdbjava2mat(data);
 for n=1:nargout
-        eval(['varargout{n}=' outputs{n} ';']);
+    eval(['varargout{n}=' outputs{n} ';']);
 end
 
 

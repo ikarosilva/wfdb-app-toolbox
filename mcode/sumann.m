@@ -7,14 +7,14 @@ function varargout=sumann(varargin)
 %
 % Reads a WFDB annotation file and summarize its contents.
 % 
-% Ouput Parameters:
+% Output Parameters:
 %
 % report 
-%       String with the contaning summary of the contents, including the 
-%       number of annotations of each type as well the duration and number of 
-%      episodes of each rhythm and signal quality.
+%       String with the containing summary of the contents, including the
+%       number of annotations of each type as well the duration and number of
+%       episodes of each rhythm and signal quality.
 %
-%Input Parameters:
+% Input Parameters:
 % recName    
 %       String specifying the WFDB record file.
 %
@@ -34,9 +34,9 @@ function varargout=sumann(varargin)
 % Version 1.0
 % Since 0.9.0
 %
-% %Example (this will generate a /mitdb/100.qrs file at your directory):
+% %Example (this will generate a /mitdb/1.0.0/100.qrs file at your directory):
 %
-% report=sumann('mitdb/100','atr');
+% report=sumann('mitdb/1.0.0/100','atr');
 %
 %
 %
@@ -48,7 +48,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('sumann');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','annName','stopTime','qrsAnnotationsOnly'};
 recName=[];
 annName=[];
@@ -63,14 +63,14 @@ end
 wfdb_argument={'-r',recName,'-a',annName};
 
 if(~isempty(stopTime))
-     wfdb_argument{end+1}='-t';
+    wfdb_argument{end+1}='-t';
     wfdb_argument{end+1}=stopTime;
 end
 if(qrsAnnotationsOnly)
-     wfdb_argument{end+1}='-q';
+    wfdb_argument{end+1}='-q';
 end
 
 report=javaWfdbExec.execToStringList(wfdb_argument);
 if(nargout>0)
-   varargout{1}=report; 
+    varargout{1}=report;
 end

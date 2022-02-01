@@ -10,7 +10,7 @@ function varargout=wrann(varargin)
 % a PhysioNet web record , a subdirectory in the current directory, with
 % the relative path determined by recordName. The files will have the
 % name 'recordName" with the 'annotator' extension. You can use RDANN to
-% verify that the write was completed sucessfully (see example below).
+% verify that the write was completed successfully (see example below).
 %
 %
 %
@@ -32,12 +32,12 @@ function varargout=wrann(varargin)
 %
 % ann
 %       Nx1 integer vector containing the sample numbers of the annotations
-%       with respect to the begining of the record. Samples must be >=1.
+%       with respect to the beginning of the record. Samples must be >=1.
 %
 % anntype
 %       Nx1 (single) character vector, or single character, describing each annotation type. 
 %       Default is 'N'. For a list of standard annotation codes used by PhyioNet, 
-%       please see: http://www.physionet.org/physiobank/annotations.shtml
+%       please see: https://archive.physionet.org/physiobank/annotations.shtml
 %       If the description is longer than one character, use the 'comments'
 %       field.
 %
@@ -61,22 +61,22 @@ function varargout=wrann(varargin)
 % or 1x1. If they are 1x1, this function will repeat the element N times.
 %
 %
-%%Example- Creates a *.test file in your current directory
-%[ann,type,subtype,chan,num]=rdann('challenge/2013/set-a/a01','fqrs');
-% wrann('challenge/2013/set-a/a01','test',ann,type,subtype,chan,num)
+% %Example- Creates a *.test file in your current directory
+% [ann,type,subtype,chan,num]=rdann('challenge-2013/1.0.0/set-a/a01','fqrs');
+% wrann('challenge-2013/1.0.0/set-a/a01','test',ann,type,subtype,chan,num)
 %
 %
 % %Reading the file again should give the same results
-%[ann,type,subtype,chan,num]=rdann('challenge/2013/set-a/a01','fqrs');
-%wrann('challenge/2013/set-a/a01','test',ann,type,subtype,chan,num);
-%[ann2,type2,subtype2,chan2,num2]=rdann('challenge/2013/set-a/a01','test',[],[],1);
-%err=sum(ann ~= ann2)
+% [ann,type,subtype,chan,num]=rdann('challenge-2013/1.0.0/set-a/a01','fqrs');
+% wrann('challenge-2013/1.0.0/set-a/a01','test',ann,type,subtype,chan,num);
+% [ann2,type2,subtype2,chan2,num2]=rdann('challenge-2013/1.0.0/set-a/a01','test',[],[],1);
+% err=sum(ann ~= ann2)
 %
 %
 %
 % %Example 2
-%[ann,type,subtype,chan,num]=rdann('mitdb/100','atr');
-%wrann('mitdb/100','test',ann,type,subtype,chan,num);
+% [ann,type,subtype,chan,num]=rdann('mitdb/1.0.0/100','atr');
+% wrann('mitdb/1.0.0/100','test',ann,type,subtype,chan,num);
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: November 4, 2014
@@ -92,7 +92,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('wrann');
 end
 
-% Set default pararamter values
+% Set default parameter values
 inputs={'recordName','annotator','ann','annType','subType','chan','num','comments'};
 annType='N';
 subType=0;
@@ -117,7 +117,7 @@ if (min(ann)<0)
 end
 N=length(ann);
 
-% Convert all the annoation to 0 based index and then to strings
+% Convert all the annotation to 0 based index and then to strings
 ann=ann-1;
 ann=num2str(reshape(ann, [], 1));
 

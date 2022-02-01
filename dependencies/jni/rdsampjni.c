@@ -1,6 +1,6 @@
 /* Modified version of RDSAMP.C:
  *
- *http://www.physionet.org/physiotools/wfdb/app/rdsamp.c
+ *https://archive.physionet.org/physiotools/wfdb/app/rdsamp.c
  *
  *The modification are done in order to make it compatible and
  *efficient when called through JNI.

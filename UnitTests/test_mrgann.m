@@ -9,7 +9,7 @@ for n=1:nargin
 end
 
 %Test the examples 
-test_string={'wqrs(''mitdb/100'');mrgann(''mitdb/100'',''atr'',''wqrs'',''testAnn'')'};
+test_string={'wqrs(''mitdb/1.0.0/100'');mrgann(''mitdb/1.0.0/100'',''atr'',''wqrs'',''testAnn'')'};
 
 clean_up={['delete([pwd filesep ''mitdb'' filesep ''*'']);' ...
           'rmdir([pwd filesep ''mitdb''],''s'');';]};

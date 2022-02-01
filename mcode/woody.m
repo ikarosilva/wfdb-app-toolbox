@@ -7,12 +7,12 @@ function [out]=woody(x,varargin)
 %
 % x             Signal measurements. Each COLUMN represents
 %               and independent measure of the signal (or channel).
-% tol           Tolerance paremeter to stop average (default is 0.1)
+% tol           Tolerance parameter to stop average (default is 0.1)
 % max_it        Maximum number of iterations done on the average (default is 100).
 % est_mthd      Estimation method to use. Options are:
 %               'woody'     : classical approach (default)
 %               'thornton'  : implements the Thornton approach that is also useful for different noise sources.
-% xcorr_mthd    Determines what estimation method to use for the estimating the correlaation function using the
+% xcorr_mthd    Determines what estimation method to use for the estimating the correlation function using the
 %               XCORR function. Options are:
 %               'biased'   - scales the raw cross-correlation by 1/M.
 %               'unbiased' - scales the raw correlation by 1/(M-abs(lags)). (Default)
@@ -60,6 +60,7 @@ function [out]=woody(x,varargin)
 % subplot(212)
 % plot(s);hold on;plot(mean(S,2),'r');plot(wood,'g');plot(thor,'k')
 % legend('Signal','Normal Ave','Woody Ave','Thornton Ave');grid on
+%
 
 %endOfHelp
 %Default parameter values
@@ -92,7 +93,7 @@ if(nargin>1)
 end
 
 
-%Call repective averaging technique
+%Call respective averaging technique
 switch est_mthd
     
     case 'woody'
@@ -139,7 +140,7 @@ end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%End of Maing Function%%%%%%%%
+%%%%%%End of Main Function%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

@@ -1,17 +1,17 @@
 %  WaveForm DataBase (WFDB) Toolbox 
-% 
-%
-%This is a set of MATLAB functions and wrappers for reading, writing, and processing
-%files in the formats used by PhysioBank databases (among others). 
-%The WFDB Toolbox has support for reading public PhysioNet databases directly from 
-%web. This feature allows your code to analyze a wide range of physiological 
-%signals available from PhysioBank without the need to download entire 
-%records and to store them locally. This toolbox is distributed under the LGPL
-%license (see LICENSE.txt file in this directory). For more informationa about the
-%toolbox please go to: http://www.physionet.org 
 %
 %
-% 
+% This is a set of MATLAB functions and wrappers for reading, writing, and processing
+% files in the formats used by PhysioBank databases (among others).
+% The WFDB Toolbox has support for reading public PhysioNet databases directly from
+% web. This feature allows your code to analyze a wide range of physiological
+% signals available from PhysioBank without the need to download entire
+% records and to store them locally. This toolbox is distributed under the LGPL
+% license (see LICENSE.txt file in this directory). For more information about the
+% toolbox please go to: http://www.physionet.org
+%
+%
+%
 %
 %  Table of Contents (T0C)
 % -----------------------
@@ -120,7 +120,7 @@
 %   Tingting Zhu
 %   
 %
-%Created by Ikaro Silva 2012
+% Created by Ikaro Silva 2012
 
 %endOfHelp
 

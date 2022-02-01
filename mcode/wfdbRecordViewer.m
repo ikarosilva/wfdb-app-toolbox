@@ -145,9 +145,9 @@ switch ButtonName,
 end % switch
 
 
-set(handles.RecorListMenu,'String',records)
+set(handles.RecordListMenu,'String',records)
 current_record=current_tmp;
-set(handles.RecorListMenu,'Value',current_record)
+set(handles.RecordListMenu,'Value',current_record)
 if(isWorkspace==0)
     loadRecord(records{current_record},handles);
     loadAnnotationList(records{current_record},handles);
@@ -174,14 +174,14 @@ function PreviousButton_Callback(hObject, eventdata, handles)
 global current_record records
 
 current_record=current_record - 1;
-set(handles.RecorListMenu,'Value',current_record);
+set(handles.RecordListMenu,'Value',current_record);
 Refresh(hObject, eventdata, handles)
 
 
 function NextButton_Callback(hObject, eventdata, handles)
 global current_record records
 current_record=current_record + 1;
-set(handles.RecorListMenu,'Value',current_record);
+set(handles.RecordListMenu,'Value',current_record);
 Refresh(hObject, eventdata, handles)
 
 
@@ -215,16 +215,16 @@ end
 delete(handles.figure1)
 
 
-% --- Executes on selection change in RecorListMenu.
-function RecorListMenu_Callback(hObject, eventdata, handles)
+% --- Executes on selection change in RecordListMenu.
+function RecordListMenu_Callback(hObject, eventdata, handles)
 
 global current_record records
-current_record=get(handles.RecorListMenu,'Value');
+current_record=get(handles.RecordListMenu,'Value');
 Refresh(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function RecorListMenu_CreateFcn(hObject, eventdata, handles)
+function RecordListMenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end

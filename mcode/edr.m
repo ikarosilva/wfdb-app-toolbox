@@ -62,13 +62,13 @@ function y=edr(varargin)
 % please report bugs/questions at sara.mariani@wyss.harvard.edu
 %
 % Example - Extract EDR signal from ECG in PhysioNet's Remote server:
-% signal='fantasia/f1o02';
+% signal='fantasia/1.0.0/f1o02';
 % r_peaks='ecg';
 % data_type=1;
 % channel=2;
 % show=1;
 % y=edr(data_type,signal,r_peaks,[],[],[],channel,show);
-% wfdb2mat('f1o02')
+% %wfdb2mat(signal)
 % [~,signal,Fs,~]=rdmat('f1o02m');
 % resp=signal(:,1);
 % resp=resp-mean(resp);
@@ -83,10 +83,9 @@ function y=edr(varargin)
 % legend('edr','respiratory signal')
 % xlabel('time (s)')
 %
-% see also: ecgpuwave, gqrs
+% See also: ECGPUWAVE, GQRS
 
 %endOfHelp
-
 
 
 %Set default pararameter values
@@ -106,6 +105,9 @@ end
 for n=nargin+1:Ninputs
     eval([inputs{n} '=[];']);
 end
+
+%Cache record
+wfdbdownload(signal);
 
 % check format and obtain all the features I need
 if data_type==0 %matlab

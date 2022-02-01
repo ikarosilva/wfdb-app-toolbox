@@ -9,8 +9,8 @@ for n=1:nargin
 end
 
 %Test the examples 
-test_string={['[refAnn]=rdann(''mitdb/100'',''atr'');sqrs(''mitdb/100'');'...
-    '[testAnn]=rdann(''mitdb/100'',''qrs'');r=bxb(''mitdb/100'',''atr'',''qrs'',''bxbReport.txt'')']};
+test_string={['[refAnn]=rdann(''mitdb/1.0.0/100'',''atr'');sqrs(''mitdb/1.0.0/100'');'...
+    '[testAnn]=rdann(''mitdb/1.0.0/100'',''qrs'');r=bxb(''mitdb/1.0.0/100'',''atr'',''qrs'',''bxbReport.txt'')']};
 
 clean_up={['delete([pwd filesep ''mitdb'' filesep ''*'']);' ...
           'rmdir([pwd filesep ''mitdb''],''s'');delete([pwd filesep ''bxbReport.txt'']);';]};

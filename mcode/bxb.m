@@ -8,7 +8,7 @@ function varargout=bxb(varargin)
 % Creates a report file ("reportFile) using
 % ANSI/AAMI-standard beat-by-beat annotation comparator.
 %
-% Ouput Parameters:
+% Output Parameters:
 %
 % report (Optional)
 %       Returns a structure containing information on the 'reportFile'.
@@ -73,18 +73,18 @@ function varargout=bxb(varargin)
 % Version 1.1
 % Since 0.9.0
 %
-% %Example (this will generate a /mitdb/100.qrs file at your directory):
+% %Example (this will generate a /mitdb/1.0.0/100.qrs file at your directory):
 % %Compares SQRS detetor with the MITDB ATR annotations
 %
-% [refAnn]=rdann('mitdb/100','atr');
-% sqrs('mitdb/100');
-% [testAnn]=rdann('mitdb/100','qrs');
-% report=bxb('mitdb/100','atr','qrs','bxbReport.txt')
+% [refAnn]=rdann('mitdb/1.0.0/100','atr');
+% sqrs('mitdb/1.0.0/100');
+% [testAnn]=rdann('mitdb/1.0.0/100','qrs');
+% report=bxb('mitdb/1.0.0/100','atr','qrs','bxbReport.txt')
 %
 %
 % %Example 2 - Load variables from a report file that has been previously
 % %generated
-%  report=bxb([],[],[],'bxbReport.txt')
+% report=bxb([],[],[],'bxbReport.txt')
 %
 %
 % See also RDANN, MXM, WFDBTIME
@@ -96,7 +96,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('bxb');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recName','refAnn','testAnn','reportFile','beginTime','stopTime','matchWindow'};
 recName=[];
 refAnn=[];
@@ -112,9 +112,9 @@ for n=1:nargin
 end
 
 if(~isempty(recName))
-    %Only execute this if recName is defined, otherwise we assume 
-    %that the user just want to load the 'reporFile' variable into the 
-    %workspace based on a previously generated 'reportFile' 
+    %Only execute this if recName is defined, otherwise we assume
+    %that the user just want to load the 'reportFile' variable into the
+    %workspace based on a previously generated 'reportFile'
     wfdb_argument={'-r',recName,'-a',refAnn,testAnn,'-S',reportFile};
     if(~isempty(beginTime))
         wfdb_argument{end+1}='-f';

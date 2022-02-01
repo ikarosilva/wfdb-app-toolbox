@@ -15,17 +15,17 @@ function varargout=wfdbexec(varargin)
 % command, is not yet in implemented in the MATLAB wrapper. This function
 % may be useful for those wishing to do some debugging or performance comparisons.
 %
-% The user should be very carefull when using this command. The user should
+% The user should be very careful when using this command. The user should
 % be familiar with the input and output arguments of the native command
 % that he/she is using. In some cases, information about the command can be
 % obtained by running the command by itself, of with either '-h',
 % '-help','--help' as input arguments in order to access the command help
-% information. Offcourse, you can also look at the man page or source code
+% information. Of course, you can also look at the man page or source code
 % for the command at http://www.physionet.org/.
 %
 %
 %
-%Required Parameters:
+% Required Parameters:
 %
 % commandName
 %       String specifying the command to be called. To ge a list of
@@ -33,18 +33,18 @@ function varargout=wfdbexec(varargin)
 %       this function by itself:
 %               [nativeCommands]=wfdbexec();
 %
-%inputArguments
+% inputArguments
 %       Cell array of strings specifying the inputArguments to the command.
 %       Each command flag is an element on the cell array. Command flags
 %       that require additional parameters should be followed by another
-%       String element with the requied parameter(s). In cases you are
-%       usign a command that is already implemente in a MATLAB wrapper, it
+%       String element with the required parameter(s). In cases you are
+%       using a command that is already implements in a MATLAB wrapper, it
 %       maybe helpful to look at that command's MATLAB code.
 %
-%Optional Parameters:
+% Optional Parameters:
 %
 %       logLevel
-%       1x1 integer that specifies the logleve (verbosity) of the execution process.
+%       1x1 integer that specifies the log level (verbosity) of the execution process.
 %       Options are:
 %                     0 OFF (Default)
 %                     1 SEVERE
@@ -53,9 +53,9 @@ function varargout=wfdbexec(varargin)
 %                     4 FINEST
 %                     5 ALL
 %
-%Output:
+% Output:
 %
-%output
+% output
 %       Nx1 Cell array list of Strings.
 %
 %
@@ -77,6 +77,7 @@ function varargout=wfdbexec(varargin)
 % out=wfdbexec('rdsamp',{'-r','mitdb/100','-t','s5'})
 %
 % See also WFDB
+%
 
 %endOfHelp
 logLevel=[];
@@ -134,11 +135,14 @@ else
     end
     try
         %System call
-        varargout{1}=cell(javaWfdbExec.execToStringList(varargin{2}).toArray);
+        if length(varargin{2}) > 1
+            varargout{1}=cell(javaWfdbExec.execToStringList(varargin{2}).toArray);
+        else
+            varargout{1}=cell(javaWfdbExec.execWithStandardInput(varargin{2}).toArray);
+        end
         clear javaWfdbExec; %Clean-up to avoid leaked Java classes
     catch exception
         clear javaWfdbExec %Clean-up to avoid leaked Java classes
         rethrow(exception)
     end
-    
 end

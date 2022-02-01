@@ -9,6 +9,6 @@ for n=1:nargin
 end
 
 %Test the examples 
-test_string={'report=sumann(''mitdb/100'',''atr'');'};
+test_string={'report=sumann(''mitdb/1.0.0/100'',''atr'');'};
 clean_up={};
 [tests,pass,perf]=test_wrapper(test_string,clean_up,verbose);

@@ -6,8 +6,8 @@
  * (C) Copyright 2012, by Ikaro Silva
  *
  * Project Info:
- *    Code: http://code.google.com/p/wfdb-java/
- *    WFDB: http://www.physionet.org/physiotools/wfdb.shtml
+ *    Code: https://code.google.com/p/wfdb-java/
+ *    WFDB: https://archive.physionet.org/physiotools/wfdb.shtml
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by

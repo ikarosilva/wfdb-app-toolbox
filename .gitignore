@@ -27,7 +27,7 @@ fort.21
 /mcode/nativelibs/*/lib/*
 /mcode/nativelibs/*/lib64/*
 /mcode/nativelibs/*/share/*
-/mcode/html/*.html
+!/mcode/html/*.html
 !/mcode/html/template.html
 !/mcode/html/template_bottom.html
 /dependencies/jni/aclocal.m4

@@ -1,16 +1,17 @@
 function wfdb
 % wfdb
 %
-%Display list of all function available for the WFDB App Toolbox.
+% Display list of all function available for the WFDB App Toolbox.
 % 
-%Since 0.0.1
+% Since 0.0.1
 %
-%%Example:
-% wfdb
+% %Example:
+%  wfdb
 %
+% Written by Ikaro Silva 2012
+%
+
+%endOfHelp
+
 [~,config]=wfdbloadlib;
 help(config.MATLAB_PATH(1:end-1))
-%Display information regarding the WFDB Toolbox.
-%Written by Ikaro Silva 2012
-
-

@@ -28,7 +28,7 @@ function ecgpuwave(varargin)
 %
 % WARNING: 
 %   If ECGPUWAVE is used without providing an annotator file for the R peaks it relies on a Pan-Tompkins detector. 
-%   This detector may not be optimized for your particular signal, and thus may need to be tuned, yielding anempty annotation
+%   This detector may not be optimized for your particular signal, and thus may need to be tuned, yielding an empty annotation
 %   file. In this case, you may want to first run a QRS detector to generate an appropriate QRS annotation file, 
 %   which you can then check manually prior to calling ECGPUWAVE with the
 %   'qrsAnn' option described below.
@@ -70,7 +70,7 @@ function ecgpuwave(varargin)
 %      specifying the ending location.
 %
 % qrsAnn
-%       A String represengint the QRS annotation file that ECGPUWAVE should
+%       A String representing the QRS annotation file that ECGPUWAVE should
 %       use (must be in the WFDP PATH or within the current directory).
 %
 % pflag
@@ -87,14 +87,14 @@ function ecgpuwave(varargin)
 %
 % 
 % %Example - Will go into the WFDB directory of examples to load data
-%curdir=pwd;
-%[~,config]=wfdbloadlib;eval(['cd ' config.WFDB_JAVA_HOME filesep 'example'])
-%ecgpuwave('100s','test');
-%[signal,Fs,tm]=rdsamp('100s');
-%pwaves=rdann('100s','test',[],[],[],'p');
-%plot(tm,signal(:,1));hold on;grid on
-%plot(tm(pwaves),signal(pwaves),'or')
-%cd(curdir) %CD back to current directory
+% curdir=pwd;
+% [~,config]=wfdbloadlib;eval(['cd ' config.WFDB_JAVA_HOME filesep 'example'])
+% ecgpuwave('100s','test');
+% [signal,Fs,tm]=rdsamp('100s');
+% pwaves=rdann('100s','test',[],[],[],'p');
+% plot(tm,signal(:,1));hold on;grid on
+% plot(tm(pwaves),signal(pwaves),'or')
+% cd(curdir) %CD back to current directory
 %
 %
 % Since 0.9.5
@@ -109,7 +109,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('ecgpuwave');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','annFileName','startTime','stopTime','qrsAnn','pflag','signalList'};
 startTime=[];
 stopTime=[];

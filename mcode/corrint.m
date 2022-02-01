@@ -1,6 +1,6 @@
 function varargout=corrint(varargin)
 %
-% [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighboorSize,estimationMode,findScaling)
+% [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighborSize,estimationMode,findScaling)
 %
 % Correlation integral analysis of a time series. Based on:
 %
@@ -24,7 +24,7 @@ function varargout=corrint(varargin)
 %
 % timeStep
 %       1x1 Integer specifying time lag distance (in samples) within
-%       each point used in the embeddedDimm vector. For example, if embeddedDim
+%       each point used in the embeddedDim vector. For example, if embeddedDim
 %       is 3 and timeStep =2, then the embedded dimension vector will consists of
 %       3 samples separated by 2 samples each, covering a window of size of 7 samples.
 %
@@ -34,7 +34,7 @@ function varargout=corrint(varargin)
 %       the same neighborhood and used for either prediction, recurrence, or the
 %       estimation of the embedded dimension.
 %
-% neighboorSize
+% neighborSize
 %      1x1 Integer specifying the number of neighbors to be used for
 %      prediction and smoothing (see 'estimationMode' parameter).
 %
@@ -48,10 +48,10 @@ function varargout=corrint(varargin)
 %                                      regions.
 %                       'prediction'  -Predicts second half of the time
 %                                      series using the first half as a model
-%                                      and neighboorSize nearest points.
+%                                      and neighborSize nearest points.
 %                       'smooth'      -Predicts all point of the times
 %                                      series using all other points as a
-%                                      model and neighboorSize nearest
+%                                      model and neighborSize nearest
 %                                      points.
 %
 % findScaling
@@ -95,7 +95,7 @@ function varargout=corrint(varargin)
 %       1x1 double. Optional, variance of the prediction error divided by variance of the time series. 
 %
 %
-% %%% Beging Example %%%
+% %%% Begin Example %%%
 % 
 % N=500; %Number of points for each process
 % model_names={'linearModel','nonlinearModel'};
@@ -138,7 +138,7 @@ function varargout=corrint(varargin)
 %     R=xcorr(x-mean(x),'coeff');
 %     plot(R(round(N):end))
 %     eval(['legend(''' model_names{i} ''')'])
-%     title('Autocorelation'); xlabel('lag')
+%     title('Autocorrelation'); xlabel('lag')
 % end
 % 
 % %Plot Phase Plots
@@ -167,11 +167,11 @@ function varargout=corrint(varargin)
 %     surr_data=zeros(D,surrN);
 %     SURR=surrogate(x,surrN);
 %     for d=1:D;
-%         neighboorSize=K(d);
-%         [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighboorSize,estimationMode);
+%         neighborSize=K(d);
+%         [y1,y2,y3]=corrint(x,embeddedDim,timeLag,timeStep,distanceThreshold,neighborSize,estimationMode);
 %         err(d)=y3;
 %         for s=1:surrN
-%             [y1,y2,y3]=corrint(SURR(:,s),embeddedDim,timeLag,timeStep,distanceThreshold,neighboorSize,estimationMode);
+%             [y1,y2,y3]=corrint(SURR(:,s),embeddedDim,timeLag,timeStep,distanceThreshold,neighborSize,estimationMode);
 %             surr_data(d,s)=y3;
 %         end
 %     end
@@ -186,7 +186,7 @@ function varargout=corrint(varargin)
 %
 % %%% End Example %%%
 %
-% Written by Ikaro Silva, 20134
+% Written by Ikaro Silva, 2013
 % Last Modified: November 23, 2014
 % Version 1.0
 %
@@ -203,13 +203,13 @@ if(isempty(javaWfdbExec))
 end
 
 %Set default pararamter values
-inputs={'x','embeddedDim','timeLag','timeStep','distanceThreshold','neighboorSize','estimationMode','findScaling'};
+inputs={'x','embeddedDim','timeLag','timeStep','distanceThreshold','neighborSize','estimationMode','findScaling'};
 outputs={'y1','y2','y3'};
 embeddedDim=[];
 timeLag=[];
 timeStep=[];
 distanceThreshold=[];
-neighboorSize=[];
+neighborSize=[];
 estimationMode='recurrence';
 findScaling=0;
 wfdb_argument={};
@@ -237,9 +237,9 @@ if(~isempty(distanceThreshold))
     wfdb_argument{end+1}='-r';
     wfdb_argument{end+1}=num2str(distanceThreshold);
 end
-if(~isempty(neighboorSize))
+if(~isempty(neighborSize))
     wfdb_argument{end+1}='-n';
-    wfdb_argument{end+1}=num2str(neighboorSize);
+    wfdb_argument{end+1}=num2str(neighborSize);
 end
 
 switch estimationMode

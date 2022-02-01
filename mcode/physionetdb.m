@@ -4,13 +4,13 @@ function varargout=physionetdb(varargin)
 %
 %
 % Lists all the available databases at PhysioNet
-% (http://physionet.org/physiobank/) or list all available records in a database.
+% (https://physionet.org/data/) or list all available records in a database.
 % Users can read the signals (waveforms) or annotations (labels) using the WFDB
 % App Toolbox's functions such as RDSAMP. Options are
 %
 % Optional Input Parameters:
 % db_name
-%          String specifying the datbase to query for available records.
+%          String specifying the database to query for available records.
 %          If left empty (default) a list of available database names is
 %          returned. NOTE: Some databases (such as 'mimic2db') have a huge
 %          number of records so that querying the records in the database
@@ -24,7 +24,7 @@ function varargout=physionetdb(varargin)
 %          write permission to the current directory.
 %
 %          NOTE: This function currently does not perform any checksum in order
-%          to verify that the files were dwnloaded properly.
+%          to verify that the files were downloaded properly.
 %
 % webBrowserFlag
 %          Boolean. If true, displays database information in MATLAB's
@@ -49,14 +49,14 @@ function varargout=physionetdb(varargin)
 % %Example 2 - List all available databases from PhysioNet in web browser
 % physionetdb([],[],1)
 %
-% %Example 3- List all available records in the ucddb database.
-% db_list=physionetdb('ucddb')
+% %Example 3- List all available records in the ucddb database version 1.0.0.
+% db_list=physionetdb('ucddb/1.0.0')
 %
-% %Example 4- Download all records for database MITDB
-%  physionetdb('mitdb',1);
+% %Example 4- Download all records for database MITDB version 1.0.0
+% physionetdb('mitdb/1.0.0',1);
 %
-% %Example 5- List all records for database MITDB on a web browser
-% physionetdb('mitdb',[],1);
+% %Example 5- List all records for database MITDB version 1.0.0 on a web browser
+% physionetdb('mitdb/1.0.0',[],1);
 %
 
 %endOfHelp
@@ -92,7 +92,7 @@ if(isempty(db_name))
         varargout(1)={db_list};
     else
         if(webBrowser)
-            web([PHYSIONET_URL 'DBS']);
+            web([config.WFDB_DBLIST]);
         else
             for i=0:double(list.size)-1
                 fprintf(char(list.get(i).getDBInfo));
@@ -107,7 +107,7 @@ else
     end
     rec_list={};
     if(webBrowser)
-        web([PHYSIONET_URL 'pbi/' db_name]);
+        web([PHYSIONET_URL db_name]);
     else
         rec_list=deblank(urlread([PHYSIONET_URL db_name '/RECORDS']));
         rec_list=regexp(rec_list,'\s','split');

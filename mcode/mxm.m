@@ -8,7 +8,7 @@ function varargout=mxm(varargin)
 % ANSI/AAMI-standard measurement-by-measurement annotation comparator.
 %
 %
-%Input Parameters:
+% Input Parameters:
 % recName    
 %       String specifying the WFDB record file.
 %
@@ -45,7 +45,7 @@ function varargout=mxm(varargin)
 %      measurement error.
 %
 %
-%TODO: INCLUDE Example
+% TODO: INCLUDE Example
 %
 % Written by Ikaro Silva, 2013
 % Last Modified: -

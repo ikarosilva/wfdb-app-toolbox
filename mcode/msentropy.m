@@ -3,11 +3,11 @@ function varargout=msentropy(varargin)
 % [y,scale,info]=msentropy(x,dn,dm,dr,N,N0,minM,maxM,maxScale,minR,maxR)
 %
 %    Wrapper to the Multiscale Entropy C code written by Madalena Costa (mcosta@fas.harvard.edu):
-%         http://physionet.org/physiotools/mse/mse-1.htm
+%         https://archive.physionet.org/physiotools/mse/mse-1.htm
 %
 % Calculates the multi scale entropy of a signal 'x'. A tutorial on Mulsticale
 % entropy is available at:
-% http://www.physionet.org/physiotools/mse/tutorial/
+% https://archive.physionet.org/physiotools/mse/tutorial/
 %
 %
 % Please cite these publications when referencing this material:
@@ -24,7 +24,7 @@ function varargout=msentropy(varargin)
 % Required Parameters:
 %
 % x
-%       Nx1 vector of doubles in which to caculate the multiscale entropy.
+%       Nx1 vector of doubles in which to calculate the multiscale entropy.
 %
 % Optional Parameters are:
 % dn
@@ -40,11 +40,11 @@ function varargout=msentropy(varargin)
 %       1x1 integer. Begin the analysis with row N0.
 %       By default, analysis begins with row 1.
 % minM
-%       1x1 integer betwee 1-10. Set the minimum pattern length for SampEn to minN (1-10; default: 2).
+%       1x1 integer between 1-10. Set the minimum pattern length for SampEn to minN (1-10; default: 2).
 % maxM
-%        1x1 integer betwee 1-10. Set the maximum m to maxM (1-10; default: 2).
+%        1x1 integer between 1-10. Set the maximum m to maxM (1-10; default: 2).
 % maxScale
-%        1x1 integer betwee 1-40. Set the maximum scale for coarse-graining to maxScale (1-40; default: 20).
+%        1x1 integer between 1-40. Set the maximum scale for coarse-graining to maxScale (1-40; default: 20).
 % minR
 %        1x1 double >0. Set the minimum similarity criterion for SampEn to minR (>0; default: 0.15).
 % maxR
@@ -59,7 +59,7 @@ function varargout=msentropy(varargin)
 %       estimated.
 %
 % info
-%       An optional 3x1 cell array of strings providing loggin and verbose information from
+%       An optional 3x1 cell array of strings providing logging and verbose information from
 %       the calculation.
 %
 % Wrapper written by Ikaro Silva, 2013
@@ -72,15 +72,27 @@ function varargout=msentropy(varargin)
 % N=30000;
 % noise=randn(N,1);
 % maxScale=10;
-%[entropyNoise,scale1]=msentropy(noise,[],[],[],[],[],[],[],maxScale);
+% [entropyNoise,scale1]=msentropy(noise,[],[],[],[],[],[],[],maxScale);
 % %Simulate determistic system with noise-like 2nd order statistics
-% nlinear=zeros(N,1);nlinear(1)=0.2;u=4;
-% for n=2:N;nlinear(n)=u*nlinear(n-1)*(1-nlinear(n-1));end
-%[entropyDeterm,scale2]=msentropy(nlinear,[],[],[],[],[],[],[],maxScale);
-%subplot(2,1,1);
-%plot(noise(1:1000));hold on;grid on;plot(nlinear(1:1000),'r');legend('Stochastic','Deterministic')
-%subplot(2,1,2);
-%plot(scale1,entropyNoise);hold on;grid on;plot(scale2,entropyDeterm,'r');legend('Stochastic','Deterministic')
+% nlinear=zeros(N,1);
+% nlinear(1)=0.2;
+% u=4;
+% for n=2:N
+%     nlinear(n)=u*nlinear(n-1)*(1-nlinear(n-1));
+% end
+% [entropyDeterm,scale2]=msentropy(nlinear,[],[],[],[],[],[],[],maxScale);
+% subplot(2,1,1);
+% plot(noise(1:1000));
+% hold on;
+% grid on;
+% plot(nlinear(1:1000),'r');
+% legend('Stochastic','Deterministic')
+% subplot(2,1,2);
+% plot(scale1,entropyNoise);
+% hold on;
+% grid on;
+% plot(scale2,entropyDeterm,'r');
+% legend('Stochastic','Deterministic')
 %
 %
 % See also SURROGATE, DFA, WFDBDESC, PHYSIONETDB, RDANN, ANN2RR, MAPRECORD

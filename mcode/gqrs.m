@@ -7,12 +7,12 @@ function varargout=gqrs(varargin)
 %
 %    Creates a SQRS annotation file  at the current MATLAB directory.
 %    The detector algorithm is new and as yet unpublished.
-%    The annotation file will have the same name as the recorName file,
-%    but followed with the *.qrs suffix. Use RDANN to read the annoations
+%    The annotation file will have the same name as the recordName file,
+%    but followed with the *.qrs suffix. Use RDANN to read the annotations
 %    into MATLAB's workspace in order to read the sample QRS locations.
 %
 %    If recordName is the path to a record at PhysioNet's database, than
-%    the annation files will be stored in a subdirectory with the same relative
+%    the annotation files will be stored in a subdirectory with the same relative
 %    path as recordName and under the current directory.
 %
 %    NOTE: In order to read the generated annotation file using RDANN, it is
@@ -21,7 +21,7 @@ function varargout=gqrs(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -33,10 +33,10 @@ function varargout=gqrs(varargin)
 %       record file (default read all = N).
 % N0
 %       A 1x1 integer specifying the sample number at which to start reading the
-%       annotion file (default 1 = begining of the record).
+%       annotation file (default 1 = beginning of the record).
 %
 % signal
-%       A 1x1 integer. Specify the singal to obtain the annotation (default
+%       A 1x1 integer. Specify the signal to obtain the annotation (default
 %       = 1, first signal).
 %
 % threshold
@@ -45,7 +45,7 @@ function varargout=gqrs(varargin)
 %       if there are too many extra detections, increase threshold.
 %
 % outputName
-%       String. Save the ouput annotation file extension as *.outputName (default =
+%       String. Save the output annotation file extension as *.outputName (default =
 %       *.qrs).
 %
 % highResolution
@@ -63,9 +63,9 @@ function varargout=gqrs(varargin)
 %
 % %Example
 % N=5000;
-% gqrs('mitdb/100',N);
-% ann=rdann('mitdb/100','qrs',[],N);
-% [signal,Fs,tm]=rdsamp('mitdb/100',[],N);
+% gqrs('mitdb/1.0.0/100',N);
+% ann=rdann('mitdb/1.0.0/100','qrs',[],N);
+% [sig,Fs,tm]=rdsamp('mitdb/1.0.0/100',[],N);
 % plot(tm,sig(:,1));hold on;grid on
 % plot(tm(ann),sig(ann,1),'ro')
 
@@ -76,7 +76,7 @@ if(isempty(javaWfdbExec))
     javaWfdbExec=getWfdbClass('gqrs');
 end
 
-%Set default pararamter values
+%Set default parameter values
 inputs={'recordName','N','N0','signal','threshold','outputName','highResolution'};
 N=[];
 N0=1;
@@ -89,6 +89,9 @@ for n=1:nargin
         eval([inputs{n} '=varargin{n};']);
     end
 end
+
+%Cache record and annotation
+wfdbdownload(recordName);
 
 N0=num2str(N0-1); %-1 is necessary because WFDB is 0 based indexed.
 wfdb_argument={'-r',recordName,'-f',['s' N0]};

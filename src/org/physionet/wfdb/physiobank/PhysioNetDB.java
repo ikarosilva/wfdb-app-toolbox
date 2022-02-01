@@ -6,8 +6,8 @@
  * (C) Copyright 2012, by Ikaro Silva
  *
  * Project Info:
- *    Code: http://code.google.com/p/wfdb-java/
- *    WFDB: http://www.physionet.org/physiotools/wfdb.shtml
+ *    Code: https://code.google.com/p/wfdb-java/
+ *    WFDB: https://archive.physionet.org/physiotools/wfdb.shtml
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -45,17 +45,22 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
-public class PhysioNetDB {
 
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
+public class PhysioNetDB {
 	private String name;
 	private String info;
 	private URL url;
-	private static final String DB_URL="http://physionet.org/physiobank/database/pbi/";
-	private static final String DB_LIST="http://physionet.org/physiobank/database/DBS";
+	private static final String DB_URL="https://physionet.org/content/";
+	private static final String DB_LIST="https://physionet.org/rest/database-list/";
 	private ArrayList<PhysioNetRecord> dbRecordList;
 	private static Logger logger =
 			Logger.getLogger(PhysioNetRecord.class.getName());
-	
+
 	public PhysioNetDB(String Name){
 		name=Name;
 		url=setDBURL();
@@ -86,24 +91,44 @@ public class PhysioNetDB {
 		return url;
 	}
 
+	public static List<String> getDBInfo(String regex,String inputText){
+		List<String> dbInfoArray = new ArrayList<String>();
+		Matcher dbInfo = Pattern.compile(regex)
+			.matcher(inputText);
+		while (dbInfo.find()) {
+			dbInfoArray.add(dbInfo.group(1));
+		}
+		return dbInfoArray;
+	}
+
 	public static List<PhysioNetDB> getPhysioNetDBList(){
-		String inputLine;
+		String inputText;
 		BufferedReader in = null;
 		List<PhysioNetDB> physionetDBList = new ArrayList<PhysioNetDB>();
 		try {
 			URL oracle = new URL(DB_LIST);
 			in = new BufferedReader(
 					new InputStreamReader(oracle.openStream()));
-			String[] tmpStr;
-			String tmpname;
+			String tmpURL;
+			String tmpName;
 			String tmpInfo;
-			while ((inputLine = in.readLine()) != null){
-				logger.finest("\n\t***Reading URL: \n\t" + inputLine);
-				tmpStr=inputLine.split("\\t");
-				tmpname=tmpStr[0];
-				tmpInfo=(inputLine.replaceFirst(tmpname,"")).replaceAll("\\t","");
-				physionetDBList.add(new PhysioNetDB(tmpname,tmpInfo));
-			}			
+			// Get the database list using the REST API and parsing the
+			// resulting JSON format.. It should be a single line
+			inputText = in.readLine();
+			List<String> projectTitles = getDBInfo("\"title\": \"([^\"]*)",inputText);
+			List<String> projectVersions = getDBInfo("\"version\": \"([^\"]*)",inputText);
+			List<String> projectSlugs = getDBInfo("\"slug\": \"([^\"]*)",inputText);
+			List<String> projectURLs = new ArrayList<String>();
+			// All the arrays should be the same size
+			for(int i=0; i<projectTitles.size(); i++){
+				// Get the URL
+				tmpURL = DB_URL+projectSlugs.get(i)+"/"+projectVersions.get(i)+"/";
+				projectURLs.add(tmpURL);
+				logger.finest("\n\t***Reading URL: \n\t" + tmpURL);
+				tmpName=projectSlugs.get(i);
+				tmpInfo=projectTitles.get(i);
+				physionetDBList.add(new PhysioNetDB(tmpName,tmpInfo));
+			}
 			logger.fine("\n\t*** physionetDBList Size: \n\t" + 
 					physionetDBList.size());
 			in.close();
@@ -145,7 +170,7 @@ public class PhysioNetDB {
 		System.out.println("\tDescription: "+ info);
 		System.out.println("\tURL: "+ url);
 	}
-	
+
 	public String getDBInfo(){
 		String str=name + "\n\tDescription: "+ info + "\n\tURL: "+ url;
 		return str;
@@ -258,7 +283,7 @@ public class PhysioNetDB {
 	};
 
 	public static List<PhysioNetDB> main() {
-
+	
 		// Prints information regarding all databases
 		// Currently available at PhysioNet
 		return PhysioNetDB.getPhysioNetDBList();

@@ -1,6 +1,6 @@
 function wfdb2mat(varargin)
 %
-% wfdm2mat(recordName,signaList,N,N0)
+% wfdb2mat(recordName,signalList,N,N0)
 %
 %    Wrapper to WFDB WFDB2MAT:
 %         http://physionet.org/physiotools/wag/wfdb2m-1.htm
@@ -11,7 +11,7 @@ function wfdb2mat(varargin)
 %
 % Required Parameters:
 %
-% recorName
+% recordName
 %       String specifying the name of the record in the WFDB path or
 %       in the current directory.
 %
@@ -42,7 +42,7 @@ function wfdb2mat(varargin)
 % Since 0.9.7
 %
 % %Example:
-% wfdb2mat('mitdb/200')
+% wfdb2mat('mitdb/1.0.0/200')
 % [tm,signal,Fs,labels]=rdmat('200m');
 % 
 %
@@ -55,7 +55,7 @@ if(isempty(javaWfdbExec))
     [javaWfdbExec,config]=getWfdbClass('wfdb2mat');
 end
 
-%Set default pararameter values
+%Set default parameter values
 inputs={'recordName','signalList','N','N0'};
 signalList=[];
 N=[];
@@ -65,6 +65,9 @@ for n=1:nargin
         eval([inputs{n} '=varargin{n};']);
     end
 end
+
+%Cache record
+wfdbdownload(recordName);
 
 wfdb_argument={'-r',recordName,'-f',['s' num2str(N0-1)]};
 
@@ -82,5 +85,3 @@ if(~isempty(signalList))
 end
 
 data=javaWfdbExec.execToStringList(wfdb_argument);
-
-

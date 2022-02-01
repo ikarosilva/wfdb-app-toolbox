@@ -9,7 +9,7 @@ for n=1:nargin
 end
 
 %Test the examples 
-test_string={['[signal, Fs, tm]=rdsamp(''mitdb/100'',1);[ann]=rdann(''mitdb/100'',''atr'');[Pxx,F]=lomb([tm(ann) signal(ann)]);'...
+test_string={['[signal, Fs, tm]=rdsamp(''mitdb/1.0.0/100'',1);[ann]=rdann(''mitdb/1.0.0/100'',''atr'');[Pxx,F]=lomb([tm(ann) signal(ann)]);'...
     'plot(F,Pxx);grid on;hold on']};
 clean_up={};
 [tests,pass,perf]=test_wrapper(test_string,clean_up,verbose);

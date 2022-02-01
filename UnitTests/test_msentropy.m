@@ -9,7 +9,7 @@ for n=1:nargin
 end
 
 %Test the examples 
-test1_str=['[RR,tms]=ann2rr(''nsr2db/nsr047'',''ecg'');[y,scale]=msentropy(RR(1:1000));'];
+test1_str=['[RR,tms]=ann2rr(''nsr2db/1.0.0/nsr047'',''ecg'');[y,scale]=msentropy(RR(1:1000));'];
 test_string={test1_str}; 
 
 clean_up={['']};

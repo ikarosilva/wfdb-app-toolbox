@@ -3,7 +3,7 @@ function pbsearch
 % pbsearch()
 %
 %
-% Launches PhsyioNet's record search tool from within 
+% Launches PhysioNet's record search tool from within
 % MATLAB's web browser.
 %
 %
@@ -13,7 +13,7 @@ function pbsearch
 %
 % Since 0.9.8
 %
-% %Example - Launch MATLAB webrowser at PhsyioNet's record search tool
+% %Example - Launch MATLAB web browser at PhysioNet's record search tool
 %  pbsearch
 %
 % See also WFDBDESC, PHYSIONETDB
@@ -21,5 +21,4 @@ function pbsearch
 %endOfHelp
 
 
-
-web('http://physionet.org/cgi-bin/pbs/pbsearch?subject=&comp_op=&sval=&name_num=&help_on=on&res_action=&sq_action=')
+web('https://archive.physionet.org/cgi-bin/pbs/pbsearch?subject=&comp_op=&sval=&name_num=&help_on=on&res_action=&sq_action=')

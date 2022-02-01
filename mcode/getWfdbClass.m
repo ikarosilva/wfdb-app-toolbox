@@ -1,4 +1,4 @@
- function varargout=getWfdbClass(varargin)
+function varargout=getWfdbClass(varargin)
 %
 % wfdbClass=getWfdbClass(comandName)
 %
