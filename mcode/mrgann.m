@@ -60,10 +60,7 @@ function mrgann(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('mrgann');
-end
+javaWfdbExec=getWfdbClass('mrgann');
 
 %Set default pararamter values
 % [ann,type,subtype,chan,num]=rdann(recordName,annotator,C,N,N0)

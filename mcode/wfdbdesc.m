@@ -85,10 +85,7 @@ function varargout=wfdbdesc(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('wfdbdesc');
-end
+[javaWfdbExec,config]=getWfdbClass('wfdbdesc');
 
 %Set default pararamter values
 inputs={'recordName'};

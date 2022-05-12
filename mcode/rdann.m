@@ -98,11 +98,8 @@ function varargout=rdann(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('rdann');
-    [~,config]=wfdbloadlib;
-end
+javaWfdbExec=getWfdbClass('rdann');
+[~,config]=wfdbloadlib;
 
 %Set default pararamter values
 % [ann, anntype, subtype, chan, num, comments] = rdann(recordName, annotator, C, N, N0, AT)

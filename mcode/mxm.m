@@ -57,12 +57,7 @@ function varargout=mxm(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('mxm');
-end
+javaWfdbExec=getWfdbClass('mxm');
 
 %Set default pararamter values
 inputs={'recName','refAnn','testAnn','reportFile',...

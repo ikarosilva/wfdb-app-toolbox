@@ -50,12 +50,7 @@ function varargout=snip(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('xform');
-end
+javaWfdbExec=getWfdbClass('xform');
 
 %Set default pararamter values
 

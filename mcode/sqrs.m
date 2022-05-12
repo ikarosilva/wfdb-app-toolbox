@@ -58,10 +58,7 @@ function varargout=sqrs(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('sqrs');
-end
+javaWfdbExec=getWfdbClass('sqrs');
 
 %Set default pararamter values
 inputs={'recordName','annotator','N','N0','signal','threshold'};

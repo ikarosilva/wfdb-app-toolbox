@@ -75,6 +75,13 @@ networkWaitTime=1000;
 
 %%%% END OF SYSTEM WIDE CONFIGURATION PARAMETERS
 
+%If called without arguments, keep the current configuration.
+%Explicit arguments override the default settings above.
+if(~isempty(config))
+    debugLevel=config.DEBUG_LEVEL;
+    networkWaitTime=config.NETWORK_WAIT_TIME;
+end
+
 inputs={'debugLevel','networkWaitTime'};
 for n=1:nargin
     if(~isempty(varargin{n}))
@@ -146,8 +153,6 @@ if(isempty(config))
         config.MATLAB_PATH=strrep(which('wfdbloadlib'),'wfdbloadlib.m','');
         wver=regexp(wfdb_path,fsep,'split');
         config.WFDB_JAVA_VERSION=wver{end};
-        config.DEBUG_LEVEL=debugLevel;
-        config.NETWORK_WAIT_TIME=networkWaitTime;
         config.MATLAB_ARCH=computer('arch');
         %Remove empty spaces from arch name
         del=strfind(config.osName,' ');
@@ -199,6 +204,9 @@ if(isempty(config))
     setenv('WFDBCAL',config.WFDBCAL);
 end
 
+%Set dynamic configuration parameters
+config.DEBUG_LEVEL=debugLevel;
+config.NETWORK_WAIT_TIME=networkWaitTime;
 
 outputs={'isloaded','config'};
 for n=1:nargout

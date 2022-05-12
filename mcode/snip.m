@@ -55,11 +55,8 @@ function varargout=snip(varargin)
 
 
 %endOfHelp
-persistent javaWfdbExec
 
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('snip');
-end
+javaWfdbExec=getWfdbClass('snip');
 
 %Set default pararamter values
 

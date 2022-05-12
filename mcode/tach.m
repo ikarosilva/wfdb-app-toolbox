@@ -50,10 +50,8 @@ function varargout=tach(varargin)
 %plot(hr);grid on;hold on
 
 %endOfHelp
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('tach');
-end
+
+[javaWfdbExec,config]=getWfdbClass('tach');
 
 %Set default pararamter values
 inputs={'recordName','annotator','N','N0','ouputSize'};

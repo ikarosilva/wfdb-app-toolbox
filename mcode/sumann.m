@@ -43,10 +43,8 @@ function varargout=sumann(varargin)
 % See also RDANN, MXM, WFDBTIME, BXB
 
 %endOfHelp
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('sumann');
-end
+
+javaWfdbExec=getWfdbClass('sumann');
 
 %Set default pararamter values
 inputs={'recName','annName','stopTime','qrsAnnotationsOnly'};

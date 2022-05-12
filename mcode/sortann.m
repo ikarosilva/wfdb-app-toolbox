@@ -46,10 +46,8 @@ function varargout=sortann(varargin)
 % See also RDANN 
 
 %endOfHelp
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('sortann');
-end
+
+javaWfdbExec=getWfdbClass('sortann');
 
 %Set default pararamter values
 inputs={'recName','annName','beginTime','stopTime','outFile'};

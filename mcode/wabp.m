@@ -79,10 +79,8 @@ function varargout=wabp(varargin)
 %
 
 %endOfHelp
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    [javaWfdbExec]=getWfdbClass('wabp');
-end
+
+[javaWfdbExec]=getWfdbClass('wabp');
 
 %Set default pararamter values
 inputs={'recName','beginTime','stopTime','resample','signal'};

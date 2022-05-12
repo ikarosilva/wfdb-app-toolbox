@@ -68,10 +68,7 @@ function varargout=lomb(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec
-if(isempty(javaWfdbExec))
-    javaWfdbExec=getWfdbClass('lomb');
-end
+javaWfdbExec=getWfdbClass('lomb');
 
 %Set default pararamter values
 %[Pxx,F]

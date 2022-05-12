@@ -197,10 +197,7 @@ function varargout=corrint(varargin)
 
 %endOfHelp
 
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('corrint');
-end
+[javaWfdbExec,config]=getWfdbClass('corrint');
 
 %Set default pararamter values
 inputs={'x','embeddedDim','timeLag','timeStep','distanceThreshold','neighboorSize','estimationMode','findScaling'};

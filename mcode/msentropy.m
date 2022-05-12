@@ -86,10 +86,8 @@ function varargout=msentropy(varargin)
 % See also SURROGATE, DFA, WFDBDESC, PHYSIONETDB, RDANN, ANN2RR, MAPRECORD
 
 %endOfHelp
-persistent javaWfdbExec config
-if(isempty(javaWfdbExec))
-    [javaWfdbExec,config]=getWfdbClass('mse');
-end
+
+[javaWfdbExec,config]=getWfdbClass('mse');
 
 %Set default pararamter values
 inputs={'x','dn','dm','dr','N','N0','minM','maxM','maxScale','minR','maxR'};
