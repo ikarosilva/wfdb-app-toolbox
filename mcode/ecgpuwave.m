@@ -38,7 +38,7 @@ function ecgpuwave(varargin)
 %     order to compile ECGPUWAVE in 64-bit arch. This patch requires
 %     compiling the source code with gfortran (g77 is not supported in gcc 4.x), which can
 %     yield slighly different results. For more information please see:
-%           http://www.dti.unimi.it/~sassi/software/wfdb64HowTo.htm
+%           http://homes.di.unimi.it/sassi/software/wfdb64HowTo.htm
 %
 %
 %
