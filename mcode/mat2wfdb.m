@@ -251,7 +251,7 @@ for m=1:M
     % Header file signal specification lines
     % Should we specify precision of num2str(gain)?
     head_str(m+1)={[fname '.dat ' fmt ' ' num2str(bit_gain) '(' ...
-        num2str(baseline_tmp) ')/' adu{m} ' ' '0 0 ' num2str(tmp_bit1(1)) ' ' num2str(ck_sum) ' 0 ' sg_name{m}]};
+        num2str(baseline_tmp) ')/' adu{m} ' ' num2str(bit_res) ' 0 ' num2str(tmp_bit1(1)) ' ' num2str(ck_sum) ' 0 ' sg_name{m}]};
 end
 if(length(y)<1)
     error(['Converted data is empty. Exiting without saving file...']);
