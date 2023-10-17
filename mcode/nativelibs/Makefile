@@ -19,21 +19,21 @@ host=custom
 
 #Package names and versions
 
-CURL_PKG=curl-7.64.0
+CURL_PKG=curl-7.75.0
 CURL_ARCHIVE=$(CURL_PKG).tar.gz
 CURL_SOURCE=http://curl.haxx.se/download/$(CURL_ARCHIVE)
-CURL_SHA256=cb90d2eb74d4e358c1ed1489f8e3af96b50ea4374ad71f143fa4595e998d81b5
+CURL_SHA256=4d51346fe621624c3e4b9f86a8fd6f122a143820e17889f59c18f245d2d8e7a6
 
-WFDB_PKG=wfdb-10.6.0
+WFDB_PKG=wfdb-10.6.2b
 WFDB_ARCHIVE=$(WFDB_PKG).tar.gz
-WFDB_SOURCE=http://www.physionet.org/physiotools/archives/wfdb-10.6/$(WFDB_ARCHIVE)
-WFDB_SHA256=6b2bcc76e0e613b91c30d6f825c087895ff7f76d50664f8f367b4008f82709fd
+WFDB_SOURCE=https://github.com/bemoody/wfdb/archive/10.6.2b.tar.gz
+WFDB_SHA256=09d0f0285d169e915d93a148ad4c7b09fd623806800fa796c9df6a4c25a2187a
 WFDB_MAJOR=10
 
-ECGPUWAVE_PKG=ecgpuwave-1.3.3
+ECGPUWAVE_PKG=ecgpuwave-1.3.4
 ECGPUWAVE_ARCHIVE=$(ECGPUWAVE_PKG).tar.gz
 ECGPUWAVE_SOURCE=http://www.physionet.org/physiotools/ecgpuwave/src/$(ECGPUWAVE_ARCHIVE)
-ECGPUWAVE_SHA256=900ead3cc1495d0095f3fa8ca123bf695a73b4799108bf9a0b6b79feff79df54
+ECGPUWAVE_SHA256=ba73dc315350bda22d57f1632c4bc676be1eb70bc7f76c469468517de993ab9d
 
 EDR_SOURCE=http://www.physionet.org/physiotools/edr/edr-1.0.c
 EDR_SHA256=c1a07750291c9c9172786e1d9c3b9d171bd198dfd27f4b5115ed1c890615c131
